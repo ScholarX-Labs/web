@@ -11,54 +11,42 @@ importers:
       '@base-ui/react':
         specifier: ^1.2.0
         version: 1.2.0(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
-<<<<<<< HEAD
       '@better-auth/drizzle-adapter':
         specifier: ^1.5.4
         version: 1.5.4(@better-auth/core@1.5.4(@better-auth/utils@0.3.1)(@better-fetch/fetch@1.1.21)(better-call@1.3.2(zod@4.3.6))(jose@6.1.3)(kysely@0.28.11)(nanostores@1.1.1))(@better-auth/utils@0.3.1)(drizzle-orm@0.45.1(@electric-sql/pglite@0.3.15)(@prisma/client@7.4.2(prisma@7.4.2(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.3))(typescript@5.9.3))(@types/pg@8.18.0)(kysely@0.28.11)(mysql2@3.15.3)(pg@8.20.0)(postgres@3.4.7)(prisma@7.4.2(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.3)))
       '@hookform/resolvers':
         specifier: ^5.2.2
         version: 5.2.2(react-hook-form@7.71.2(react@19.2.3))
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
       '@tanstack/react-query':
         specifier: ^5.90.21
         version: 5.90.21(react@19.2.3)
       axios:
         specifier: ^1.13.5
         version: 1.13.5
-<<<<<<< HEAD
       better-auth:
         specifier: ^1.5.4
         version: 1.5.4(@prisma/client@7.4.2(prisma@7.4.2(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.3))(typescript@5.9.3))(drizzle-kit@0.31.9)(drizzle-orm@0.45.1(@electric-sql/pglite@0.3.15)(@prisma/client@7.4.2(prisma@7.4.2(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.3))(typescript@5.9.3))(@types/pg@8.18.0)(kysely@0.28.11)(mysql2@3.15.3)(pg@8.20.0)(postgres@3.4.7)(prisma@7.4.2(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.3)))(mongodb@7.1.0)(mysql2@3.15.3)(next@16.1.6(@babel/core@7.29.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(pg@8.20.0)(prisma@7.4.2(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
-<<<<<<< HEAD
       dotenv:
         specifier: ^17.3.1
         version: 17.3.1
       drizzle-orm:
         specifier: ^0.45.1
         version: 0.45.1(@electric-sql/pglite@0.3.15)(@prisma/client@7.4.2(prisma@7.4.2(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.3))(typescript@5.9.3))(@types/pg@8.18.0)(kysely@0.28.11)(mysql2@3.15.3)(pg@8.20.0)(postgres@3.4.7)(prisma@7.4.2(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.3))
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
       lucide-react:
         specifier: ^0.575.0
         version: 0.575.0(react@19.2.3)
       next:
         specifier: 16.1.6
         version: 16.1.6(@babel/core@7.29.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
-<<<<<<< HEAD
       pg:
         specifier: ^8.20.0
         version: 8.20.0
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
       radix-ui:
         specifier: ^1.4.3
         version: 1.4.3(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -68,12 +56,9 @@ importers:
       react-dom:
         specifier: 19.2.3
         version: 19.2.3(react@19.2.3)
-<<<<<<< HEAD
       react-hook-form:
         specifier: ^7.71.2
         version: 7.71.2(react@19.2.3)
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
       shadcn:
         specifier: ^3.8.5
         version: 3.8.5(@types/node@20.19.33)(typescript@5.9.3)
@@ -83,12 +68,9 @@ importers:
       tw-animate-css:
         specifier: ^1.4.0
         version: 1.4.0
-<<<<<<< HEAD
       zod:
         specifier: ^4.3.6
         version: 4.3.6
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
     devDependencies:
       '@tailwindcss/postcss':
         specifier: ^4
@@ -288,7 +270,6 @@ packages:
       '@types/react':
         optional: true
 
-<<<<<<< HEAD
   '@better-auth/core@1.5.4':
     resolution: {integrity: sha512-k5AdwPRQETZn0vdB60EB9CDxxfllpJXKqVxTjyXIUSRz7delNGlU0cR/iRP3VfVJwvYR1NbekphBDNo+KGoEzQ==}
     peerDependencies:
@@ -361,25 +342,19 @@ packages:
   '@chevrotain/utils@10.5.0':
     resolution: {integrity: sha512-hBzuU5+JjB2cqNZyszkDHZgOSrUUT8V3dhgRl8Q9Gp6dAj/H5+KILGjbhDpc3Iy9qmqlm/akuOI2ut9VUtzJxQ==}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   '@dotenvx/dotenvx@1.52.0':
     resolution: {integrity: sha512-CaQcc8JvtzQhUSm9877b6V4Tb7HCotkcyud9X2YwdqtQKwgljkMRwU96fVYKnzN3V0Hj74oP7Es+vZ0mS+Aa1w==}
     hasBin: true
 
-<<<<<<< HEAD
   '@drizzle-team/brocli@0.10.2':
     resolution: {integrity: sha512-z33Il7l5dKjUgGULTqBsQBQwckHh5AbIuxhdsIxDDiZAzBOrZO6q9ogcWC65kU382AfynTfgNumVcNIjuIua6w==}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   '@ecies/ciphers@0.2.5':
     resolution: {integrity: sha512-GalEZH4JgOMHYYcYmVqnFirFsjZHeoGMDt9IxEnM9F7GRUUyUksJ7Ou53L83WHJq3RWKD3AcBpo0iQh0oMpf8A==}
     engines: {bun: '>=1', deno: '>=2', node: '>=16'}
     peerDependencies:
       '@noble/ciphers': ^1.0.0
 
-<<<<<<< HEAD
   '@electric-sql/pglite-socket@0.0.20':
     resolution: {integrity: sha512-J5nLGsicnD9wJHnno9r+DGxfcZWh+YJMCe0q/aCgtG6XOm9Z7fKeite8IZSNXgZeGltSigM9U/vAWZQWdgcSFg==}
     hasBin: true
@@ -394,8 +369,6 @@ packages:
   '@electric-sql/pglite@0.3.15':
     resolution: {integrity: sha512-Cj++n1Mekf9ETfdc16TlDi+cDDQF0W7EcbyRHYOAeZdsAe8M/FJg18itDTSwyHfar2WIezawM9o0EKaRGVKygQ==}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   '@emnapi/core@1.8.1':
     resolution: {integrity: sha512-AvT9QFpxK0Zd8J0jopedNm+w/2fIzvtPKPjqyw9jwvBaReTTqPBk9Hixaz7KbjimP+QNz605/XnjFcDAL2pqBg==}
 
@@ -916,14 +889,11 @@ packages:
     peerDependencies:
       hono: ^4
 
-<<<<<<< HEAD
   '@hookform/resolvers@5.2.2':
     resolution: {integrity: sha512-A/IxlMLShx3KjV/HeTcTfaMxdwy690+L/ZADoeaTltLx+CVuzkeVIPuybK3jrRfw7YZnmdKsVVHAlEPIAEUNlA==}
     peerDependencies:
       react-hook-form: ^7.55.0
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
     engines: {node: '>=18.18.0'}
@@ -1154,7 +1124,6 @@ packages:
       '@cfworker/json-schema':
         optional: true
 
-<<<<<<< HEAD
   '@mongodb-js/saslprep@1.4.6':
     resolution: {integrity: sha512-y+x3H1xBZd38n10NZF/rEBlvDOOMQ6LKUTHqr8R9VkJ+mmQOYtJFxIlkkK8fZrtOiL6VixbOBWMbZGBdal3Z1g==}
 
@@ -1162,8 +1131,6 @@ packages:
     resolution: {integrity: sha512-XyroGQXcHrZdvmrGJvsA9KNeOOgGMg1Vg9OlheUsBOSKznLMDl+YChxbkboRHvtFYJEMRYmlV3uoo/njCw05iw==}
     engines: {node: '>=16'}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   '@mswjs/interceptors@0.41.3':
     resolution: {integrity: sha512-cXu86tF4VQVfwz8W1SPbhoRyHJkti6mjH/XJIxp40jhO4j2k1m4KYrEykxqWPkFF3vrK4rgQppBh//AwyGSXPA==}
     engines: {node: '>=18'}
@@ -1233,13 +1200,10 @@ packages:
     resolution: {integrity: sha512-2I0gnIVPtfnMw9ee9h1dJG7tp81+8Ob3OJb3Mv37rx5L40/b0i7djjCVvGOVqc9AEIQyvyu1i6ypKdFw8R8gQw==}
     engines: {node: ^14.21.3 || >=16}
 
-<<<<<<< HEAD
   '@noble/ciphers@2.1.1':
     resolution: {integrity: sha512-bysYuiVfhxNJuldNXlFEitTVdNnYUc+XNJZd7Qm2a5j1vZHgY+fazadNFWFaMK/2vye0JVlxV3gHmC0WDfAOQw==}
     engines: {node: '>= 20.19.0'}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   '@noble/curves@1.9.7':
     resolution: {integrity: sha512-gbKGcRUYIjA3/zCCNaWDciTMFI0dCkvou3TL8Zmy5Nc7sJ47a0jtOeZoTaMxkuqRo9cRhjOdZJXegxYE5FN/xw==}
     engines: {node: ^14.21.3 || >=16}
@@ -1248,13 +1212,10 @@ packages:
     resolution: {integrity: sha512-jCs9ldd7NwzpgXDIf6P3+NrHh9/sD6CQdxHyjQI+h/6rDNo88ypBxxz45UDuZHz9r3tNz7N/VInSVoVdtXEI4A==}
     engines: {node: ^14.21.3 || >=16}
 
-<<<<<<< HEAD
   '@noble/hashes@2.0.1':
     resolution: {integrity: sha512-XlOlEbQcE9fmuXxrVTXCTlG2nlRXa9Rj3rr5Ue/+tX+nmkgbX720YHh0VR3hBF9xDvwnb8D2shVGOwNx+ulArw==}
     engines: {node: '>= 20.19.0'}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
     engines: {node: '>= 8'}
@@ -1280,7 +1241,6 @@ packages:
   '@open-draft/until@2.1.0':
     resolution: {integrity: sha512-U69T3ItWHvLwGg5eJ0n3I62nWuE6ilHlmz7zM0npLBRvPRd7e6NYmg54vvRtP5mZG7kZqZCFVdsTWo7BPtBujg==}
 
-<<<<<<< HEAD
   '@prisma/client-runtime-utils@7.4.2':
     resolution: {integrity: sha512-cID+rzOEb38VyMsx5LwJMEY4NGIrWCNpKu/0ImbeooQ2Px7TI+kOt7cm0NelxUzF2V41UVVXAmYjANZQtCu1/Q==}
 
@@ -1333,8 +1293,6 @@ packages:
       react: ^18.0.0 || ^19.0.0
       react-dom: ^18.0.0 || ^19.0.0
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   '@radix-ui/number@1.1.1':
     resolution: {integrity: sha512-MkKCwxlXTgz6CFoJx3pCwn07GKp36+aZyu/u2Ln2VrA5DcdyCZkASEDBTd8x5whTQQL5CiYf4prXKLcgQdv29g==}
 
@@ -2035,15 +1993,12 @@ packages:
     resolution: {integrity: sha512-tlqY9xq5ukxTUZBmoOp+m61cqwQD5pHJtFY3Mn8CA8ps6yghLH/Hw8UPdqg4OLmFW3IFlcXnQNmo/dh8HzXYIQ==}
     engines: {node: '>=18'}
 
-<<<<<<< HEAD
   '@standard-schema/spec@1.1.0':
     resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==}
 
   '@standard-schema/utils@0.3.0':
     resolution: {integrity: sha512-e7Mew686owMaPJVNNLs55PUvgz371nKgwsc4vxE49zsODpJEnxgxRo2y/OKrqueavXgZNMDVj3DdHFlaSAeU8g==}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   '@swc/helpers@0.5.15':
     resolution: {integrity: sha512-JQ5TuMi45Owi4/BIMAJBoSQoOJu12oOk/gADqlcUL9JEdHB8vyjUSsxqeNXnmXHjYKMi2WcYtezGEEhqUI/E2g==}
 
@@ -2182,15 +2137,12 @@ packages:
   '@types/validate-npm-package-name@4.0.2':
     resolution: {integrity: sha512-lrpDziQipxCEeK5kWxvljWYhUvOiB2A9izZd9B2AFarYAkqZshb4lPbRs7zKEic6eGtH8V/2qJW+dPp9OtF6bw==}
 
-<<<<<<< HEAD
   '@types/webidl-conversions@7.0.3':
     resolution: {integrity: sha512-CiJJvcRtIgzadHCYXw7dqEnMNRjhGZlYK05Mj9OyktqV8uVT8fD2BFOB7S1uwBE3Kj2Z+4UyPmFw/Ixgw/LAlA==}
 
   '@types/whatwg-url@13.0.0':
     resolution: {integrity: sha512-N8WXpbE6Wgri7KUSvrmQcqrMllKZ9uxkYWMt+mCSGwNc0Hsw9VQTW7ApqI4XNrx6/SaM2QQJCzMPDEXE058s+Q==}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   '@typescript-eslint/eslint-plugin@8.56.0':
     resolution: {integrity: sha512-lRyPDLzNCuae71A3t9NEINBiTn7swyOhvUj3MyUOxb8x6g6vPEFoOU+ZRmGMusNC3X3YMhqMIX7i8ShqhT74Pw==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
@@ -2489,7 +2441,6 @@ packages:
     engines: {node: '>=6.0.0'}
     hasBin: true
 
-<<<<<<< HEAD
   better-auth@1.5.4:
     resolution: {integrity: sha512-ReykcEKx6Kp9560jG1wtlDBnftA7L7xb3ZZdDWm5yGXKKe2pUf+oBjH0fqekrkRII0m4XBVQbQ0mOrFv+3FdYg==}
     peerDependencies:
@@ -2560,8 +2511,6 @@ packages:
       zod:
         optional: true
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   body-parser@2.2.2:
     resolution: {integrity: sha512-oP5VkATKlNwcgvxi0vM0p/D3n2C3EReYVX+DNYs5TjZFn/oQt2j+4sVJtSMr18pdRr8wjTcBl6LoV+FUwzPmNA==}
     engines: {node: '>=18'}
@@ -2582,7 +2531,6 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
 
-<<<<<<< HEAD
   bson@7.2.0:
     resolution: {integrity: sha512-YCEo7KjMlbNlyHhz7zAZNDpIpQbd+wOEHJYezv0nMYTn4x31eIUM2yomNNubclAt63dObUzKHWsBLJ9QcZNSnQ==}
     engines: {node: '>=20.19.0'}
@@ -2590,8 +2538,6 @@ packages:
   buffer-from@1.1.2:
     resolution: {integrity: sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   bundle-name@4.1.0:
     resolution: {integrity: sha512-tjwM5exMg6BGRI+kNmTntNsvdZS1X8BFYS6tnJ2hdH0kVxM6/eVZ2xy+FqStSWvYmtfFMDLIxurorHwDKfDz5Q==}
     engines: {node: '>=18'}
@@ -2600,7 +2546,6 @@ packages:
     resolution: {integrity: sha512-/Nf7TyzTx6S3yRJObOAV7956r8cr2+Oj8AC5dt8wSP3BQAoeX58NoHyCU8P8zGkNXStjTSi6fzO6F0pBdcYbEg==}
     engines: {node: '>= 0.8'}
 
-<<<<<<< HEAD
   c12@3.1.0:
     resolution: {integrity: sha512-uWoS8OU1MEIsOv8p/5a82c3H31LsWVR5qiyXVfBNOzfffjUWtPnhAb4BYI2uG2HfGmZmFjCtui5XNWaps+iFuw==}
     peerDependencies:
@@ -2609,8 +2554,6 @@ packages:
       magicast:
         optional: true
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   call-bind-apply-helpers@1.0.2:
     resolution: {integrity: sha512-Sp1ablJ0ivDkSzjcaJdxEunN5/XvksFJ2sMBFfq6x0ryhQV/2b/KwFe21cMpmHtPOSij8K99/wSfoEuTObmuMQ==}
     engines: {node: '>= 0.4'}
@@ -2638,7 +2581,6 @@ packages:
     resolution: {integrity: sha512-7NzBL0rN6fMUW+f7A6Io4h40qQlG+xGmtMxfbnH/K7TAtt8JQWVQK+6g0UXKMeVJoyV5EkkNsErQ8pVD3bLHbA==}
     engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
 
-<<<<<<< HEAD
   chevrotain@10.5.0:
     resolution: {integrity: sha512-Pkv5rBY3+CsHOYfV5g/Vs5JY9WTHHDEKOlohI2XeygaZhUeqhAlldZ8Hz9cRmxu709bvS08YzxHdTPHhffc13A==}
 
@@ -2652,8 +2594,6 @@ packages:
   citty@0.2.1:
     resolution: {integrity: sha512-kEV95lFBhQgtogAPlQfJJ0WGVSokvLr/UEoFPiKKOXF7pl98HfUVUD0ejsuTCld/9xH9vogSywZ5KqHzXrZpqg==}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   class-variance-authority@0.7.1:
     resolution: {integrity: sha512-Ka+9Trutv7G8M6WT6SeiRWz792K5qEqIGEGzXKhAE6xOWAY6pPH8U+9IY3oCMv6kqTmLsv7Xh/2w2RigkePMsg==}
 
@@ -2705,7 +2645,6 @@ packages:
   concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
 
-<<<<<<< HEAD
   confbox@0.2.4:
     resolution: {integrity: sha512-ysOGlgTFbN2/Y6Cg3Iye8YKulHw+R2fNXHrgSmXISQdMnomY6eNDprVdW9R5xBguEqI954+S6709UyiO7B+6OQ==}
 
@@ -2713,8 +2652,6 @@ packages:
     resolution: {integrity: sha512-5IKcdX0nnYavi6G7TtOhwkYzyjfJlatbjMjuLSfE2kYT5pMDOilZ4OvMhi637CcDICTmz3wARPoyhqyX1Y+XvA==}
     engines: {node: ^14.18.0 || >=16.10.0}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   content-disposition@1.0.1:
     resolution: {integrity: sha512-oIXISMynqSqm241k6kcQ5UwttDILMK4BiurCfGEREw6+X9jkkpEe5T9FZaApyLGGOnFuyMWZpdolTXMtvEJ08Q==}
     engines: {node: '>=18'}
@@ -2810,13 +2747,10 @@ packages:
   deep-is@0.1.4:
     resolution: {integrity: sha512-oIPzksmTg4/MriiaYGO+okXDT7ztn/w3Eptv/+gSIdMdKsJo0u4CfYNFJPy+4SKMuCqGw2wxnA+URMg3t8a/bQ==}
 
-<<<<<<< HEAD
   deepmerge-ts@7.1.5:
     resolution: {integrity: sha512-HOJkrhaYsweh+W+e74Yn7YStZOilkoPb6fycpwNLKzSPtruFs48nYis0zy5yJz1+ktUhHxoRDJ27RQAWLIJVJw==}
     engines: {node: '>=16.0.0'}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   deepmerge@4.3.1:
     resolution: {integrity: sha512-3sUqbMEc77XqpdNO7FRyRog+eW3ph+GYCbj+rK+uYyRMuwsVy0rMiVtPn+QJlKFvWP/1PYpapqYn0Me2knFn+A==}
     engines: {node: '>=0.10.0'}
@@ -2841,33 +2775,24 @@ packages:
     resolution: {integrity: sha512-8QmQKqEASLd5nx0U1B1okLElbUuuttJ/AnYmRXbbbGDWh6uS208EjD4Xqq/I9wK7u0v6O08XhTWnt5XtEbR6Dg==}
     engines: {node: '>= 0.4'}
 
-<<<<<<< HEAD
   defu@6.1.4:
     resolution: {integrity: sha512-mEQCMmwJu317oSz8CwdIOdwf3xMif1ttiM8LTufzc3g6kR+9Pe236twL8j3IYT1F7GfRgGcW6MWxzZjLIkuHIg==}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   delayed-stream@1.0.0:
     resolution: {integrity: sha512-ZySD7Nf91aLB0RxL4KGrKHBXl7Eds1DAmEdcoVawXnLD7SDhpNgtuII2aAkg7a7QS41jxPSZ17p4VdGnMHk3MQ==}
     engines: {node: '>=0.4.0'}
 
-<<<<<<< HEAD
   denque@2.1.0:
     resolution: {integrity: sha512-HVQE3AAb/pxF8fQAoiqpvg9i3evqug3hoiwakOyZAwJm+6vZehbkYXZ0l4JxS+I3QxM97v5aaRNhj8v5oBhekw==}
     engines: {node: '>=0.10'}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   depd@2.0.0:
     resolution: {integrity: sha512-g7nH6P6dyDioJogAAGprGpCtVImJhpPk/roCzdb3fIh61/s/nPsfR6onyMwkCAR/OlC3yBC0lESvUoQEAssIrw==}
     engines: {node: '>= 0.8'}
 
-<<<<<<< HEAD
   destr@2.0.5:
     resolution: {integrity: sha512-ugFTXCtDZunbzasqBxrK93Ik/DRYsO6S/fedkWEMKqt04xZ4csmnmwGDBAb07QWNaGMAmnTIemsYZCksjATwsA==}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   detect-libc@2.1.2:
     resolution: {integrity: sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ==}
     engines: {node: '>=8'}
@@ -2883,18 +2808,14 @@ packages:
     resolution: {integrity: sha512-35mSku4ZXK0vfCuHEDAwt55dg2jNajHZ1odvF+8SSr82EsZY4QmXfuWso8oEd8zRhVObSN18aM0CjSdoBX7zIw==}
     engines: {node: '>=0.10.0'}
 
-<<<<<<< HEAD
   dotenv@16.6.1:
     resolution: {integrity: sha512-uBq4egWHTcTt33a72vpSG0z3HnPuIl6NqYcTrKEg2azoEyl2hpW0zqlxysq2pK9HlDIHyHyakeYaYnSAwd8bow==}
     engines: {node: '>=12'}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   dotenv@17.3.1:
     resolution: {integrity: sha512-IO8C/dzEb6O3F9/twg6ZLXz164a2fhTnEWb95H23Dm4OuN+92NmEAlTrupP9VW6Jm3sO26tQlqyvyi4CsnY9GA==}
     engines: {node: '>=12'}
 
-<<<<<<< HEAD
   drizzle-kit@0.31.9:
     resolution: {integrity: sha512-GViD3IgsXn7trFyBUUHyTFBpH/FsHTxYJ66qdbVggxef4UBPHRYxQaRzYLTuekYnk9i5FIEL9pbBIwMqX/Uwrg==}
     hasBin: true
@@ -2991,8 +2912,6 @@ packages:
       sqlite3:
         optional: true
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   dunder-proto@1.0.1:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}
     engines: {node: '>= 0.4'}
@@ -3004,12 +2923,9 @@ packages:
   ee-first@1.1.1:
     resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
 
-<<<<<<< HEAD
   effect@3.18.4:
     resolution: {integrity: sha512-b1LXQJLe9D11wfnOKAk3PKxuqYshQ0Heez+y5pnkd3jLj1yx9QhM72zZ9uUrOQyNvrs2GZZd/3maL0ZV18YuDA==}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   electron-to-chromium@1.5.302:
     resolution: {integrity: sha512-sM6HAN2LyK82IyPBpznDRqlTQAtuSaO+ShzFiWTvoMJLHyZ+Y39r8VMfHzwbU8MVBzQ4Wdn85+wlZl2TLGIlwg==}
 
@@ -3022,13 +2938,10 @@ packages:
   emoji-regex@9.2.2:
     resolution: {integrity: sha512-L18DaJsXSUk2+42pv8mLs5jJT2hqFkFE4j21wOmgbUqsZ2hL72NsUU785g9RXgo3s0ZNgVl42TiHp3ZtOv/Vyg==}
 
-<<<<<<< HEAD
   empathic@2.0.0:
     resolution: {integrity: sha512-i6UzDscO/XfAcNYD75CfICkmfLedpyPDdozrLMmQc5ORaQcdMoc21OnlEylMIqI7U8eniKrPMxxtj8k0vhmJhA==}
     engines: {node: '>=14'}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   encodeurl@2.0.0:
     resolution: {integrity: sha512-Q0n9HRi4m6JuGIV1eFlmvJB7ZEVxu93IrMyiMsGC0lrMJMWzRgx6WGquyfQgZVb31vhGgXnfmPNNXmxnOkRBrg==}
     engines: {node: '>= 0.8'}
@@ -3262,7 +3175,6 @@ packages:
     resolution: {integrity: sha512-hIS4idWWai69NezIdRt2xFVofaF4j+6INOpJlVOLDO8zXGpUVEVzIYk12UUi2JzjEzWL3IOAxcTubgz9Po0yXw==}
     engines: {node: '>= 18'}
 
-<<<<<<< HEAD
   exsolve@1.0.8:
     resolution: {integrity: sha512-LmDxfWXwcTArk8fUEnOfSZpHOJ6zOMUJKOtFLFqJLoKJetuQG874Uc7/Kki7zFLzYybmZhp1M7+98pfMqeX8yA==}
 
@@ -3270,8 +3182,6 @@ packages:
     resolution: {integrity: sha512-h5+1OzzfCC3Ef7VbtKdcv7zsstUQwUDlYpUTvjeUsJAssPgLn7QzbboPtL5ro04Mq0rPOsMzl7q5hIbRs2wD1A==}
     engines: {node: '>=8.0.0'}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   fast-deep-equal@3.1.3:
     resolution: {integrity: sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==}
 
@@ -3348,13 +3258,10 @@ packages:
     resolution: {integrity: sha512-dKx12eRCVIzqCxFGplyFKJMPvLEWgmNtUrpTiJIR5u97zEhRG8ySrtboPHZXx7daLxQVrl643cTzbab2tkQjxg==}
     engines: {node: '>= 0.4'}
 
-<<<<<<< HEAD
   foreground-child@3.3.1:
     resolution: {integrity: sha512-gIXjKqtFuWEgzFRJA9WCQeSJLZDjgJUOMCMzxtvFq/37KojM1BFGufqsCy0r4qSQmYLsZYMeyRqzIWOMup03sw==}
     engines: {node: '>=14'}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   form-data@4.0.5:
     resolution: {integrity: sha512-8RipRLol37bNs2bhoV67fiTEvdTrbMUYcFTiy3+wuuOnUog2QBHCZWXDRijWQfAkhBj2Uf5UnVaiWwA5vdd82w==}
     engines: {node: '>= 6'}
@@ -3375,14 +3282,11 @@ packages:
     resolution: {integrity: sha512-VWSRii4t0AFm6ixFFmLLx1t7wS1gh+ckoa84aOeapGum0h+EZd1EhEumSB+ZdDLnEPuucsVB9oB7cxJHap6Afg==}
     engines: {node: '>=14.14'}
 
-<<<<<<< HEAD
   fsevents@2.3.3:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   function-bind@1.1.2:
     resolution: {integrity: sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA==}
 
@@ -3399,12 +3303,9 @@ packages:
   fzf@0.5.2:
     resolution: {integrity: sha512-Tt4kuxLXFKHy8KT40zwsUPUkg1CrsgY25FxA2U/j/0WgEDCk3ddc/zLTCCcbSHX9FcKtLuVaDGtGE/STWC+j3Q==}
 
-<<<<<<< HEAD
   generate-function@2.3.1:
     resolution: {integrity: sha512-eeB5GfMNeevm/GRYq20ShmsaGcmI81kIX2K9XQx5miC8KdHaC6Jm0qQ8ZNeGOi7wYB8OsdxKs+Y2oVuTFuVwKQ==}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   generator-function@2.0.1:
     resolution: {integrity: sha512-SFdFmIJi+ybC0vjlHN0ZGVGHc3lgE0DxPAT0djjVg+kjOnSqclqmj0KQ7ykTOLP6YxoqOvuAODGdcHJn+43q3g==}
     engines: {node: '>= 0.4'}
@@ -3433,12 +3334,9 @@ packages:
     resolution: {integrity: sha512-PKsK2FSrQCyxcGHsGrLDcK0lx+0Ke+6e8KFFozA9/fIQLhQzPaRvJFdcz7+Axg3jUH/Mq+NI4xa5u/UT2tQskA==}
     engines: {node: '>=14.16'}
 
-<<<<<<< HEAD
   get-port-please@3.2.0:
     resolution: {integrity: sha512-I9QVvBw5U/hw3RmWpYKRumUeaDgxTPd401x364rLmWBJcOQ753eov1eTgzDqRG9bqFIfDc7gfzcQEWrUri3o1A==}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   get-proto@1.0.1:
     resolution: {integrity: sha512-sTSfBjoXBp89JvIKIefqw7U2CCebsc74kiY6awiGogKtoSGbgjYE/G/+l9sF3MWFPNc9IcoOC4ODfKHfxFmp0g==}
     engines: {node: '>= 0.4'}
@@ -3489,15 +3387,12 @@ packages:
   graceful-fs@4.2.11:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
 
-<<<<<<< HEAD
   grammex@3.1.12:
     resolution: {integrity: sha512-6ufJOsSA7LcQehIJNCO7HIBykfM7DXQual0Ny780/DEcJIpBlHRvcqEBWGPYd7hrXL2GJ3oJI1MIhaXjWmLQOQ==}
 
   graphmatch@1.1.1:
     resolution: {integrity: sha512-5ykVn/EXM1hF0XCaWh05VbYvEiOL2lY1kBxZtaYsyvjp7cmWOU1XsAdfQBwClraEofXDT197lFbXOEVMHpvQOg==}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   graphql@16.12.0:
     resolution: {integrity: sha512-DKKrynuQRne0PNpEbzuEdHlYOMksHSUI8Zc9Unei5gTsMNA2/vMpoMz/yKba50pejK56qj98qM0SjYxAKi13gQ==}
     engines: {node: ^12.22.0 || ^14.16.0 || ^16.0.0 || >=17.0.0}
@@ -3538,13 +3433,10 @@ packages:
   hermes-parser@0.25.1:
     resolution: {integrity: sha512-6pEjquH3rqaI6cYAXYPcz9MS4rY6R4ngRgrgfDshRptUZIc3lw0MCIJIGDj9++mfySOuPTHB4nrSW99BCvOPIA==}
 
-<<<<<<< HEAD
   hono@4.11.4:
     resolution: {integrity: sha512-U7tt8JsyrxSRKspfhtLET79pU8K+tInj5QZXs1jSugO1Vq5dFj3kmZsRldo29mTBfcjDRVRXrEZ6LS63Cog9ZA==}
     engines: {node: '>=16.9.0'}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   hono@4.12.1:
     resolution: {integrity: sha512-hi9afu8g0lfJVLolxElAZGANCTTl6bewIdsRNhaywfP9K8BPf++F2z6OLrYGIinUwpRKzbZHMhPwvc0ZEpAwGw==}
     engines: {node: '>=16.9.0'}
@@ -3553,12 +3445,9 @@ packages:
     resolution: {integrity: sha512-4FbRdAX+bSdmo4AUFuS0WNiPz8NgFt+r8ThgNWmlrjQjt1Q7ZR9+zTlce2859x4KSXrwIsaeTqDoKQmtP8pLmQ==}
     engines: {node: '>= 0.8'}
 
-<<<<<<< HEAD
   http-status-codes@2.3.0:
     resolution: {integrity: sha512-RJ8XvFvpPM/Dmc5SV+dC4y5PCeOhT3x1Hq0NU3rjGeg5a/CqlhZ7uudknPwZFz4aeAXDcbAyaeP7GAo9lvngtA==}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   https-proxy-agent@7.0.6:
     resolution: {integrity: sha512-vK9P5/iUfdl95AI+JVyUuIcVtd4ofvtrOr3HNtM2yxC9bnMbEdp3x01OhQNnjb8IJYi38VlTE3mBXwcfvywuSw==}
     engines: {node: '>= 14'}
@@ -3712,12 +3601,9 @@ packages:
   is-promise@4.0.0:
     resolution: {integrity: sha512-hvpoI6korhJMnej285dSg6nu1+e6uxs7zG3BYAm5byqDsgJNWwxzM6z6iZiAgQR4TJ30JmBTOwqZUw3WlyH3AQ==}
 
-<<<<<<< HEAD
   is-property@1.0.2:
     resolution: {integrity: sha512-Ks/IoX00TtClbGQr4TWXemAnktAQvYB7HzcCxDGqEZU6oCmb2INHuOoKxbtR+HFkmYWBKv/dOZtGRiAjDhj92g==}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   is-regex@1.2.1:
     resolution: {integrity: sha512-MjYsKHO5O7mCsmRGxWcLWheFqN9DJ/2TmngvjKXihe6efViPqc274+Fx/4fYj/r03+ESvBdTXK0V6tA3rgez1g==}
     engines: {node: '>= 0.4'}
@@ -3856,13 +3742,10 @@ packages:
     resolution: {integrity: sha512-o+NO+8WrRiQEE4/7nwRJhN1HWpVmJm511pBHUxPLtp0BUISzlBplORYSmTclCnJvQq2tKu/sgl3xVpkc7ZWuQQ==}
     engines: {node: '>=6'}
 
-<<<<<<< HEAD
   kysely@0.28.11:
     resolution: {integrity: sha512-zpGIFg0HuoC893rIjYX1BETkVWdDnzTzF5e0kWXJFg5lE0k1/LfNWBejrcnOFu8Q2Rfq/hTDTU7XLUM8QOrpzg==}
     engines: {node: '>=20.0.0'}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   language-subtag-registry@0.3.23:
     resolution: {integrity: sha512-0K65Lea881pHotoGEa5gDlMxt3pctLi2RplBb7Ezh4rRdLEOtgi7n4EwK9lamnUCkKBqaeKRVebTq6BAxSkpXQ==}
 
@@ -3948,13 +3831,10 @@ packages:
     resolution: {integrity: sha512-l51N2r93WmGUye3WuFoN5k10zyvrVs0qfKBhyC5ogUQ6Ew6JUSswh78mbSO+IU3nTWsyOArqPCcShdQSadghBQ==}
     engines: {node: '>= 12.0.0'}
 
-<<<<<<< HEAD
   lilconfig@2.1.0:
     resolution: {integrity: sha512-utWOt/GHzuUxnLKxB6dk81RoOeoNeHgbrXiuGk4yyF5qlRz+iIVWu56E2fqGHFrXz0QNUhLB/8nKqvRH66JKGQ==}
     engines: {node: '>=10'}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   lines-and-columns@1.2.4:
     resolution: {integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==}
 
@@ -3965,22 +3845,16 @@ packages:
   lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
 
-<<<<<<< HEAD
   lodash@4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   log-symbols@6.0.0:
     resolution: {integrity: sha512-i24m8rpwhmPIS4zscNzK6MSEhk0DUWa/8iYQWxhffV8jkI4Phvs3F+quL5xvS0gdQR0FyTCMMH33Y78dDTzzIw==}
     engines: {node: '>=18'}
 
-<<<<<<< HEAD
   long@5.3.2:
     resolution: {integrity: sha512-mNAgZ1GmyNhD7AuqnTG3/VQ26o760+ZYBPKjPvugO8+nLbYfX6TVpJPseBvopbdY+qpZ/lKUnmEc1LeZYS3QAA==}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   loose-envify@1.4.0:
     resolution: {integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==}
     hasBin: true
@@ -3988,13 +3862,10 @@ packages:
   lru-cache@5.1.1:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
 
-<<<<<<< HEAD
   lru.min@1.1.4:
     resolution: {integrity: sha512-DqC6n3QQ77zdFpCMASA1a3Jlb64Hv2N2DciFGkO/4L9+q/IpIAuRlKOvCXabtRW6cQf8usbmM6BE/TOPysCdIA==}
     engines: {bun: '>=1.0.0', deno: '>=1.30.0', node: '>=8.0.0'}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   lucide-react@0.575.0:
     resolution: {integrity: sha512-VuXgKZrk0uiDlWjGGXmKV6MSk9Yy4l10qgVvzGn2AWBx1Ylt0iBexKOAoA6I7JO3m+M9oeovJd3yYENfkUbOeg==}
     peerDependencies:
@@ -4011,12 +3882,9 @@ packages:
     resolution: {integrity: sha512-aisnrDP4GNe06UcKFnV5bfMNPBUw4jsLGaWwWfnH3v02GnBuXX2MCVn5RbrWo0j3pczUilYblq7fQ7Nw2t5XKw==}
     engines: {node: '>= 0.8'}
 
-<<<<<<< HEAD
   memory-pager@1.5.0:
     resolution: {integrity: sha512-ZS4Bp4r/Zoeq6+NLJpP+0Zzm0pR8whtGPf1XExKLJBAczGMnSi3It14OiNCStjQjM6NU1okjQGSxgEZN8eBYKg==}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   merge-descriptors@2.0.0:
     resolution: {integrity: sha512-Snk314V5ayFLhp3fkUREub6WtjBfPdCPY1Ln8/8munuLuiYhsABgBVWsozAG+MWMbVEvcdcpbi9R7ww22l9Q3g==}
     engines: {node: '>=18'}
@@ -4118,7 +3986,6 @@ packages:
     resolution: {integrity: sha512-WWdIxpyjEn+FhQJQQv9aQAYlHoNVdzIzUySNV1gHUPDSdZJ3yZn7pAAbQcV7B56Mvu881q9FZV+0Vx2xC44VWA==}
     engines: {node: ^18.17.0 || >=20.5.0}
 
-<<<<<<< HEAD
   mysql2@3.15.3:
     resolution: {integrity: sha512-FBrGau0IXmuqg4haEZRBfHNWB5mUARw6hNwPDXXGg0XzVJ50mr/9hb267lvpVMnhZ1FON3qNd4Xfcez1rbFwSg==}
     engines: {node: '>= 8.0'}
@@ -4127,8 +3994,6 @@ packages:
     resolution: {integrity: sha512-Tz09sEL2EEuv5fFowm419c1+a/jSMiBjI9gHxVLrVdbUkkNUUfjsVYs9pVZu5oCon/kmRh9TfLEObFtkVxmY0w==}
     engines: {node: '>=8.0.0'}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   nanoid@3.3.11:
     resolution: {integrity: sha512-N8SpfPUnUp1bK+PMYW8qSWdl9U+wwNWI4QKxOYDy9JAro3WMX7p2OeVRF9v+347pnakNevPmiHhNmZ2HbFA76w==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
@@ -4180,12 +4045,9 @@ packages:
     resolution: {integrity: sha512-pyFS63ptit/P5WqUkt+UUfe+4oevH+bFeIiPPdfb0pFeYEu/1ELnJu5l+5EcTKYL5M7zaAa7S8ddywgXypqKCw==}
     engines: {node: '>= 0.4'}
 
-<<<<<<< HEAD
   node-fetch-native@1.6.7:
     resolution: {integrity: sha512-g9yhqoedzIUm0nTnTqAQvueMPVOuIY16bqgAJJC8XOOubYFNwz6IER9qs0Gq2Xd0+CecCKFjtdDTMA4u4xG06Q==}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   node-fetch@3.3.2:
     resolution: {integrity: sha512-dRB78srN/l6gqWulah9SrxeYnxeddIG30+GOqK/9OlLVyLg3HPnr6SqOWTWOXKRwC2eGYCkZ59NNuSgvSrpgOA==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
@@ -4201,14 +4063,11 @@ packages:
     resolution: {integrity: sha512-9qny7Z9DsQU8Ou39ERsPU4OZQlSTP47ShQzuKZ6PRXpYLtIFgl/DEBYEXKlvcEa+9tHVcK8CF81Y2V72qaZhWA==}
     engines: {node: '>=18'}
 
-<<<<<<< HEAD
   nypm@0.6.5:
     resolution: {integrity: sha512-K6AJy1GMVyfyMXRVB88700BJqNUkByijGJM8kEHpLdcAt+vSQAVfkWWHYzuRXHSY6xA2sNc5RjTj0p9rE2izVQ==}
     engines: {node: '>=18'}
     hasBin: true
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   object-assign@4.1.1:
     resolution: {integrity: sha512-rJgTQnkUnH1sFw8yT6VSU3zD3sWmu6sZhIseY8VX+GRu3P6F7Fu+JNDoXfklElbLJSnc3FUQHVe4cU5hj+BcUg==}
     engines: {node: '>=0.10.0'}
@@ -4245,12 +4104,9 @@ packages:
     resolution: {integrity: sha512-gXah6aZrcUxjWg2zR2MwouP2eHlCBzdV4pygudehaKXSGW4v2AsRQUK+lwwXhii6KFZcunEnmSUoYp5CXibxtA==}
     engines: {node: '>= 0.4'}
 
-<<<<<<< HEAD
   ohash@2.0.11:
     resolution: {integrity: sha512-RdR9FQrFwNBNXAr4GixM8YaRZRJ5PUWbKYbE5eOsrwAjJW0q2REGcf79oYPsLyskQCZG1PLN+S/K1V00joZAoQ==}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   on-finished@2.4.1:
     resolution: {integrity: sha512-oVlzkg3ENAhCk2zdv7IJwd/QUD4z2RxRwpkcGY8psCVcCYZNq4wYnVWALHM+brtuJjePWiYF/ClmuDr8Ch5+kg==}
     engines: {node: '>= 0.8'}
@@ -4336,7 +4192,6 @@ packages:
   path-to-regexp@8.3.0:
     resolution: {integrity: sha512-7jdwVIRtsP8MYpdXSwOS0YdD0Du+qOoF/AEPIt88PcCFrZCzx41oxku1jD88hZBwbNUIEfpqvuhjFaMAqMTWnA==}
 
-<<<<<<< HEAD
   pathe@2.0.3:
     resolution: {integrity: sha512-WUjGcAqP1gQacoQe+OBJsFA7Ld4DyXuUIjZ5cc75cLHvJ7dtNsTugphxIADwspS+AraAUePCKrSVtPLFj/F88w==}
 
@@ -4377,8 +4232,6 @@ packages:
   pgpass@1.0.5:
     resolution: {integrity: sha512-FdW9r/jQZhSeohs1Z3sI1yxFQNFvMcnmfuj4WBMUTxOrAyLMaTcE1aAMBiTlbMNaXvBCQuVi0R7hd8udDSP7ug==}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
 
@@ -4394,12 +4247,9 @@ packages:
     resolution: {integrity: sha512-wQ0b/W4Fr01qtpHlqSqspcj3EhBvimsdh0KlHhH8HRZnMsEa0ea2fTULOXOS9ccQr3om+GcGRk4e+isrZWV8qQ==}
     engines: {node: '>=16.20.0'}
 
-<<<<<<< HEAD
   pkg-types@2.3.0:
     resolution: {integrity: sha512-SIqCzDRg0s9npO5XQ3tNZioRY1uK06lA41ynBC1YmFTmnY6FjUjVt6s4LoADmwoig1qqD0oK8h1p/8mlMx8Oig==}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   possible-typed-array-names@1.1.0:
     resolution: {integrity: sha512-/+5VFTchJDoVj3bhoqi6UeymcD00DAwb1nJwamzPvHEszJ4FpF6SNNbUbOS8yI56qHzdV8eK0qEfOSiodkTdxg==}
     engines: {node: '>= 0.4'}
@@ -4416,7 +4266,6 @@ packages:
     resolution: {integrity: sha512-3Ybi1tAuwAP9s0r1UQ2J4n5Y0G05bJkpUIO0/bI9MhwmD70S5aTWbXGBwxHrelT+XM1k6dM0pk+SwNkpTRN7Pg==}
     engines: {node: ^10 || ^12 || >=14}
 
-<<<<<<< HEAD
   postgres-array@2.0.0:
     resolution: {integrity: sha512-VpZrUqU5A69eQyW2c5CA1jtLecCsN2U/bD6VilrFDWq5+5UIEVO7nazS3TEcHf1zuPYO/sqGvUvW62g86RXZuA==}
     engines: {node: '>=4'}
@@ -4437,8 +4286,6 @@ packages:
     resolution: {integrity: sha512-Jtc2612XINuBjIl/QTWsV5UvE8UHuNblcO3vVADSrKsrc6RqGX6lOW1cEo3CM2v0XG4Nat8nI+YM7/f26VxXLw==}
     engines: {node: '>=12'}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   powershell-utils@0.1.0:
     resolution: {integrity: sha512-dM0jVuXJPsDN6DvRpea484tCUaMiXWjuCn++HGTqUWzGDjv5tZkEZldAJ/UMlqRYGFrD/etByo4/xOuC/snX2A==}
     engines: {node: '>=20'}
@@ -4451,7 +4298,6 @@ packages:
     resolution: {integrity: sha512-gjVS5hOP+M3wMm5nmNOucbIrqudzs9v/57bWRHQWLYklXqoXKrVfYW2W9+glfGsqtPgpiz5WwyEEB+ksXIx3gQ==}
     engines: {node: '>=18'}
 
-<<<<<<< HEAD
   prisma@7.4.2:
     resolution: {integrity: sha512-2bP8Ruww3Q95Z2eH4Yqh4KAENRsj/SxbdknIVBfd6DmjPwmpsC4OVFMLOeHt6tM3Amh8ebjvstrUz3V/hOe1dA==}
     engines: {node: ^20.19 || ^22.12 || >=24.0}
@@ -4465,8 +4311,6 @@ packages:
       typescript:
         optional: true
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   prompts@2.4.2:
     resolution: {integrity: sha512-NxNv/kLguCA7p3jE8oL2aEBsrJWgAakBpgmgK6lpPWV+WuOmY6r2/zbAVnP+T8bQlA0nzHXSJSJW0Hq7ylaD2Q==}
     engines: {node: '>= 6'}
@@ -4474,12 +4318,9 @@ packages:
   prop-types@15.8.1:
     resolution: {integrity: sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==}
 
-<<<<<<< HEAD
   proper-lockfile@4.1.2:
     resolution: {integrity: sha512-TjNPblN4BwAWMXU8s9AEz4JmQxnD1NNL7bNOY/AKUzyamc379FWASUhc/K1pL2noVb+XmZKLL68cjzLsiOAMaA==}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   proxy-addr@2.0.7:
     resolution: {integrity: sha512-llQsMLSUDUPT44jdrU/O37qlnifitDP+ZwrmmZcoSKyLKvtZxpyV0n2/bD/N4tBAAZ/gJEdZU7KMraoK1+XYAg==}
     engines: {node: '>= 0.10'}
@@ -4491,12 +4332,9 @@ packages:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
     engines: {node: '>=6'}
 
-<<<<<<< HEAD
   pure-rand@6.1.0:
     resolution: {integrity: sha512-bVWawvoZoBYpp6yIoQtQXHZjmz35RSVHnUOTefl8Vcjr8snTPY1wnpSPMWekcFwbxI6gtmT7rSYPFvz71ldiOA==}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   qs@6.15.0:
     resolution: {integrity: sha512-mAZTtNCeetKMH+pSjrb76NAM8V9a05I9aBZOHztWy/UqcJdQYNsf59vrRKWnojAT9Y+GbIvoTBC++CPHqpDBhQ==}
     engines: {node: '>=0.6'}
@@ -4525,12 +4363,9 @@ packages:
     resolution: {integrity: sha512-K5zQjDllxWkf7Z5xJdV0/B0WTNqx6vxG70zJE4N0kBs4LovmEYWJzQGxC9bS9RAKu3bgM40lrd5zoLJ12MQ5BA==}
     engines: {node: '>= 0.10'}
 
-<<<<<<< HEAD
   rc9@2.1.2:
     resolution: {integrity: sha512-btXCnMmRIBINM2LDZoEmOogIZU7Qe7zn4BpomSKZ/ykbLObuBdvG+mFq11DL6fjH1DRwHhrlgtYWG96bJiC7Cg==}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   react-dom@19.2.3:
     resolution: {integrity: sha512-yELu4WmLPw5Mr/lmeEpox5rw3RETacE++JgHqQzd2dg+YbJuat3jH4ingc+WPZhxaoFzdv9y33G+F7Nl5O0GBg==}
     peerDependencies:
@@ -4579,13 +4414,10 @@ packages:
     resolution: {integrity: sha512-Ku/hhYbVjOQnXDZFv2+RibmLFGwFdeeKHFcOTlrt7xplBnya5OGn/hIRDsqDiSUcfORsDC7MPxwork8jBwsIWA==}
     engines: {node: '>=0.10.0'}
 
-<<<<<<< HEAD
   readdirp@4.1.2:
     resolution: {integrity: sha512-GDhwkLfywWL2s6vEjyhri+eXmfH6j1L7JE27WhqLeYzoh/A3DBaYGEj2H/HFZCn/kMfim73FXxEJTw06WtxQwg==}
     engines: {node: '>= 14.18.0'}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   recast@0.23.11:
     resolution: {integrity: sha512-YTUo+Flmw4ZXiWfQKGcwwc11KnoRAYgzAE2E7mXKCjSviTKShtxBsN6YUUBB2gtaBzKzeKunxhUwNHQuRryhWA==}
     engines: {node: '>= 4'}
@@ -4601,12 +4433,9 @@ packages:
     resolution: {integrity: sha512-dYqgNSZbDwkaJ2ceRd9ojCGjBq+mOm9LmtXnAnEGyHhN/5R7iDW2TRw3h+o/jCFxus3P2LfWIIiwowAjANm7IA==}
     engines: {node: '>= 0.4'}
 
-<<<<<<< HEAD
   remeda@2.33.4:
     resolution: {integrity: sha512-ygHswjlc/opg2VrtiYvUOPLjxjtdKvjGz1/plDhkG66hjNjFr1xmfrs2ClNFo/E6TyUFiwYNh53bKV26oBoMGQ==}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   require-directory@2.1.1:
     resolution: {integrity: sha512-fGxEI7+wsG9xrvdjsrlmL22OMTTiHRwAMroiEeMgq8gzoLC/PQr7RsRDSTLUg/bZAZtF+TVIkHc6/4RIKrui+Q==}
     engines: {node: '>=0.10.0'}
@@ -4639,13 +4468,10 @@ packages:
     resolution: {integrity: sha512-oMA2dcrw6u0YfxJQXm342bFKX/E4sG9rbTzO9ptUcR/e8A33cHuvStiYOwH7fszkZlZ1z/ta9AAoPk2F4qIOHA==}
     engines: {node: '>=18'}
 
-<<<<<<< HEAD
   retry@0.12.0:
     resolution: {integrity: sha512-9LkiTwjUh6rT555DtE9rTX+BKByPfrMzEAtnlEtdEwr3Nkffwiihqe2bWADg+OQRjt9gl6ICdmB/ZFDCGAtSow==}
     engines: {node: '>= 4'}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   rettime@0.10.1:
     resolution: {integrity: sha512-uyDrIlUEH37cinabq0AX4QbgV4HbFZ/gqoiunWQ1UqBtRvTTytwhNYjE++pO/MjPTZL5KQCf2bEoJ/BJNVQ5Kw==}
 
@@ -4653,12 +4479,9 @@ packages:
     resolution: {integrity: sha512-g6QUff04oZpHs0eG5p83rFLhHeV00ug/Yf9nZM6fLeUrPguBTkTQOdpAWWspMh55TZfVQDPaN3NQJfbVRAxdIw==}
     engines: {iojs: '>=1.0.0', node: '>=0.10.0'}
 
-<<<<<<< HEAD
   rou3@0.7.12:
     resolution: {integrity: sha512-iFE4hLDuloSWcD7mjdCDhx2bKcIsYbtOTpfH5MHHLSKMOUyjqQXTeZVa289uuwEGEKFoE/BAPbhaU4B774nceg==}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   router@2.2.0:
     resolution: {integrity: sha512-nLTrUKm2UyiL7rlhapu/Zl45FwNgkZGaCpZbIHajDYgwlJCOzLSk+cIPAnsEqV955GjILJnKbdQC1nVPz+gAYQ==}
     engines: {node: '>= 18'}
@@ -4701,22 +4524,16 @@ packages:
     resolution: {integrity: sha512-1gnZf7DFcoIcajTjTwjwuDjzuz4PPcY2StKPlsGAQ1+YH20IRVrBaXSWmdjowTJ6u8Rc01PoYOGHXfP1mYcZNQ==}
     engines: {node: '>= 18'}
 
-<<<<<<< HEAD
   seq-queue@0.0.5:
     resolution: {integrity: sha512-hr3Wtp/GZIc/6DAGPDcV4/9WoZhjrkXsi5B/07QgX8tsdc6ilr7BFM6PM6rbdAX1kFSDYeZGLipIZZKyQP0O5Q==}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   serve-static@2.2.1:
     resolution: {integrity: sha512-xRXBn0pPqQTVQiC8wyQrKs2MOlX24zQ0POGaj0kultvoOCstBQM5yvOhAVSUwOMjQtTvsPWoNCHfPGwaaQJhTw==}
     engines: {node: '>= 18'}
 
-<<<<<<< HEAD
   set-cookie-parser@3.0.1:
     resolution: {integrity: sha512-n7Z7dXZhJbwuAHhNzkTti6Aw9QDDjZtm3JTpTGATIdNzdQz5GuFs22w90BcvF4INfnrL5xrX3oGsuqO5Dx3A1Q==}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   set-function-length@1.2.2:
     resolution: {integrity: sha512-pgRc4hJ4/sNjWCSS9AmnS40x3bNMDTknHgL5UaMBTMyJnU90EgWh1Rz+MC9eFu4BuN/UwZjKQuY/1v3rM7HMfg==}
     engines: {node: '>= 0.4'}
@@ -4778,17 +4595,13 @@ packages:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
     engines: {node: '>=0.10.0'}
 
-<<<<<<< HEAD
   source-map-support@0.5.21:
     resolution: {integrity: sha512-uBHU3L3czsIyYXKX88fdrGovxdSCoTGDRZ6SYXtSRxLZUzHg5P/66Ht6uoUlHu9EZod+inXhKo3qQgwXUT/y1w==}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   source-map@0.6.1:
     resolution: {integrity: sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==}
     engines: {node: '>=0.10.0'}
 
-<<<<<<< HEAD
   sparse-bitfield@3.0.3:
     resolution: {integrity: sha512-kvzhi7vqKTfkh0PZU+2D2PIllw2ymqJKujUcyPMd9Y75Nv4nPbGJZXNhxsgdQab2BmlDct1YnfQCguEvHr7VsQ==}
 
@@ -4800,8 +4613,6 @@ packages:
     resolution: {integrity: sha512-qC9iz2FlN7DQl3+wjwn3802RTyjCx7sDvfQEXchwa6CWOx07/WVfh91gBmQ9fahw8snwGEWU3xGzOt4tFyHLxg==}
     engines: {node: '>= 0.6'}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   stable-hash@0.0.5:
     resolution: {integrity: sha512-+L3ccpzibovGXFK+Ap/f8LOS0ahMrHTf3xu7mMLSpEGU0EO9ucaysSylKo9eRDFNhWve/y275iPmIZ4z39a9iA==}
 
@@ -4809,12 +4620,9 @@ packages:
     resolution: {integrity: sha512-DvEy55V3DB7uknRo+4iOGT5fP1slR8wQohVdknigZPMpMstaKJQWhwiYBACJE3Ul2pTnATihhBYnRhZQHGBiRw==}
     engines: {node: '>= 0.8'}
 
-<<<<<<< HEAD
   std-env@3.10.0:
     resolution: {integrity: sha512-5GS12FdOZNliM5mAOxFRg7Ir0pWz8MdpYm6AY6VPkGpbA7ZzmbzNcBJQ0GPvvyWgcY7QAhCgf9Uy89I03faLkg==}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   stdin-discarder@0.2.2:
     resolution: {integrity: sha512-UhDfHmA92YAlNnCfhmq0VeNL5bDbiZGg7sZ2IvPsXubGkiNa9EC+tUTsjBRsYUAz87btI6/1wf4XoVvQ3uRnmQ==}
     engines: {node: '>=18'}
@@ -4953,13 +4761,10 @@ packages:
     resolution: {integrity: sha512-kXuRi1mtaKMrsLUxz3sQYvVl37B0Ns6MzfrtV5DvJceE9bPyspOqk9xxv7XbZWcfLWbFmm997vl83qUWVJA64w==}
     engines: {node: '>=16'}
 
-<<<<<<< HEAD
   tr46@5.1.1:
     resolution: {integrity: sha512-hdF5ZgjTqgAntKkklYw0R03MG2x/bSzTtkxmIRw/sTNV8YXsCJ1tfLAX23lhxhHJlEf3CRCOCGGWw3vI3GaSPw==}
     engines: {node: '>=18'}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   ts-api-utils@2.4.0:
     resolution: {integrity: sha512-3TaVTaAv2gTiMB35i3FiGJaRfwb3Pyn/j3m/bfAvGe8FB7CF6u+LMYqYlDh7reQf7UNvoTvdfAqHGmPGOSsPmA==}
     engines: {node: '>=18.12'}
@@ -4979,14 +4784,11 @@ packages:
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
 
-<<<<<<< HEAD
   tsx@4.21.0:
     resolution: {integrity: sha512-5C1sg4USs1lfG0GFb2RLXsdpXqBSEhAaA/0kPL01wxzpMqLILNxIxIOKiILz+cdg/pLnOUxFYOR5yhHU666wbw==}
     engines: {node: '>=18.0.0'}
     hasBin: true
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   tw-animate-css@1.4.0:
     resolution: {integrity: sha512-7bziOlRqH0hJx80h/3mbicLW7o8qLsH5+RaLR2t+OHM3D0JlWGODQKQ4cxbK7WlvmUxpcj6Kgu6EKqjrGFe3QQ==}
 
@@ -5092,7 +4894,6 @@ packages:
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
-<<<<<<< HEAD
   valibot@1.2.0:
     resolution: {integrity: sha512-mm1rxUsmOxzrwnX5arGS+U4T25RdvpPjPN4yR0u9pUBov9+zGVtO84tif1eY4r6zWxVxu3KzIyknJy3rxfRZZg==}
     peerDependencies:
@@ -5101,8 +4902,6 @@ packages:
       typescript:
         optional: true
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   validate-npm-package-name@7.0.2:
     resolution: {integrity: sha512-hVDIBwsRruT73PbK7uP5ebUt+ezEtCmzZz3F59BSr2F6OVFnJ/6h8liuvdLrQ88Xmnk6/+xGGuq+pG9WwTuy3A==}
     engines: {node: ^20.17.0 || >=22.9.0}
@@ -5115,7 +4914,6 @@ packages:
     resolution: {integrity: sha512-d2JWLCivmZYTSIoge9MsgFCZrt571BikcWGYkjC1khllbTeDlGqZ2D8vD8E/lJa8WGWbb7Plm8/XJYV7IJHZZw==}
     engines: {node: '>= 8'}
 
-<<<<<<< HEAD
   webidl-conversions@7.0.0:
     resolution: {integrity: sha512-VwddBukDzu71offAQR975unBIGqfKZpM+8ZX6ySk8nYhVoo5CYaZyzt3YBvYtRtO+aoGlqxPg/B87NGVZ/fu6g==}
     engines: {node: '>=12'}
@@ -5124,8 +4922,6 @@ packages:
     resolution: {integrity: sha512-De72GdQZzNTUBBChsXueQUnPKDkg/5A5zp7pFDuQAj5UFoENpiACU0wlCvzpAGnTkj++ihpKwKyYewn/XNUbKw==}
     engines: {node: '>=18'}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   which-boxed-primitive@1.1.1:
     resolution: {integrity: sha512-TbX3mj8n0odCBFVlY8AxkqcHASw3L60jIuF8jFP78az3C2YhmGvqbHBpAjTRH2/xqYunrJ9g1jSyjCjpoWzIAA==}
     engines: {node: '>= 0.4'}
@@ -5171,13 +4967,10 @@ packages:
     resolution: {integrity: sha512-g/eziiSUNBSsdDJtCLB8bdYEUMj4jR7AGeUo96p/3dTafgjHhpF4RiCFPiRILwjQoDXx5MqkBr4fwWtR3Ky4Wg==}
     engines: {node: '>=20'}
 
-<<<<<<< HEAD
   xtend@4.0.2:
     resolution: {integrity: sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==}
     engines: {node: '>=0.4'}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   y18n@5.0.8:
     resolution: {integrity: sha512-0pfFzegeDWJHJIAmTLRP2DwHjdF5s7jo9tuztdQxAhINCdvS+3nGINqPd00AphqJR/0LhANUS6/+7SCb98YOfA==}
     engines: {node: '>=10'}
@@ -5205,12 +4998,9 @@ packages:
     resolution: {integrity: sha512-CzhO+pFNo8ajLM2d2IW/R93ipy99LWjtwblvC1RsoSUMZgyLbYFr221TnSNT7GjGdYui6P459mw9JH/g/zW2ug==}
     engines: {node: '>=18'}
 
-<<<<<<< HEAD
   zeptomatch@2.1.0:
     resolution: {integrity: sha512-KiGErG2J0G82LSpniV0CtIzjlJ10E04j02VOudJsPyPwNZgGnRKQy7I1R7GMyg/QswnE4l7ohSGrQbQbjXPPDA==}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   zod-to-json-schema@3.25.1:
     resolution: {integrity: sha512-pM/SU9d3YAggzi6MtR4h7ruuQlqKtad8e9S0fmxcMi+ueAK5Korys/aWcV9LIIHTVbj01NdzxcnXSN+O74ZIVA==}
     peerDependencies:
@@ -5451,7 +5241,6 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.2.14
 
-<<<<<<< HEAD
   '@better-auth/core@1.5.4(@better-auth/utils@0.3.1)(@better-fetch/fetch@1.1.21)(better-call@1.3.2(zod@4.3.6))(jose@6.1.3)(kysely@0.28.11)(nanostores@1.1.1)':
     dependencies:
       '@better-auth/utils': 0.3.1
@@ -5518,8 +5307,6 @@ snapshots:
 
   '@chevrotain/utils@10.5.0': {}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   '@dotenvx/dotenvx@1.52.0':
     dependencies:
       commander: 11.1.0
@@ -5532,16 +5319,12 @@ snapshots:
       picomatch: 4.0.3
       which: 4.0.0
 
-<<<<<<< HEAD
   '@drizzle-team/brocli@0.10.2': {}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   '@ecies/ciphers@0.2.5(@noble/ciphers@1.3.0)':
     dependencies:
       '@noble/ciphers': 1.3.0
 
-<<<<<<< HEAD
   '@electric-sql/pglite-socket@0.0.20(@electric-sql/pglite@0.3.15)':
     dependencies:
       '@electric-sql/pglite': 0.3.15
@@ -5552,8 +5335,6 @@ snapshots:
 
   '@electric-sql/pglite@0.3.15': {}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   '@emnapi/core@1.8.1':
     dependencies:
       '@emnapi/wasi-threads': 1.1.0
@@ -5865,25 +5646,19 @@ snapshots:
 
   '@floating-ui/utils@0.2.10': {}
 
-<<<<<<< HEAD
   '@hono/node-server@1.19.9(hono@4.11.4)':
     dependencies:
       hono: 4.11.4
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   '@hono/node-server@1.19.9(hono@4.12.1)':
     dependencies:
       hono: 4.12.1
 
-<<<<<<< HEAD
   '@hookform/resolvers@5.2.2(react-hook-form@7.71.2(react@19.2.3))':
     dependencies:
       '@standard-schema/utils': 0.3.0
       react-hook-form: 7.71.2(react@19.2.3)
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   '@humanfs/core@0.19.1': {}
 
   '@humanfs/node@0.16.7':
@@ -6061,7 +5836,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-<<<<<<< HEAD
   '@mongodb-js/saslprep@1.4.6':
     dependencies:
       sparse-bitfield: 3.0.3
@@ -6071,8 +5845,6 @@ snapshots:
       chevrotain: 10.5.0
       lilconfig: 2.1.0
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   '@mswjs/interceptors@0.41.3':
     dependencies:
       '@open-draft/deferred-promise': 2.2.0
@@ -6121,22 +5893,16 @@ snapshots:
 
   '@noble/ciphers@1.3.0': {}
 
-<<<<<<< HEAD
   '@noble/ciphers@2.1.1': {}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   '@noble/curves@1.9.7':
     dependencies:
       '@noble/hashes': 1.8.0
 
   '@noble/hashes@1.8.0': {}
 
-<<<<<<< HEAD
   '@noble/hashes@2.0.1': {}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
       '@nodelib/fs.stat': 2.0.5
@@ -6160,7 +5926,6 @@ snapshots:
 
   '@open-draft/until@2.1.0': {}
 
-<<<<<<< HEAD
   '@prisma/client-runtime-utils@7.4.2': {}
 
   '@prisma/client@7.4.2(prisma@7.4.2(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.3))(typescript@5.9.3)':
@@ -6236,8 +6001,6 @@ snapshots:
       react: 19.2.3
       react-dom: 19.2.3(react@19.2.3)
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   '@radix-ui/number@1.1.1': {}
 
   '@radix-ui/primitive@1.1.3': {}
@@ -6991,13 +6754,10 @@ snapshots:
 
   '@sindresorhus/merge-streams@4.0.0': {}
 
-<<<<<<< HEAD
   '@standard-schema/spec@1.1.0': {}
 
   '@standard-schema/utils@0.3.0': {}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   '@swc/helpers@0.5.15':
     dependencies:
       tslib: 2.8.1
@@ -7117,15 +6877,12 @@ snapshots:
 
   '@types/validate-npm-package-name@4.0.2': {}
 
-<<<<<<< HEAD
   '@types/webidl-conversions@7.0.3': {}
 
   '@types/whatwg-url@13.0.0':
     dependencies:
       '@types/webidl-conversions': 7.0.3
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   '@typescript-eslint/eslint-plugin@8.56.0(@typescript-eslint/parser@8.56.0(eslint@9.39.3(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.3(jiti@2.6.1))(typescript@5.9.3)':
     dependencies:
       '@eslint-community/regexpp': 4.12.2
@@ -7426,7 +7183,6 @@ snapshots:
 
   baseline-browser-mapping@2.10.0: {}
 
-<<<<<<< HEAD
   better-auth@1.5.4(@prisma/client@7.4.2(prisma@7.4.2(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.3))(typescript@5.9.3))(drizzle-kit@0.31.9)(drizzle-orm@0.45.1(@electric-sql/pglite@0.3.15)(@prisma/client@7.4.2(prisma@7.4.2(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.3))(typescript@5.9.3))(@types/pg@8.18.0)(kysely@0.28.11)(mysql2@3.15.3)(pg@8.20.0)(postgres@3.4.7)(prisma@7.4.2(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.3)))(mongodb@7.1.0)(mysql2@3.15.3)(next@16.1.6(@babel/core@7.29.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(pg@8.20.0)(prisma@7.4.2(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
     dependencies:
       '@better-auth/core': 1.5.4(@better-auth/utils@0.3.1)(@better-fetch/fetch@1.1.21)(better-call@1.3.2(zod@4.3.6))(jose@6.1.3)(kysely@0.28.11)(nanostores@1.1.1)
@@ -7469,8 +7225,6 @@ snapshots:
     optionalDependencies:
       zod: 4.3.6
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   body-parser@2.2.2:
     dependencies:
       bytes: 3.1.2
@@ -7506,20 +7260,16 @@ snapshots:
       node-releases: 2.0.27
       update-browserslist-db: 1.2.3(browserslist@4.28.1)
 
-<<<<<<< HEAD
   bson@7.2.0: {}
 
   buffer-from@1.1.2: {}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   bundle-name@4.1.0:
     dependencies:
       run-applescript: 7.1.0
 
   bytes@3.1.2: {}
 
-<<<<<<< HEAD
   c12@3.1.0:
     dependencies:
       chokidar: 4.0.3
@@ -7535,8 +7285,6 @@ snapshots:
       pkg-types: 2.3.0
       rc9: 2.1.2
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   call-bind-apply-helpers@1.0.2:
     dependencies:
       es-errors: 1.3.0
@@ -7565,7 +7313,6 @@ snapshots:
 
   chalk@5.6.2: {}
 
-<<<<<<< HEAD
   chevrotain@10.5.0:
     dependencies:
       '@chevrotain/cst-dts-gen': 10.5.0
@@ -7585,8 +7332,6 @@ snapshots:
 
   citty@0.2.1: {}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   class-variance-authority@0.7.1:
     dependencies:
       clsx: 2.1.1
@@ -7627,13 +7372,10 @@ snapshots:
 
   concat-map@0.0.1: {}
 
-<<<<<<< HEAD
   confbox@0.2.4: {}
 
   consola@3.4.2: {}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   content-disposition@1.0.1: {}
 
   content-type@1.0.5: {}
@@ -7704,11 +7446,8 @@ snapshots:
 
   deep-is@0.1.4: {}
 
-<<<<<<< HEAD
   deepmerge-ts@7.1.5: {}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   deepmerge@4.3.1: {}
 
   default-browser-id@5.0.1: {}
@@ -7732,7 +7471,6 @@ snapshots:
       has-property-descriptors: 1.0.2
       object-keys: 1.1.1
 
-<<<<<<< HEAD
   defu@6.1.4: {}
 
   delayed-stream@1.0.0: {}
@@ -7743,12 +7481,6 @@ snapshots:
 
   destr@2.0.5: {}
 
-=======
-  delayed-stream@1.0.0: {}
-
-  depd@2.0.0: {}
-
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   detect-libc@2.1.2: {}
 
   detect-node-es@1.1.0: {}
@@ -7759,7 +7491,6 @@ snapshots:
     dependencies:
       esutils: 2.0.3
 
-<<<<<<< HEAD
   dotenv@16.6.1: {}
 
   dotenv@17.3.1: {}
@@ -7784,10 +7515,6 @@ snapshots:
       postgres: 3.4.7
       prisma: 7.4.2(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.3)
 
-=======
-  dotenv@17.3.1: {}
-
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   dunder-proto@1.0.1:
     dependencies:
       call-bind-apply-helpers: 1.0.2
@@ -7803,14 +7530,11 @@ snapshots:
 
   ee-first@1.1.1: {}
 
-<<<<<<< HEAD
   effect@3.18.4:
     dependencies:
       '@standard-schema/spec': 1.1.0
       fast-check: 3.23.2
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   electron-to-chromium@1.5.302: {}
 
   emoji-regex@10.6.0: {}
@@ -7819,11 +7543,8 @@ snapshots:
 
   emoji-regex@9.2.2: {}
 
-<<<<<<< HEAD
   empathic@2.0.0: {}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   encodeurl@2.0.0: {}
 
   enhanced-resolve@5.19.0:
@@ -8314,15 +8035,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-<<<<<<< HEAD
   exsolve@1.0.8: {}
 
   fast-check@3.23.2:
     dependencies:
       pure-rand: 6.1.0
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   fast-deep-equal@3.1.3: {}
 
   fast-glob@3.3.1:
@@ -8401,14 +8119,11 @@ snapshots:
     dependencies:
       is-callable: 1.2.7
 
-<<<<<<< HEAD
   foreground-child@3.3.1:
     dependencies:
       cross-spawn: 7.0.6
       signal-exit: 4.1.0
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   form-data@4.0.5:
     dependencies:
       asynckit: 0.4.0
@@ -8431,12 +8146,9 @@ snapshots:
       jsonfile: 6.2.0
       universalify: 2.0.1
 
-<<<<<<< HEAD
   fsevents@2.3.3:
     optional: true
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   function-bind@1.1.2: {}
 
   function.prototype.name@1.1.8:
@@ -8454,13 +8166,10 @@ snapshots:
 
   fzf@0.5.2: {}
 
-<<<<<<< HEAD
   generate-function@2.3.1:
     dependencies:
       is-property: 1.0.2
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   generator-function@2.0.1: {}
 
   gensync@1.0.0-beta.2: {}
@@ -8486,11 +8195,8 @@ snapshots:
 
   get-own-enumerable-keys@1.0.0: {}
 
-<<<<<<< HEAD
   get-port-please@3.2.0: {}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   get-proto@1.0.1:
     dependencies:
       dunder-proto: 1.0.1
@@ -8543,13 +8249,10 @@ snapshots:
 
   graceful-fs@4.2.11: {}
 
-<<<<<<< HEAD
   grammex@3.1.12: {}
 
   graphmatch@1.1.1: {}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   graphql@16.12.0: {}
 
   has-bigints@1.1.0: {}
@@ -8582,11 +8285,8 @@ snapshots:
     dependencies:
       hermes-estree: 0.25.1
 
-<<<<<<< HEAD
   hono@4.11.4: {}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   hono@4.12.1: {}
 
   http-errors@2.0.1:
@@ -8597,11 +8297,8 @@ snapshots:
       statuses: 2.0.2
       toidentifier: 1.0.1
 
-<<<<<<< HEAD
   http-status-codes@2.3.0: {}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   https-proxy-agent@7.0.6:
     dependencies:
       agent-base: 7.1.4
@@ -8735,11 +8432,8 @@ snapshots:
 
   is-promise@4.0.0: {}
 
-<<<<<<< HEAD
   is-property@1.0.2: {}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   is-regex@1.2.1:
     dependencies:
       call-bound: 1.0.4
@@ -8859,11 +8553,8 @@ snapshots:
 
   kleur@4.1.5: {}
 
-<<<<<<< HEAD
   kysely@0.28.11: {}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   language-subtag-registry@0.3.23: {}
 
   language-tags@1.0.9:
@@ -8924,11 +8615,8 @@ snapshots:
       lightningcss-win32-arm64-msvc: 1.31.1
       lightningcss-win32-x64-msvc: 1.31.1
 
-<<<<<<< HEAD
   lilconfig@2.1.0: {}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   lines-and-columns@1.2.4: {}
 
   locate-path@6.0.0:
@@ -8937,21 +8625,15 @@ snapshots:
 
   lodash.merge@4.6.2: {}
 
-<<<<<<< HEAD
   lodash@4.17.21: {}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   log-symbols@6.0.0:
     dependencies:
       chalk: 5.6.2
       is-unicode-supported: 1.3.0
 
-<<<<<<< HEAD
   long@5.3.2: {}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   loose-envify@1.4.0:
     dependencies:
       js-tokens: 4.0.0
@@ -8960,11 +8642,8 @@ snapshots:
     dependencies:
       yallist: 3.1.1
 
-<<<<<<< HEAD
   lru.min@1.1.4: {}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   lucide-react@0.575.0(react@19.2.3):
     dependencies:
       react: 19.2.3
@@ -8977,11 +8656,8 @@ snapshots:
 
   media-typer@1.1.0: {}
 
-<<<<<<< HEAD
   memory-pager@1.5.0: {}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   merge-descriptors@2.0.0: {}
 
   merge-stream@2.0.0: {}
@@ -9063,7 +8739,6 @@ snapshots:
 
   mute-stream@2.0.0: {}
 
-<<<<<<< HEAD
   mysql2@3.15.3:
     dependencies:
       aws-ssl-profiles: 1.1.2
@@ -9080,8 +8755,6 @@ snapshots:
     dependencies:
       lru.min: 1.1.4
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   nanoid@3.3.11: {}
 
   nanostores@1.1.1: {}
@@ -9125,11 +8798,8 @@ snapshots:
       object.entries: 1.1.9
       semver: 6.3.1
 
-<<<<<<< HEAD
   node-fetch-native@1.6.7: {}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   node-fetch@3.3.2:
     dependencies:
       data-uri-to-buffer: 4.0.1
@@ -9147,15 +8817,12 @@ snapshots:
       path-key: 4.0.0
       unicorn-magic: 0.3.0
 
-<<<<<<< HEAD
   nypm@0.6.5:
     dependencies:
       citty: 0.2.1
       pathe: 2.0.3
       tinyexec: 1.0.2
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   object-assign@4.1.1: {}
 
   object-inspect@1.13.4: {}
@@ -9200,11 +8867,8 @@ snapshots:
       define-properties: 1.2.1
       es-object-atoms: 1.1.1
 
-<<<<<<< HEAD
   ohash@2.0.11: {}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   on-finished@2.4.1:
     dependencies:
       ee-first: 1.1.1
@@ -9298,7 +8962,6 @@ snapshots:
 
   path-to-regexp@8.3.0: {}
 
-<<<<<<< HEAD
   pathe@2.0.3: {}
 
   perfect-debounce@1.0.0: {}
@@ -9338,8 +9001,6 @@ snapshots:
     dependencies:
       split2: 4.2.0
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   picocolors@1.1.1: {}
 
   picomatch@2.3.1: {}
@@ -9348,15 +9009,12 @@ snapshots:
 
   pkce-challenge@5.0.1: {}
 
-<<<<<<< HEAD
   pkg-types@2.3.0:
     dependencies:
       confbox: 0.2.4
       exsolve: 1.0.8
       pathe: 2.0.3
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   possible-typed-array-names@1.1.0: {}
 
   postcss-selector-parser@7.1.1:
@@ -9376,7 +9034,6 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
-<<<<<<< HEAD
   postgres-array@2.0.0: {}
 
   postgres-bytea@1.0.1: {}
@@ -9389,8 +9046,6 @@ snapshots:
 
   postgres@3.4.7: {}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   powershell-utils@0.1.0: {}
 
   prelude-ls@1.2.1: {}
@@ -9399,7 +9054,6 @@ snapshots:
     dependencies:
       parse-ms: 4.0.0
 
-<<<<<<< HEAD
   prisma@7.4.2(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.3):
     dependencies:
       '@prisma/config': 7.4.2
@@ -9416,8 +9070,6 @@ snapshots:
       - react
       - react-dom
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   prompts@2.4.2:
     dependencies:
       kleur: 3.0.3
@@ -9429,15 +9081,12 @@ snapshots:
       object-assign: 4.1.1
       react-is: 16.13.1
 
-<<<<<<< HEAD
   proper-lockfile@4.1.2:
     dependencies:
       graceful-fs: 4.2.11
       retry: 0.12.0
       signal-exit: 3.0.7
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   proxy-addr@2.0.7:
     dependencies:
       forwarded: 0.2.0
@@ -9447,11 +9096,8 @@ snapshots:
 
   punycode@2.3.1: {}
 
-<<<<<<< HEAD
   pure-rand@6.1.0: {}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   qs@6.15.0:
     dependencies:
       side-channel: 1.1.0
@@ -9530,14 +9176,11 @@ snapshots:
       iconv-lite: 0.7.2
       unpipe: 1.0.0
 
-<<<<<<< HEAD
   rc9@2.1.2:
     dependencies:
       defu: 6.1.4
       destr: 2.0.5
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   react-dom@19.2.3(react@19.2.3):
     dependencies:
       react: 19.2.3
@@ -9578,11 +9221,8 @@ snapshots:
 
   react@19.2.3: {}
 
-<<<<<<< HEAD
   readdirp@4.1.2: {}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   recast@0.23.11:
     dependencies:
       ast-types: 0.16.1
@@ -9613,11 +9253,8 @@ snapshots:
       gopd: 1.2.0
       set-function-name: 2.0.2
 
-<<<<<<< HEAD
   remeda@2.33.4: {}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   require-directory@2.1.1: {}
 
   require-from-string@2.0.2: {}
@@ -9648,20 +9285,14 @@ snapshots:
       onetime: 7.0.0
       signal-exit: 4.1.0
 
-<<<<<<< HEAD
   retry@0.12.0: {}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   rettime@0.10.1: {}
 
   reusify@1.1.0: {}
 
-<<<<<<< HEAD
   rou3@0.7.12: {}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   router@2.2.0:
     dependencies:
       debug: 4.4.3
@@ -9721,11 +9352,8 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-<<<<<<< HEAD
   seq-queue@0.0.5: {}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   serve-static@2.2.1:
     dependencies:
       encodeurl: 2.0.0
@@ -9735,11 +9363,8 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-<<<<<<< HEAD
   set-cookie-parser@3.0.1: {}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   set-function-length@1.2.2:
     dependencies:
       define-data-property: 1.1.4
@@ -9882,7 +9507,6 @@ snapshots:
 
   source-map-js@1.2.1: {}
 
-<<<<<<< HEAD
   source-map-support@0.5.21:
     dependencies:
       buffer-from: 1.1.2
@@ -9898,19 +9522,12 @@ snapshots:
 
   sqlstring@2.3.3: {}
 
-=======
-  source-map@0.6.1: {}
-
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   stable-hash@0.0.5: {}
 
   statuses@2.0.2: {}
 
-<<<<<<< HEAD
   std-env@3.10.0: {}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   stdin-discarder@0.2.2: {}
 
   stop-iteration-iterator@1.1.0:
@@ -10052,13 +9669,10 @@ snapshots:
     dependencies:
       tldts: 7.0.23
 
-<<<<<<< HEAD
   tr46@5.1.1:
     dependencies:
       punycode: 2.3.1
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   ts-api-utils@2.4.0(typescript@5.9.3):
     dependencies:
       typescript: 5.9.3
@@ -10083,7 +9697,6 @@ snapshots:
 
   tslib@2.8.1: {}
 
-<<<<<<< HEAD
   tsx@4.21.0:
     dependencies:
       esbuild: 0.27.3
@@ -10091,8 +9704,6 @@ snapshots:
     optionalDependencies:
       fsevents: 2.3.3
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   tw-animate-css@1.4.0: {}
 
   type-check@0.4.0:
@@ -10227,20 +9838,16 @@ snapshots:
 
   util-deprecate@1.0.2: {}
 
-<<<<<<< HEAD
   valibot@1.2.0(typescript@5.9.3):
     optionalDependencies:
       typescript: 5.9.3
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   validate-npm-package-name@7.0.2: {}
 
   vary@1.1.2: {}
 
   web-streams-polyfill@3.3.3: {}
 
-<<<<<<< HEAD
   webidl-conversions@7.0.0: {}
 
   whatwg-url@14.2.0:
@@ -10248,8 +9855,6 @@ snapshots:
       tr46: 5.1.1
       webidl-conversions: 7.0.0
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   which-boxed-primitive@1.1.1:
     dependencies:
       is-bigint: 1.1.0
@@ -10320,11 +9925,8 @@ snapshots:
       is-wsl: 3.1.1
       powershell-utils: 0.1.0
 
-<<<<<<< HEAD
   xtend@4.0.2: {}
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   y18n@5.0.8: {}
 
   yallist@3.1.1: {}
@@ -10347,14 +9949,11 @@ snapshots:
 
   yoctocolors@2.1.2: {}
 
-<<<<<<< HEAD
   zeptomatch@2.1.0:
     dependencies:
       grammex: 3.1.12
       graphmatch: 1.1.1
 
-=======
->>>>>>> c8c3698 (feat: add UI components for dropdown menu, input fields, and form elements)
   zod-to-json-schema@3.25.1(zod@3.25.76):
     dependencies:
       zod: 3.25.76
