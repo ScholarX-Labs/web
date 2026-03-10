@@ -23,6 +23,7 @@ CREATE TABLE "session" (
 	"ip_address" text,
 	"user_agent" text,
 	"user_id" text NOT NULL,
+	"impersonated_by" text,
 	CONSTRAINT "session_token_unique" UNIQUE("token")
 );
 --> statement-breakpoint
@@ -34,9 +35,31 @@ CREATE TABLE "user" (
 	"image" text,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
+	"phone_number" text,
+	"phone_number_verified" boolean,
+	"role" text,
+	"banned" boolean DEFAULT false,
+	"ban_reason" text,
+	"ban_expires" timestamp,
 	"first_name" text NOT NULL,
 	"last_name" text NOT NULL,
-	CONSTRAINT "user_email_unique" UNIQUE("email")
+	"first_name_ar" text,
+	"last_name_ar" text,
+	"education_level" text,
+	"university" text,
+	"faculty" text,
+	"company" text,
+	"school" text,
+	"gpa" integer,
+	"industry" text,
+	"date_of_birth" timestamp,
+	"nationality" text,
+	"city" text,
+	"current_interest" text,
+	"saved_opportunities" text[],
+	"registered_events" text[],
+	CONSTRAINT "user_email_unique" UNIQUE("email"),
+	CONSTRAINT "user_phone_number_unique" UNIQUE("phone_number")
 );
 --> statement-breakpoint
 CREATE TABLE "verification" (

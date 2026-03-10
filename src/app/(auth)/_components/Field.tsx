@@ -22,6 +22,7 @@ const Field = React.forwardRef<HTMLInputElement, FieldProps>(
         {label && <FieldLabel htmlFor={name}>{label}</FieldLabel>}
         <FieldContent>
           <Input
+            className="bg-white"
             ref={ref}
             id={name}
             name={name}
