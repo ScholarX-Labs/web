@@ -16,6 +16,41 @@ import { CourseRating } from "./course-rating";
 import { CourseMeta } from "./course-meta";
 import { InstructorInfo } from "./instructor-info";
 import { cn } from "@/lib/utils";
+import { Monitor, PenTool, Database, Cpu, Tag } from "lucide-react";
+
+const CATEGORY_STYLES: Record<string, { icon: React.ElementType, gradient: string, shadow: string, ring: string }> = {
+  Engineering: {
+    icon: Monitor,
+    gradient: "from-blue-500 to-cyan-400",
+    shadow: "shadow-[0_4px_14px_rgba(59,130,246,0.4)]",
+    ring: "ring-blue-400/30",
+  },
+  Design: {
+    icon: PenTool,
+    gradient: "from-pink-500 to-rose-400",
+    shadow: "shadow-[0_4px_14px_rgba(236,72,153,0.4)]",
+    ring: "ring-pink-400/30",
+  },
+  Backend: {
+    icon: Database,
+    gradient: "from-emerald-500 to-teal-400",
+    shadow: "shadow-[0_4px_14px_rgba(16,185,129,0.4)]",
+    ring: "ring-emerald-400/30",
+  },
+  Systems: {
+    icon: Cpu,
+    gradient: "from-purple-500 to-violet-400",
+    shadow: "shadow-[0_4px_14px_rgba(168,85,247,0.4)]",
+    ring: "ring-purple-400/30",
+  },
+};
+
+const DEFAULT_CATEGORY_STYLE = {
+  icon: Tag,
+  gradient: "from-hero-orange to-[#ff8a6a]",
+  shadow: "shadow-[0_4px_14px_rgba(255,106,58,0.4)]",
+  ring: "ring-white/30",
+};
 
 interface CourseCardProps {
   course: Course;
@@ -50,11 +85,21 @@ export function CourseCard({ course, className }: CourseCardProps) {
             {/* Elegant gradient overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent opacity-80 transition-opacity duration-500 group-hover/course-card:opacity-95" />
 
-            {course.category && (
-              <Badge className="absolute left-4 top-4 px-3 py-1 text-xs shadow-sm bg-black/40 backdrop-blur-md text-white border border-white/10 font-medium tracking-wide rounded-full">
-                {course.category}
-              </Badge>
-            )}
+            {course.category && (() => {
+              const style = CATEGORY_STYLES[course.category] || DEFAULT_CATEGORY_STYLE;
+              const Icon = style.icon;
+              return (
+                <div className={cn(
+                  "absolute left-4 top-4 px-3 py-1.5 text-xs shadow-sm text-white font-semibold tracking-wide rounded-md ring-1 backdrop-blur-md flex items-center gap-1.5 bg-gradient-to-r",
+                  style.gradient,
+                  style.shadow,
+                  style.ring
+                )}>
+                  <Icon className="w-3.5 h-3.5" />
+                  {course.category}
+                </div>
+              );
+            })()}
 
             <div className="absolute bottom-4 right-4 shadow-lg transition-transform duration-500 ease-out group-hover/course-card:-translate-y-1">
               <CoursePrice

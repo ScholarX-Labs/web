@@ -46,6 +46,7 @@ const SAMPLE_COURSES: Course[] = [
     thumbnail:
       "https://images.unsplash.com/photo-1561070791-2526d30994b5?q=80&w=800&auto=format&fit=crop",
     price: 0,
+    originalPrice: 200,
     category: "Design",
     level: "Beginner",
     duration: "6h 15m",
