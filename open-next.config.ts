@@ -5,10 +5,6 @@ const config: OpenNextConfig = {
     override: {
       wrapper: "cloudflare-node",
       converter: "edge",
-      incrementalCache: async () => {
-        const { KVCache } = await import("@opennextjs/cloudflare/kvCache");
-        return new KVCache();
-      },
     },
   },
 };
