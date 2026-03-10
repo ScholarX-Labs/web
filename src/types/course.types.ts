@@ -28,6 +28,12 @@ export interface Course {
   studentsCount?: number;
   originalPrice?: number;
 
+  // Premium Layout & Engagements features
+  videoPreviewUrl?: string;
+  isBestseller?: boolean;
+  urgencyText?: string;
+  tags?: string[];
+
   // Access and Status
   requiresForm: boolean;
   isPublished: boolean;

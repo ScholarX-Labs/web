@@ -21,43 +21,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Course } from "@/types/course.types";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
-
-const CATEGORY_STYLES: Record<
-  string,
-  { icon: React.ElementType; gradient: string; shadow: string; ring: string }
-> = {
-  Engineering: {
-    icon: Monitor,
-    gradient: "from-blue-500 to-cyan-400",
-    shadow: "shadow-[0_4px_14px_rgba(59,130,246,0.4)]",
-    ring: "ring-blue-400/30",
-  },
-  Design: {
-    icon: PenTool,
-    gradient: "from-pink-500 to-rose-400",
-    shadow: "shadow-[0_4px_14px_rgba(236,72,153,0.4)]",
-    ring: "ring-pink-400/30",
-  },
-  Backend: {
-    icon: Database,
-    gradient: "from-emerald-500 to-teal-400",
-    shadow: "shadow-[0_4px_14px_rgba(16,185,129,0.4)]",
-    ring: "ring-emerald-400/30",
-  },
-  Systems: {
-    icon: Cpu,
-    gradient: "from-purple-500 to-violet-400",
-    shadow: "shadow-[0_4px_14px_rgba(168,85,247,0.4)]",
-    ring: "ring-purple-400/30",
-  },
-};
-
-const DEFAULT_CATEGORY_STYLE = {
-  icon: Tag,
-  gradient: "from-hero-orange to-[#ff8a6a]",
-  shadow: "shadow-[0_4px_14px_rgba(255,106,58,0.4)]",
-  ring: "ring-white/30",
-};
+import { Parallax3DWrapper } from "@/components/animations/parallax-3d-card";
+import { VisualLevelMeter } from "./card-parts/visual-level-meter";
+import { HoverMedia } from "./card-parts/hover-media";
+import { CourseCategoryBadge } from "./card-parts/course-badges";
+import { SocialProofRibbon } from "./card-parts/social-proof-ribbon";
+import { CoursePriceDisplay } from "./card-parts/course-price-display";
 
 interface LatestCourseCardProps {
   course: Course;
@@ -89,10 +58,6 @@ export function LatestCourseCard({
 
   return (
     <motion.div
-      className={cn(
-        "group relative bg-white rounded-[1.5rem] shadow-[0_2px_15px_rgba(0,0,0,0.06)] border border-gray-100/80 hover:border-hero-blue/20 overflow-visible flex flex-col h-full",
-        className,
-      )}
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.15 }}
@@ -101,54 +66,35 @@ export function LatestCourseCard({
         ease: [0.25, 0.46, 0.45, 0.94],
         delay: index * 0.1,
       }}
-      whileHover={{
-        y: -6,
-        scale: 1.01,
-        boxShadow: "0 25px 50px -12px rgba(51, 153, 204, 0.20)",
-      }}
+      className="h-full"
     >
-      {/* Subtle hover background glow */}
-      <div className="absolute inset-0 bg-gradient-to-br from-hero-blue/[0.04] via-transparent to-hero-orange/[0.03] opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-[1.5rem] pointer-events-none z-0" />
+      <Parallax3DWrapper
+        className={cn(
+          "group relative bg-white rounded-[1.5rem] shadow-[0_2px_15px_rgba(0,0,0,0.06)] border border-gray-100/80 hover:border-hero-blue/20 flex flex-col h-full overflow-hidden",
+          className,
+        )}
+      >
+        {/* Subtle hover background glow */}
+      <div className="absolute inset-0 bg-linear-to-br from-hero-blue/4 via-transparent to-hero-orange/3 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-[1.5rem] pointer-events-none z-0" />
 
       {/* ── Image block ──────────────────────────────────────── */}
-      <div className="relative aspect-[4/3] w-full rounded-t-[1.5rem] overflow-hidden shrink-0 z-10 group/image">
-        <Image
-          src={
-            course.thumbnail ||
-            "https://images.unsplash.com/photo-1620064916958-605375619af8?q=80&w=800&auto=format&fit=crop"
-          }
-          alt={course.title}
-          fill
-          className="object-cover transition-transform duration-700 ease-out group-hover/image:scale-110"
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+      <div className="relative aspect-4/3 w-full rounded-t-[1.5rem] overflow-hidden shrink-0 z-10 group/image">
+        <HoverMedia 
+          thumbnail={course.thumbnail} 
+          title={course.title}
+          videoPreviewUrl={course.videoPreviewUrl}
         />
-        {/* Subtle cinematic gradient overlay on hover */}
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 via-transparent to-transparent opacity-0 group-hover/image:opacity-100 transition-opacity duration-500 pointer-events-none z-10" />
 
-        {/* Category badge */}
-        {course.category &&
-          (() => {
-            const style =
-              CATEGORY_STYLES[course.category] || DEFAULT_CATEGORY_STYLE;
-            const Icon = style.icon;
-            return (
-              <motion.span
-                className={cn(
-                  "absolute top-3 left-3 bg-gradient-to-r text-white text-[11px] font-bold tracking-wide rounded-md px-2.5 py-1.5 z-20 ring-1 backdrop-blur-md flex items-center gap-1.5",
-                  style.gradient,
-                  style.shadow,
-                  style.ring,
-                )}
-                initial={{ opacity: 0, x: -10 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 + 0.2, duration: 0.4 }}
-              >
-                <Icon className="w-3.5 h-3.5" />
-                {course.category}
-              </motion.span>
-            );
-          })()}
+        <SocialProofRibbon 
+          isBestseller={course.isBestseller}
+          urgencyText={course.urgencyText}
+        />
+
+        <CourseCategoryBadge 
+          category={course.category} 
+          delay={index * 0.1 + 0.2}
+          className="absolute top-3 left-3 z-20"
+        />
 
         {/* Wishlist button */}
         <motion.button
@@ -175,7 +121,7 @@ export function LatestCourseCard({
               className={cn(
                 "w-4 h-4 transition-colors duration-300",
                 wishlisted
-                  ? "fill-[#ff6a3a] stroke-[#ff6a3a]"
+                  ? "fill-hero-orange stroke-hero-orange"
                   : "stroke-gray-600 fill-transparent group-hover/image:stroke-hero-blue",
               )}
             />
@@ -192,6 +138,11 @@ export function LatestCourseCard({
 
         {/* Meta row - Colorful Pills */}
         <div className="flex flex-wrap items-center gap-2">
+          {course.level && (
+            <div className="flex items-center gap-1.5 bg-slate-50/80 text-slate-700 px-2.5 py-1 rounded-md text-[11px] font-bold border border-slate-200/50">
+              <VisualLevelMeter level={course.level} />
+            </div>
+          )}
           {course.lessonsCount !== undefined && (
             <div className="flex items-center gap-1.5 bg-blue-50/80 text-blue-700 px-2.5 py-1 rounded-md text-[11px] font-bold border border-blue-100/50">
               <BookOpen className="w-3.5 h-3.5" />
@@ -218,52 +169,31 @@ export function LatestCourseCard({
         </div>
 
         {/* Price row */}
-        <div className="flex items-center gap-2.5 pt-1">
-          {displayPrice !== undefined && (
-            <>
-              {showStrikethrough && originalPrice && (
-                <span className="text-xs font-semibold text-slate-500 line-through decoration-slate-500 decoration-2">
-                  EGP {originalPrice.toLocaleString()}
-                </span>
-              )}
+        <CoursePriceDisplay 
+          price={course.price} 
+          currentPrice={course.currentPrice} 
+          originalPrice={course.originalPrice} 
+        />
 
-              {isPaid ? (
-                <span className="font-black text-xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-hero-blue to-[#4834d4]">
-                  EGP {displayPrice.toLocaleString()}
-                </span>
-              ) : (
-                <span className="font-black text-xl tracking-tight text-emerald-600 drop-shadow-sm">
-                  Free
-                </span>
-              )}
-
-              {showStrikethrough && originalPrice !== undefined && (
-                <span
-                  className={cn(
-                    "text-[10px] font-extrabold rounded-full px-2 py-0.5 leading-none shadow-sm",
-                    !isPaid
-                      ? "text-red-700 bg-red-100 border border-red-300 animate-pulse" // 100% OFF vibrant style
-                      : "text-emerald-700 bg-emerald-100 border border-emerald-300",
-                  )}
-                >
-                  {Math.round(
-                    ((originalPrice - displayPrice) / originalPrice) * 100,
-                  )}
-                  % OFF
-                </span>
-              )}
-            </>
-          )}
-        </div>
+        {/* Tech Stack Tags */}
+        {course.tags && course.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-auto pt-1 pb-1">
+            {course.tags.slice(0, 3).map((tag, i) => (
+              <span key={i} className="text-[10px] font-semibold tracking-wider text-slate-500 bg-slate-100/80 border border-slate-200/60 rounded-md px-2 py-0.5">
+                #{tag}
+              </span>
+            ))}
+          </div>
+        )}
 
         {/* Enroll row */}
         <div className="flex items-center gap-3 mt-auto pt-2">
           <Link
             href={ROUTES.COURSE_DETAIL(course.slug)}
-            className="group/btn relative flex-1 overflow-hidden flex items-center justify-center gap-2 bg-gradient-to-r from-hero-blue to-hero-blue-dark text-white text-sm font-bold rounded-full py-3 shadow-lg shadow-hero-blue/30 transition-transform active:scale-[0.98]"
+            className="group/btn relative flex-1 overflow-hidden flex items-center justify-center gap-2 bg-linear-to-r from-hero-blue to-hero-blue-dark text-white text-sm font-bold rounded-full py-3 shadow-lg shadow-hero-blue/30 transition-transform active:scale-[0.98]"
           >
             {/* Shimmer sweep effect inside button */}
-            <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 ease-in-out" />
+            <span className="absolute inset-0 w-full h-full bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 ease-in-out" />
             <span className="relative z-10 flex items-center gap-1.5">
               Enroll Now
               <ChevronRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
@@ -273,7 +203,7 @@ export function LatestCourseCard({
           {/* Rating badge */}
           {course.rating !== undefined && (
             <motion.div
-              className="w-[3.25rem] h-[3.25rem] rounded-full border border-amber-200/60 shadow-lg shadow-amber-500/20 bg-gradient-to-br from-amber-50 to-orange-50 flex flex-col items-center justify-center shrink-0 relative overflow-hidden"
+              className="w-13 h-13 rounded-full border border-amber-200/60 shadow-lg shadow-amber-500/20 bg-linear-to-br from-amber-50 to-orange-50 flex flex-col items-center justify-center shrink-0 relative overflow-hidden"
               whileHover={{ scale: 1.15, rotate: -8 }}
               transition={{ type: "spring", stiffness: 400, damping: 12 }}
             >
@@ -321,6 +251,7 @@ export function LatestCourseCard({
           </Link>
         </div>
       </div>
+      </Parallax3DWrapper>
     </motion.div>
   );
 }

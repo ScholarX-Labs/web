@@ -31,7 +31,7 @@ export function CourseGrid({ children, className }: CourseGridProps) {
             <AnimatePresence>
               {hoveredIndex === idx && (
                 <motion.span
-                  className="absolute inset-[-1rem] bg-primary/5 dark:bg-primary/10 backdrop-blur-3xl border border-primary/5 block rounded-[2rem] -z-10"
+                  className="absolute -inset-4 bg-primary/5 dark:bg-primary/10 backdrop-blur-3xl border border-primary/5 block rounded-[2rem] -z-10"
                   layoutId="courseGridHoverBackground"
                   initial={{ opacity: 0 }}
                   animate={{

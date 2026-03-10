@@ -73,7 +73,7 @@ export function CourseCard({ course, className }: CourseCardProps) {
           )}
         >
           {/* Image Area */}
-          <div className="relative aspect-[16/9] w-full overflow-hidden mb-2 rounded-t-[1.5rem]">
+          <div className="relative aspect-video w-full overflow-hidden mb-2 rounded-t-[1.5rem]">
             <Image
               src={
                 course.thumbnail ||
@@ -85,7 +85,7 @@ export function CourseCard({ course, className }: CourseCardProps) {
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
             {/* Elegant gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent opacity-80 transition-opacity duration-500 group-hover/course-card:opacity-95" />
+            <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/10 to-transparent opacity-80 transition-opacity duration-500 group-hover/course-card:opacity-95" />
 
             {course.category &&
               (() => {
@@ -95,7 +95,7 @@ export function CourseCard({ course, className }: CourseCardProps) {
                 return (
                   <div
                     className={cn(
-                      "absolute left-4 top-4 px-3 py-1.5 text-xs shadow-sm text-white font-semibold tracking-wide rounded-md ring-1 backdrop-blur-md flex items-center gap-1.5 bg-gradient-to-r",
+                      "absolute left-4 top-4 px-3 py-1.5 text-xs shadow-sm text-white font-semibold tracking-wide rounded-md ring-1 backdrop-blur-md flex items-center gap-1.5 bg-linear-to-r",
                       style.gradient,
                       style.shadow,
                       style.ring,

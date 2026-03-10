@@ -57,7 +57,7 @@ export function CoursesFilterSection({ courses }: CoursesFilterSectionProps) {
         </CourseGrid>
       ) : (
         <div className="flex flex-col items-center justify-center py-24 text-center">
-          <p className="text-2xl font-bold text-[#1a2b49] mb-2">
+          <p className="text-2xl font-bold text-hero-heading mb-2">
             No courses found
           </p>
           <p className="text-muted-foreground text-sm max-w-xs">

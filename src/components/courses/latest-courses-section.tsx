@@ -31,7 +31,10 @@ export function LatestCoursesSection({ courses }: LatestCoursesSectionProps) {
 
   useEffect(() => {
     if (!emblaApi) return;
-    onSelect();
+    
+    // Defer the initial setting to avoid synchronous setState warning
+    Promise.resolve().then(onSelect);
+
     emblaApi.on("select", onSelect);
     emblaApi.on("reInit", onSelect);
     return () => {

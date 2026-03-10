@@ -149,7 +149,7 @@ export function CoursesHero() {
                  z-30 : Child — thumb-2-2 SVG (arch clip built-in)
                  z-40 : Floating stat badges
           ──────────────────────────────────────────────────────────── */}
-          <div className="relative h-[500px] w-full hidden lg:block">
+          <div className="relative h-125 w-full hidden lg:block">
             {/* Soft white card backdrop */}
             <div className="absolute left-[14%] right-[10%] top-[5%] bottom-[8%] bg-white/30 rounded-3xl z-0" />
 
