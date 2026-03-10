@@ -10,8 +10,8 @@ function SignoutButton() {
     <button
       onClick={async () => {
         await signOut();
-        router.refresh();
         router.replace("/");
+        router.refresh();
       }}
     >
       Logout

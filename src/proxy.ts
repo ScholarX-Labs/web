@@ -17,7 +17,6 @@ function hasSessionCookie(request: NextRequest) {
 export function proxy(request: NextRequest) {
   const isAuthenticated = hasSessionCookie(request);
   const { pathname } = request.nextUrl;
-
   if (AUTH_ROUTES.has(pathname) && isAuthenticated) {
     return NextResponse.redirect(new URL("/", request.url));
   }
