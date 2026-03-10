@@ -7,11 +7,18 @@ interface CoursePriceDisplayProps {
   className?: string;
 }
 
-export function CoursePriceDisplay({ price, currentPrice, originalPrice: propOriginalPrice, className }: CoursePriceDisplayProps) {
-  const isPaid = (price ?? 0) > 0;
+export function CoursePriceDisplay({
+  price,
+  currentPrice,
+  originalPrice: propOriginalPrice,
+  className,
+}: CoursePriceDisplayProps) {
   const displayPrice = currentPrice ?? price;
-  const originalPrice = propOriginalPrice ?? (currentPrice !== undefined ? price : undefined);
-  const showStrikethrough = originalPrice !== undefined && originalPrice !== displayPrice;
+  const isPaid = (displayPrice ?? 0) > 0;
+  const originalPrice =
+    propOriginalPrice ?? (currentPrice !== undefined ? price : undefined);
+  const showStrikethrough =
+    originalPrice !== undefined && originalPrice > (displayPrice ?? 0);
 
   return (
     <div className={cn("flex flex-col", className)}>
@@ -40,10 +47,13 @@ export function CoursePriceDisplay({ price, currentPrice, originalPrice: propOri
                   "text-[10px] font-extrabold rounded-full px-2 py-0.5 leading-none shadow-sm",
                   !isPaid
                     ? "text-red-700 bg-red-100 border border-red-300 animate-pulse" // 100% OFF vibrant style
-                    : "text-emerald-700 bg-emerald-100 border border-emerald-300"
+                    : "text-emerald-700 bg-emerald-100 border border-emerald-300",
                 )}
               >
-                {Math.round(((originalPrice - displayPrice) / originalPrice) * 100)}% OFF
+                {Math.round(
+                  ((originalPrice - displayPrice) / originalPrice) * 100,
+                )}
+                % OFF
               </span>
             )}
           </>

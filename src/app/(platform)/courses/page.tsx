@@ -25,6 +25,10 @@ const SAMPLE_COURSES: Course[] = [
     studentsCount: 99,
     rating: 4.9,
     totalRatings: 1240,
+    isBestseller: true,
+    urgencyText: "3 Spots Left",
+    tags: ["React", "Architecture", "Performance"],
+    videoPreviewUrl: "https://www.w3schools.com/html/mov_bbb.mp4", // generic test video
     instructor: {
       id: "i1",
       name: "Dan Abramov",
@@ -55,6 +59,8 @@ const SAMPLE_COURSES: Course[] = [
     studentsCount: 210,
     rating: 4.7,
     totalRatings: 856,
+    tags: ["Figma", "Accessibility", "Design"],
+    isBestseller: true,
     instructor: {
       id: "i2",
       name: "Sarah Drasner",
@@ -86,6 +92,8 @@ const SAMPLE_COURSES: Course[] = [
     studentsCount: 87,
     rating: 4.8,
     totalRatings: 342,
+    tags: ["NestJS", "Microservices", "Node.js"],
+    urgencyText: "Ends in 5h",
     instructor: {
       id: "i3",
       name: "Kamil Myśliwiec",
@@ -117,6 +125,8 @@ const SAMPLE_COURSES: Course[] = [
     studentsCount: 312,
     rating: 5.0,
     totalRatings: 2100,
+    tags: ["Rust", "Systems", "WASM"],
+    urgencyText: "Only 2 left",
     instructor: {
       id: "i4",
       name: "Ashley Williams",

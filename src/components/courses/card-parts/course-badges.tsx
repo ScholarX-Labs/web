@@ -1,10 +1,11 @@
+import { type ElementType } from "react";
 import { motion } from "framer-motion";
 import { Monitor, PenTool, Database, Cpu, Tag } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const CATEGORY_STYLES: Record<
   string,
-  { icon: React.ElementType; gradient: string; shadow: string; ring: string }
+  { icon: ElementType; gradient: string; shadow: string; ring: string }
 > = {
   Engineering: {
     icon: Monitor,
@@ -62,7 +63,7 @@ export function CourseCategoryBadge({
         style.gradient,
         style.shadow,
         style.ring,
-        className
+        className,
       )}
       initial={{ opacity: 0, x: -10 }}
       whileInView={{ opacity: 1, x: 0 }}

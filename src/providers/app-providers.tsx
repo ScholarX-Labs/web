@@ -1,10 +1,18 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Toaster } from "sonner";
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
+
+const ReactQueryDevtools =
+  process.env.NODE_ENV === "development"
+    ? lazy(() =>
+        import("@tanstack/react-query-devtools").then((m) => ({
+          default: m.ReactQueryDevtools,
+        }))
+      )
+    : null;
 
 // Use a factory function to ensure we don't share QueryClient across requests (for Server Components context)
 function makeQueryClient() {
@@ -45,7 +53,11 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
         {/* Toast Provider */}
         <Toaster position="bottom-right" richColors theme="system" />
         {/* Devtools: only in development, hidden by default */}
-        <ReactQueryDevtools initialIsOpen={false} />
+        {ReactQueryDevtools && (
+          <Suspense>
+            <ReactQueryDevtools initialIsOpen={false} />
+          </Suspense>
+        )}
       </NuqsAdapter>
     </QueryClientProvider>
   );

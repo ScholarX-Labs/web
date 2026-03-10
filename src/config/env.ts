@@ -2,7 +2,7 @@ import { z } from "zod";
 
 // Define the schema for environment variables
 const envSchema = z.object({
-  NEXT_PUBLIC_API_URL: z.string().url().default("http://localhost:3000/api"),
+  NEXT_PUBLIC_API_URL: z.string().min(1).default("/api"),
   // Add other env variables here as needed
 });
 
