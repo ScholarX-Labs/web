@@ -10,7 +10,6 @@ import {
   CardFooter,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { CoursePrice } from "./course-price";
 import { CourseRating } from "./course-rating";
 import { CourseMeta } from "./course-meta";
