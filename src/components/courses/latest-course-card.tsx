@@ -189,7 +189,7 @@ export function LatestCourseCard({
                     "text-[10px] font-extrabold rounded-full px-2 py-0.5 leading-none shadow-sm",
                     !isPaid
                       ? "text-red-700 bg-red-100 border border-red-300 animate-pulse" // 100% OFF vibrant style
-                      : "text-emerald-700 bg-emerald-100 border border-emerald-300"
+                      : "text-emerald-700 bg-emerald-100 border border-emerald-300",
                   )}
                 >
                   {Math.round(
