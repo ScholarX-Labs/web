@@ -37,12 +37,16 @@ export function LatestCourseCard({
 
   const isPaid = (course.price ?? 0) > 0;
 
-  const instructorInitials = course.instructor?.name
-    .split(" ")
-    .map((n) => n[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
+  const instructorInitials =
+    course.instructor?.name
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((n) => n[0] ?? "")
+      .filter(Boolean)
+      .slice(0, 2)
+      .join("")
+      .toUpperCase() ?? "";
 
   return (
     <motion.div
