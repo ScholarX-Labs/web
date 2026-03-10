@@ -22,7 +22,10 @@ import { Course } from "@/types/course.types";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 
-const CATEGORY_STYLES: Record<string, { icon: React.ElementType, gradient: string, shadow: string, ring: string }> = {
+const CATEGORY_STYLES: Record<
+  string,
+  { icon: React.ElementType; gradient: string; shadow: string; ring: string }
+> = {
   Engineering: {
     icon: Monitor,
     gradient: "from-blue-500 to-cyan-400",
@@ -123,27 +126,29 @@ export function LatestCourseCard({
         <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 via-transparent to-transparent opacity-0 group-hover/image:opacity-100 transition-opacity duration-500 pointer-events-none z-10" />
 
         {/* Category badge */}
-        {course.category && (() => {
-          const style = CATEGORY_STYLES[course.category] || DEFAULT_CATEGORY_STYLE;
-          const Icon = style.icon;
-          return (
-            <motion.span
-              className={cn(
-                "absolute top-3 left-3 bg-gradient-to-r text-white text-[11px] font-bold tracking-wide rounded-md px-2.5 py-1.5 z-20 ring-1 backdrop-blur-md flex items-center gap-1.5",
-                style.gradient,
-                style.shadow,
-                style.ring
-              )}
-              initial={{ opacity: 0, x: -10 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 + 0.2, duration: 0.4 }}
-            >
-              <Icon className="w-3.5 h-3.5" />
-              {course.category}
-            </motion.span>
-          );
-        })()}
+        {course.category &&
+          (() => {
+            const style =
+              CATEGORY_STYLES[course.category] || DEFAULT_CATEGORY_STYLE;
+            const Icon = style.icon;
+            return (
+              <motion.span
+                className={cn(
+                  "absolute top-3 left-3 bg-gradient-to-r text-white text-[11px] font-bold tracking-wide rounded-md px-2.5 py-1.5 z-20 ring-1 backdrop-blur-md flex items-center gap-1.5",
+                  style.gradient,
+                  style.shadow,
+                  style.ring,
+                )}
+                initial={{ opacity: 0, x: -10 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 + 0.2, duration: 0.4 }}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                {course.category}
+              </motion.span>
+            );
+          })()}
 
         {/* Wishlist button */}
         <motion.button

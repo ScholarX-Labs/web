@@ -18,7 +18,10 @@ import { InstructorInfo } from "./instructor-info";
 import { cn } from "@/lib/utils";
 import { Monitor, PenTool, Database, Cpu, Tag } from "lucide-react";
 
-const CATEGORY_STYLES: Record<string, { icon: React.ElementType, gradient: string, shadow: string, ring: string }> = {
+const CATEGORY_STYLES: Record<
+  string,
+  { icon: React.ElementType; gradient: string; shadow: string; ring: string }
+> = {
   Engineering: {
     icon: Monitor,
     gradient: "from-blue-500 to-cyan-400",
@@ -85,21 +88,25 @@ export function CourseCard({ course, className }: CourseCardProps) {
             {/* Elegant gradient overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent opacity-80 transition-opacity duration-500 group-hover/course-card:opacity-95" />
 
-            {course.category && (() => {
-              const style = CATEGORY_STYLES[course.category] || DEFAULT_CATEGORY_STYLE;
-              const Icon = style.icon;
-              return (
-                <div className={cn(
-                  "absolute left-4 top-4 px-3 py-1.5 text-xs shadow-sm text-white font-semibold tracking-wide rounded-md ring-1 backdrop-blur-md flex items-center gap-1.5 bg-gradient-to-r",
-                  style.gradient,
-                  style.shadow,
-                  style.ring
-                )}>
-                  <Icon className="w-3.5 h-3.5" />
-                  {course.category}
-                </div>
-              );
-            })()}
+            {course.category &&
+              (() => {
+                const style =
+                  CATEGORY_STYLES[course.category] || DEFAULT_CATEGORY_STYLE;
+                const Icon = style.icon;
+                return (
+                  <div
+                    className={cn(
+                      "absolute left-4 top-4 px-3 py-1.5 text-xs shadow-sm text-white font-semibold tracking-wide rounded-md ring-1 backdrop-blur-md flex items-center gap-1.5 bg-gradient-to-r",
+                      style.gradient,
+                      style.shadow,
+                      style.ring,
+                    )}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    {course.category}
+                  </div>
+                );
+              })()}
 
             <div className="absolute bottom-4 right-4 shadow-lg transition-transform duration-500 ease-out group-hover/course-card:-translate-y-1">
               <CoursePrice
