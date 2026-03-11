@@ -1,6 +1,6 @@
 import { getSession } from "@/lib/dal";
 import { redirect } from "next/navigation";
-import PhoneForm from "@/app/(auth)/_components/PhoneForm";
+import PhoneForm from "@/app/auth/_components/PhoneForm";
 
 export default async function Page() {
   const session = await getSession();

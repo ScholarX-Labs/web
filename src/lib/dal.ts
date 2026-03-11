@@ -21,11 +21,11 @@ export async function requireSession() {
   const session = await getSession();
 
   if (!session) {
-    redirect("/signin");
+    redirect("/auth/signin");
   }
 
   if (!session.user.phoneNumber) {
-    redirect("auth/collect-phone");
+    redirect("/auth/collect-phone");
   }
 
   return session;

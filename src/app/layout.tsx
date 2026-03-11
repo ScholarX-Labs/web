@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
-import SignoutButton from "./(auth)/_components/SignoutButton";
+import SignoutButton from "./auth/_components/SignoutButton";
 import { getSession } from "@/lib/dal";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });

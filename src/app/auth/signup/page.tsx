@@ -7,7 +7,7 @@ import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import Field from "@/app/(auth)/_components/Field";
+import Field from "@/app/auth/_components/Field";
 import { Button } from "@/components/ui/button";
 import { signIn, signUp } from "@/lib/auth-client";
 import { redirect } from "next/navigation";
@@ -235,10 +235,8 @@ export default function Page() {
           {isSubmitting ? "Loading..." : "Sign up"}
         </Button>
 
-        <div className="flex items-center gap-3">
-          <span className="flex-1 h-px bg-border" />
-          <span className="text-xs text-muted-foreground">or</span>
-          <span className="flex-1 h-px bg-border" />
+        <div className="relative flex items-center gap-3 text-xs text-muted-foreground before:content-[''] before:flex-1 before:h-px before:bg-border after:content-[''] after:flex-1 after:h-px after:bg-border">
+          or
         </div>
 
         <Button
@@ -246,7 +244,10 @@ export default function Page() {
           variant="outline"
           className="h-10 w-full max-w-64 self-center justify-center gap-3 rounded-md border-[#dadce0] bg-white px-3 text-sm font-medium text-[#3c4043] shadow-none transition-colors hover:border-[#d2e3fc] hover:bg-[#f8f9fa] hover:text-[#3c4043] hover:cursor-pointer focus-visible:border-[#4285f4] focus-visible:ring-[#4285f4]/30 active:bg-[#f1f3f4]"
           onClick={() =>
-            signIn.social({ provider: "google", callbackURL: "/collect-phone" })
+            signIn.social({
+              provider: "google",
+              callbackURL: "/auth/collect-phone",
+            })
           }
         >
           <GoogleIcon />
@@ -254,9 +255,9 @@ export default function Page() {
         </Button>
 
         <p className="text-center text-sm text-muted-foreground">
-          Already have an account?
+          Already have an account?{" "}
           <Link
-            href="/signin"
+            href="/auth/signin"
             className="relative text-primary motion-safe:transition-colors duration-200 ease-in-out hover:opacity-80 after:content-[''] after:absolute after:-bottom-0.5 after:left-0 after:h-0.5 after:w-full after:origin-bottom-right after:scale-x-0 after:bg-current after:transition-transform after:duration-300 after:ease-in-out hover:after:scale-x-100 hover:after:origin-bottom-left"
           >
             Sign in
