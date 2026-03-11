@@ -3,7 +3,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
 import { drizzle } from "drizzle-orm/node-postgres";
 import * as schema from "@/db/schema/auth-schema";
-import { admin, phoneNumber } from "better-auth/plugins";
+import { admin, bearer, phoneNumber } from "better-auth/plugins";
 import { z } from "zod";
 const db = drizzle({
   connection: {
@@ -112,5 +112,5 @@ export const auth = betterAuth({
       },
     },
   },
-  plugins: [nextCookies(), phoneNumber(), admin()],
+  plugins: [nextCookies(), phoneNumber(), admin(), bearer()],
 });
