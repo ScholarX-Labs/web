@@ -24,7 +24,7 @@ export const useFeaturedCourses = (page = 1, limit = 3) => {
   return useQuery({
     queryKey: ["courses", "featured", { page, limit }],
     queryFn: async (): Promise<PaginatedCoursesResponse> => {
-      const response = await api.get(
+      const response = await apiClient.get(
         `/courses/featured?page=${page}&limit=${limit}`,
       );
       return response.data;
@@ -36,7 +36,7 @@ export const useCourse = (id: string) => {
   return useQuery({
     queryKey: ["course", id],
     queryFn: async (): Promise<ICourse> => {
-      const response = await api.get(`/courses/${id}`);
+      const response = await apiClient.get(`/courses/${id}`);
       return response.data;
     },
     enabled: !!id,
@@ -47,7 +47,7 @@ export const useEnrollCourse = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (courseId: string) => {
-      const response = await api.post(`/courses/${courseId}/enroll`);
+      const response = await apiClient.post(`/courses/${courseId}/enroll`);
       return response.data;
     },
     onSuccess: (_, courseId) => {
