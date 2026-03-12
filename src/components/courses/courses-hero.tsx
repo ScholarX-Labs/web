@@ -44,6 +44,7 @@ export function CoursesHero() {
           alt=""
           width={160}
           height={110}
+          style={{ width: "160px", height: "auto" }}
           priority
         />
       </div>
