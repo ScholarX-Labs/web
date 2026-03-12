@@ -3,6 +3,9 @@
  */
 export const ROUTES = {
   HOME: "/",
+  SIGNUP: "/auth/signup",
+  SIGNIN: "/auth/signin",
+  PHONE_COLLECTION: "/auth/collect-phone",
   COURSES: "/courses",
   COURSE_DETAIL: (slug: string) => `/courses/${slug}`,
   LESSON: (courseSlug: string, lessonId: string) =>

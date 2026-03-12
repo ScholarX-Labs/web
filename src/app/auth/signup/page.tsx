@@ -10,7 +10,7 @@ import { z } from "zod";
 import Field from "@/app/auth/_components/Field";
 import { Button } from "@/components/ui/button";
 import { signIn, signUp } from "@/lib/auth-client";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 function GoogleIcon() {
   return (
@@ -134,26 +134,29 @@ export default function Page() {
       const msg = error.message ?? "";
       if (msg.toLowerCase().includes("phone") || error.status === 409) {
         setServerError("This phone number is already in use.");
+        return;
       } else if (
         error.status === 422 ||
         msg.toLowerCase().includes("invalid")
       ) {
         setServerError("Invalid details provided. Please check your inputs.");
+        return;
       } else {
         setServerError(msg || "Something went wrong. Please try again.");
+        return;
       }
     }
-    redirect("/");
+    useRouter().replace("/");
   };
 
   return (
     <section
-      about="signup-form"
+      aria-label="signup-form"
       className="bg-[oklch(96%_0.02_228.96)] h-full w-full flex justify-center items-center p-4"
     >
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="min-h-3/4 lg:w-3/8 w-1/2 p-6 rounded-2xl flex flex-col gap-4"
+        className="min-h-[75%] lg:w-[37.5%] w-1/2 p-6 rounded-2xl flex flex-col gap-4"
       >
         <h2 className="text-center text-3xl font-semibold">
           Create your account
