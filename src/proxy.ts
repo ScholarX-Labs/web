@@ -30,5 +30,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/auth/:path*"],
+  matcher: ["/((?!api|_next/static|_next/image|.*\\..*).*)"],
 };

@@ -16,3 +16,8 @@ export const ROUTES = {
   LOGIN: "/login",
   REGISTER: "/register",
 };
+
+export const API_ROUTES = {
+  CHECK_UNIQUES: "/api/check-uniques",
+  COLLECT_PHONE: "/api/collect-phone",
+};

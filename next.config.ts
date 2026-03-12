@@ -3,7 +3,8 @@ import path from "path";
 
 const nextConfig: NextConfig = {
   turbopack: {
-    root: path.join(__dirname, ".."),
+    root: __dirname,
+  },
   images: {
     remotePatterns: [
       {
@@ -11,8 +12,6 @@ const nextConfig: NextConfig = {
         hostname: "images.unsplash.com",
       },
     ],
-
   },
 };
-
 export default nextConfig;

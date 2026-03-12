@@ -10,35 +10,8 @@ import { z } from "zod";
 import Field from "@/app/auth/_components/Field";
 import { Button } from "@/components/ui/button";
 import { signIn, signUp } from "@/lib/auth-client";
+import { GoogleIcon } from "../_components/GoogleIcon";
 import { useRouter } from "next/navigation";
-
-function GoogleIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-      className="size-5"
-    >
-      <path
-        d="M23.52 12.272c0-.817-.073-1.603-.209-2.357H12v4.458h6.472a5.533 5.533 0 0 1-2.4 3.629v3.01h3.884c2.273-2.093 3.564-5.178 3.564-8.74Z"
-        fill="#4285F4"
-      />
-      <path
-        d="M12 24c3.24 0 5.956-1.073 7.94-2.915l-3.884-3.01c-1.073.72-2.444 1.145-4.056 1.145-3.115 0-5.754-2.104-6.697-4.931H1.288v3.104A11.998 11.998 0 0 0 12 24Z"
-        fill="#34A853"
-      />
-      <path
-        d="M5.303 14.289A7.205 7.205 0 0 1 4.928 12c0-.795.137-1.568.375-2.289V6.607H1.288A11.998 11.998 0 0 0 0 12c0 1.939.464 3.776 1.288 5.393l4.015-3.104Z"
-        fill="#FBBC04"
-      />
-      <path
-        d="M12 4.78c1.764 0 3.345.607 4.591 1.8l3.444-3.444C17.95 1.198 15.235 0 12 0 7.288 0 3.185 2.702 1.288 6.607l4.015 3.104C6.246 6.884 8.885 4.78 12 4.78Z"
-        fill="#EA4335"
-      />
-    </svg>
-  );
-}
 
 const passwordRequirements = /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])/;
 
@@ -72,6 +45,7 @@ type SignupForm = z.infer<typeof signupSchema>;
 
 export default function Page() {
   const [serverError, setServerError] = useState<string | null>(null);
+  const [isSocialSubmitting, setIsSocialSubmitting] = useState(false);
 
   const {
     register,
@@ -91,7 +65,10 @@ export default function Page() {
     },
   });
 
+  const isAnySubmitting = isSubmitting || isSocialSubmitting;
+
   const onSubmit = async (data: SignupForm) => {
+    if (isSocialSubmitting) return;
     setServerError(null);
     const { confirmPassword, ...payload } = data;
     const uniqueQuery = new URLSearchParams({
@@ -128,6 +105,7 @@ export default function Page() {
       firstName: payload.firstName,
       lastName: payload.lastName,
       phoneNumber: payload.phoneNumber,
+      callbackURL: "/",
     });
 
     if (error) {
@@ -147,6 +125,29 @@ export default function Page() {
       }
     }
     useRouter().replace("/");
+  };
+
+  const onGoogleSignIn = async () => {
+    if (isAnySubmitting) return;
+
+    setServerError(null);
+    setIsSocialSubmitting(true);
+
+    try {
+      const result = await signIn.social({
+        provider: "google",
+        callbackURL: "/auth/collect-phone",
+      });
+
+      if (result?.error) {
+        setServerError(
+          result.error.message ??
+            "Unable to continue with Google. Please try again.",
+        );
+      }
+    } finally {
+      setIsSocialSubmitting(false);
+    }
   };
 
   return (
@@ -229,13 +230,13 @@ export default function Page() {
         />
         <Button
           type="submit"
-          disabled={isSubmitting}
+          disabled={isAnySubmitting}
           className={
             "text-primary-foreground max-w-64 self-center w-1/2 " +
-            (isSubmitting ? "cursor-not-allowed" : "cursor-pointer")
+            (isAnySubmitting ? "cursor-not-allowed" : "cursor-pointer")
           }
         >
-          {isSubmitting ? "Loading..." : "Sign up"}
+          {isAnySubmitting ? "Loading..." : "Sign up"}
         </Button>
 
         <div className="relative flex items-center gap-3 text-xs text-muted-foreground before:content-[''] before:flex-1 before:h-px before:bg-border after:content-[''] after:flex-1 after:h-px after:bg-border">
@@ -245,16 +246,12 @@ export default function Page() {
         <Button
           type="button"
           variant="outline"
+          disabled={isAnySubmitting}
           className="h-10 w-full max-w-64 self-center justify-center gap-3 rounded-md border-[#dadce0] bg-white px-3 text-sm font-medium text-[#3c4043] shadow-none transition-colors hover:border-[#d2e3fc] hover:bg-[#f8f9fa] hover:text-[#3c4043] hover:cursor-pointer focus-visible:border-[#4285f4] focus-visible:ring-[#4285f4]/30 active:bg-[#f1f3f4]"
-          onClick={() =>
-            signIn.social({
-              provider: "google",
-              callbackURL: "/auth/collect-phone",
-            })
-          }
+          onClick={onGoogleSignIn}
         >
           <GoogleIcon />
-          Continue with Google
+          {isAnySubmitting ? "Loading..." : "Continue with Google"}
         </Button>
 
         <p className="text-center text-sm text-muted-foreground">
