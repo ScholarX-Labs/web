@@ -40,8 +40,8 @@ export const user = pgTable("user", {
   nationality: text("nationality"),
   city: text("city"),
   currentInterest: text("current_interest"),
-  savedOpportunities: text("saved_opportunities").array().default([]),
-  registeredEvents: text("registered_events").array().default([]),
+  savedOpportunities: text("saved_opportunities").array().default(),
+  registeredEvents: text("registered_events").array().default(),
 });
 
 export const session = pgTable(
