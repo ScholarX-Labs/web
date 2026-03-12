@@ -47,11 +47,14 @@ export const useEnrollCourse = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (courseId: string) => {
+      if (!courseId) throw new Error("courseId is required");
       const response = await apiClient.post(`/courses/${courseId}/enroll`);
       return response.data;
     },
     onSuccess: (_, courseId) => {
-      queryClient.invalidateQueries({ queryKey: ["course", courseId] });
+      if (courseId) {
+        queryClient.invalidateQueries({ queryKey: ["course", courseId] });
+      }
       queryClient.invalidateQueries({ queryKey: ["courses"] });
     },
   });
