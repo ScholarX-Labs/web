@@ -1,8 +1,4 @@
-import {
-  CoursesHero,
-  CoursesFilterSection,
-  LatestCoursesSection,
-} from "@/components/courses";
+import { CoursesHero, CoursesFilterSection } from "@/components/courses";
 import { Course } from "@/types/course.types";
 
 const SAMPLE_COURSES: Course[] = [
@@ -145,7 +141,6 @@ export default function CoursesPage() {
   return (
     <div className="w-full flex flex-col pb-10">
       <CoursesHero />
-      <LatestCoursesSection courses={SAMPLE_COURSES} />
       <CoursesFilterSection courses={SAMPLE_COURSES} />
     </div>
   );
