@@ -5,6 +5,14 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  /* ── Courses Hero brand palette ────────────────────────────── */
+  --color-hero-blue: #3399cc;
+  --color-hero-blue-dark: #2980b3;
+  --color-hero-orange: #ff6a3a;
+  --color-hero-heading: #1a2b49;
+  --color-hero-body: #4a5568;
+  /* ─────────────────────────────────────────────────────────── */
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
@@ -80,6 +88,13 @@
   --sidebar-accent-foreground: oklch(0.98 0.02 201);
   --sidebar-border: oklch(0.92 0.004 286.32);
   --sidebar-ring: oklch(0.705 0.015 286.067);
+  --spotlight-color: rgba(
+    0,
+    0,
+    0,
+    0.08
+  ); /* Dark spotlight on light background */
+  --shiny-color: rgba(0, 0, 0, 0.6); /* Dark shine over text */
 }
 
 .dark {
@@ -114,6 +129,13 @@
   --sidebar-accent-foreground: oklch(0.3 0.05 230);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.552 0.016 285.938);
+  --spotlight-color: rgba(
+    255,
+    255,
+    255,
+    0.15
+  ); /* Light spotlight on dark background */
+  --shiny-color: rgba(255, 255, 255, 0.8); /* Light shine over text */
 }
 
 @layer base {

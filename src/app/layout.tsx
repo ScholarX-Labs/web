@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
+import { AppProviders } from "@/providers/app-providers";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
 import SignoutButton from "./auth/_components/SignoutButton";
 import { getSession } from "@/lib/dal";
@@ -33,8 +35,12 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {currentUser ? <SignoutButton /> : null}
-        {children}
+        <AppProviders>
+          <TooltipProvider>
+            {currentUser ? <SignoutButton /> : null}
+            {children}
+          </TooltipProvider>
+        </AppProviders>
       </body>
     </html>
   );
