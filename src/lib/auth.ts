@@ -1,22 +1,102 @@
 import { betterAuth } from "better-auth";
+import { APIError, createAuthMiddleware } from "better-auth/api";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
-import { drizzle } from "drizzle-orm/node-postgres";
+import { db } from "@/db";
+import { eq } from "drizzle-orm";
 import * as schema from "@/db/schema/auth-schema";
 import { admin, bearer, phoneNumber } from "better-auth/plugins";
+import { parsePhoneNumber } from "react-phone-number-input";
 import { z } from "zod";
-const db = drizzle({
-  connection: {
-    connectionString: process.env.DATABASE_URL!,
-    ssl: false,
-  },
-});
 
 export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL,
   database: drizzleAdapter(db, { provider: "pg", schema }),
   emailAndPassword: {
     enabled: true,
+  },
+  hooks: {
+    before: createAuthMiddleware(async (ctx) => {
+      if (ctx.path !== "/sign-up/email") {
+        return;
+      }
+
+      const hasEmailInput = ctx.body?.email !== undefined;
+      const hasPhoneInput = ctx.body?.phoneNumber !== undefined;
+      const originalEmail = ctx.body?.email;
+      const originalPhone = ctx.body?.phoneNumber;
+
+      const email = hasEmailInput
+        ? (originalEmail ?? "").trim().toLowerCase()
+        : "";
+      const rawPhone = hasPhoneInput ? (originalPhone ?? "").trim() : "";
+      let normalizedPhone = rawPhone;
+
+      if (rawPhone) {
+        const parsedPhone = parsePhoneNumber(rawPhone);
+        if (!parsedPhone || !parsedPhone.isValid()) {
+          throw new APIError("BAD_REQUEST", {
+            message: "ERR_INVALID_PHONE",
+          });
+        }
+
+        normalizedPhone = parsedPhone.number;
+      }
+
+      const [foundEmail, foundPhone] = await Promise.all([
+        email
+          ? db
+              .select({ id: schema.user.id })
+              .from(schema.user)
+              .where(eq(schema.user.email, email))
+              .limit(1)
+          : Promise.resolve([]),
+        normalizedPhone
+          ? db
+              .select({ id: schema.user.id })
+              .from(schema.user)
+              .where(eq(schema.user.phoneNumber, normalizedPhone))
+              .limit(1)
+          : Promise.resolve([]),
+      ]);
+
+      if (foundEmail.length > 0 && foundPhone.length > 0) {
+        throw new APIError("BAD_REQUEST", {
+          message: "ERR_EMAIL_EXISTS|ERR_PHONE_EXISTS",
+        });
+      }
+
+      if (foundEmail.length > 0) {
+        throw new APIError("BAD_REQUEST", {
+          message: "ERR_EMAIL_EXISTS",
+        });
+      }
+
+      if (foundPhone.length > 0) {
+        throw new APIError("BAD_REQUEST", {
+          message: "ERR_PHONE_EXISTS",
+        });
+      }
+
+      const shouldRewriteEmail = hasEmailInput && originalEmail !== email;
+      const shouldRewritePhone =
+        hasPhoneInput && originalPhone !== normalizedPhone;
+
+      if (shouldRewriteEmail || shouldRewritePhone) {
+        const nextBody = {
+          ...ctx.body,
+          ...(shouldRewriteEmail ? { email } : {}),
+          ...(shouldRewritePhone ? { phoneNumber: normalizedPhone } : {}),
+        };
+
+        return {
+          context: {
+            ...ctx,
+            body: nextBody,
+          },
+        };
+      }
+    }),
   },
   socialProviders: {
     google: {
@@ -70,7 +150,7 @@ export const auth = betterAuth({
         type: "string",
         required: false,
       },
-      GPA: {
+      gpa: {
         type: "number",
         required: false,
         validator: {

@@ -4,6 +4,7 @@ import * as schema from "@/db/schema/auth-schema";
 import { db } from "@/db";
 import { getSession } from "@/lib/dal";
 import { and, eq, ne } from "drizzle-orm";
+import { isValidPhoneNumber } from "react-phone-number-input";
 
 export async function POST(req: Request) {
   let phone: string;
@@ -16,6 +17,10 @@ export async function POST(req: Request) {
 
   if (!phone) {
     return Response.json({ error: "phone is required" }, { status: 400 });
+  }
+
+  if (!isValidPhoneNumber(phone)) {
+    return Response.json({ error: "invalid phone number" }, { status: 400 });
   }
 
   const session = await getSession();

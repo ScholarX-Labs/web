@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useId } from "react";
 
 import {
   Field as UIField,
@@ -16,15 +16,17 @@ type FieldProps = React.ComponentProps<typeof Input> & {
 };
 
 const Field = React.forwardRef<HTMLInputElement, FieldProps>(
-  ({ label, description, error, name, ...props }, ref) => {
+  ({ label, description, error, name, id, ...props }, ref) => {
+    const generatedId = useId();
+    const fieldId = id ?? name ?? generatedId;
     return (
       <UIField>
-        {label && <FieldLabel htmlFor={name}>{label}</FieldLabel>}
+        {label && <FieldLabel htmlFor={fieldId}>{label}</FieldLabel>}
         <FieldContent>
           <Input
             className="bg-white"
             ref={ref}
-            id={name}
+            id={fieldId}
             name={name}
             aria-invalid={error ? true : undefined}
             {...props}

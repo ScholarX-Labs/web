@@ -18,6 +18,5 @@ export const ROUTES = {
 };
 
 export const API_ROUTES = {
-  CHECK_UNIQUES: "/api/check-uniques",
   COLLECT_PHONE: "/api/collect-phone",
 };

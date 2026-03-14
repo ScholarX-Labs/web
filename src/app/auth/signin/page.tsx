@@ -8,7 +8,8 @@ import { z } from "zod";
 import Field from "@/app/auth/_components/Field";
 import { Button } from "@/components/ui/button";
 import { signIn } from "@/lib/auth-client";
-import { GoogleIcon } from "../_components/GoogleIcon";
+import { GoogleIcon } from "../../../components/icons/GoogleIcon";
+import { ROUTES } from "@/lib/routes";
 
 const signinSchema = z.object({
   email: z.email({ message: "Enter a valid email address" }),
@@ -59,7 +60,7 @@ export default function Page() {
     try {
       const result = await signIn.social({
         provider: "google",
-        callbackURL: "/auth/collect-phone",
+        callbackURL: ROUTES.PHONE_COLLECTION,
       });
 
       if (result?.error) {
@@ -132,7 +133,7 @@ export default function Page() {
         <p className="text-center text-sm text-muted-foreground">
           Don&apos;t have an account?{" "}
           <Link
-            href="/auth/signup"
+            href={ROUTES.SIGNUP}
             className="relative text-primary motion-safe:transition-colors duration-200 ease-in-out hover:opacity-80 after:content-[''] after:absolute after:-bottom-0.5 after:left-0 after:h-0.5 after:w-full after:origin-bottom-right after:scale-x-0 after:bg-current after:transition-transform after:duration-300 after:ease-in-out hover:after:scale-x-100 hover:after:origin-bottom-left"
           >
             Sign up

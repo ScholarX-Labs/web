@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import { ROUTES } from "./lib/routes";
 
 const SESSION_COOKIE_NAME = "better-auth.session_token";
 const SECURE_SESSION_COOKIE_NAME = `__Secure-${SESSION_COOKIE_NAME}`;
@@ -23,7 +24,7 @@ export function proxy(request: NextRequest) {
   }
 
   if (!OPEN_ROUTES.has(pathname) && !isAuthenticated && !isAuthRoute) {
-    return NextResponse.redirect(new URL("/auth/signin", request.url));
+    return NextResponse.redirect(new URL(ROUTES.SIGNIN, request.url));
   }
 
   return NextResponse.next();

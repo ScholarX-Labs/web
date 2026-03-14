@@ -10,8 +10,9 @@ import { z } from "zod";
 import Field from "@/app/auth/_components/Field";
 import { Button } from "@/components/ui/button";
 import { signIn, signUp } from "@/lib/auth-client";
-import { GoogleIcon } from "../_components/GoogleIcon";
+import { GoogleIcon } from "../../../components/icons/GoogleIcon";
 import { useRouter } from "next/navigation";
+import { ROUTES } from "@/lib/routes";
 
 const passwordRequirements = /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])/;
 
@@ -46,6 +47,7 @@ type SignupForm = z.infer<typeof signupSchema>;
 export default function Page() {
   const [serverError, setServerError] = useState<string | null>(null);
   const [isSocialSubmitting, setIsSocialSubmitting] = useState(false);
+  const router = useRouter();
 
   const {
     register,
@@ -71,33 +73,7 @@ export default function Page() {
     if (isSocialSubmitting) return;
     setServerError(null);
     const { confirmPassword, ...payload } = data;
-    const uniqueQuery = new URLSearchParams({
-      email: payload.email,
-      phone: payload.phoneNumber,
-    });
-    const uniqueCheck = await fetch(`/api/check-uniques?${uniqueQuery}`);
-    const uniqueCheckData = await uniqueCheck.json().catch(() => ({}));
-    const uniqueErrors = uniqueCheckData.errors as
-      | { email?: string; phone?: string }
-      | undefined;
 
-    if (uniqueCheck.status === 400) {
-      if (uniqueErrors?.email) {
-        setError("email", {
-          type: "server",
-          message: uniqueErrors.email,
-        });
-      }
-
-      if (uniqueErrors?.phone) {
-        setError("phoneNumber", {
-          type: "server",
-          message: uniqueErrors.phone,
-        });
-      }
-
-      return;
-    }
     const { error } = await signUp.email({
       email: payload.email,
       password: payload.password,
@@ -109,22 +85,40 @@ export default function Page() {
     });
 
     if (error) {
-      const msg = error.message ?? "";
-      if (msg.toLowerCase().includes("phone") || error.status === 409) {
-        setServerError("This phone number is already in use.");
-        return;
-      } else if (
-        error.status === 422 ||
-        msg.toLowerCase().includes("invalid")
-      ) {
-        setServerError("Invalid details provided. Please check your inputs.");
-        return;
-      } else {
-        setServerError(msg || "Something went wrong. Please try again.");
+      const message = error.message ?? "";
+      const hasEmailExistsError = message.includes("ERR_EMAIL_EXISTS");
+      const hasPhoneExistsError = message.includes("ERR_PHONE_EXISTS");
+
+      if (hasEmailExistsError) {
+        setError("email", {
+          type: "server",
+          message: "Email already exists",
+        });
+      }
+
+      if (hasPhoneExistsError) {
+        setError("phoneNumber", {
+          type: "server",
+          message: "Phone number already exists",
+        });
+      }
+
+      if (hasEmailExistsError || hasPhoneExistsError) {
         return;
       }
+
+      if (error.status === 422 || message.toLowerCase().includes("invalid")) {
+        setServerError("Invalid details provided. Please check your inputs.");
+        return;
+      }
+
+      setServerError(
+        error.message || "Something went wrong. Please try again.",
+      );
+      return;
     }
-    useRouter().replace("/");
+
+    router.replace("/");
   };
 
   const onGoogleSignIn = async () => {
@@ -136,7 +130,7 @@ export default function Page() {
     try {
       const result = await signIn.social({
         provider: "google",
-        callbackURL: "/auth/collect-phone",
+        callbackURL: ROUTES.PHONE_COLLECTION,
       });
 
       if (result?.error) {
@@ -257,7 +251,7 @@ export default function Page() {
         <p className="text-center text-sm text-muted-foreground">
           Already have an account?{" "}
           <Link
-            href="/auth/signin"
+            href={ROUTES.SIGNIN}
             className="relative text-primary motion-safe:transition-colors duration-200 ease-in-out hover:opacity-80 after:content-[''] after:absolute after:-bottom-0.5 after:left-0 after:h-0.5 after:w-full after:origin-bottom-right after:scale-x-0 after:bg-current after:transition-transform after:duration-300 after:ease-in-out hover:after:scale-x-100 hover:after:origin-bottom-left"
           >
             Sign in

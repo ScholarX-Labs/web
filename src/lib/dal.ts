@@ -4,6 +4,7 @@ import { cache } from "react";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
+import { ROUTES } from "./routes";
 
 export type AppRole = "user" | "admin";
 
@@ -21,11 +22,11 @@ export async function requireSession() {
   const session = await getSession();
 
   if (!session) {
-    redirect("/auth/signin");
+    redirect(ROUTES.SIGNIN);
   }
 
   if (!session.user.phoneNumber) {
-    redirect("/auth/collect-phone");
+    redirect(ROUTES.PHONE_COLLECTION);
   }
 
   return session;
@@ -34,7 +35,7 @@ export async function requireSession() {
 export async function requireRole(role: AppRole) {
   const session = await requireSession();
 
-  if (session.user.role !== role) {
+  if (!session.user.role || session.user.role !== role) {
     redirect("/forbidden");
   }
 
@@ -43,8 +44,8 @@ export async function requireRole(role: AppRole) {
 
 export async function requireAnyRole(roles: AppRole[]) {
   const session = await requireSession();
-
-  if (!roles.includes(session.user.role as AppRole)) {
+  const userRole = session.user.role;
+  if (!userRole || !roles.includes(userRole as AppRole)) {
     redirect("/forbidden");
   }
 

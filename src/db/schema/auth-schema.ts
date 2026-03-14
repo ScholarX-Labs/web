@@ -34,7 +34,7 @@ export const user = pgTable("user", {
   faculty: text("faculty"),
   company: text("company"),
   school: text("school"),
-  GPA: integer("gpa"),
+  gpa: integer("gpa"),
   industry: text("industry"),
   dateOfBirth: timestamp("date_of_birth"),
   nationality: text("nationality"),
