@@ -1,6 +1,6 @@
 import { relations } from "drizzle-orm";
 import {
-  pgTable,
+  pgSchema,
   text,
   timestamp,
   boolean,
@@ -8,7 +8,9 @@ import {
   index,
 } from "drizzle-orm/pg-core";
 
-export const user = pgTable("user", {
+const authSchema = pgSchema("auth");
+
+export const user = authSchema.table("user", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
@@ -40,11 +42,11 @@ export const user = pgTable("user", {
   nationality: text("nationality"),
   city: text("city"),
   currentInterest: text("current_interest"),
-  savedOpportunities: text("saved_opportunities").array().default(),
-  registeredEvents: text("registered_events").array().default(),
+  savedOpportunities: text("saved_opportunities").array().default([]),
+  registeredEvents: text("registered_events").array().default([]),
 });
 
-export const session = pgTable(
+export const session = authSchema.table(
   "session",
   {
     id: text("id").primaryKey(),
@@ -64,7 +66,7 @@ export const session = pgTable(
   (table) => [index("session_userId_idx").on(table.userId)],
 );
 
-export const account = pgTable(
+export const account = authSchema.table(
   "account",
   {
     id: text("id").primaryKey(),
@@ -88,7 +90,7 @@ export const account = pgTable(
   (table) => [index("account_userId_idx").on(table.userId)],
 );
 
-export const verification = pgTable(
+export const verification = authSchema.table(
   "verification",
   {
     id: text("id").primaryKey(),

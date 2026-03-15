@@ -22,6 +22,13 @@
       "when": 1773329066987,
       "tag": "0002_patch_gpa_to_numeric",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1773583951780,
+      "tag": "0003_boring_ogun",
+      "breakpoints": true
     }
   ]
 }
