@@ -6,6 +6,10 @@ const SESSION_COOKIE_NAME = "better-auth.session_token";
 const SECURE_SESSION_COOKIE_NAME = `__Secure-${SESSION_COOKIE_NAME}`;
 
 const OPEN_ROUTES = new Set<string>(["/"]);
+const ALLOWED_AUTH_ROUTES_FOR_AUTHENTICATED = new Set<string>([
+  ROUTES.PHONE_COLLECTION,
+  ROUTES.VERIFY_EMAIL,
+]);
 
 function hasSessionCookie(request: NextRequest) {
   return Boolean(
@@ -19,7 +23,11 @@ export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isAuthRoute = pathname.startsWith("/auth");
 
-  if (isAuthRoute && isAuthenticated) {
+  if (
+    isAuthRoute &&
+    isAuthenticated &&
+    !ALLOWED_AUTH_ROUTES_FOR_AUTHENTICATED.has(pathname)
+  ) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 

@@ -4,7 +4,7 @@ import * as schema from "@/db/schema/auth-schema";
 import { db } from "@/db";
 import { getSession } from "@/lib/dal";
 import { and, eq, ne } from "drizzle-orm";
-import { isValidPhoneNumber } from "react-phone-number-input";
+import { isValidPhoneNumber } from "libphonenumber-js";
 
 export async function POST(req: Request) {
   let phone: string;

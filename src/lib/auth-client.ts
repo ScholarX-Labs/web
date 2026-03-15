@@ -5,6 +5,12 @@ import {
   inferAdditionalFields,
   phoneNumberClient,
 } from "better-auth/client/plugins";
-export const { signIn, signUp, signOut, useSession } = createAuthClient({
+
+const authClient = createAuthClient({
   plugins: [inferAdditionalFields<typeof auth>(), phoneNumberClient()],
 });
+
+export const { signIn, signUp, signOut, useSession, sendVerificationEmail } =
+  authClient;
+
+export { authClient };

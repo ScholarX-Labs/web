@@ -25,6 +25,10 @@ export async function requireSession() {
     redirect(ROUTES.SIGNIN);
   }
 
+  if (!session.user.emailVerified) {
+    redirect(ROUTES.VERIFY_EMAIL);
+  }
+
   if (!session.user.phoneNumber) {
     redirect(ROUTES.PHONE_COLLECTION);
   }

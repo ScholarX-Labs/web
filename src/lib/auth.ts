@@ -6,14 +6,35 @@ import { db } from "@/db";
 import { eq } from "drizzle-orm";
 import * as schema from "@/db/schema/auth-schema";
 import { admin, bearer, phoneNumber } from "better-auth/plugins";
-import { parsePhoneNumber } from "react-phone-number-input";
+import { parsePhoneNumberWithError } from "libphonenumber-js";
 import { z } from "zod";
+import { sendEmail } from "./email";
 
 export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL,
   database: drizzleAdapter(db, { provider: "pg", schema }),
   emailAndPassword: {
     enabled: true,
+  },
+  emailVerification: {
+    sendVerificationEmail: async ({ user, url }) => {
+      try {
+        await sendEmail({
+          to: user.email,
+          subject: "Verify your email address",
+          text: `Click the link to verify your email: ${url}`,
+        });
+      } catch (error) {
+        console.error("[sendVerificationEmail] sendEmail failed", error);
+        throw error;
+      }
+    },
+    async afterEmailVerification(user, request) {
+      // Actions after user verified email
+    },
+    autoSignInAfterVerification: true,
+    sendOnSignUp: true,
+    sendOnSignIn: false,
   },
   hooks: {
     before: createAuthMiddleware(async (ctx) => {
@@ -33,7 +54,7 @@ export const auth = betterAuth({
       let normalizedPhone = rawPhone;
 
       if (rawPhone) {
-        const parsedPhone = parsePhoneNumber(rawPhone);
+        const parsedPhone = parsePhoneNumberWithError(rawPhone);
         if (!parsedPhone || !parsedPhone.isValid()) {
           throw new APIError("BAD_REQUEST", {
             message: "ERR_INVALID_PHONE",

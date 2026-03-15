@@ -147,7 +147,7 @@ export default function Page() {
   return (
     <section
       aria-label="signup-form"
-      className="bg-[oklch(96%_0.02_228.96)] h-full w-full flex justify-center items-center p-4"
+      className="bg-auth-surface h-full w-full flex justify-center items-center p-4"
     >
       <form
         onSubmit={handleSubmit(onSubmit)}

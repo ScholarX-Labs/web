@@ -75,7 +75,7 @@ export default function Page() {
   };
 
   return (
-    <section className="bg-[oklch(96%_0.02_228.96)] h-full w-full flex justify-center items-center p-4">
+    <section className="bg-auth-surface h-full w-full flex justify-center items-center p-4">
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="min-h-[75vh] lg:w-[37.5%] w-1/2 p-6 rounded-2xl flex flex-col gap-4"
