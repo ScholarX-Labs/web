@@ -26,3 +26,33 @@ export interface PaginatedData<T> {
   items: T[];
   meta: PaginationMeta;
 }
+
+export interface BackendPagination {
+  currentPage: number;
+  totalPages: number;
+  totalCourses: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
+export interface BackendErrorDetail {
+  field?: string;
+  constraints?: Record<string, string>;
+}
+
+export interface BackendErrorPayload {
+  success: false;
+  error: {
+    statusCode: number;
+    code: string;
+    numericCode: number;
+    message: string;
+    details?: BackendErrorDetail[];
+  };
+  meta?: {
+    timestamp?: string;
+    path?: string;
+    method?: string;
+    requestId?: string;
+  };
+}

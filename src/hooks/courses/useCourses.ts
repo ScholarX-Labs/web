@@ -1,44 +1,30 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { PaginatedCoursesResponse, ICourse } from "../../types/course";
-import { apiClient } from "@/lib/api";
-// Assuming a generic api fetching utility exists in lib/api
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Course } from "@/types/course.types";
+import {
+  coursesService,
+  PaginatedCoursesApiResponse,
+} from "@/lib/api/courses.service";
 
 export const useCourses = (page = 1, limit = 3, category?: string) => {
   return useQuery({
     queryKey: ["courses", { page, limit, category }],
-    queryFn: async (): Promise<PaginatedCoursesResponse> => {
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: limit.toString(),
-      });
-      if (category) {
-        params.append("category", category);
-      }
-      const response = await apiClient.get(`/courses?${params.toString()}`);
-      return response.data;
-    },
+    queryFn: (): Promise<PaginatedCoursesApiResponse> =>
+      coursesService.list({ page, limit, category }),
   });
 };
 
 export const useFeaturedCourses = (page = 1, limit = 3) => {
   return useQuery({
     queryKey: ["courses", "featured", { page, limit }],
-    queryFn: async (): Promise<PaginatedCoursesResponse> => {
-      const response = await apiClient.get(
-        `/courses/featured?page=${page}&limit=${limit}`,
-      );
-      return response.data;
-    },
+    queryFn: (): Promise<PaginatedCoursesApiResponse> =>
+      coursesService.getFeatured({ page, limit }),
   });
 };
 
 export const useCourse = (id: string) => {
   return useQuery({
     queryKey: ["course", id],
-    queryFn: async (): Promise<ICourse> => {
-      const response = await apiClient.get(`/courses/${id}`);
-      return response.data;
-    },
+    queryFn: (): Promise<Course> => coursesService.getById(id),
     enabled: !!id,
   });
 };
@@ -48,8 +34,7 @@ export const useEnrollCourse = () => {
   return useMutation({
     mutationFn: async (courseId: string) => {
       if (!courseId) throw new Error("courseId is required");
-      const response = await apiClient.post(`/courses/${courseId}/enroll`);
-      return response.data;
+      return coursesService.enrollFree(courseId);
     },
     onSuccess: (_, courseId) => {
       if (courseId) {

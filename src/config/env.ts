@@ -3,6 +3,7 @@ import { z } from "zod";
 // Define the schema for environment variables
 const envSchema = z.object({
   NEXT_PUBLIC_API_URL: z.string().min(1).default("/api"),
+  NEXT_PUBLIC_API_BASE_URL: z.string().min(1).default("http://localhost:3001"),
   // Add other env variables here as needed
 });
 
@@ -10,6 +11,8 @@ const envSchema = z.object({
 // This provides runtime validation and type safety
 export const env = envSchema.parse({
   NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+  NEXT_PUBLIC_API_BASE_URL:
+    process.env.NEXT_PUBLIC_API_BASE_URL ?? process.env.NEXT_PUBLIC_API_URL,
 });
 
 export type Env = z.infer<typeof envSchema>;
