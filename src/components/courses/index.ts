@@ -7,5 +7,3 @@ export * from "./course-card-skeleton";
 export * from "./course-grid";
 export * from "./courses-hero";
 export * from "./courses-filter-section";
-export * from "./latest-course-card";
-export * from "./latest-courses-section";
