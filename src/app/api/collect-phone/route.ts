@@ -77,7 +77,10 @@ export async function POST(req: Request) {
         { status: 409 },
       );
     }
-
+    console.error(
+      `[collect-phone] failed to update phone for user ${session.user.id}`,
+      err,
+    );
     return Response.json({ error: "internal error" }, { status: 500 }); // 6. JSON error
   }
 

@@ -54,14 +54,19 @@ export const auth = betterAuth({
       let normalizedPhone = rawPhone;
 
       if (rawPhone) {
-        const parsedPhone = parsePhoneNumberWithError(rawPhone);
-        if (!parsedPhone || !parsedPhone.isValid()) {
+        try {
+          const parsedPhone = parsePhoneNumberWithError(rawPhone);
+          if (!parsedPhone.isValid()) {
+            throw new APIError("BAD_REQUEST", {
+              message: "ERR_INVALID_PHONE",
+            });
+          }
+          normalizedPhone = parsedPhone.number;
+        } catch (error) {
           throw new APIError("BAD_REQUEST", {
             message: "ERR_INVALID_PHONE",
           });
         }
-
-        normalizedPhone = parsedPhone.number;
       }
 
       const [foundEmail, foundPhone] = await Promise.all([

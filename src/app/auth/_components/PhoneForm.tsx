@@ -12,7 +12,7 @@ export default function PhoneForm() {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  async function onSubmit(e: React.SubmitEvent) {
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!isValidPhoneNumber(phone)) {
       setError("Invalid phone number");

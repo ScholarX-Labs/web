@@ -11,7 +11,6 @@ export default function PlatformLayout({
 }: {
   children: React.ReactNode;
 }) {
-  requireSession();
   return (
     <div className="flex min-h-screen flex-col bg-background">
       {/* <NavBar /> */}

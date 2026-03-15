@@ -1,4 +1,5 @@
 import "server-only";
+import { createHash } from "node:crypto";
 import nodemailer, { type Transporter } from "nodemailer";
 
 type EmailProps = {
@@ -52,6 +53,7 @@ async function sendEmail({
   const smtpFrom = process.env.SMTP_FROM ?? process.env.SMTP_EMAIL!;
 
   const maskedRecipient = maskRecipient(to);
+  const subjectHash = hashSubject(subject);
 
   try {
     const info = await getTransporter().sendMail({
@@ -69,8 +71,8 @@ async function sendEmail({
     };
   } catch (error) {
     console.error("[sendEmail] delivery failed", {
-      subject,
       recipient: maskedRecipient,
+      subjectHash,
     });
 
     throw new Error("Email delivery failed", { cause: error });
@@ -86,6 +88,10 @@ function maskRecipient(email: string): string {
 
   const firstChar = localPart[0] ?? "*";
   return `${firstChar}***@${domain}`;
+}
+
+function hashSubject(subject: string): string {
+  return createHash("sha256").update(subject).digest("hex").slice(0, 12);
 }
 
 export { sendEmail };
