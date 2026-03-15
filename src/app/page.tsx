@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+
 export default function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground font-sans w-full flex flex-col items-center justify-center relative overflow-hidden">

@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1773328975916,
+      "tag": "0000_base_db_config",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1773329026816,
+      "tag": "0001_patch_array_text_columns_default",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1773329066987,
+      "tag": "0002_patch_gpa_to_numeric",
+      "breakpoints": true
+    }
+  ]
+}
