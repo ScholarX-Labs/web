@@ -9,8 +9,8 @@ const rawRole = process.env.DEV_AUTH_BYPASS_ROLE;
 export const devAuthBypassRole: DevBypassRole =
   rawRole === "admin" ? "admin" : "user";
 
-if (!isDevelopment && bypassFlagEnabled) {
-  console.warn(
-    "[auth] DEV_AUTH_BYPASS is ignored because NODE_ENV is not development.",
+if (bypassFlagEnabled && !isDevelopment) {
+  throw new Error(
+    "[auth] DEV_AUTH_BYPASS=true is only allowed when NODE_ENV=development.",
   );
 }

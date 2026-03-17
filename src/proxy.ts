@@ -20,10 +20,9 @@ function hasSessionCookie(request: NextRequest) {
 }
 
 export function proxy(request: NextRequest) {
-  if (isDevAuthBypassEnabled) {
+  if (isDevAuthBypassEnabled && process.env.NODE_ENV !== "production") {
     return NextResponse.next();
   }
-
   const isAuthenticated = hasSessionCookie(request);
   const { pathname } = request.nextUrl;
   const isAuthRoute = pathname.startsWith("/auth");
