@@ -65,7 +65,7 @@ export function AiSearchPageClient() {
   return (
     <div className="h-screen overflow-hidden bg-[#F0F7FB]">
       <div className="flex h-full">
-        <div className="hidden w-75 shrink-0 border-r border-border bg-background/95 p-4 lg:block">
+        <div className="hidden w-75 shrink-0 border-r border-border bg-background/95 p-4 lg:block animate-in fade-in slide-in-from-left-8 duration-700">
           <AiSearchSidebar onClearConversation={clearConversation} />
         </div>
 
@@ -91,7 +91,7 @@ export function AiSearchPageClient() {
           </div>
         ) : null}
 
-        <main className="flex min-w-0 flex-1 flex-col">
+        <main className="flex min-w-0 flex-1 flex-col animate-in fade-in slide-in-from-bottom-8 duration-700 delay-150 fill-mode-backwards">
           <div className="flex items-center border-b border-border bg-card/70 px-3 py-2 lg:hidden">
             <Button
               size="icon-sm"
