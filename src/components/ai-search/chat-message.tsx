@@ -13,7 +13,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
   const isUser = message.role === "user";
 
   return (
-    <div className={cn("flex gap-3", isUser ? "justify-end" : "justify-start")}>
+    <div className={cn("flex gap-3 animate-in fade-in slide-in-from-bottom-4 duration-500", isUser ? "justify-end" : "justify-start")}>
       {!isUser ? <BotAvatar size="sm" className="mt-1" /> : null}
 
       <div className={cn("max-w-4xl", isUser ? "order-first" : "")}>
@@ -46,7 +46,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
 
 export function StreamingMessageSkeleton() {
   return (
-    <div className="flex gap-3">
+    <div className="flex gap-3 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150 fill-mode-backwards">
       <BotAvatar size="sm" className="mt-1" />
       <div className="w-full max-w-4xl space-y-3">
         <Skeleton className="h-16 w-full rounded-xl" />
