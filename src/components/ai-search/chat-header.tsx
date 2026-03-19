@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 
 export function ChatHeader() {
   return (
-    <header className="border-b border-border bg-card/70 backdrop-blur supports-backdrop-filter:bg-card/60">
+    <header className="border-b border-white/5 bg-background/40 backdrop-blur-3xl">
       <div className="mx-auto flex h-16 w-full max-w-7xl items-center gap-3 px-4 lg:px-6">
         <BotAvatar showOnlineBadge />
         <div className="min-w-0">
