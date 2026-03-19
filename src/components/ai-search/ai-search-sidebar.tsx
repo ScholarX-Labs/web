@@ -19,10 +19,10 @@ interface AiSearchSidebarProps {
 }
 
 const HOW_IT_WORKS_STEPS = [
-  "Describe your goals",
-  "AI scans the database",
-  "Get ranked matches",
-  "Apply with one click",
+  { text: "Describe your goals", color: "bg-sky-100 text-sky-700 group-hover:bg-sky-500" },
+  { text: "AI scans the database", color: "bg-violet-100 text-violet-700 group-hover:bg-violet-500" },
+  { text: "Get ranked matches", color: "bg-pink-100 text-pink-700 group-hover:bg-pink-500" },
+  { text: "Apply with one click", color: "bg-emerald-100 text-emerald-700 group-hover:bg-emerald-500" },
 ];
 
 const DATABASE_STATS = [
@@ -69,14 +69,14 @@ export function AiSearchSidebar({ onClearConversation }: AiSearchSidebarProps) {
         <CardContent className="space-y-3 px-4">
           {HOW_IT_WORKS_STEPS.map((step, index) => (
             <div 
-              key={step} 
+              key={step.text} 
               className="group flex cursor-default items-center gap-2 text-xs transition-all duration-300 hover:scale-[1.02]"
             >
-              <span className="inline-flex size-5 shrink-0 items-center justify-center rounded-full bg-sky-100 font-medium text-sky-700 transition-colors group-hover:bg-sky-500 group-hover:text-white">
+              <span className={`inline-flex size-5 shrink-0 items-center justify-center rounded-full font-medium transition-colors group-hover:text-white ${step.color}`}>
                 {index + 1}
               </span>
               <span className="text-muted-foreground transition-colors group-hover:text-foreground">
-                {step}
+                {step.text}
               </span>
             </div>
           ))}
