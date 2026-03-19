@@ -35,10 +35,11 @@ const DATABASE_STATS = [
 export function AiSearchSidebar({ onClearConversation }: AiSearchSidebarProps) {
   return (
     <aside className="flex h-full w-full flex-col gap-4">
-      <Card className="border-sky-900/40 bg-linear-to-b from-[#0f1f42] via-[#102a50] to-[#0f3655] py-4 text-sky-50">
-        <CardHeader className="px-4">
+      <Card className="group relative overflow-hidden border-sky-900/40 bg-linear-to-b from-[#0f1f42] via-[#102a50] to-[#0f3655] py-4 text-sky-50">
+        <div className="absolute -inset-0.5 bg-sky-400/10 opacity-0 transition-opacity duration-500 group-hover:opacity-100 blur-[20px]" />
+        <CardHeader className="relative z-10 px-4">
           <CardTitle className="flex items-center gap-2 text-base font-semibold text-white">
-            <span className="inline-flex size-11 items-center justify-center rounded-full bg-linear-to-br from-[#33AACC] to-[#7C3AED] shadow-lg shadow-sky-900/40">
+            <span className="inline-flex size-11 items-center justify-center rounded-full bg-linear-to-br from-[#33AACC] to-[#7C3AED] shadow-[0_0_15px_rgba(51,170,204,0.3)] transition-all duration-500 group-hover:shadow-[0_0_25px_rgba(51,170,204,0.6)] group-hover:scale-105">
               <Image
                 src="/AI_Robot_03_3d%201.svg"
                 alt="AI Search"
@@ -50,7 +51,7 @@ export function AiSearchSidebar({ onClearConversation }: AiSearchSidebarProps) {
             AI Search
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-4">
+        <CardContent className="relative z-10 px-4">
           <p className="text-xs leading-5 text-sky-100/90">
             Our AI analyzes your profile and matches you with high-fit
             scholarships, internships, and conferences.
@@ -67,11 +68,16 @@ export function AiSearchSidebar({ onClearConversation }: AiSearchSidebarProps) {
         </CardHeader>
         <CardContent className="space-y-3 px-4">
           {HOW_IT_WORKS_STEPS.map((step, index) => (
-            <div key={step} className="flex items-center gap-2 text-xs">
-              <span className="inline-flex size-5 items-center justify-center rounded-full bg-sky-100 font-medium text-sky-700">
+            <div 
+              key={step} 
+              className="group flex cursor-default items-center gap-2 text-xs transition-all duration-300 hover:scale-[1.02]"
+            >
+              <span className="inline-flex size-5 shrink-0 items-center justify-center rounded-full bg-sky-100 font-medium text-sky-700 transition-colors group-hover:bg-sky-500 group-hover:text-white">
                 {index + 1}
               </span>
-              <span className="text-muted-foreground">{step}</span>
+              <span className="text-muted-foreground transition-colors group-hover:text-foreground">
+                {step}
+              </span>
             </div>
           ))}
         </CardContent>
@@ -86,17 +92,20 @@ export function AiSearchSidebar({ onClearConversation }: AiSearchSidebarProps) {
         </CardHeader>
         <CardContent className="space-y-2 px-4">
           {DATABASE_STATS.map((item) => (
-            <div key={item.label}>
-              <div className="flex items-center justify-between text-xs">
-                <span className="flex items-center gap-2 text-muted-foreground">
-                  <item.icon className="size-3.5 text-sky-500" />
+            <div 
+              key={item.label}
+              className="group transition-transform duration-300 hover:scale-[1.02]"
+            >
+              <div className="flex items-center justify-between text-xs my-1">
+                <span className="flex items-center gap-2 text-muted-foreground transition-colors group-hover:text-foreground">
+                  <item.icon className="size-3.5 text-sky-500 transition-transform duration-300 group-hover:scale-110" />
                   {item.label}
                 </span>
                 <span className="font-semibold text-foreground">
                   {item.value}
                 </span>
               </div>
-              <Separator className="mt-2" />
+              <Separator className="mt-2 transition-colors group-hover:bg-border/80" />
             </div>
           ))}
         </CardContent>
