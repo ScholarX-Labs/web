@@ -36,7 +36,7 @@ export function AiSearchPageClient() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages, isStreaming]);
 
-  const submitPrompt = () => {
+  const submitPrompt = async () => {
     const value = draft.trim();
     if (!value || isStreaming) {
       return;
@@ -51,15 +51,59 @@ export function AiSearchPageClient() {
     setDraft("");
     setStreaming(true);
 
-    window.setTimeout(() => {
+    try {
+      const response = await fetch("https://scholarx-search-api.vercel.app/api/search", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({
+          query: value,
+          lang: "en",
+          limit: 10
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch opportunities from the API.");
+      }
+
+      const data = await response.json();
+      
+      const mappedOpportunities = (data.results || []).map((result: any) => {
+        const opp = result.opportunity;
+        return {
+          id: opp.id || result.id,
+          type: opp.type?.subtype?.[0] || "scholarship",
+          title: opp.title || "Unknown Opportunity",
+          subtitle: opp.location || (opp.target_segment ? opp.target_segment.join(", ") : ""),
+          description: opp.description ? opp.description.slice(0, 150) + "..." : "",
+          aiReason: `Matched based on semantic similarity of ${Math.round(result.score * 100)}%.`,
+          country: opp.country?.[0] || "Global",
+          deadline: opp.deadline ? new Date(opp.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "Rolling",
+          fundingLabel: opp.fund_type?.[0] === "fully_funded" ? "Fully Funded" : (opp.fund_type?.[0] || "Funded").replace("_", " "),
+          remote: opp.is_remote || false,
+          matchScore: Math.round(result.score * 100),
+        };
+      });
+
       addMessage({
         id: createId(),
         role: "assistant",
-        text: "Great question. Here are high-fit opportunities ranked for your query.",
-        opportunities: MOCK_OPPORTUNITIES,
+        text: `Here are the top ${mappedOpportunities.length} opportunities I found based on your semantic query.`,
+        opportunities: mappedOpportunities,
       });
+    } catch (error) {
+      console.error(error);
+      addMessage({
+        id: createId(),
+        role: "assistant",
+        text: "I'm sorry, I encountered an error while searching the database. Please try again later.",
+      });
+    } finally {
       setStreaming(false);
-    }, 850);
+    }
   };
 
   return (
