@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import { isDevAuthBypassEnabled } from "@/config/dev-auth-bypass";
 import { ROUTES } from "./lib/routes";
 
 const SESSION_COOKIE_NAME = "better-auth.session_token";
@@ -19,6 +20,9 @@ function hasSessionCookie(request: NextRequest) {
 }
 
 export function proxy(request: NextRequest) {
+  if (isDevAuthBypassEnabled && process.env.NODE_ENV !== "production") {
+    return NextResponse.next();
+  }
   const isAuthenticated = hasSessionCookie(request);
   const { pathname } = request.nextUrl;
   const isAuthRoute = pathname.startsWith("/auth");

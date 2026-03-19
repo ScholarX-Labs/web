@@ -6,6 +6,15 @@ import { getSession } from "@/lib/dal";
 import { and, eq, ne } from "drizzle-orm";
 import { isValidPhoneNumber } from "libphonenumber-js";
 
+function hasCode(value: unknown): value is { code: string } {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "code" in value &&
+    typeof (value as { code?: unknown }).code === "string"
+  );
+}
+
 export async function POST(req: Request) {
   let phone: string;
   try {
@@ -66,9 +75,8 @@ export async function POST(req: Request) {
   } catch (err: unknown) {
     // Race condition: unique constraint violation caught at DB level
     const isUniqueViolation =
-      err instanceof Error &&
-      ((err as any).code === "23505" ||
-        err.message.includes("unique constraint"));
+      (hasCode(err) && err.code === "23505") ||
+      (err instanceof Error && err.message.includes("unique constraint"));
 
     if (isUniqueViolation) {
       console.warn(`[collect-phone] unique constraint race for phone`);
