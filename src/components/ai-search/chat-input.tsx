@@ -20,7 +20,7 @@ export function ChatInput({
 }: ChatInputProps) {
   return (
     <div className="border-t border-border bg-card/80 p-3 backdrop-blur supports-backdrop-filter:bg-card/70 lg:p-4">
-      <div className="mx-auto flex w-full max-w-7xl items-end gap-2 rounded-2xl border border-border bg-background px-2 py-2">
+      <div className="mx-auto flex w-full max-w-7xl items-end gap-2 rounded-2xl border border-border bg-background px-2 py-2 transition-all duration-300 focus-within:border-sky-500/50 focus-within:ring-2 focus-within:ring-sky-500/20 focus-within:shadow-lg shadow-sm">
         <Textarea
           value={value}
           disabled={disabled}
@@ -44,7 +44,7 @@ export function ChatInput({
           size="icon"
           onClick={onSubmit}
           disabled={disabled || value.trim().length === 0}
-          className="rounded-full bg-sky-500 text-white hover:bg-sky-600"
+          className="rounded-full bg-sky-500 text-white hover:bg-sky-600 transition-transform active:scale-95"
           aria-label="Send message"
         >
           <SendHorizontal className="size-4" />
