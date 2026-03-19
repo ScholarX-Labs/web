@@ -48,7 +48,7 @@ interface OpportunityCardProps {
 
 export function OpportunityCard({ opportunity }: OpportunityCardProps) {
   return (
-    <Card className="gap-4 border-blue-200/70 py-4">
+    <Card className="gap-4 border-blue-200/70 py-4 transition-all duration-500 hover:-translate-y-1 hover:border-sky-400/50 hover:shadow-xl hover:shadow-sky-500/10 cursor-pointer">
       <CardHeader className="gap-2 px-4">
         <div className="flex items-center gap-2">
           <Badge
