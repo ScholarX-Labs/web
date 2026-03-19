@@ -65,13 +65,13 @@ export function AiSearchPageClient() {
   return (
     <div className="h-screen overflow-hidden bg-[#F0F7FB]">
       <div className="flex h-full">
-        <div className="hidden w-75 shrink-0 border-r border-border bg-background/95 p-4 lg:block animate-in fade-in slide-in-from-left-8 duration-700">
+        <div className="hidden w-75 shrink-0 border-r border-white/5 bg-background/40 backdrop-blur-3xl p-4 shadow-[5px_0_30px_rgba(0,0,0,0.03)] lg:block animate-in fade-in slide-in-from-left-8 duration-700">
           <AiSearchSidebar onClearConversation={clearConversation} />
         </div>
 
         {isSidebarOpen ? (
           <div className="fixed inset-0 z-40 bg-black/40 lg:hidden">
-            <div className="h-full w-75 bg-background p-4 shadow-xl">
+            <div className="h-full w-75 bg-background/40 backdrop-blur-3xl p-4 shadow-2xl border-r border-white/5">
               <div className="mb-2 flex justify-end">
                 <Button
                   size="icon-sm"
