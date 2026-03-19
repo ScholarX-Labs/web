@@ -48,13 +48,15 @@ export function StreamingMessageSkeleton() {
   return (
     <div className="flex gap-3 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150 fill-mode-backwards">
       <BotAvatar size="sm" className="mt-1" />
-      <div className="w-full max-w-4xl space-y-3">
-        <Skeleton className="h-16 w-full rounded-xl" />
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-          <Skeleton className="h-52 w-full rounded-xl" />
-          <Skeleton className="h-52 w-full rounded-xl" />
-          <Skeleton className="h-52 w-full rounded-xl" />
+      <div className="flex max-w-4xl items-center py-2">
+        <div className="flex h-10 items-center justify-center gap-1.5 rounded-full bg-background/40 px-5 shadow-[0_0_20px_rgba(51,170,204,0.15)] backdrop-blur-2xl border border-white/10">
+          <span className="size-2.5 animate-bounce rounded-full bg-sky-400 [animation-delay:-0.3s]" />
+          <span className="size-2.5 animate-bounce rounded-full bg-violet-400 [animation-delay:-0.15s]" />
+          <span className="size-2.5 animate-bounce rounded-full bg-emerald-400" />
         </div>
+        <span className="ml-4 text-xs font-medium text-muted-foreground/80 animate-pulse tracking-wide">
+          Intelligence gathering...
+        </span>
       </div>
     </div>
   );
