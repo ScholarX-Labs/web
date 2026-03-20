@@ -17,10 +17,22 @@ interface AiSearchSidebarProps {
 }
 
 const HOW_IT_WORKS_STEPS = [
-  { text: "Describe your goals", color: "bg-sky-100 text-sky-700 group-hover:bg-sky-500" },
-  { text: "AI scans the database", color: "bg-violet-100 text-violet-700 group-hover:bg-violet-500" },
-  { text: "Get ranked matches", color: "bg-pink-100 text-pink-700 group-hover:bg-pink-500" },
-  { text: "Apply with one click", color: "bg-emerald-100 text-emerald-700 group-hover:bg-emerald-500" },
+  {
+    text: "Describe your goals",
+    color: "bg-sky-100 text-sky-700 group-hover:bg-sky-500",
+  },
+  {
+    text: "AI scans the database",
+    color: "bg-violet-100 text-violet-700 group-hover:bg-violet-500",
+  },
+  {
+    text: "Get ranked matches",
+    color: "bg-pink-100 text-pink-700 group-hover:bg-pink-500",
+  },
+  {
+    text: "Apply with one click",
+    color: "bg-emerald-100 text-emerald-700 group-hover:bg-emerald-500",
+  },
 ];
 
 const DATABASE_STATS = [
@@ -69,11 +81,13 @@ function HowItWorksCard() {
       </CardHeader>
       <CardContent className="space-y-4 px-4 pt-3">
         {HOW_IT_WORKS_STEPS.map((step, index) => (
-          <div 
-            key={step.text} 
+          <div
+            key={step.text}
             className="group flex cursor-default items-center gap-3 text-xs transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] hover:scale-[1.02]"
           >
-            <span className={`inline-flex size-5 shrink-0 items-center justify-center rounded-full font-medium transition-colors group-hover:text-white ${step.color}`}>
+            <span
+              className={`inline-flex size-5 shrink-0 items-center justify-center rounded-full font-medium transition-colors group-hover:text-white ${step.color}`}
+            >
               {index + 1}
             </span>
             <span className="text-muted-foreground transition-colors group-hover:text-foreground font-medium">
@@ -97,7 +111,7 @@ function DatabaseStatsCard() {
       </CardHeader>
       <CardContent className="space-y-4 px-4 pt-3">
         {DATABASE_STATS.map((item) => (
-          <div 
+          <div
             key={item.label}
             className="group transition-transform duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] hover:scale-[1.02]"
           >
