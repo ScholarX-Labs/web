@@ -16,21 +16,21 @@ export function ChatMessage({ message }: ChatMessageProps) {
     <div className={cn("flex gap-3 animate-in fade-in slide-in-from-bottom-4 duration-500", isUser ? "justify-end" : "justify-start")}>
       {!isUser ? <BotAvatar size="sm" className="mt-1" /> : null}
 
-      <div className={cn("max-w-4xl", isUser ? "order-first" : "")}>
-        <Card
+      <div className={cn("max-w-4xl flex flex-col", isUser ? "order-first items-end" : "items-start")}>
+        <div
           className={cn(
-            "py-3 px-4 gap-2",
+            "py-2.5 px-4 max-w-[85%] shadow-sm backdrop-blur-md",
             isUser
-              ? "bg-sky-500 text-white border-sky-400"
-              : "bg-card border-border",
+              ? "bg-linear-to-br from-sky-400 to-blue-500 text-white rounded-2xl rounded-tr-sm"
+              : "bg-card/40 border border-white/10 rounded-2xl rounded-tl-sm shadow-[0_4px_20px_rgba(0,0,0,0.03)]",
           )}
         >
           <p
-            className={cn("text-sm", isUser ? "text-white" : "text-foreground")}
+            className={cn("text-[15px] leading-relaxed tracking-tight", isUser ? "text-white font-medium shadow-sm" : "text-foreground/90")}
           >
             {message.text}
           </p>
-        </Card>
+        </div>
 
         {message.opportunities?.length ? (
           <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
