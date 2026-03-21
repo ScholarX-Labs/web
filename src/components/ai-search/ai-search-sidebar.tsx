@@ -79,7 +79,7 @@ function HowItWorksCard() {
           How it works
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4 px-4 pt-3">
+      <CardContent className="space-y-2 px-4 pt-1.5">
         {HOW_IT_WORKS_STEPS.map((step, index) => (
           <div
             key={step.text}
@@ -109,13 +109,13 @@ function DatabaseStatsCard() {
           Database Stats
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4 px-4 pt-3">
+      <CardContent className="space-y-2 px-4 pt-1.5">
         {DATABASE_STATS.map((item) => (
           <div
             key={item.label}
             className="group transition-transform duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] hover:scale-[1.02]"
           >
-            <div className="flex items-center justify-between text-xs my-1">
+            <div className="flex items-center justify-between text-xs">
               <span className="flex items-center gap-2 text-muted-foreground transition-colors group-hover:text-foreground font-medium">
                 <item.icon className="size-3.5 text-sky-500 transition-transform duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:scale-110 group-hover:text-sky-400" />
                 {item.label}

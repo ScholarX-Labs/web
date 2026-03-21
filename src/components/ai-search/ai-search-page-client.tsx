@@ -52,37 +52,53 @@ export function AiSearchPageClient() {
     setStreaming(true);
 
     try {
-      const response = await fetch("https://scholarx-search-api.vercel.app/api/search", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json"
+      const response = await fetch(
+        "https://scholarx-search-api.vercel.app/api/search",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            query: value,
+            lang: "en",
+            limit: 10,
+          }),
         },
-        body: JSON.stringify({
-          query: value,
-          lang: "en",
-          limit: 10
-        }),
-      });
+      );
 
       if (!response.ok) {
         throw new Error("Failed to fetch opportunities from the API.");
       }
 
       const data = await response.json();
-      
+
       const mappedOpportunities = (data.results || []).map((result: any) => {
         const opp = result.opportunity;
         return {
           id: opp.id || result.id,
           type: opp.type?.subtype?.[0] || "scholarship",
           title: opp.title || "Unknown Opportunity",
-          subtitle: opp.location || (opp.target_segment ? opp.target_segment.join(", ") : ""),
-          description: opp.description ? opp.description.slice(0, 150) + "..." : "",
+          subtitle:
+            opp.location ||
+            (opp.target_segment ? opp.target_segment.join(", ") : ""),
+          description: opp.description
+            ? opp.description.slice(0, 150) + "..."
+            : "",
           aiReason: `Matched based on semantic similarity of ${Math.round(result.score * 100)}%.`,
           country: opp.country?.[0] || "Global",
-          deadline: opp.deadline ? new Date(opp.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "Rolling",
-          fundingLabel: opp.fund_type?.[0] === "fully_funded" ? "Fully Funded" : (opp.fund_type?.[0] || "Funded").replace("_", " "),
+          deadline: opp.deadline
+            ? new Date(opp.deadline).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })
+            : "Rolling",
+          fundingLabel:
+            opp.fund_type?.[0] === "fully_funded"
+              ? "Fully Funded"
+              : (opp.fund_type?.[0] || "Funded").replace("_", " "),
           remote: opp.is_remote || false,
           matchScore: Math.round(result.score * 100),
         };

@@ -12,8 +12,8 @@ export function ChatHeader() {
           </p>
           <p className="text-xs text-emerald-600">Online • Ready to help</p>
         </div>
-        <Badge 
-          variant="outline" 
+        <Badge
+          variant="outline"
           className="ml-auto border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
         >
           <span className="mr-2 flex size-2 relative">
