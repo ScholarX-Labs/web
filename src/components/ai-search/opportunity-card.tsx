@@ -1,5 +1,5 @@
 import { cva } from "class-variance-authority";
-import { Bookmark, CalendarDays, MapPin, Sparkles } from "lucide-react";
+import { ArrowRight, Bookmark, CalendarDays, MapPin, Sparkles } from "lucide-react";
 
 import { Opportunity } from "@/components/ai-search/types";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -119,9 +119,26 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
         >
           {opportunity.fundingLabel}
         </Badge>
-        <Button size="sm" className="bg-sky-500 hover:bg-sky-600 text-white">
-          Apply Now
-        </Button>
+        {opportunity.applicationLink ? (
+          <Button
+            size="sm"
+            className="group bg-sky-500 hover:bg-sky-600 text-white transition-all duration-300"
+            asChild
+          >
+            <a
+              href={opportunity.applicationLink}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Apply Now
+              <ArrowRight className="ml-1.5 size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+            </a>
+          </Button>
+        ) : (
+          <Button size="sm" className="bg-sky-500 hover:bg-sky-600 text-white">
+            Apply Now
+          </Button>
+        )}
       </CardFooter>
     </Card>
   );

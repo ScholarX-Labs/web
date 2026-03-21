@@ -17,6 +17,7 @@ export interface Opportunity {
   fundingLabel: string;
   remote?: boolean;
   matchScore: number;
+  applicationLink?: string | null;
 }
 
 export interface AiChatMessage {

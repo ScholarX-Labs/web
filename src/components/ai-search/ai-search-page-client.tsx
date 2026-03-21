@@ -101,6 +101,7 @@ export function AiSearchPageClient() {
               : (opp.fund_type?.[0] || "Funded").replace("_", " "),
           remote: opp.is_remote || false,
           matchScore: Math.round(result.score * 100),
+          applicationLink: opp.application_link || null,
         };
       });
 
