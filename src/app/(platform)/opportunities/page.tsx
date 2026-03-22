@@ -1,5 +1,5 @@
-import { Dot, icons, Search, Zap } from "lucide-react";
-import Image from "next/image";
+import { Dot, Search, Zap } from "lucide-react";
+import Filters from "./_components/Filters";
 
 function opportunities() {
   return (
@@ -47,9 +47,11 @@ function opportunities() {
         </div>
       </section>
       {/* filters section */}
-      <section className="flex-2 bg-gray-900"></section>
+      <section className="shrink-0 px-4 py-3 border-y border-gray-500">
+        <Filters />
+      </section>
       {/* opportunities section */}
-      <section className="flex-20 overflow-auto bg-gray-800"></section>
+      <section className="flex-20 overflow-auto "></section>
     </div>
   );
 }
