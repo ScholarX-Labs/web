@@ -174,7 +174,8 @@
 }
 
 @layer components {
-  .ai-chat-scroll [data-slot="scroll-area-scrollbar"][data-orientation="vertical"] {
+  .ai-chat-scroll
+    [data-slot="scroll-area-scrollbar"][data-orientation="vertical"] {
     width: 12px;
     border-left: 1px solid transparent;
     padding: 2px;
@@ -193,10 +194,13 @@
     background: linear-gradient(180deg, #33aacc 0%, #7c3aed 100%);
     border-radius: 9999px;
     box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35) inset;
-    transition: background 200ms ease, transform 150ms ease;
+    transition:
+      background 200ms ease,
+      transform 150ms ease;
   }
 
-  .ai-chat-scroll [data-slot="scroll-area-scrollbar"]:hover
+  .ai-chat-scroll
+    [data-slot="scroll-area-scrollbar"]:hover
     [data-slot="scroll-area-thumb"] {
     background: linear-gradient(180deg, #40b5d8 0%, #8e49ff 100%);
     transform: scaleX(1.02);
@@ -205,4 +209,9 @@
   .ai-chat-scroll [data-slot="scroll-area-viewport"] {
     overscroll-behavior: contain;
   }
+}
+
+.footer .navbar {
+  flex-shrink: 0;
+  padding: 1rem;
 }
