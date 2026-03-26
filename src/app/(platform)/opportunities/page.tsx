@@ -1,7 +1,7 @@
 import { Dot, Search, Zap } from "lucide-react";
 import Filters from "./_components/Filters";
 
-function opportunities() {
+function Opportunities() {
   return (
     <div className="flex flex-col  min-h-screen">
       {/* Header section */}
@@ -10,7 +10,7 @@ function opportunities() {
         aria-label="Header section that includes search box"
         className="relative bg-cover flex-5 min-h-1/4 flex flex-col"
         style={{
-          backgroundImage: "url('/opportunities-hero-bg.jpg')",
+          backgroundImage: "url('/O-hero-bg.jpg')",
           backgroundRepeat: "no-repeat",
           backgroundPosition: "50% 40%",
           backgroundSize: "cover",
@@ -25,13 +25,22 @@ function opportunities() {
             Explore all scholarships and opportunities
           </span>
           <div className="flex flex-row relative w-3/4 my-4">
+            <label htmlFor="opportunities-search" className="sr-only">
+              Search opportunities
+            </label>
             <input
-              type="text"
-              role="searchbox"
+              id="opportunities-search"
+              type="search"
               className="bg-white w-full rounded-sm p-3"
               placeholder="Search opportunities"
             />
-            <Search className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer h-full" />
+            <button
+              type="submit"
+              aria-label="Submit search"
+              className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer"
+            >
+              <Search className="h-5 w-5" aria-hidden="true" />
+            </button>
           </div>
           <div className="flex flex-row w-1/5 sm:w-2/3 lg:w-1/2 xl:w-2/5 max-w-95 min-w-80 justify-between my-3 items-center">
             <button className="flex flex-row text-white bg-ring/20 p-2 border-border border-2 cursor-pointer rounded-3xl text-sm text-nowrap gap-2">
@@ -56,4 +65,4 @@ function opportunities() {
   );
 }
 
-export default opportunities;
+export default Opportunities;

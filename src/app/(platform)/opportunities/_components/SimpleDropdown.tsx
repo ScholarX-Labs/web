@@ -52,13 +52,12 @@ export default function SimpleDropdown({
           viewBox="0 0 24 24"
           className="ml-2 text-gray-500"
         >
-          <path d="M7 10l5 5 5-5z" />
+          <path fill="currentColor" d="M7 10l5 5 5-5z" />
         </svg>
       </button>
 
       {open && (
         <div
-          role="menu"
           className="absolute left-0 z-50 mt-2 w-full max-h-64 max-w-[calc(100vw-2rem)] overflow-auto rounded-md border bg-white p-2 shadow-lg"
           style={{ whiteSpace: "normal" }}
         >
