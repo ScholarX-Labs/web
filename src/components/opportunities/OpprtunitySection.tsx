@@ -92,7 +92,11 @@ function OpprtunitySection() {
   const totalPages = data?.pagination?.totalPages || 1;
 
   const formattedTotal =
-    total > 0 && total % 10 !== 0 ? `${Math.floor(total / 10) * 10}+` : total;
+    total > 0 && total < 10
+      ? total
+      : total > 0 && total % 10 !== 0
+        ? `${Math.floor(total / 10) * 10}+`
+        : total;
 
   const handlePageChange = (newPage: number) => {
     if (newPage < 1 || newPage > totalPages) return;
