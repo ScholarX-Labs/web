@@ -217,28 +217,21 @@ export function CourseDetailSheet({
             <div className="absolute inset-0 bg-linear-to-t from-slate-950 via-slate-950/40 to-transparent" />
             <motion.div
               {...reveal(0)}
-              className="absolute inset-x-0 bottom-0 p-6 sm:p-8 text-white"
+              className="absolute inset-x-0 bottom-0 p-6 sm:p-10 text-white"
             >
-              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-white/90 backdrop-blur-md">
-                <Sparkles className="h-3.5 w-3.5" />
-                Premium Learning Experience
-              </div>
-              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.25em] text-white/70">
-                ScholarX Detail Surface
-              </p>
-              <h2 className="max-w-md text-3xl font-black tracking-tight sm:text-4xl">
+              <h2 className="max-w-md text-3xl font-medium tracking-tight sm:text-4xl">
                 {course.title}
               </h2>
-              <div className="mt-5 flex flex-wrap gap-3 text-sm text-white/75">
-                <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1.5 backdrop-blur-md">
-                  <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+              <div className="mt-4 flex flex-wrap gap-4 text-[15px] font-medium text-white/90">
+                <span className="inline-flex items-center gap-1.5">
+                  <Star className="h-4 w-4" />
                   {course.rating?.toFixed(1) ?? "4.9"}
                 </span>
-                <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1.5 backdrop-blur-md">
+                <span className="inline-flex items-center gap-1.5">
                   <Users className="h-4 w-4" />
                   {course.studentsCount?.toLocaleString() ?? "1,200"} enrolled
                 </span>
-                <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1.5 backdrop-blur-md">
+                <span className="inline-flex items-center gap-1.5">
                   <Clock3 className="h-4 w-4" />
                   {course.duration || "12h 30m"}
                 </span>
@@ -247,23 +240,20 @@ export function CourseDetailSheet({
           </div>
 
           <div className="flex min-h-0 flex-1 flex-col">
-            <div className="relative z-30 flex items-start justify-between gap-4 border-b border-slate-200/90 bg-white/80 px-5 py-4 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/70 sm:px-8">
+            <div className="relative z-30 flex items-start justify-between gap-4 border-b border-slate-100 bg-white/80 px-6 py-5 backdrop-blur-xl dark:border-slate-800/60 dark:bg-slate-950/70 sm:px-10">
               <motion.div {...reveal(1)} className="min-w-0">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-hero-blue">
+                <p className="text-xs font-semibold uppercase tracking-[0.15em] text-slate-400">
                   {intent === "enroll" ? "Enrollment preview" : "Course detail"}
                 </p>
-                <h3 className="mt-1 truncate text-xl font-bold text-slate-900 dark:text-white sm:text-2xl">
+                <h3 className="mt-1.5 truncate text-2xl font-medium tracking-tight text-slate-900 dark:text-white">
                   {course.title}
                 </h3>
-                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                  By {course.instructor?.name || "Expert Instructor"}
-                </p>
               </motion.div>
 
               <button
                 ref={closeButtonRef}
                 onClick={handleDismiss}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition-all hover:scale-[1.04] hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-900"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition-colors hover:bg-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
                 aria-label="Close detail sheet"
                 style={{ opacity: flipComplete ? 1 : 0 }}
               >
@@ -271,107 +261,74 @@ export function CourseDetailSheet({
               </button>
             </div>
 
-            <div className="min-h-0 flex-1 overflow-y-auto px-5 py-6 sm:px-8">
-              <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-                <div className="space-y-6">
-                  <motion.div
-                    {...reveal(2)}
-                    className="rounded-[24px] border border-slate-200 bg-slate-50/80 p-5 dark:border-slate-800 dark:bg-slate-900/40"
-                  >
-                    <p className="text-sm font-semibold text-slate-900 dark:text-white">
-                      Why this course
-                    </p>
-                    <p className="mt-2 text-sm leading-7 text-slate-600 dark:text-slate-300">
+            <div className="min-h-0 flex-1 overflow-y-auto px-6 py-8 sm:px-10">
+              <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr]">
+                <div className="space-y-8 pr-4">
+                  <motion.div {...reveal(2)}>
+                    <h4 className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-400">
+                      Overview
+                    </h4>
+                    <p className="mt-3 text-[17px] leading-relaxed text-slate-700 dark:text-slate-300">
                       {course.description}
                     </p>
                   </motion.div>
 
-                  <motion.div {...reveal(3)}>
-                    <h4 className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                  <motion.div {...reveal(3)} className="h-px w-full bg-slate-100 dark:bg-slate-800/60" />
+
+                  <motion.div {...reveal(4)}>
+                    <h4 className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-400">
                       What you&apos;ll learn
                     </h4>
-                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                    <ul className="mt-4 space-y-4">
                       {learningOutcomes.map((item) => (
-                        <div
+                        <li
                           key={item}
-                          className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm leading-6 text-slate-700 shadow-sm dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300"
+                          className="flex items-start text-[17px] leading-relaxed text-slate-700 dark:text-slate-300"
                         >
+                          <span className="mr-4 mt-1 block h-1.5 w-1.5 shrink-0 rounded-full bg-slate-300 dark:bg-slate-600" />
                           {item}
-                        </div>
+                        </li>
                       ))}
-                    </div>
-                  </motion.div>
-
-                  <motion.div
-                    {...reveal(4)}
-                    className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-950"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="h-12 w-12 overflow-hidden rounded-2xl bg-slate-200">
-                        {course.instructor?.avatar ? (
-                          <img
-                            src={course.instructor.avatar}
-                            alt={course.instructor.name}
-                            className="h-full w-full object-cover"
-                          />
-                        ) : null}
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-slate-900 dark:text-white">
-                          {course.instructor?.name || "Expert Instructor"}
-                        </p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">
-                          {course.instructor?.title || "Principal Instructor"}
-                        </p>
-                      </div>
-                    </div>
+                    </ul>
                   </motion.div>
                 </div>
 
                 <motion.aside
                   {...reveal(5)}
-                  className="sticky top-5 space-y-4 rounded-[24px] border border-slate-200 bg-slate-50/95 p-5 shadow-[0_14px_34px_rgba(2,6,23,0.08)] dark:border-slate-800 dark:bg-slate-900/60"
+                  className="sticky top-5 flex flex-col gap-8"
                 >
-                  <div className="flex items-center justify-between gap-3">
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-                        Enrollment
-                      </p>
-                      <p className="mt-1 text-lg font-bold text-slate-900 dark:text-white">
-                        {isPaid ? `$${course.currentPrice}` : "Free"}
-                      </p>
-                    </div>
-                    <BookOpen className="h-6 w-6 text-hero-blue" />
+                  <div>
+                    <h4 className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-400">
+                      Investment
+                    </h4>
+                    <p className="mt-2 text-5xl font-light tracking-tight text-slate-900 dark:text-white">
+                      {isPaid ? `$${course.currentPrice}` : "Free"}
+                    </p>
                   </div>
 
-                  <div className="space-y-3 text-sm text-slate-600 dark:text-slate-300">
-                    <p>• Lifetime access</p>
-                    <p>• Certificate of completion</p>
-                    <p>• Premium course experience</p>
+                  <div className="space-y-4 text-[15px] text-slate-500 dark:text-slate-400">
+                    <p className="flex items-center gap-3"><BookOpen className="h-5 w-5 text-slate-400" /> Lifetime access to content</p>
+                    <p className="flex items-center gap-3"><Sparkles className="h-5 w-5 text-slate-400" /> Official completion certificate</p>
+                    <p className="flex items-center gap-3"><Star className="h-5 w-5 text-slate-400" /> Premium learning experience</p>
                   </div>
 
-                  {isEnrolled ? (
-                    <Link
-                      href={ROUTES.LESSON(course.slug, "1")}
-                      className="inline-flex w-full items-center justify-center rounded-full bg-emerald-500 px-5 py-3 text-sm font-semibold text-white transition-all hover:scale-[1.01] hover:bg-emerald-600"
-                    >
-                      Resume Learning
-                    </Link>
-                  ) : (
-                    <button
-                      onClick={onEnrollIntent}
-                      className="inline-flex w-full items-center justify-center rounded-full bg-hero-blue px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-cyan-500/25 transition-all hover:scale-[1.01] hover:bg-hero-blue-dark"
-                    >
-                      {isPaid ? "Continue to Enrollment" : "Enroll for Free"}
-                    </button>
-                  )}
-
-                  <Link
-                    href={`${ROUTES.COURSE_DETAIL(course.slug)}?intent=enroll`}
-                    className="inline-flex w-full items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900"
-                  >
-                    View full enrollment flow
-                  </Link>
+                  <div className="pt-4">
+                    {isEnrolled ? (
+                      <Link
+                        href={ROUTES.LESSON(course.slug, "1")}
+                        className="inline-flex w-full items-center justify-center rounded-2xl bg-slate-900 px-6 py-4 text-[15px] font-medium text-white transition-transform hover:scale-[1.02] active:scale-[0.98] dark:bg-white dark:text-slate-900"
+                      >
+                        Resume Learning
+                      </Link>
+                    ) : (
+                      <button
+                        onClick={onEnrollIntent}
+                        className="inline-flex w-full items-center justify-center rounded-2xl bg-slate-900 px-6 py-4 text-[15px] font-medium text-white transition-transform hover:scale-[1.02] active:scale-[0.98] dark:bg-white dark:text-slate-900"
+                      >
+                        {isPaid ? "Continue to Enrollment" : "Enroll for Free"}
+                      </button>
+                    )}
+                  </div>
                 </motion.aside>
               </div>
             </div>
