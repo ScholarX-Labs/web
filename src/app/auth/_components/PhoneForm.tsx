@@ -67,7 +67,7 @@ export default function PhoneForm() {
         type="submit"
         disabled={submitting}
         className={
-          "text-primary-foreground max-w-64 self-center w-1/2 " +
+          "text-primary-foreground w-full sm:w-1/2 max-w-64 self-center " +
           (submitting ? "cursor-not-allowed" : "cursor-pointer")
         }
       >

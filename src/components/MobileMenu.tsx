@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { Menu } from "lucide-react";
+import { useState } from "react";
+import SignoutButton from "@/app/auth/_components/SignoutButton";
 import {
   Sheet,
   SheetContent,
@@ -18,8 +20,10 @@ interface MobileMenuProps {
 }
 
 export default function MobileMenu({ isLoggedIn }: MobileMenuProps) {
+  const [open, setOpen] = useState(false);
+
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button variant="ghost" size="icon" className="lg:hidden">
           <Menu className="h-6 w-6" />
@@ -42,52 +46,66 @@ export default function MobileMenu({ isLoggedIn }: MobileMenuProps) {
         <nav className="flex flex-col gap-4 mt-8">
           <Link
             href="/"
+            onClick={() => setOpen(false)}
             className="text-lg font-medium transition-colors hover:text-primary"
           >
             Home
           </Link>
           <Link
             href="/about"
+            onClick={() => setOpen(false)}
             className="text-lg font-medium transition-colors hover:text-primary"
           >
             About us
           </Link>
           <Link
             href="/courses"
+            onClick={() => setOpen(false)}
             className="text-lg font-medium transition-colors hover:text-primary"
           >
             Courses
           </Link>
           <Link
             href="/opportunities"
+            onClick={() => setOpen(false)}
             className="text-lg font-medium transition-colors hover:text-primary"
           >
             Opportunities
           </Link>
           <Link
             href="/contact"
+            onClick={() => setOpen(false)}
             className="text-lg font-medium transition-colors hover:text-primary"
           >
             Contact us
           </Link>
           <hr className="my-2" />
           {isLoggedIn ? (
-            <Link
-              href="/profile"
-              className="text-lg font-medium transition-colors hover:text-primary"
-            >
-              Profile
-            </Link>
+            <div className="flex flex-col gap-4">
+              <Link
+                href="/profile"
+                onClick={() => setOpen(false)}
+                className="text-lg font-medium transition-colors hover:text-primary"
+              >
+                Profile
+              </Link>
+              <SignoutButton
+                onClick={() => setOpen(false)}
+                className="flex w-full items-center justify-center px-4 py-2 rounded-sm text-primary border border-primary font-medium hover:bg-primary/10"
+              />
+            </div>
           ) : (
             <div className="flex flex-col gap-4">
               <Link
                 href="/auth/signin"
+                onClick={() => setOpen(false)}
                 className="flex w-full items-center justify-center px-4 py-2 rounded-sm text-primary border border-primary font-medium hover:bg-primary/10"
               >
                 Log in
               </Link>
               <Link
                 href="/auth/signup"
+                onClick={() => setOpen(false)}
                 className="flex w-full items-center justify-center px-4 py-2 rounded-md bg-primary text-white font-medium hover:bg-chart-5"
               >
                 Sign up

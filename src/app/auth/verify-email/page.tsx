@@ -20,8 +20,8 @@ export default async function VerifyEmailPage() {
   }
 
   return (
-    <section className="bg-auth-surface h-full w-full flex justify-center items-center p-4">
-      <div className="min-h-3/4 lg:w-3/8 w-11/12 max-w-lg p-6 rounded-2xl flex flex-col gap-4 bg-white/80">
+    <section className="bg-auth-surface min-h-screen w-full flex justify-center items-center p-4">
+      <div className="w-full max-w-md md:max-w-lg p-6 rounded-2xl flex flex-col gap-4 bg-white/80 backdrop-blur-sm shadow-sm">
         <h2 className="text-center text-3xl font-semibold">
           Verify your email
         </h2>
