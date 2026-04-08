@@ -8,7 +8,7 @@ import MobileMenu from "@/components/MobileMenu";
 
 async function Header() {
   const session = await getSession();
-  const isLoggedIn = session?.session.id;
+  const isLoggedIn = !!session?.session?.id;
   return (
     <header className="sticky top-0 z-50 w-full flex flex-row items-center justify-between px-4 lg:justify-around bg-background border-b lg:border-none">
       <section className="flex-1 flex justify-center lg:justify-start">
@@ -35,7 +35,7 @@ async function Header() {
           </Link>
           <Link
             className="text-black transition-colors duration-300 hover:text-primary"
-            href="about"
+            href="/about"
           >
             About us
           </Link>

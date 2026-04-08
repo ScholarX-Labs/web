@@ -14,7 +14,7 @@ import Image from "next/image";
 import Scholarx_horizontal_logo from "../../public/ScholarX-Logo-horizontal-Blue-Solid-Small_ScholarX.png";
 
 interface MobileMenuProps {
-  isLoggedIn: string | undefined;
+  isLoggedIn: boolean;
 }
 
 export default function MobileMenu({ isLoggedIn }: MobileMenuProps) {
