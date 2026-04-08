@@ -14,25 +14,20 @@ function Footer() {
       <section className="grid grid-cols-1 gap-10 md:gap-0 md:grid-cols-4 md:grid-rows-1 align-middle text-center md:text-start">
         {/* Image section  */}
         <section className="">
-          <a
-            href="https://www.scholarx.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex justify-center align-middle p-6"
-          >
+          <Link href="/" className="flex justify-center align-middle p-6">
             <Image
               alt="ScholarX logo"
               src={Scholarx_vertical_logo}
               style={{
                 width: "50%",
-                minWidth: "100px",
+                minWidth: "75px",
                 height: "auto",
                 objectFit: "contain",
                 alignSelf: "center",
               }}
               className="hover:cursor-pointer max-w-62.5"
             />
-          </a>
+          </Link>
         </section>
         {/* Quick links section */}
         <section className="flex flex-col gap-5">
