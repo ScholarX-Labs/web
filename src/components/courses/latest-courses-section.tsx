@@ -23,6 +23,7 @@ export function LatestCoursesSection({ courses }: LatestCoursesSectionProps) {
 
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(true);
+  const [activeCardIndex, setActiveCardIndex] = useState<number | null>(null);
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
@@ -95,7 +96,20 @@ export function LatestCoursesSection({ courses }: LatestCoursesSectionProps) {
           {courses.map((course, index) => (
             <div
               key={course.id}
-              className="flex-[0_0_100%] sm:flex-[0_0_calc(50%-12px)] lg:flex-[0_0_calc(33.333%-16px)] min-w-0"
+              className={cn(
+                "flex-[0_0_100%] sm:flex-[0_0_calc(50%-12px)] lg:flex-[0_0_calc(33.333%-16px)] min-w-0 transition-[opacity,transform,filter] duration-300 ease-out motion-reduce:transition-opacity motion-reduce:duration-200 motion-reduce:transform-none motion-reduce:filter-none",
+                activeCardIndex !== null && activeCardIndex !== index
+                  ? "opacity-65 scale-[0.985]"
+                  : "opacity-100 scale-100",
+              )}
+              onMouseEnter={() => setActiveCardIndex(index)}
+              onMouseLeave={() => setActiveCardIndex(null)}
+              onFocusCapture={() => setActiveCardIndex(index)}
+              onBlurCapture={(event) => {
+                if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+                  setActiveCardIndex(null);
+                }
+              }}
             >
               <LatestCourseCard course={course} index={index} />
             </div>
