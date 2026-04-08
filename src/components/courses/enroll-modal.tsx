@@ -98,25 +98,34 @@ export function EnrollModal({ course, autoOpen = false }: EnrollModalProps) {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={(open) => !open && closeModal()}>
-      <DialogContent className="sm:max-w-md p-0 overflow-hidden bg-white dark:bg-card border-slate-200 dark:border-slate-800 rounded-3xl gap-0">
+      <DialogContent className="sm:max-w-md p-0 overflow-hidden rounded-3xl border border-slate-200/90 bg-white/95 shadow-[0_32px_95px_rgba(2,6,23,0.28)] ring-1 ring-slate-100/80 backdrop-blur-xl gap-0 dark:border-slate-800 dark:bg-card/95 dark:ring-slate-800/80">
         <AnimatePresence mode="wait">
           {!isSuccess ? (
             <motion.div
               key="enroll-form"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.2 }}
+              initial={{ opacity: 0, scale: 0.94, y: 14 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.97, y: 8 }}
+              transition={{ duration: 0.32, ease: [0.32, 0.72, 0, 1] }}
             >
-              <div className="bg-slate-50 dark:bg-slate-900/50 p-6 border-b border-slate-100 dark:border-slate-800">
+              <div className="bg-slate-50/95 dark:bg-slate-900/65 p-6 border-b border-slate-100 dark:border-slate-800 backdrop-blur-xl">
                 <DialogHeader>
                   <DialogTitle className="sr-only">
                     Enroll in {course.title}
                   </DialogTitle>
                 </DialogHeader>
 
+                <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-cyan-200/70 bg-cyan-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-cyan-700 dark:border-cyan-500/30 dark:bg-cyan-500/10 dark:text-cyan-300">
+                  Priority Enrollment Window
+                </div>
+
                 <div className="flex gap-4">
-                  <div className="relative w-24 h-24 rounded-xl overflow-hidden shrink-0 shadow-md">
+                  <motion.div
+                    className="relative w-24 h-24 rounded-xl overflow-hidden shrink-0 shadow-md"
+                    initial={{ scale: 0.92, rotate: -2, opacity: 0.8 }}
+                    animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                    transition={{ duration: 0.42, ease: [0.32, 0.72, 0, 1] }}
+                  >
                     <Image
                       src={
                         course.thumbnail ||
@@ -126,7 +135,7 @@ export function EnrollModal({ course, autoOpen = false }: EnrollModalProps) {
                       fill
                       className="object-cover"
                     />
-                  </div>
+                  </motion.div>
                   <div className="flex flex-col justify-center min-w-0">
                     <h3 className="font-bold text-slate-900 dark:text-white line-clamp-2 leading-tight">
                       {course.title}
@@ -162,10 +171,12 @@ export function EnrollModal({ course, autoOpen = false }: EnrollModalProps) {
 
                 <div className="pt-2">
                   {!isPaid ? (
-                    <button
+                    <motion.button
                       onClick={handleEnrollFree}
                       disabled={isEnrolling}
                       className="w-full flex items-center justify-center gap-2 bg-linear-to-r from-hero-blue to-hero-blue-dark text-white font-bold rounded-xl py-4 shadow-lg shadow-hero-blue/20 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
+                      whileHover={{ scale: isEnrolling ? 1 : 1.015 }}
+                      whileTap={{ scale: isEnrolling ? 1 : 0.985 }}
                     >
                       {isEnrolling ? (
                         <>
@@ -175,15 +186,17 @@ export function EnrollModal({ course, autoOpen = false }: EnrollModalProps) {
                       ) : (
                         "Enroll for Free"
                       )}
-                    </button>
+                    </motion.button>
                   ) : (
-                    <button
+                    <motion.button
                       onClick={
                         course.requiresForm
                           ? handleGoToApplication
                           : handleGoToCheckout
                       }
                       className="w-full flex items-center justify-between px-6 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold rounded-xl py-4 transition-all active:scale-[0.98] group"
+                      whileHover={{ scale: 1.015 }}
+                      whileTap={{ scale: 0.985 }}
                     >
                       <span className="flex items-center gap-2">
                         {course.requiresForm ? "Apply Now" : "Checkout Now"}
@@ -192,7 +205,7 @@ export function EnrollModal({ course, autoOpen = false }: EnrollModalProps) {
                         ${course.currentPrice}
                         <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                       </span>
-                    </button>
+                    </motion.button>
                   )}
 
                   <p className="text-center text-xs text-slate-500 mt-4 px-4 flex justify-center items-center gap-1.5">
@@ -205,9 +218,9 @@ export function EnrollModal({ course, autoOpen = false }: EnrollModalProps) {
           ) : (
             <motion.div
               key="success-view"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.4 }}
+              initial={{ opacity: 0, scale: 0.95, y: 12 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ duration: 0.45, ease: [0.32, 0.72, 0, 1] }}
               className="p-8"
             >
               <EnrollmentSuccess

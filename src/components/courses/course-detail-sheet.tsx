@@ -9,7 +9,7 @@ import {
   useState,
 } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { BookOpen, Clock3, Star, Users, X } from "lucide-react";
+import { BookOpen, Clock3, Sparkles, Star, Users, X } from "lucide-react";
 import { Course } from "@/types/course.types";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
@@ -43,6 +43,7 @@ export function CourseDetailSheet({
   const isPaid = (course.price ?? 0) > 0;
   const isEnrolled = Boolean(course.isSubscribed);
   const sheetRef = useRef<HTMLDivElement | null>(null);
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const [flipComplete, setFlipComplete] = useState(false);
   const [isDismissing, setIsDismissing] = useState(false);
 
@@ -135,6 +136,12 @@ export function CourseDetailSheet({
   }, [isDismissing, onClose, originRect, playReverse, prefersReducedMotion]);
 
   useEffect(() => {
+    if (!flipComplete || !closeButtonRef.current) return;
+
+    closeButtonRef.current.focus({ preventScroll: true });
+  }, [flipComplete]);
+
+  useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         handleDismiss();
@@ -174,17 +181,30 @@ export function CourseDetailSheet({
     >
       <button
         aria-label="Close course details"
-        className="absolute inset-0 cursor-default bg-slate-950/55 backdrop-blur-xl"
+        className="absolute inset-0 cursor-default bg-slate-950/58 backdrop-blur-2xl"
         onClick={handleDismiss}
       />
+
+      <motion.div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.35 }}
+      >
+        <div className="absolute left-1/2 top-[14%] h-56 w-56 -translate-x-1/2 rounded-full bg-cyan-400/15 blur-3xl" />
+        <div className="absolute right-[14%] top-[8%] h-64 w-64 rounded-full bg-blue-500/12 blur-3xl" />
+      </motion.div>
 
       <div
         ref={sheetRef}
         className={cn(
-          "relative z-10 w-full max-w-6xl overflow-hidden rounded-[28px] border border-white/10 bg-white shadow-[0_40px_120px_rgba(15,23,42,0.35)] dark:bg-slate-950",
+          "relative z-10 w-full max-w-6xl overflow-hidden rounded-[28px] border border-white/30 bg-white/95 shadow-[0_48px_140px_rgba(15,23,42,0.4)] ring-1 ring-slate-100/80 dark:border-slate-800/70 dark:bg-slate-950/95 dark:ring-slate-800/80",
           "max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3rem)]",
         )}
       >
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-20 h-14 bg-linear-to-b from-white/70 to-transparent dark:from-slate-900/50" />
+
         <div className="flex flex-col lg:flex-row">
           <div className="relative w-full lg:w-[44%] min-h-[260px] lg:min-h-[640px] overflow-hidden bg-slate-950">
             <div
@@ -199,6 +219,10 @@ export function CourseDetailSheet({
               {...reveal(0)}
               className="absolute inset-x-0 bottom-0 p-6 sm:p-8 text-white"
             >
+              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-white/90 backdrop-blur-md">
+                <Sparkles className="h-3.5 w-3.5" />
+                Premium Learning Experience
+              </div>
               <p className="mb-3 text-xs font-semibold uppercase tracking-[0.25em] text-white/70">
                 ScholarX Detail Surface
               </p>
@@ -223,7 +247,7 @@ export function CourseDetailSheet({
           </div>
 
           <div className="flex min-h-0 flex-1 flex-col">
-            <div className="flex items-start justify-between gap-4 border-b border-slate-200 px-5 py-4 dark:border-slate-800 sm:px-8">
+            <div className="relative z-30 flex items-start justify-between gap-4 border-b border-slate-200/90 bg-white/80 px-5 py-4 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/70 sm:px-8">
               <motion.div {...reveal(1)} className="min-w-0">
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-hero-blue">
                   {intent === "enroll" ? "Enrollment preview" : "Course detail"}
@@ -237,8 +261,9 @@ export function CourseDetailSheet({
               </motion.div>
 
               <button
+                ref={closeButtonRef}
                 onClick={handleDismiss}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-900"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition-all hover:scale-[1.04] hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-900"
                 aria-label="Close detail sheet"
                 style={{ opacity: flipComplete ? 1 : 0 }}
               >
@@ -305,7 +330,7 @@ export function CourseDetailSheet({
 
                 <motion.aside
                   {...reveal(5)}
-                  className="space-y-4 rounded-[24px] border border-slate-200 bg-slate-50 p-5 dark:border-slate-800 dark:bg-slate-900/40"
+                  className="sticky top-5 space-y-4 rounded-[24px] border border-slate-200 bg-slate-50/95 p-5 shadow-[0_14px_34px_rgba(2,6,23,0.08)] dark:border-slate-800 dark:bg-slate-900/60"
                 >
                   <div className="flex items-center justify-between gap-3">
                     <div>
@@ -328,14 +353,14 @@ export function CourseDetailSheet({
                   {isEnrolled ? (
                     <Link
                       href={ROUTES.LESSON(course.slug, "1")}
-                      className="inline-flex w-full items-center justify-center rounded-full bg-emerald-500 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-emerald-600"
+                      className="inline-flex w-full items-center justify-center rounded-full bg-emerald-500 px-5 py-3 text-sm font-semibold text-white transition-all hover:scale-[1.01] hover:bg-emerald-600"
                     >
                       Resume Learning
                     </Link>
                   ) : (
                     <button
                       onClick={onEnrollIntent}
-                      className="inline-flex w-full items-center justify-center rounded-full bg-hero-blue px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-hero-blue-dark"
+                      className="inline-flex w-full items-center justify-center rounded-full bg-hero-blue px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-cyan-500/25 transition-all hover:scale-[1.01] hover:bg-hero-blue-dark"
                     >
                       {isPaid ? "Continue to Enrollment" : "Enroll for Free"}
                     </button>
