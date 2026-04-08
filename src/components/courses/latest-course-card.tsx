@@ -58,6 +58,23 @@ export function LatestCourseCard({
     }
 
     event.preventDefault();
+    event.stopPropagation();
+
+    const cardElement = event.currentTarget.closest("[data-course-card]") as HTMLElement | null;
+    const gridElement = event.currentTarget.closest("[data-catalog-grid]") as HTMLElement | null;
+
+    if (cardElement) {
+      cardElement.setAttribute("data-active-card", "true");
+      cardElement.style.transition = "opacity 160ms ease-out";
+      cardElement.style.opacity = "0.3";
+    }
+
+    if (gridElement) {
+      gridElement.setAttribute("data-active-grid", "true");
+      gridElement.style.contain = "layout";
+      gridElement.style.pointerEvents = "none";
+    }
+
     openCourseSheet(
       course,
       intent,
@@ -78,6 +95,7 @@ export function LatestCourseCard({
 
   return (
     <motion.div
+      data-course-card
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.15 }}

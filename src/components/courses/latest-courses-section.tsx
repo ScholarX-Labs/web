@@ -48,7 +48,10 @@ export function LatestCoursesSection({ courses }: LatestCoursesSectionProps) {
   const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
 
   return (
-    <section className="px-4 md:px-8 lg:px-16 py-16 bg-white">
+    <section
+      data-catalog-grid
+      className="px-4 md:px-8 lg:px-16 py-16 bg-white transition-[opacity,filter] duration-300 ease-out data-[dimmed=true]:opacity-40 data-[dimmed=true]:blur-[10px] data-[dimmed=true]:pointer-events-none"
+    >
       {/* ── Section header ─────────────────────────────────────── */}
       <div className="flex items-end justify-between mb-10">
         <div>

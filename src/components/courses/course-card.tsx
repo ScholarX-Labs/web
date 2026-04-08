@@ -82,10 +82,25 @@ export function CourseCard({ course, className }: CourseCardProps) {
     }
 
     event.preventDefault();
+    event.stopPropagation();
+
+    const cardElement = event.currentTarget;
+    const gridElement = cardElement.closest("[data-catalog-grid]") as HTMLElement | null;
+
+    cardElement.setAttribute("data-active-card", "true");
+    cardElement.style.transition = "opacity 160ms ease-out";
+    cardElement.style.opacity = "0.3";
+
+    if (gridElement) {
+      gridElement.setAttribute("data-active-grid", "true");
+      gridElement.style.contain = "layout";
+      gridElement.style.pointerEvents = "none";
+    }
+
     openCourseSheet(
       course,
       "details",
-      event.currentTarget.getBoundingClientRect(),
+      cardElement.getBoundingClientRect(),
     );
   };
 
@@ -93,7 +108,8 @@ export function CourseCard({ course, className }: CourseCardProps) {
     <Link
       href={ROUTES.COURSE_DETAIL(course.id)}
       onClick={handleCardClick}
-      className="block outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-[1.5rem] h-full"
+      data-course-card
+      className="course-card block outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-[1.5rem] h-full"
     >
       <SpotlightCard className="h-full group/spotlight rounded-[1.5rem] bg-card/40 dark:bg-card/20 backdrop-blur-xl border-border/40 hover:border-primary/20 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5">
         <Card

@@ -12,6 +12,7 @@ export function CourseDetailSurfacePortal() {
   const isOpen = useCourseSheetStore((state) => state.isOpen);
   const course = useCourseSheetStore((state) => state.course);
   const intent = useCourseSheetStore((state) => state.intent);
+  const originRect = useCourseSheetStore((state) => state.originRect);
   const closeCourseSheet = useCourseSheetStore((state) => state.closeCourseSheet);
   const setIntent = useCourseSheetStore((state) => state.setIntent);
 
@@ -40,6 +41,7 @@ export function CourseDetailSurfacePortal() {
         <CourseDetailSheet
           course={course}
           intent={intent}
+          originRect={originRect}
           onClose={closeCourseSheet}
           onEnrollIntent={() => setIntent("enroll")}
         />
