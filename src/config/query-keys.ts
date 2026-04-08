@@ -1,3 +1,5 @@
+import { OpportunitiesQuery } from "@/lib/opportunities/types";
+
 /**
  * Query Key Factory for React Query.
  * Centralizing query keys prevents typos and makes cache invalidation predictable.
@@ -19,6 +21,14 @@ export const queryKeys = {
     enrollments: () => [...queryKeys.courses.all, "enrollments"] as const,
     enrollmentStatus: (courseId: string) =>
       [...queryKeys.courses.enrollments(), courseId, "status"] as const,
+  },
+  opportunities: {
+    all: ["opportunities"] as const,
+    lists: () => [...queryKeys.opportunities.all, "list"] as const,
+    list: (filters: OpportunitiesQuery) =>
+      [...queryKeys.opportunities.lists(), { filters }] as const,
+    details: () => [...queryKeys.opportunities.all, "detail"] as const,
+    detail: (id: string) => [...queryKeys.opportunities.details(), id] as const,
   },
   sales: {
     all: ["sales"] as const,

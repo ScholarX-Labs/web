@@ -37,20 +37,18 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <main className="flex flex-col">
-          <AppProviders>
-            <TooltipProvider>
-              {isDevAuthBypassEnabled ? (
-                <div className="w-full bg-amber-200 px-4 py-2 text-center text-xs font-semibold tracking-wide text-amber-950">
-                  DEV_AUTH_BYPASS is ON: authentication and route protection are
-                  bypassed.
-                </div>
-              ) : null}
-              {currentUser && !isDevAuthBypassEnabled && <SignoutButton />}
-              {children}
-            </TooltipProvider>
-          </AppProviders>
-        </main>
+        <AppProviders>
+          <TooltipProvider>
+            {isDevAuthBypassEnabled ? (
+              <div className="w-full bg-amber-200 px-4 py-2 text-center text-xs font-semibold tracking-wide text-amber-950">
+                DEV_AUTH_BYPASS is ON: authentication and route protection are
+                bypassed.
+              </div>
+            ) : null}
+            {currentUser && !isDevAuthBypassEnabled ? <SignoutButton /> : null}
+            {children}
+          </TooltipProvider>
+        </AppProviders>
         <Footer />
       </body>
     </html>
