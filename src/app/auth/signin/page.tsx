@@ -27,7 +27,7 @@ export default function Page() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<SigninForm>({
-    resolver: zodResolver(signinSchema),
+    resolver: zodResolver(signinSchema as any),
     defaultValues: {
       email: "",
       password: "",

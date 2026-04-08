@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { MouseEvent } from "react";
 import { Course } from "@/types/course.types";
 import { ROUTES } from "@/lib/routes";
 import { SpotlightCard } from "@/components/animations/spotlight-card";
@@ -16,6 +19,8 @@ import { CourseMeta } from "./course-meta";
 import { InstructorInfo } from "./instructor-info";
 import { cn } from "@/lib/utils";
 import { Monitor, PenTool, Database, Cpu, Tag } from "lucide-react";
+import { useMediaQuery } from "@/hooks/use-media-query";
+import { useCourseSheetStore } from "@/stores/course-sheet.store";
 
 const CATEGORY_STYLES: Record<
   string,
@@ -60,9 +65,34 @@ interface CourseCardProps {
 }
 
 export function CourseCard({ course, className }: CourseCardProps) {
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
+  const openCourseSheet = useCourseSheetStore((state) => state.openCourseSheet);
+
+  const handleCardClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (!isDesktop) return;
+
+    if (
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey ||
+      event.button !== 0
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+    openCourseSheet(
+      course,
+      "details",
+      event.currentTarget.getBoundingClientRect(),
+    );
+  };
+
   return (
     <Link
-      href={ROUTES.COURSE_DETAIL(course.slug)}
+      href={ROUTES.COURSE_DETAIL(course.id)}
+      onClick={handleCardClick}
       className="block outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-[1.5rem] h-full"
     >
       <SpotlightCard className="h-full group/spotlight rounded-[1.5rem] bg-card/40 dark:bg-card/20 backdrop-blur-xl border-border/40 hover:border-primary/20 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5">
@@ -72,8 +102,10 @@ export function CourseCard({ course, className }: CourseCardProps) {
             className,
           )}
         >
-          {/* Image Area */}
-          <div className="relative aspect-video w-full overflow-hidden mb-2 rounded-t-[1.5rem]">
+          <div
+            className="relative aspect-video w-full overflow-hidden mb-2 rounded-t-[1.5rem]"
+            style={{ viewTransitionName: `course-thumbnail-${course.slug}` }}
+          >
             <Image
               src={
                 course.thumbnail ||

@@ -128,6 +128,7 @@ const mapCourse = (course: CourseItemResponse): Course => {
       : undefined,
     requiresForm: course.requiresForm ?? false,
     isPublished: course.isPublished,
+    isSubscribed: course.isSubscribed ?? false,
     createdAt: course.createdAt ?? new Date().toISOString(),
     updatedAt: course.updatedAt ?? new Date().toISOString(),
   };
@@ -404,7 +405,7 @@ export const coursesService = {
   },
 
   // Kept for compatibility until slug endpoint is reintroduced.
-  getBySlug: async (slug: string): Promise<Course> => {
-    return coursesService.getById(slug);
+  getBySlug: async (slug: string, token?: string): Promise<Course> => {
+    return coursesService.getById(slug, token);
   },
 };

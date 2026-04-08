@@ -350,3 +350,6 @@
     transition: none !important;
   }
 }
+
+/* View Transitions are handled via default matching */
+

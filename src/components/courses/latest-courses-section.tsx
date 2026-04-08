@@ -8,6 +8,7 @@ import Link from "next/link";
 import { Course } from "@/types/course.types";
 import { LatestCourseCard } from "./latest-course-card";
 import { cn } from "@/lib/utils";
+import { CourseDetailSurfacePortal } from "./course-detail-surface-portal";
 
 interface LatestCoursesSectionProps {
   courses: Course[];
@@ -31,7 +32,7 @@ export function LatestCoursesSection({ courses }: LatestCoursesSectionProps) {
 
   useEffect(() => {
     if (!emblaApi) return;
-    
+
     // Defer the initial setting to avoid synchronous setState warning
     Promise.resolve().then(onSelect);
 
@@ -136,6 +137,8 @@ export function LatestCoursesSection({ courses }: LatestCoursesSectionProps) {
           <ChevronRight className="w-5 h-5" />
         </motion.button>
       </motion.div>
+
+      <CourseDetailSurfacePortal />
     </section>
   );
 }

@@ -7,3 +7,5 @@ export * from "./course-card-skeleton";
 export * from "./course-grid";
 export * from "./courses-hero";
 export * from "./courses-filter-section";
+export * from "./course-detail-sheet";
+export * from "./course-detail-surface-portal";
