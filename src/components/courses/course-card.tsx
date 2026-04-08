@@ -85,7 +85,9 @@ export function CourseCard({ course, className }: CourseCardProps) {
     event.stopPropagation();
 
     const cardElement = event.currentTarget;
-    const gridElement = cardElement.closest("[data-catalog-grid]") as HTMLElement | null;
+    const gridElement = cardElement.closest(
+      "[data-catalog-grid]",
+    ) as HTMLElement | null;
 
     cardElement.setAttribute("data-active-card", "true");
     cardElement.style.transition = "opacity 160ms ease-out";
@@ -97,11 +99,7 @@ export function CourseCard({ course, className }: CourseCardProps) {
       gridElement.style.pointerEvents = "none";
     }
 
-    openCourseSheet(
-      course,
-      "details",
-      cardElement.getBoundingClientRect(),
-    );
+    openCourseSheet(course, "details", cardElement.getBoundingClientRect());
   };
 
   return (

@@ -60,8 +60,12 @@ export function LatestCourseCard({
     event.preventDefault();
     event.stopPropagation();
 
-    const cardElement = event.currentTarget.closest("[data-course-card]") as HTMLElement | null;
-    const gridElement = event.currentTarget.closest("[data-catalog-grid]") as HTMLElement | null;
+    const cardElement = event.currentTarget.closest(
+      "[data-course-card]",
+    ) as HTMLElement | null;
+    const gridElement = event.currentTarget.closest(
+      "[data-catalog-grid]",
+    ) as HTMLElement | null;
 
     if (cardElement) {
       cardElement.setAttribute("data-active-card", "true");
