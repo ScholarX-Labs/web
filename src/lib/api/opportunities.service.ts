@@ -17,7 +17,6 @@ const OPPORTUNITIES_API_URL =
 const DEFAULT_QUERY: OpportunitiesQuery = {
   page: 1,
   per_page: 12,
-  limit: 120,
 };
 
 export const mapOpportunity = (raw: {
