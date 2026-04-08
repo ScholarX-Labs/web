@@ -288,6 +288,66 @@ All states must have designed outcomes:
 - Success ceremony depth:
   lightweight animation only versus richer celebratory effects
 
+## Prioritized Implementation Backlog (P0 To P3)
+
+This backlog consolidates the motion polish suggestions into an execution order
+that protects spatial continuity first, then adds delight safely.
+
+### P0 Critical (Must Ship First)
+
+- Preserve true FLIP origin behavior per clicked card:
+  use measured `getBoundingClientRect()` as the only start point so left,
+  center, and right cards naturally expand from different physical origins.
+- Add deterministic focus restoration on dismiss:
+  store the triggering card element on open and return focus to it after reverse
+  FLIP completes.
+- Keep layout lock and unlock sequencing strict:
+  apply `contain: layout` and interaction lock synchronously on click, release
+  only after entry animation completes.
+- Enforce reduced-motion parity for all newly added effects:
+  remove non-essential transforms and stagger delays when reduced motion is
+  enabled.
+
+### P1 High Impact (Primary UX Upgrade)
+
+- Implement thumbnail shared-element transition fallback:
+  when View Transition API is unavailable, animate a cloned thumbnail from card
+  to sheet hero and back on dismiss.
+- Add hover CTA overlay on card thumbnail:
+  reveal Details and Enroll CTAs with blur scrim and micro-stagger on hover and
+  keyboard focus.
+- Introduce sheet interior stagger orchestration after FLIP completion:
+  sequence badges, title, metadata, and content sections only after container
+  expansion finishes.
+
+### P2 Visual Depth (Premium Feel)
+
+- Add catalog sibling recession on hover:
+  when one card is active, subtly de-emphasize non-hovered cards to improve
+  focus and visual hierarchy.
+- Add category-driven ambient lighting accents:
+  vary spotlight/glow treatment by course category while preserving contrast and
+  readability.
+- Tune backdrop dim and blur timing:
+  ensure catalog recedes without fighting sheet motion or causing jank.
+
+### P3 Optional Delight (Post-Hardening)
+
+- Add first-load ripple entrance for course grid:
+  stagger cards by index/row for a controlled cascade on desktop.
+- Add per-card micro-personality tokens:
+  allow small, bounded differences (timing offset, hover intensity) without
+  altering FLIP geometry or motion semantics.
+- Add instrumentation for motion quality checks:
+  track frame stability and interaction latency during card-to-sheet flows.
+
+### Suggested Systematic Rollout
+
+1. Complete P0 and run accessibility + reduced-motion QA.
+2. Implement P1 and verify no regressions in FLIP entry/dismiss paths.
+3. Layer P2 enhancements and profile animation smoothness.
+4. Ship P3 only after hardening and cross-browser validation.
+
 ## Definition Of Done
 
 - All Sprint 2 acceptance criteria are met

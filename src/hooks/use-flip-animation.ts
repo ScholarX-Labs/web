@@ -46,8 +46,8 @@ export function useFlipAnimation(): FlipAnimationApi {
   const play = useCallback(
     (element: HTMLElement, options: FlipPlayOptions = {}) => {
       const {
-        duration = 380,
-        easing = "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+        duration = 500, // Apple fluid motion standard
+        easing = "cubic-bezier(0.32, 0.72, 0, 1)", // iOS fluid ease
         onComplete,
       } = options;
 
@@ -92,8 +92,8 @@ export function useFlipAnimation(): FlipAnimationApi {
       options: FlipPlayOptions = {},
     ): Promise<void> => {
       const {
-        duration = 280,
-        easing = "cubic-bezier(0.4, 0, 1, 1)",
+        duration = 420,
+        easing = "cubic-bezier(0.32, 0.72, 0, 1)",
         onComplete,
       } = options;
 

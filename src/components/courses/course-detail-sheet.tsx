@@ -1,7 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { BookOpen, Clock3, Star, Users, X } from "lucide-react";
 import { Course } from "@/types/course.types";
@@ -57,11 +63,13 @@ export function CourseDetailSheet({
 
     const frame = requestAnimationFrame(() => {
       void play(element, {
-        duration: 380,
-        easing: "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+        duration: 500,
+        easing: "cubic-bezier(0.32, 0.72, 0, 1)",
         onComplete: () => {
           element.style.overflow = "auto";
-          const grid = document.querySelector("[data-active-grid='true']") as HTMLElement | null;
+          const grid = document.querySelector(
+            "[data-active-grid='true']",
+          ) as HTMLElement | null;
           if (grid) {
             grid.style.contain = "auto";
             grid.style.pointerEvents = "auto";
@@ -75,7 +83,9 @@ export function CourseDetailSheet({
   }, [applyInverseFromRect, originRect, play, prefersReducedMotion]);
 
   useEffect(() => {
-    const grid = document.querySelector("[data-active-grid='true']") as HTMLElement | null;
+    const grid = document.querySelector(
+      "[data-active-grid='true']",
+    ) as HTMLElement | null;
     if (!grid) return;
 
     grid.setAttribute("data-dimmed", "true");
@@ -97,7 +107,9 @@ export function CourseDetailSheet({
       element.style.overflow = "hidden";
     }
 
-    const grid = document.querySelector("[data-active-grid='true']") as HTMLElement | null;
+    const grid = document.querySelector(
+      "[data-active-grid='true']",
+    ) as HTMLElement | null;
     if (grid) {
       grid.removeAttribute("data-dimmed");
       grid.removeAttribute("data-active-grid");
@@ -105,12 +117,14 @@ export function CourseDetailSheet({
 
     if (element && originRect && !prefersReducedMotion) {
       await playReverse(element, originRect, {
-        duration: 280,
-        easing: "cubic-bezier(0.4, 0, 1, 1)",
+        duration: 420,
+        easing: "cubic-bezier(0.32, 0.72, 0, 1)",
       });
     }
 
-    const activeCard = document.querySelector("[data-active-card='true']") as HTMLElement | null;
+    const activeCard = document.querySelector(
+      "[data-active-card='true']",
+    ) as HTMLElement | null;
     if (activeCard) {
       activeCard.style.transition = "opacity 160ms ease-in";
       activeCard.style.opacity = "1";
@@ -134,12 +148,17 @@ export function CourseDetailSheet({
   const reveal = (index: number) => ({
     initial: false,
     animate: flipComplete
-      ? { opacity: 1, y: 0 }
-      : { opacity: 0, y: prefersReducedMotion ? 0 : 8 },
+      ? { opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }
+      : {
+          opacity: 0,
+          y: prefersReducedMotion ? 0 : 16,
+          scale: 0.98,
+          filter: "blur(4px)",
+        },
     transition: {
-      duration: prefersReducedMotion ? 0.12 : 0.22,
-      delay: prefersReducedMotion ? 0 : 0.38 + index * 0.04,
-      ease: [0.25, 0.46, 0.45, 0.94] as const,
+      duration: prefersReducedMotion ? 0.2 : 0.55,
+      delay: prefersReducedMotion ? 0 : 0.1 + index * 0.05,
+      ease: [0.32, 0.72, 0, 1] as const,
     },
   });
 
@@ -176,7 +195,10 @@ export function CourseDetailSheet({
               }}
             />
             <div className="absolute inset-0 bg-linear-to-t from-slate-950 via-slate-950/40 to-transparent" />
-            <motion.div {...reveal(0)} className="absolute inset-x-0 bottom-0 p-6 sm:p-8 text-white">
+            <motion.div
+              {...reveal(0)}
+              className="absolute inset-x-0 bottom-0 p-6 sm:p-8 text-white"
+            >
               <p className="mb-3 text-xs font-semibold uppercase tracking-[0.25em] text-white/70">
                 ScholarX Detail Surface
               </p>
@@ -227,7 +249,10 @@ export function CourseDetailSheet({
             <div className="min-h-0 flex-1 overflow-y-auto px-5 py-6 sm:px-8">
               <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
                 <div className="space-y-6">
-                  <motion.div {...reveal(2)} className="rounded-[24px] border border-slate-200 bg-slate-50/80 p-5 dark:border-slate-800 dark:bg-slate-900/40">
+                  <motion.div
+                    {...reveal(2)}
+                    className="rounded-[24px] border border-slate-200 bg-slate-50/80 p-5 dark:border-slate-800 dark:bg-slate-900/40"
+                  >
                     <p className="text-sm font-semibold text-slate-900 dark:text-white">
                       Why this course
                     </p>
@@ -252,7 +277,10 @@ export function CourseDetailSheet({
                     </div>
                   </motion.div>
 
-                  <motion.div {...reveal(4)} className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-950">
+                  <motion.div
+                    {...reveal(4)}
+                    className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-950"
+                  >
                     <div className="flex items-center gap-3">
                       <div className="h-12 w-12 overflow-hidden rounded-2xl bg-slate-200">
                         {course.instructor?.avatar ? (
@@ -275,7 +303,10 @@ export function CourseDetailSheet({
                   </motion.div>
                 </div>
 
-                <motion.aside {...reveal(5)} className="space-y-4 rounded-[24px] border border-slate-200 bg-slate-50 p-5 dark:border-slate-800 dark:bg-slate-900/40">
+                <motion.aside
+                  {...reveal(5)}
+                  className="space-y-4 rounded-[24px] border border-slate-200 bg-slate-50 p-5 dark:border-slate-800 dark:bg-slate-900/40"
+                >
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
