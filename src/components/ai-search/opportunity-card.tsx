@@ -1,5 +1,12 @@
+"use client";
+
+import { useOptimistic, useTransition } from "react";
 import { cva } from "class-variance-authority";
 import { ArrowRight, Bookmark, CalendarDays, MapPin, Sparkles } from "lucide-react";
+import { toast } from "sonner";
+
+import { toggleSavedOpportunity } from "@/actions/user.actions";
+import { useSession } from "@/lib/auth-client";
 
 import { Opportunity } from "@/components/ai-search/types";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -47,6 +54,43 @@ interface OpportunityCardProps {
 }
 
 export function OpportunityCard({ opportunity }: OpportunityCardProps) {
+  const { data: session } = useSession();
+
+  // Extract the saved list from the user's session safely
+  const savedList: string[] = (session?.user as any)?.savedOpportunities || [];
+  const isCurrentlySaved = savedList.includes(opportunity.id);
+
+  // Optimistic UI state for instant feedback
+  const [optimisticSaved, addOptimisticSaved] = useOptimistic(
+    isCurrentlySaved,
+    (state, newSavedState: boolean) => newSavedState
+  );
+
+  const [isPending, startTransition] = useTransition();
+
+  const handleToggleSave = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    if (!session?.user) {
+      // You could trigger a sign-in modal/toast here in a real production app.
+      return;
+    }
+
+    const newState = !optimisticSaved;
+    startTransition(async () => {
+      addOptimisticSaved(newState);
+      try {
+        const result = await toggleSavedOpportunity(opportunity.id, newState ? "save" : "unsave");
+        if (!result.success) {
+          toast.error(result.error || "Failed to update saved status. Please try again.");
+        }
+      } catch (error) {
+        toast.error("An unexpected error occurred. Please try again.");
+      }
+    });
+  };
+
   return (
     <Card className="gap-4 border-blue-200/70 py-4 transition-all duration-500 hover:-translate-y-1 hover:border-sky-400/50 hover:shadow-xl hover:shadow-sky-500/10 cursor-pointer">
       <CardHeader className="gap-2 px-4">
@@ -66,10 +110,15 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
           <Button
             variant="ghost"
             size="icon-xs"
-            className="text-muted-foreground"
-            aria-label="Save opportunity"
+            className={cn(
+              "text-muted-foreground transition-colors duration-300",
+              optimisticSaved && "text-sky-500 hover:text-sky-600 hover:bg-sky-50"
+            )}
+            aria-label={optimisticSaved ? "Unsave opportunity" : "Save opportunity"}
+            onClick={handleToggleSave}
+            disabled={!session?.user} // Prevent action if user is not logged in
           >
-            <Bookmark />
+            <Bookmark className={cn(optimisticSaved && "fill-sky-500 text-sky-500")} />
           </Button>
         </div>
 
