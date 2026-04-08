@@ -10,7 +10,9 @@ import {
 } from "framer-motion";
 import { cn } from "@/lib/utils";
 
-interface SpotlightCardProps extends React.HTMLAttributes<HTMLDivElement> {
+interface SpotlightCardProps {
+  children: React.ReactNode;
+  className?: string;
   spotlightColor?: string;
   tiltEnabled?: boolean;
 }
@@ -20,7 +22,6 @@ export function SpotlightCard({
   className,
   spotlightColor,
   tiltEnabled = true,
-  ...props
 }: SpotlightCardProps) {
   const divRef = useRef<HTMLDivElement>(null);
   const [isFocused, setIsFocused] = useState(false);
@@ -117,7 +118,6 @@ export function SpotlightCard({
         "relative flex h-full w-full overflow-hidden rounded-[1.5rem] bg-card shadow-lg transition-shadow duration-500",
         className,
       )}
-      {...props}
     >
       <div
         className="relative z-10 w-full h-full flex flex-col"

@@ -11,6 +11,7 @@ interface CourseGridProps {
 
 export function CourseGrid({ children, className }: CourseGridProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const hasActiveCard = hoveredIndex !== null;
 
   return (
     <div
@@ -25,9 +26,20 @@ export function CourseGrid({ children, className }: CourseGridProps) {
 
         return (
           <div
-            className="relative group block p-0 h-full"
+            className={cn(
+              "relative group block h-full p-0 transition-[opacity,transform,filter] duration-300 ease-out motion-reduce:transition-opacity motion-reduce:duration-200 motion-reduce:transform-none motion-reduce:filter-none",
+              hasActiveCard && hoveredIndex !== idx
+                ? "opacity-65 scale-[0.985]"
+                : "opacity-100 scale-100",
+            )}
             onMouseEnter={() => setHoveredIndex(idx)}
             onMouseLeave={() => setHoveredIndex(null)}
+            onFocusCapture={() => setHoveredIndex(idx)}
+            onBlurCapture={(event) => {
+              if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+                setHoveredIndex(null);
+              }
+            }}
           >
             <AnimatePresence>
               {hoveredIndex === idx && (
