@@ -49,6 +49,7 @@ export default async function RootLayout({
             {children}
           </TooltipProvider>
         </AppProviders>
+        <Footer />
       </body>
     </html>
   );

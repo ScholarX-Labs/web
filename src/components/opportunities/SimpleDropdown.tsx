@@ -8,16 +8,22 @@ export default function SimpleDropdown({
   options,
   selected,
   onChange,
+  disabled = false,
 }: {
   label: string;
   options: Option[];
   selected: string[];
   onChange: (value: string, checked: boolean) => void;
+  disabled?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    if (disabled) {
+      setOpen(false);
+      return;
+    }
     function onDoc(e: MouseEvent) {
       if (!ref.current) return;
       if (!ref.current.contains(e.target as Node)) setOpen(false);
@@ -33,14 +39,18 @@ export default function SimpleDropdown({
       document.removeEventListener("mousedown", onDoc);
       document.removeEventListener("keydown", onKey);
     };
-  }, []);
+  }, [disabled]);
 
   return (
-    <div className="relative" ref={ref}>
+    <div
+      className={`relative ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+      ref={ref}
+    >
       <button
         type="button"
+        disabled={disabled}
         onClick={() => setOpen((s) => !s)}
-        className="flex h-9 w-full items-center justify-between rounded-4xl border border-input bg-white px-3 text-sm text-black hover:cursor-pointer"
+        className={`flex h-9 w-full items-center justify-between rounded-4xl border border-input bg-white px-3 text-sm text-black ${disabled ? "cursor-not-allowed pointer-events-none" : "hover:cursor-pointer"}`}
         aria-expanded={open}
         aria-haspopup="menu"
       >
