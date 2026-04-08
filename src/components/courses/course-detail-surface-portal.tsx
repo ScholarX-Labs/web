@@ -13,7 +13,9 @@ export function CourseDetailSurfacePortal() {
   const course = useCourseSheetStore((state) => state.course);
   const intent = useCourseSheetStore((state) => state.intent);
   const originRect = useCourseSheetStore((state) => state.originRect);
-  const closeCourseSheet = useCourseSheetStore((state) => state.closeCourseSheet);
+  const closeCourseSheet = useCourseSheetStore(
+    (state) => state.closeCourseSheet,
+  );
   const setIntent = useCourseSheetStore((state) => state.setIntent);
 
   useEffect(() => {
