@@ -3,7 +3,7 @@
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import OpportiuntyCard from "./OpportuintyCard";
+import OpportiuntyCard from "./OpportunityCard";
 import { Outfit } from "next/font/google";
 import { useOpportunitiesSearch as useOpportunitiesQuery } from "@/hooks/queries/useOpportunitiesSearch";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -42,7 +42,7 @@ function generatePagination(currentPage: number, totalPages: number) {
   ];
 }
 
-function OpprtunitySection() {
+function OpportunitySection() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -98,11 +98,11 @@ function OpprtunitySection() {
         ? `${Math.floor(total / 10) * 10}+`
         : total;
 
-  const handlePageChange = (newPage: number) => {
+  const handlePageChange = async (newPage: number) => {
     if (newPage < 1 || newPage > totalPages) return;
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", newPage.toString());
-    router.push(`${pathname}?${params.toString()}`);
+    await router.push(`${pathname}?${params.toString()}`);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -171,4 +171,4 @@ function OpprtunitySection() {
   );
 }
 
-export default OpprtunitySection;
+export default OpportunitySection;

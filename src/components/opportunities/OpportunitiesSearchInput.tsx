@@ -52,12 +52,14 @@ export default function OpportunitiesSearchInput() {
         onChange={(e) => setSearchQuery(e.target.value)}
         onKeyDown={handleKeyDown}
       />
-      <div
+      <button
+        type="button"
+        aria-label="Search"
         className="absolute right-0 top-0 h-full px-3 flex items-center cursor-pointer text-gray-400 hover:text-gray-600"
         onClick={handleSearch}
       >
         <Search />
-      </div>
+      </button>
     </div>
   );
 }

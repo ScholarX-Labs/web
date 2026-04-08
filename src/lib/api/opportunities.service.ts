@@ -43,7 +43,10 @@ export const mapOpportunity = (raw: {
     officialWebsite: data.official_website,
     deadline: data.deadline,
     // Conversions
-    gpa: data.gpa ? Number(data.gpa) : undefined,
+    gpa:
+      data.gpa !== null && data.gpa !== undefined
+        ? Number(data.gpa)
+        : undefined,
     minAge:
       data.min_age !== null && data.min_age !== undefined
         ? Number(data.min_age)

@@ -36,10 +36,11 @@ async function opportunities() {
             <OpportunitiesSearchInput />
 
             <div className="flex flex-row w-1/5 sm:w-2/3 lg:w-1/2 xl:w-2/5 max-w-95 min-w-80 justify-between my-3 items-center">
-              <Link href="/ai-search">
-                <button className="flex flex-row text-white bg-ring/20 p-2 border-border border-2 cursor-pointer rounded-3xl text-sm text-nowrap gap-2">
-                  <Zap color="#FFFFFF" /> <span>AI search</span>
-                </button>
+              <Link
+                href="/ai-search"
+                className="flex flex-row text-white bg-ring/20 p-2 border-border border-2 cursor-pointer rounded-3xl text-sm text-nowrap gap-2"
+              >
+                <Zap color="#FFFFFF" /> <span>AI search</span>
               </Link>
               <span className="">
                 <Dot color="#808080" />

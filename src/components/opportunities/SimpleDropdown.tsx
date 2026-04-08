@@ -62,7 +62,7 @@ export default function SimpleDropdown({
           viewBox="0 0 24 24"
           className="ml-2 text-gray-500"
         >
-          <path d="M7 10l5 5 5-5z" />
+          <path fill="currentColor" d="M7 10l5 5 5-5z" />
         </svg>
       </button>
 

@@ -32,10 +32,10 @@ function OpportiuntyCard({ Opportunity }: { Opportunity: Opportunity }) {
               })}
           </div>
           <button
-            className="rounded-4xl transition-colors p-1 hover:bg-gray-400/50 active:bg-gray-400/70 hover:cursor-pointer z-2"
+            className="rounded-4xl transition-colors p-1 hover:bg-gray-400/50 active:bg-gray-400/70 hover:cursor-pointer"
             onClick={(e) => {
               e.stopPropagation();
-              console.log("arhive");
+              // TODO: Implement archiving
             }}
           >
             <Bookmark />

@@ -53,8 +53,7 @@ type OpportunitiesQuery = {
 };
 
 interface SearchRawOpportunity {
-  // Required
-  id?: string; // UUID assigned by the extractor
+  id?: string; // UUID assigned by the extractor (optional, may be absent in raw data)
   title: string;
   description: string;
   application_link: string;

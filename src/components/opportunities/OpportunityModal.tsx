@@ -95,11 +95,16 @@ export default function OpportunityModal({
                 <Calendar size={16} className="text-[#55AAD4]" />
                 <span className="font-medium">
                   Deadline:{" "}
-                  {new Date(opportunity.deadline).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "2-digit",
-                    year: "numeric",
-                  })}
+                  {(() => {
+                    const date = new Date(opportunity.deadline);
+                    return isNaN(date.getTime())
+                      ? opportunity.deadline
+                      : date.toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "2-digit",
+                          year: "numeric",
+                        });
+                  })()}
                 </span>
               </div>
             )}
