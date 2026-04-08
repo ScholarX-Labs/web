@@ -41,9 +41,15 @@ const DEV_BYPASS_SESSION = {
 };
 
 const getCachedSession = cache(async () => {
-  return auth.api.getSession({
-    headers: await headers(),
-  });
+  try {
+    const h = await headers();
+    return auth.api.getSession({
+      headers: h,
+    });
+  } catch (error) {
+    // Return null if headers cannot be accessed (e.g., during static generation)
+    return null;
+  }
 });
 
 export async function getSession() {

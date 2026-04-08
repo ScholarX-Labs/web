@@ -25,7 +25,7 @@ async function Header() {
           />
         </Link>
       </section>
-      <section className="hidden lg:flex flex-2">
+      <section className="hidden lg:flex flex-2 justify-center">
         <div className="flex flex-row gap-8 justify-center items-center h-full">
           <Link
             className="text-black transition-colors duration-300 hover:text-primary"
