@@ -373,150 +373,150 @@ Effort scale used in this section:
 Estimated phase effort: 4 to 6 days
 
 - [ ] src/stores/enrollment.store.ts
-  Refactor to explicit lifecycle state machine: idle, precheck, auth_redirect,
-  modal_open, processing, success, error, closed. Add typed transition actions,
-  guard invalid transitions, and reset semantics. Estimate: L
+      Refactor to explicit lifecycle state machine: idle, precheck, auth_redirect,
+      modal_open, processing, success, error, closed. Add typed transition actions,
+      guard invalid transitions, and reset semantics. Estimate: L
 - [ ] src/stores/course-sheet.store.ts
-  Add source metadata and correlation id fields for each intent invocation.
-  Preserve originRect and focus restoration target references. Estimate: M
+      Add source metadata and correlation id fields for each intent invocation.
+      Preserve originRect and focus restoration target references. Estimate: M
 - [ ] src/components/courses/latest-course-card.tsx
-  Replace direct intent branching with unified intent dispatcher integration.
-  Ensure desktop and modified-click fallback behavior remains intact.
-  Estimate: M
+      Replace direct intent branching with unified intent dispatcher integration.
+      Ensure desktop and modified-click fallback behavior remains intact.
+      Estimate: M
 - [ ] src/components/courses/course-card.tsx
-  Route click path through shared IntentController for details and enroll
-  consistency. Keep FLIP origin capture unchanged. Estimate: M
-- [ ] src/app/(platform)/courses/[slug]/_components/course-hero.tsx
-  Replace direct store modal open with shared intent command path.
-  Estimate: S
-- [ ] src/app/(platform)/courses/[slug]/_components/course-sticky-cta.tsx
-  Replace direct store modal open with shared intent command path.
-  Estimate: S
+      Route click path through shared IntentController for details and enroll
+      consistency. Keep FLIP origin capture unchanged. Estimate: M
+- [ ] src/app/(platform)/courses/[slug]/\_components/course-hero.tsx
+      Replace direct store modal open with shared intent command path.
+      Estimate: S
+- [ ] src/app/(platform)/courses/[slug]/\_components/course-sticky-cta.tsx
+      Replace direct store modal open with shared intent command path.
+      Estimate: S
 - [ ] src/components/courses/course-detail-surface-portal.tsx
-  Harmonize intent propagation to use new state machine actions and
-  correlation context. Estimate: M
+      Harmonize intent propagation to use new state machine actions and
+      correlation context. Estimate: M
 - [ ] src/components/courses/enroll-modal.tsx
-  Consume state machine status instead of boolean flags for rendering and
-  control flow. Remove implicit coupling to local hasAutoOpened behavior where
-  state machine can own it. Estimate: L
+      Consume state machine status instead of boolean flags for rendering and
+      control flow. Remove implicit coupling to local hasAutoOpened behavior where
+      state machine can own it. Estimate: L
 - [ ] src/lib/enrollment/intent-controller.ts (new)
-  Create IntentController with openEnroll and openDetails orchestration,
-  source metadata construction, and consistent command dispatch.
-  Estimate: L
+      Create IntentController with openEnroll and openDetails orchestration,
+      source metadata construction, and consistent command dispatch.
+      Estimate: L
 - [ ] src/lib/enrollment/types.ts (new)
-  Add typed contracts for intent command payload, lifecycle states,
-  transition events, and error classes. Estimate: S
+      Add typed contracts for intent command payload, lifecycle states,
+      transition events, and error classes. Estimate: S
 
 ### Phase 2 Checklist: Motion and Surface Orchestration
 
 Estimated phase effort: 3 to 5 days
 
 - [ ] src/components/courses/course-grid.tsx
-  Finalize first-load ripple cascade contract by row and index for desktop,
-  cap max delay, and disable stagger for dynamic filtering updates.
-  Estimate: M
+      Finalize first-load ripple cascade contract by row and index for desktop,
+      cap max delay, and disable stagger for dynamic filtering updates.
+      Estimate: M
 - [ ] src/components/courses/latest-course-card.tsx
-  Ensure lock and unlock sequencing aligns with unified surface orchestration:
-  interaction lock, contain layout, and guaranteed unlock on close.
-  Estimate: M
+      Ensure lock and unlock sequencing aligns with unified surface orchestration:
+      interaction lock, contain layout, and guaranteed unlock on close.
+      Estimate: M
 - [ ] src/components/courses/course-card.tsx
-  Align active-card dimming behavior and unlock lifecycle with portal close and
-  cancellation paths. Estimate: M
+      Align active-card dimming behavior and unlock lifecycle with portal close and
+      cancellation paths. Estimate: M
 - [ ] src/components/courses/course-detail-sheet.tsx
-  Gate interior stagger until container expansion completes, and respect
-  reduced-motion by removing non-essential transform choreography.
-  Estimate: L
+      Gate interior stagger until container expansion completes, and respect
+      reduced-motion by removing non-essential transform choreography.
+      Estimate: L
 - [ ] src/components/courses/course-detail-surface-portal.tsx
-  Add deterministic cleanup for document body locks and pointer-events in all
-  close scenarios. Estimate: M
+      Add deterministic cleanup for document body locks and pointer-events in all
+      close scenarios. Estimate: M
 - [ ] src/components/animations/page-transition.tsx
-  Implement adapter-based fallback for unsupported View Transition API where
-  needed by enroll surface transitions. Estimate: M
+      Implement adapter-based fallback for unsupported View Transition API where
+      needed by enroll surface transitions. Estimate: M
 - [ ] src/lib/motion/surface-transition-adapter.ts (new)
-  Create capability adapter with typed API for supported and fallback motion
-  pipelines. Estimate: L
+      Create capability adapter with typed API for supported and fallback motion
+      pipelines. Estimate: L
 
 ### Phase 3 Checklist: Transaction Hardening
 
 Estimated phase effort: 4 to 6 days
 
 - [ ] src/components/courses/enroll-modal.tsx
-  Extract action handling into strategy executor and normalize success and error
-  message mapping from API error codes. Estimate: L
+      Extract action handling into strategy executor and normalize success and error
+      message mapping from API error codes. Estimate: L
 - [ ] src/lib/api/courses.service.ts
-  Ensure enroll endpoints return stable machine-readable codes and idempotent
-  semantics expected by front-end strategy executor. Estimate: M
+      Ensure enroll endpoints return stable machine-readable codes and idempotent
+      semantics expected by front-end strategy executor. Estimate: M
 - [ ] src/lib/enrollment/strategies/free-enroll.strategy.ts (new)
-  Implement free enrollment strategy with optimistic UI and rollback behavior.
-  Estimate: M
+      Implement free enrollment strategy with optimistic UI and rollback behavior.
+      Estimate: M
 - [ ] src/lib/enrollment/strategies/paid-checkout.strategy.ts (new)
-  Implement paid checkout handoff strategy with preflight validation and
-  structured fallback errors. Estimate: M
+      Implement paid checkout handoff strategy with preflight validation and
+      structured fallback errors. Estimate: M
 - [ ] src/lib/enrollment/strategies/form-application.strategy.ts (new)
-  Implement requiresForm strategy with routing handoff and recoverable state.
-  Estimate: M
+      Implement requiresForm strategy with routing handoff and recoverable state.
+      Estimate: M
 - [ ] src/lib/enrollment/enrollment-executor.ts (new)
-  Add strategy selection, execution envelope, retries, and typed result mapping.
-  Estimate: L
+      Add strategy selection, execution envelope, retries, and typed result mapping.
+      Estimate: L
 - [ ] src/lib/enrollment/error-mapper.ts (new)
-  Centralize API error to UI error class mapping.
-  Estimate: S
+      Centralize API error to UI error class mapping.
+      Estimate: S
 - [ ] src/app/(platform)/courses/[slug]/page.tsx
-  Confirm server-rendered branch selection remains correct after enrollment
-  success and refresh. Estimate: S
+      Confirm server-rendered branch selection remains correct after enrollment
+      success and refresh. Estimate: S
 
 ### Phase 4 Checklist: Accessibility and Performance Hardening
 
 Estimated phase effort: 3 to 4 days
 
 - [ ] src/components/courses/enroll-modal.tsx
-  Add explicit ARIA live region status announcements for processing, success,
-  and error transitions. Add deterministic escape behavior guards.
-  Estimate: M
+      Add explicit ARIA live region status announcements for processing, success,
+      and error transitions. Add deterministic escape behavior guards.
+      Estimate: M
 - [ ] src/components/courses/course-detail-sheet.tsx
-  Ensure focus restoration uses original trigger and handles reverse FLIP timing
-  safely. Estimate: M
+      Ensure focus restoration uses original trigger and handles reverse FLIP timing
+      safely. Estimate: M
 - [ ] src/components/courses/course-grid.tsx
-  Profile and memoize motion config objects; ensure no avoidable re-renders in
-  hover and first-load sequence. Estimate: S
+      Profile and memoize motion config objects; ensure no avoidable re-renders in
+      hover and first-load sequence. Estimate: S
 - [ ] src/hooks/use-media-query.ts
-  Validate no hydration mismatch or unnecessary media query recalculation across
-  transition-heavy components. Estimate: S
+      Validate no hydration mismatch or unnecessary media query recalculation across
+      transition-heavy components. Estimate: S
 - [ ] src/lib/telemetry/enrollment-events.ts (new)
-  Define typed event emitters for enroll lifecycle and dimensions.
-  Estimate: M
+      Define typed event emitters for enroll lifecycle and dimensions.
+      Estimate: M
 - [ ] src/providers/app-providers.tsx
-  Wire telemetry provider and ensure event emission is non-blocking.
-  Estimate: S
+      Wire telemetry provider and ensure event emission is non-blocking.
+      Estimate: S
 
 ### Phase 5 Checklist: Testing, Rollout, and Guardrails
 
 Estimated phase effort: 3 to 5 days
 
 - [ ] src/stores/enrollment.store.ts
-  Add unit tests for state transitions and invalid transition guards.
-  Estimate: M
+      Add unit tests for state transitions and invalid transition guards.
+      Estimate: M
 - [ ] src/lib/enrollment/enrollment-executor.ts
-  Add unit tests for strategy selection, result mapping, and retry behavior.
-  Estimate: M
+      Add unit tests for strategy selection, result mapping, and retry behavior.
+      Estimate: M
 - [ ] src/components/courses/enroll-modal.tsx
-  Add integration tests for auth redirect, success, error, and retry paths.
-  Estimate: M
+      Add integration tests for auth redirect, success, error, and retry paths.
+      Estimate: M
 - [ ] src/components/courses/latest-course-card.tsx
-  Add integration tests for intent metadata and desktop versus mobile behavior.
-  Estimate: S
+      Add integration tests for intent metadata and desktop versus mobile behavior.
+      Estimate: S
 - [ ] src/components/courses/course-grid.tsx
-  Add motion-related tests for stagger delay logic and reduced-motion fallback.
-  Estimate: S
+      Add motion-related tests for stagger delay logic and reduced-motion fallback.
+      Estimate: S
 - [ ] src/app/(platform)/courses/[slug]/page.tsx
-  Add E2E coverage for deep-link intent auto-open and callback return flow.
-  Estimate: M
+      Add E2E coverage for deep-link intent auto-open and callback return flow.
+      Estimate: M
 - [ ] src/config/env.ts
-  Add feature flag definitions for staged rollout and kill switch controls.
-  Estimate: S
+      Add feature flag definitions for staged rollout and kill switch controls.
+      Estimate: S
 - [ ] src/config/query-keys.ts
-  Ensure post-enrollment invalidation keys are explicit and stable.
-  Estimate: S
+      Ensure post-enrollment invalidation keys are explicit and stable.
+      Estimate: S
 
 ## Effort Summary by Phase
 
@@ -565,161 +565,161 @@ Assumptions:
 ### Endpoint Readiness Matrix
 
 - [ ] GET /courses
-  Make response shape contract-stable and include optional nextAction metadata.
-  Status: partial (works, but no typed contract guarantee). Estimate: S
+      Make response shape contract-stable and include optional nextAction metadata.
+      Status: partial (works, but no typed contract guarantee). Estimate: S
 - [ ] GET /courses/:id
-  Keep current behavior and ensure contract includes isSubscribed when user is
-  authenticated. Status: partial. Estimate: S
+      Keep current behavior and ensure contract includes isSubscribed when user is
+      authenticated. Status: partial. Estimate: S
 - [ ] GET /courses/slug/:slug (new)
-  Add true slug-based endpoint to remove front-end compatibility shim.
-  Status: missing. Estimate: M
+      Add true slug-based endpoint to remove front-end compatibility shim.
+      Status: missing. Estimate: M
 - [ ] GET /courses/:id/subscription-status
-  Ensure stable error codes and typed response envelope.
-  Status: partial. Estimate: S
+      Ensure stable error codes and typed response envelope.
+      Status: partial. Estimate: S
 - [ ] POST /courses/:id/enroll
-  Add idempotency handling, machine-readable error codes, and nextAction output.
-  Status: partial. Estimate: L
+      Add idempotency handling, machine-readable error codes, and nextAction output.
+      Status: partial. Estimate: L
 - [ ] POST /courses/:id/enroll/free (new alias)
-  Optional explicit free path for strategy clarity in frontend executor.
-  Status: missing. Estimate: M
+      Optional explicit free path for strategy clarity in frontend executor.
+      Status: missing. Estimate: M
 - [ ] POST /courses/:id/enroll/paid/init (new)
-  Initialize paid flow and return checkout client payload.
-  Status: missing. Estimate: L
+      Initialize paid flow and return checkout client payload.
+      Status: missing. Estimate: L
 - [ ] POST /courses/:id/enroll/application/init (new)
-  Initialize requiresForm flow and return application handoff payload.
-  Status: missing. Estimate: M
+      Initialize requiresForm flow and return application handoff payload.
+      Status: missing. Estimate: M
 
 ### Controller Changes Checklist
 
 File: server/src/courses/courses.controller.ts
 
 - [ ] Add GET /courses/slug/:slug route and wire to service.getCourseBySlug.
-  Estimate: S
+      Estimate: S
 - [ ] Add POST /courses/:id/enroll/free route for explicit strategy endpoint.
-  Estimate: S
+      Estimate: S
 - [ ] Add POST /courses/:id/enroll/paid/init route.
-  Estimate: S
+      Estimate: S
 - [ ] Add POST /courses/:id/enroll/application/init route.
-  Estimate: S
+      Estimate: S
 - [ ] Standardize ParseUUIDPipe usage on id params and Parse slug as string.
-  Estimate: S
+      Estimate: S
 - [ ] Return consistent response envelope from enroll endpoints:
-  success, code, message, data, requestId.
-  Estimate: M
+      success, code, message, data, requestId.
+      Estimate: M
 
 ### DTO Changes Checklist
 
 File: server/src/courses/dto/create-course.dto.ts
 
 - [ ] Expand category validation to match current frontend categories or add
-  clear mapping layer (Engineering, Design, Backend, Systems, Featured,
-  ScholarX).
-  Estimate: M
+      clear mapping layer (Engineering, Design, Backend, Systems, Featured,
+      ScholarX).
+      Estimate: M
 - [ ] Add requiresForm boolean to support strategy branching.
-  Estimate: S
+      Estimate: S
 - [ ] Tighten slug validation format and uniqueness expectations.
-  Estimate: S
+      Estimate: S
 
 File: server/src/courses/dto/update-course.dto.ts
 
 - [ ] Ensure requiresForm and category updates are allowed and validated.
-  Estimate: S
+      Estimate: S
 
 File: server/src/courses/dto/pagination-query.dto.ts
 
 - [ ] Add slug query support only if needed for backward compatibility.
-  Estimate: S
+      Estimate: S
 - [ ] Add optional includeInactive flag for admin-only internal tools (guarded).
-  Estimate: S
+      Estimate: S
 
 New DTO files:
 
 - [ ] server/src/courses/dto/enroll-free.dto.ts
-  Include optional idempotencyKey and sourceSurface metadata.
-  Estimate: S
+      Include optional idempotencyKey and sourceSurface metadata.
+      Estimate: S
 - [ ] server/src/courses/dto/enroll-paid-init.dto.ts
-  Include paymentMethod, currency, returnUrl, idempotencyKey.
-  Estimate: M
+      Include paymentMethod, currency, returnUrl, idempotencyKey.
+      Estimate: M
 - [ ] server/src/courses/dto/enroll-application-init.dto.ts
-  Include applicant profile seed data and idempotencyKey.
-  Estimate: M
+      Include applicant profile seed data and idempotencyKey.
+      Estimate: M
 - [ ] server/src/courses/dto/enrollment-response.dto.ts
-  Standard response contract with nextAction and machine-readable code.
-  Estimate: M
+      Standard response contract with nextAction and machine-readable code.
+      Estimate: M
 
 ### Service Changes Checklist
 
 File: server/src/courses/courses.service.ts
 
 - [ ] Add getCourseBySlug(slug, userId?) that resolves active course safely.
-  Estimate: M
+      Estimate: M
 - [ ] Refactor enrollUserToCourse into strategy-aware internal methods:
-  enrollFree, initPaidEnrollment, initApplicationEnrollment.
-  Estimate: L
+      enrollFree, initPaidEnrollment, initApplicationEnrollment.
+      Estimate: L
 - [ ] Add idempotency support for enrollment writes:
-  no double increment of studentsCount on duplicate requests.
-  Estimate: L
+      no double increment of studentsCount on duplicate requests.
+      Estimate: L
 - [ ] Replace plain text exceptions with structured error codes:
-  auth_required, already_enrolled, course_not_found, payment_unavailable,
-  validation_failed, unknown.
-  Estimate: L
+      auth_required, already_enrolled, course_not_found, payment_unavailable,
+      validation_failed, unknown.
+      Estimate: L
 - [ ] Return typed result payload with nextAction for frontend strategy executor.
-  Estimate: M
+      Estimate: M
 - [ ] Validate blocked user and enrollment eligibility in one shared precheck.
-  Estimate: M
+      Estimate: M
 - [ ] Ensure transaction safety and deterministic order:
-  check existing enrollment before increment, then insert subscription,
-  then update counters or derive from aggregate.
-  Estimate: L
+      check existing enrollment before increment, then insert subscription,
+      then update counters or derive from aggregate.
+      Estimate: L
 
 ### Module and Wiring Checklist
 
 File: server/src/courses/courses.module.ts
 
 - [ ] Register any new providers for enrollment strategy services.
-  Estimate: S
+      Estimate: S
 - [ ] Register payment adapter provider (if paid init route is enabled).
-  Estimate: M
+      Estimate: M
 
 Potential new files:
 
 - [ ] server/src/courses/enrollment.service.ts
-  Orchestrator for enrollment strategies and response mapping.
-  Estimate: L
+      Orchestrator for enrollment strategies and response mapping.
+      Estimate: L
 - [ ] server/src/courses/payment-adapter.service.ts
-  Adapter abstraction for payment provider init.
-  Estimate: M
+      Adapter abstraction for payment provider init.
+      Estimate: M
 - [ ] server/src/courses/enrollment-error.mapper.ts
-  Convert domain and infra errors to stable API error codes.
-  Estimate: M
+      Convert domain and infra errors to stable API error codes.
+      Estimate: M
 
 ### Test Coverage Checklist (Backend)
 
 File: server/src/courses/courses.controller.spec.ts
 
 - [ ] Add route-level tests for new slug and enrollment init endpoints.
-  Estimate: M
+      Estimate: M
 - [ ] Validate status codes and response envelope shape.
-  Estimate: S
+      Estimate: S
 
 File: server/src/courses/courses.service.spec.ts
 
 - [ ] Add service tests for enroll idempotency and duplicate enrollment handling.
-  Estimate: M
+      Estimate: M
 - [ ] Add tests for blocked user, not found, and validation branches.
-  Estimate: M
+      Estimate: M
 - [ ] Add tests for paid/application init payloads and code mapping.
-  Estimate: M
+      Estimate: M
 
 ### Error Contract Checklist
 
 - [ ] Standardize error payload shape across all enroll endpoints:
-  error.code, error.message, error.details, requestId.
-  Estimate: M
+      error.code, error.message, error.details, requestId.
+      Estimate: M
 - [ ] Ensure frontend-expected classes map cleanly:
-  auth_required, already_enrolled, network_transient,
-  validation_failure, payment_unavailable, unknown.
-  Estimate: M
+      auth_required, already_enrolled, network_transient,
+      validation_failure, payment_unavailable, unknown.
+      Estimate: M
 
 ### API Completion Definition
 

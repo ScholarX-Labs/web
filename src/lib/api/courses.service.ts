@@ -1,7 +1,10 @@
 import { Course } from "@/types/course.types";
 import { env } from "@/config/env";
 import { BackendErrorPayload, BackendPagination } from "@/types/api.types";
-import { EnrollmentErrorCode, EnrollmentSourceSurface } from "@/lib/enrollment/types";
+import {
+  EnrollmentErrorCode,
+  EnrollmentSourceSurface,
+} from "@/lib/enrollment/types";
 
 interface InstructorSummary {
   id: string;
@@ -282,7 +285,12 @@ const createRequestHeaders = (
   hasJsonBody = false,
 ): HeadersInit => {
   const requestId = createRequestId();
-  console.log("[API] createRequestHeaders called with token:", !!token, "hasJsonBody:", hasJsonBody);
+  console.log(
+    "[API] createRequestHeaders called with token:",
+    !!token,
+    "hasJsonBody:",
+    hasJsonBody,
+  );
   console.log("[API] generated request ID:", requestId);
   return {
     ...(hasJsonBody ? { "Content-Type": "application/json" } : {}),
@@ -338,7 +346,10 @@ const postJson = async <T>(
 ) => {
   const hasJsonBody = options.body !== undefined;
   const finalUrl = createRequestUrl(path);
-  console.log("[API] executeRequestWithBody before fetch - url:", finalUrl.toString());
+  console.log(
+    "[API] executeRequestWithBody before fetch - url:",
+    finalUrl.toString(),
+  );
   const response = await fetch(finalUrl, {
     method: "POST",
     headers: createRequestHeaders(options.token, hasJsonBody),
@@ -478,7 +489,12 @@ export const coursesService = {
     token?: string,
   ): Promise<EnrollCourseResponse> => {
     try {
-      console.log("[COURSES_SERVICE] enrollFree called with courseId:", courseId, "body:", body);
+      console.log(
+        "[COURSES_SERVICE] enrollFree called with courseId:",
+        courseId,
+        "body:",
+        body,
+      );
       const result = await postJson<EnrollCourseResponse>(
         `/courses/${courseId}/enroll/free`,
         {
@@ -507,7 +523,10 @@ export const coursesService = {
             },
             "Failed to enroll",
           );
-          console.log("[COURSES_SERVICE] enrollFree fallback returned:", fallbackResult);
+          console.log(
+            "[COURSES_SERVICE] enrollFree fallback returned:",
+            fallbackResult,
+          );
           return fallbackResult;
         } catch (fallbackError) {
           console.error(
@@ -593,7 +612,10 @@ export const coursesService = {
         "Failed to initialize application enrollment",
       );
     } catch (error) {
-      return throwApiError(error, "Failed to initialize application enrollment");
+      return throwApiError(
+        error,
+        "Failed to initialize application enrollment",
+      );
     }
   },
 };

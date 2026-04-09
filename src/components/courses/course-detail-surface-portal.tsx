@@ -18,7 +18,9 @@ export function CourseDetailSurfacePortal() {
     (state) => state.closeCourseSheet,
   );
   const setIntent = useCourseSheetStore((state) => state.setIntent);
-  const isEnrollmentModalOpen = useEnrollmentStore((state) => state.isModalOpen);
+  const isEnrollmentModalOpen = useEnrollmentStore(
+    (state) => state.isModalOpen,
+  );
 
   useEffect(() => {
     setMounted(true);

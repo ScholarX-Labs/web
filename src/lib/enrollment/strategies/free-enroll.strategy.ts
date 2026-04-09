@@ -10,7 +10,10 @@ export const executeFreeEnroll = async (
   apiClient: typeof coursesService = coursesService,
 ): Promise<EnrollmentExecutionResult> => {
   try {
-    console.log("[FREE_ENROLL] calling enrollFree with courseId:", context.course.id);
+    console.log(
+      "[FREE_ENROLL] calling enrollFree with courseId:",
+      context.course.id,
+    );
     const response = await apiClient.enrollFree(context.course.id, {
       sourceSurface: context.command.source,
       idempotencyKey: context.command.correlationId,

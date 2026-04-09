@@ -10,7 +10,10 @@ export const executePaidCheckoutInit = async (
   apiClient: typeof coursesService = coursesService,
 ): Promise<EnrollmentExecutionResult> => {
   try {
-    console.log("[PAID_ENROLL] calling initPaidEnrollment with courseId:", context.course.id);
+    console.log(
+      "[PAID_ENROLL] calling initPaidEnrollment with courseId:",
+      context.course.id,
+    );
     const response = await apiClient.initPaidEnrollment(context.course.id, {
       sourceSurface: context.command.source,
       idempotencyKey: context.command.correlationId,

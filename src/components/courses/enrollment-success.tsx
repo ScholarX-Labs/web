@@ -56,7 +56,11 @@ export function EnrollmentSuccess({ course, onClose }: EnrollmentSuccessProps) {
       />
 
       <motion.div
-        initial={shouldReduceMotion ? { opacity: 0 } : { scale: 0.65, opacity: 0, y: 10 }}
+        initial={
+          shouldReduceMotion
+            ? { opacity: 0 }
+            : { scale: 0.65, opacity: 0, y: 10 }
+        }
         animate={
           shouldReduceMotion
             ? { opacity: 1 }
@@ -88,7 +92,10 @@ export function EnrollmentSuccess({ course, onClose }: EnrollmentSuccessProps) {
         <motion.h2
           initial={{ y: shouldReduceMotion ? 0 : 18, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.1, duration: shouldReduceMotion ? 0.18 : 0.35 }}
+          transition={{
+            delay: 0.1,
+            duration: shouldReduceMotion ? 0.18 : 0.35,
+          }}
           className="text-3xl font-extrabold text-slate-900 dark:text-white"
         >
           You&apos;re enrolled!

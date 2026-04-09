@@ -10,7 +10,10 @@ export const executeFormApplicationInit = async (
   apiClient: typeof coursesService = coursesService,
 ): Promise<EnrollmentExecutionResult> => {
   try {
-    console.log("[APP_ENROLL] calling initApplicationEnrollment with courseId:", context.course.id);
+    console.log(
+      "[APP_ENROLL] calling initApplicationEnrollment with courseId:",
+      context.course.id,
+    );
     const response = await apiClient.initApplicationEnrollment(
       context.course.id,
       {

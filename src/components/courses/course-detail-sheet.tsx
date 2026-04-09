@@ -276,7 +276,10 @@ export function CourseDetailSheet({
                     </p>
                   </motion.div>
 
-                  <motion.div {...reveal(3)} className="h-px w-full bg-slate-100 dark:bg-slate-800/60" />
+                  <motion.div
+                    {...reveal(3)}
+                    className="h-px w-full bg-slate-100 dark:bg-slate-800/60"
+                  />
 
                   <motion.div {...reveal(4)}>
                     <h4 className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-400">
@@ -310,9 +313,18 @@ export function CourseDetailSheet({
                   </div>
 
                   <div className="space-y-4 text-[15px] text-slate-500 dark:text-slate-400">
-                    <p className="flex items-center gap-3"><BookOpen className="h-5 w-5 text-slate-400" /> Lifetime access to content</p>
-                    <p className="flex items-center gap-3"><Sparkles className="h-5 w-5 text-slate-400" /> Official completion certificate</p>
-                    <p className="flex items-center gap-3"><Star className="h-5 w-5 text-slate-400" /> Premium learning experience</p>
+                    <p className="flex items-center gap-3">
+                      <BookOpen className="h-5 w-5 text-slate-400" /> Lifetime
+                      access to content
+                    </p>
+                    <p className="flex items-center gap-3">
+                      <Sparkles className="h-5 w-5 text-slate-400" /> Official
+                      completion certificate
+                    </p>
+                    <p className="flex items-center gap-3">
+                      <Star className="h-5 w-5 text-slate-400" /> Premium
+                      learning experience
+                    </p>
                   </div>
 
                   <div className="pt-4">
