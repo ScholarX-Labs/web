@@ -83,8 +83,8 @@ export function EnrollModal({
     ],
     [],
   );
-  const modalCloseDuration = shouldReduceMotion ? 320 : 580;
-  const modalHandoffGap = shouldReduceMotion ? 0 : 340;
+  const modalCloseDuration = shouldReduceMotion ? 100 : 120;
+  const modalHandoffGap = shouldReduceMotion ? 0 : 20;
 
   // Handle transition from main modal to priority enrollment window
   useEffect(() => {
@@ -217,8 +217,8 @@ export function EnrollModal({
 
       // Keep processing visible long enough for a premium two-step transition
       const minProcessingDuration = shouldReduceMotion
-        ? 260
-        : modalCloseDuration + modalHandoffGap + 900;
+        ? 220
+        : modalCloseDuration + modalHandoffGap + 320;
       const elapsed = Date.now() - enrollmentStartedAt;
       const animationDelay = Math.max(minProcessingDuration - elapsed, 0);
       console.log(
