@@ -29,6 +29,13 @@ export function PriorityEnrollmentWindow({
   onClose,
 }: PriorityEnrollmentWindowProps) {
   const shouldReduceMotion = useReducedMotion();
+
+  useEffect(() => {
+    if (isOpen) {
+      console.log("[PRIORITY-WINDOW] Opening with isOpen:", isOpen);
+    }
+  }, [isOpen]);
+
   const keynoteEasing: [number, number, number, number] = [0.22, 1, 0.36, 1];
   const keynoteTransition = shouldReduceMotion
     ? { duration: 0.15 }
