@@ -73,7 +73,7 @@ export function useEnrollIntentController() {
         sourceSurface: context.command.source,
         correlationId: context.command.correlationId,
       });
-      markPrecheck(context);
+      // Skip markPrecheck for direct modal opens - go straight to openModal
       openModal(context);
     },
 
