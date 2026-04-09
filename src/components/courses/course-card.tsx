@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { MouseEvent } from "react";
+import { useRouter } from "next/navigation";
 import { Course } from "@/types/course.types";
 import { ROUTES } from "@/lib/routes";
 import { SpotlightCard } from "@/components/animations/spotlight-card";
@@ -21,6 +22,7 @@ import { cn } from "@/lib/utils";
 import { Monitor, PenTool, Database, Cpu, Tag } from "lucide-react";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useCourseSheetStore } from "@/stores/course-sheet.store";
+import { useEnrollIntentController } from "@/lib/enrollment/intent-controller";
 
 const CATEGORY_STYLES: Record<
   string,
@@ -66,7 +68,10 @@ interface CourseCardProps {
 
 export function CourseCard({ course, className }: CourseCardProps) {
   const isDesktop = useMediaQuery("(min-width: 1024px)");
+  const router = useRouter();
   const openCourseSheet = useCourseSheetStore((state) => state.openCourseSheet);
+  const { openFromCard } = useEnrollIntentController();
+  const courseDetailHref = ROUTES.COURSE_DETAIL(course.slug ?? course.id);
 
   const handleCardClick = (event: MouseEvent<HTMLAnchorElement>) => {
     if (!isDesktop) return;
@@ -102,9 +107,48 @@ export function CourseCard({ course, className }: CourseCardProps) {
     openCourseSheet(course, "details", cardElement.getBoundingClientRect());
   };
 
+  const handleEnrollClick = (event: MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const cardElement = event.currentTarget.closest(
+      "[data-course-card]",
+    ) as HTMLElement | null;
+
+    if (!cardElement) {
+      router.push(`${courseDetailHref}?intent=enroll`);
+      return;
+    }
+
+    if (!isDesktop) {
+      router.push(`${courseDetailHref}?intent=enroll`);
+      return;
+    }
+
+    const gridElement = cardElement.closest(
+      "[data-catalog-grid]",
+    ) as HTMLElement | null;
+
+    cardElement.setAttribute("data-active-card", "true");
+    cardElement.style.transition = "opacity 160ms ease-out";
+    cardElement.style.opacity = "0.3";
+
+    if (gridElement) {
+      gridElement.setAttribute("data-active-grid", "true");
+      gridElement.style.contain = "layout";
+      gridElement.style.pointerEvents = "none";
+    }
+
+    openFromCard({
+      course,
+      source: "course_card",
+      originRect: cardElement.getBoundingClientRect(),
+    });
+  };
+
   return (
     <Link
-      href={ROUTES.COURSE_DETAIL(course.id)}
+      href={courseDetailHref}
       onClick={handleCardClick}
       data-course-card
       className="course-card block outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-[1.5rem] h-full"
@@ -159,6 +203,14 @@ export function CourseCard({ course, className }: CourseCardProps) {
                 className="bg-black/60 backdrop-blur-xl px-3 py-1.5 rounded-full text-sm border border-white/10 text-white"
               />
             </div>
+
+            <button
+              type="button"
+              onClick={handleEnrollClick}
+              className="absolute bottom-4 left-4 rounded-full bg-hero-blue px-3 py-1.5 text-xs font-semibold text-white shadow-lg transition-colors hover:bg-hero-blue-dark"
+            >
+              Enroll
+            </button>
           </div>
 
           {/* Content Area */}

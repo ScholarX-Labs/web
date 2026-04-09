@@ -174,7 +174,10 @@ export function CourseDetailSheet({
       role="dialog"
       aria-modal="true"
       aria-label={`Course details: ${course.title}`}
-      className="fixed inset-0 z-[70] flex items-start justify-center px-4 py-4 sm:px-6 sm:py-6"
+      className={cn(
+        "fixed inset-0 z-70 flex items-start justify-center px-4 py-4 sm:px-6 sm:py-6",
+        intent === "enroll" && "pointer-events-none",
+      )}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1, transition: { duration: 0.22 } }}
       exit={{ opacity: 0, transition: { duration: 0.16 } }}

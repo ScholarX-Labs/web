@@ -15,4 +15,10 @@ export const env = envSchema.parse({
     process.env.NEXT_PUBLIC_API_BASE_URL ?? process.env.NEXT_PUBLIC_API_URL,
 });
 
+// Log env config on load for diagnostics
+if (typeof window !== "undefined") {
+  console.log("[ENV] NEXT_PUBLIC_API_BASE_URL:", env.NEXT_PUBLIC_API_BASE_URL);
+  console.log("[ENV] NEXT_PUBLIC_API_URL:", env.NEXT_PUBLIC_API_URL);
+}
+
 export type Env = z.infer<typeof envSchema>;

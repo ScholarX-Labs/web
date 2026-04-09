@@ -6,6 +6,7 @@ import { AnimatePresence } from "framer-motion";
 import { EnrollModal } from "./enroll-modal";
 import { CourseDetailSheet } from "./course-detail-sheet";
 import { useCourseSheetStore } from "@/stores/course-sheet.store";
+import { useEnrollmentStore } from "@/stores/enrollment.store";
 
 export function CourseDetailSurfacePortal() {
   const [mounted, setMounted] = useState(false);
@@ -17,6 +18,7 @@ export function CourseDetailSurfacePortal() {
     (state) => state.closeCourseSheet,
   );
   const setIntent = useCourseSheetStore((state) => state.setIntent);
+  const isEnrollmentModalOpen = useEnrollmentStore((state) => state.isModalOpen);
 
   useEffect(() => {
     setMounted(true);
@@ -37,19 +39,27 @@ export function CourseDetailSurfacePortal() {
 
   if (!mounted || !course || !isOpen) return null;
 
+  const shouldShowCourseSheet = intent !== "enroll" || !isEnrollmentModalOpen;
+
   return createPortal(
     <>
       <AnimatePresence>
-        <CourseDetailSheet
-          course={course}
-          intent={intent}
-          originRect={originRect}
-          onClose={closeCourseSheet}
-          onEnrollIntent={() => setIntent("enroll")}
-        />
+        {shouldShowCourseSheet && (
+          <CourseDetailSheet
+            course={course}
+            intent={intent}
+            originRect={originRect}
+            onClose={closeCourseSheet}
+            onEnrollIntent={() => setIntent("enroll")}
+          />
+        )}
       </AnimatePresence>
 
-      <EnrollModal course={course} autoOpen={intent === "enroll"} />
+      <EnrollModal
+        course={course}
+        autoOpen={intent === "enroll"}
+        onDismiss={closeCourseSheet}
+      />
     </>,
     document.body,
   );

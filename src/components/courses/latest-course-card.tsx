@@ -23,6 +23,7 @@ import { SocialProofRibbon } from "./card-parts/social-proof-ribbon";
 import { CoursePriceDisplay } from "./card-parts/course-price-display";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useCourseSheetStore } from "@/stores/course-sheet.store";
+import { useEnrollIntentController } from "@/lib/enrollment/intent-controller";
 
 interface LatestCourseCardProps {
   course: Course;
@@ -38,6 +39,8 @@ export function LatestCourseCard({
   const [wishlisted, setWishlisted] = useState(false);
   const isDesktop = useMediaQuery("(min-width: 1024px)");
   const openCourseSheet = useCourseSheetStore((state) => state.openCourseSheet);
+  const { openFromCard } = useEnrollIntentController();
+  const courseDetailHref = ROUTES.COURSE_DETAIL(course.slug ?? course.id);
 
   const isPaid = (course.price ?? 0) > 0;
 
@@ -79,11 +82,18 @@ export function LatestCourseCard({
       gridElement.style.pointerEvents = "none";
     }
 
-    openCourseSheet(
-      course,
-      intent,
-      event.currentTarget.getBoundingClientRect(),
-    );
+    const originRect = event.currentTarget.getBoundingClientRect();
+
+    if (intent === "enroll") {
+      openFromCard({
+        course,
+        source: "latest_course_card",
+        originRect,
+      });
+      return;
+    }
+
+    openCourseSheet(course, intent, originRect);
   };
 
   const instructorInitials =
@@ -236,7 +246,7 @@ export function LatestCourseCard({
           {/* Enroll row */}
           <div className="flex items-center gap-3 mt-auto pt-2">
             <Link
-              href={`${ROUTES.COURSE_DETAIL(course.id)}?intent=enroll`}
+              href={`${courseDetailHref}?intent=enroll`}
               onClick={(event) => handleSurfaceLinkClick(event, "enroll")}
               className="group/btn relative flex-1 overflow-hidden flex items-center justify-center gap-2 bg-linear-to-r from-hero-blue to-hero-blue-dark text-white text-sm font-bold rounded-full py-3 shadow-lg shadow-hero-blue/30 transition-transform active:scale-[0.98]"
             >
@@ -291,7 +301,7 @@ export function LatestCourseCard({
             )}
 
             <Link
-              href={ROUTES.COURSE_DETAIL(course.id)}
+              href={courseDetailHref}
               onClick={(event) => handleSurfaceLinkClick(event, "details")}
               className="text-xs font-bold text-hero-blue hover:text-hero-blue-dark shrink-0 flex items-center gap-1 group/link transition-colors"
             >

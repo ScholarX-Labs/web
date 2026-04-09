@@ -1,6 +1,7 @@
 import { Course } from "@/types/course.types";
 import { env } from "@/config/env";
 import { BackendErrorPayload, BackendPagination } from "@/types/api.types";
+import { EnrollmentErrorCode, EnrollmentSourceSurface } from "@/lib/enrollment/types";
 
 interface InstructorSummary {
   id: string;
@@ -57,17 +58,55 @@ interface SubscriptionStatusResponse {
 }
 
 interface EnrollCourseResponse {
-  course: {
-    id: string;
-    studentsCount: number;
+  requestId: string;
+  success: boolean;
+  code: string;
+  message: string;
+  data: {
+    course: {
+      id: string;
+      studentsCount: number;
+    };
+    userId: string;
+    nextAction?: string;
   };
-  userId: string;
 }
 
-class ApiRequestError extends Error {
+interface PaidEnrollmentInitResponse {
+  requestId: string;
+  success: boolean;
+  code: string;
+  message: string;
+  data: {
+    courseId: string;
+    checkoutUrl: string;
+    nextAction: "checkout";
+  };
+}
+
+interface ApplicationEnrollmentInitResponse {
+  requestId: string;
+  success: boolean;
+  code: string;
+  message: string;
+  data: {
+    courseId: string;
+    applicationUrl: string;
+    nextAction: "application";
+  };
+}
+
+interface EnrollmentRequestBody {
+  idempotencyKey?: string;
+  sourceSurface?: EnrollmentSourceSurface;
+  returnUrl?: string;
+}
+
+export class ApiRequestError extends Error {
   constructor(
     message: string,
     readonly status: number,
+    readonly code?: EnrollmentErrorCode,
   ) {
     super(message);
     this.name = "ApiRequestError";
@@ -159,6 +198,31 @@ const parseApiErrorMessage = (error: unknown, fallback: string): string => {
   return fallback;
 };
 
+const parseApiErrorCode = (error: unknown): EnrollmentErrorCode | undefined => {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "error" in error &&
+    typeof error.error === "object" &&
+    error.error !== null &&
+    "code" in error.error &&
+    typeof error.error.code === "string"
+  ) {
+    return error.error.code as EnrollmentErrorCode;
+  }
+
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    typeof error.code === "string"
+  ) {
+    return error.code as EnrollmentErrorCode;
+  }
+
+  return undefined;
+};
+
 const throwApiError = (
   error: unknown,
   fallback: string,
@@ -167,6 +231,7 @@ const throwApiError = (
   throw new ApiRequestError(
     parseApiErrorMessage(error, fallback),
     status ?? 500,
+    parseApiErrorCode(error),
   );
 };
 
@@ -174,7 +239,19 @@ const createRequestUrl = (
   path: string,
   params?: Record<string, string | number | undefined>,
 ) => {
-  const url = new URL(path, env.NEXT_PUBLIC_API_BASE_URL);
+  console.log("[API] createRequestUrl called with path:", path);
+  const configuredBase = env.NEXT_PUBLIC_API_BASE_URL.trim();
+  console.log("[API] configuredBase from env:", configuredBase);
+
+  const url = /^https?:\/\//i.test(configuredBase)
+    ? new URL(path, configuredBase)
+    : new URL(
+        `${(configuredBase.startsWith("/") ? configuredBase : `/${configuredBase}`).replace(/\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`,
+        typeof window !== "undefined"
+          ? window.location.origin
+          : "http://localhost",
+      );
+  console.log("[API] constructed URL:", url.toString());
 
   Object.entries(params ?? {}).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== "") {
@@ -188,14 +265,31 @@ const createRequestUrl = (
 const buildAuthHeaders = (token?: string) =>
   token ? { Authorization: `Bearer ${token}` } : undefined;
 
+const createRequestId = (): string => {
+  if (
+    typeof globalThis !== "undefined" &&
+    globalThis.crypto &&
+    typeof globalThis.crypto.randomUUID === "function"
+  ) {
+    return globalThis.crypto.randomUUID();
+  }
+
+  return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+};
+
 const createRequestHeaders = (
   token?: string,
   hasJsonBody = false,
-): HeadersInit => ({
-  ...(hasJsonBody ? { "Content-Type": "application/json" } : {}),
-  ...(buildAuthHeaders(token) ?? {}),
-  "X-Request-Id": crypto.randomUUID(),
-});
+): HeadersInit => {
+  const requestId = createRequestId();
+  console.log("[API] createRequestHeaders called with token:", !!token, "hasJsonBody:", hasJsonBody);
+  console.log("[API] generated request ID:", requestId);
+  return {
+    ...(hasJsonBody ? { "Content-Type": "application/json" } : {}),
+    ...(buildAuthHeaders(token) ?? {}),
+    "X-Request-Id": requestId,
+  };
+};
 
 const parseResponse = async <T>(
   response: Response,
@@ -223,7 +317,9 @@ const getJson = async <T>(
   } = {},
   fallbackMessage: string,
 ) => {
-  const response = await fetch(createRequestUrl(path, options.params), {
+  const finalUrl = createRequestUrl(path, options.params);
+  console.log("[API] getJson before fetch - url:", finalUrl.toString());
+  const response = await fetch(finalUrl, {
     method: "GET",
     headers: createRequestHeaders(options.token),
     next: options.next,
@@ -241,7 +337,9 @@ const postJson = async <T>(
   fallbackMessage: string,
 ) => {
   const hasJsonBody = options.body !== undefined;
-  const response = await fetch(createRequestUrl(path), {
+  const finalUrl = createRequestUrl(path);
+  console.log("[API] executeRequestWithBody before fetch - url:", finalUrl.toString());
+  const response = await fetch(finalUrl, {
     method: "POST",
     headers: createRequestHeaders(options.token, hasJsonBody),
     body: hasJsonBody ? JSON.stringify(options.body) : undefined,
@@ -376,17 +474,51 @@ export const coursesService = {
 
   enrollFree: async (
     courseId: string,
+    body?: EnrollmentRequestBody,
     token?: string,
   ): Promise<EnrollCourseResponse> => {
     try {
-      return await postJson<EnrollCourseResponse>(
-        `/courses/${courseId}/enroll`,
+      console.log("[COURSES_SERVICE] enrollFree called with courseId:", courseId, "body:", body);
+      const result = await postJson<EnrollCourseResponse>(
+        `/courses/${courseId}/enroll/free`,
         {
+          body,
           token,
         },
         "Failed to enroll",
       );
+      console.log("[COURSES_SERVICE] enrollFree returned:", result);
+      return result;
     } catch (error) {
+      if (
+        error instanceof ApiRequestError &&
+        (error.status === 404 || error.code === "NOT_FOUND")
+      ) {
+        console.warn(
+          "[COURSES_SERVICE] /enroll/free not found, falling back to legacy /enroll endpoint",
+        );
+
+        try {
+          const fallbackResult = await postJson<EnrollCourseResponse>(
+            `/courses/${courseId}/enroll`,
+            {
+              body,
+              token,
+            },
+            "Failed to enroll",
+          );
+          console.log("[COURSES_SERVICE] enrollFree fallback returned:", fallbackResult);
+          return fallbackResult;
+        } catch (fallbackError) {
+          console.error(
+            "[COURSES_SERVICE] enrollFree fallback threw error:",
+            fallbackError,
+          );
+          return throwApiError(fallbackError, "Failed to enroll");
+        }
+      }
+
+      console.error("[COURSES_SERVICE] enrollFree threw error:", error);
       return throwApiError(error, "Failed to enroll");
     }
   },
@@ -406,6 +538,62 @@ export const coursesService = {
 
   // Kept for compatibility until slug endpoint is reintroduced.
   getBySlug: async (slug: string, token?: string): Promise<Course> => {
-    return coursesService.getById(slug, token);
+    try {
+      const data = await getJson<CourseItemResponse>(
+        `/courses/slug/${slug}`,
+        { token },
+        "Failed to fetch course details",
+      );
+      return mapCourse(data);
+    } catch (error) {
+      // Backward compatibility: some links still pass course IDs in [slug] route.
+      if (slug) {
+        try {
+          return await coursesService.getById(slug, token);
+        } catch {
+          return throwApiError(error, "Failed to fetch course details");
+        }
+      }
+
+      return throwApiError(error, "Failed to fetch course details");
+    }
+  },
+
+  initPaidEnrollment: async (
+    courseId: string,
+    body?: EnrollmentRequestBody,
+    token?: string,
+  ): Promise<PaidEnrollmentInitResponse> => {
+    try {
+      return await postJson<PaidEnrollmentInitResponse>(
+        `/courses/${courseId}/enroll/paid/init`,
+        {
+          token,
+          body,
+        },
+        "Failed to initialize paid enrollment",
+      );
+    } catch (error) {
+      return throwApiError(error, "Failed to initialize paid enrollment");
+    }
+  },
+
+  initApplicationEnrollment: async (
+    courseId: string,
+    body?: EnrollmentRequestBody,
+    token?: string,
+  ): Promise<ApplicationEnrollmentInitResponse> => {
+    try {
+      return await postJson<ApplicationEnrollmentInitResponse>(
+        `/courses/${courseId}/enroll/application/init`,
+        {
+          token,
+          body,
+        },
+        "Failed to initialize application enrollment",
+      );
+    } catch (error) {
+      return throwApiError(error, "Failed to initialize application enrollment");
+    }
   },
 };

@@ -5,7 +5,7 @@ import { Course } from "@/types/course.types";
 import { Badge } from "@/components/ui/badge";
 import { Play, Star, Users, Clock, MonitorPlay } from "lucide-react";
 import { useScroll, useTransform, motion } from "framer-motion";
-import { useEnrollmentStore } from "@/stores/enrollment.store";
+import { useEnrollIntentController } from "@/lib/enrollment/intent-controller";
 import { ROUTES } from "@/lib/routes";
 import Link from "next/link";
 import { StaggerContainer, StaggerItem } from "@/components/animations/stagger";
@@ -18,7 +18,7 @@ export function CourseHero({ course }: CourseHeroProps) {
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 500], [0, 150]);
   const opacity = useTransform(scrollY, [0, 300], [1, 0.3]);
-  const openModal = useEnrollmentStore((state) => state.openModal);
+  const { openFromCta } = useEnrollIntentController();
 
   const isPaid = (course.price ?? 0) > 0;
   const isEnrolled = course.isSubscribed;
@@ -162,7 +162,12 @@ export function CourseHero({ course }: CourseHeroProps) {
               </Link>
             ) : (
               <button
-                onClick={openModal}
+                onClick={() =>
+                  openFromCta({
+                    course,
+                    source: "course_hero",
+                  })
+                }
                 className="group relative flex items-center justify-center gap-2 bg-linear-to-r from-hero-blue to-hero-blue-dark hover:from-[#3db3ec] hover:to-[#2b90ca] text-white text-base font-bold rounded-full py-4 px-8 shadow-xl shadow-hero-blue/20 transition-all active:scale-[0.98] w-fit overflow-hidden"
               >
                 <span className="absolute inset-0 w-full h-full bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
