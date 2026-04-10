@@ -27,6 +27,7 @@ export type EnrollmentErrorCode =
   | "payment_unavailable"
   | "validation_failure"
   | "network_transient"
+  | "NOT_FOUND"
   | "unknown";
 
 export interface EnrollIntentCommand {

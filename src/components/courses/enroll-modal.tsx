@@ -89,34 +89,49 @@ export function EnrollModal({
 
   // Handle transition from main modal to priority enrollment window
   useEffect(() => {
+    let timer: NodeJS.Timeout;
+    const CINEMATIC_DEBOUNCE_MS = 700;
+    
     if (isEnrolling && !showPriorityWindow && !isAnimatingOut) {
-      console.log("[ANIMATION-DEBUG] Starting exit animation sequence");
-      // Trigger animation out
-      setIsAnimatingOut(true);
-
-      // After animation completes, show priority window
-      const timer = setTimeout(() => {
-        console.log(
-          "[ANIMATION-DEBUG] Animation complete, showing priority window",
-        );
-        setShowPriorityWindow(true);
-      }, modalCloseDuration + modalHandoffGap);
-
-      return () => clearTimeout(timer);
+      console.log("[ANIMATION-DEBUG] Intent to transition detected, starting debounce timer");
+      
+      // Debounce the cinematic sequence to avoid flicker on fast failures
+      timer = setTimeout(() => {
+        // Double-check we are still in the processing phase before starting animation
+        const currentLifecycle = useEnrollmentStore.getState().lifecycle;
+        if (currentLifecycle === "processing") {
+          console.log("[ANIMATION-DEBUG] Debounce complete, starting exit animation");
+          setIsAnimatingOut(true);
+          
+          // Hand off to priority window after exit animation duration
+          setTimeout(() => {
+            if (useEnrollmentStore.getState().isEnrolling) {
+              console.log("[ANIMATION-DEBUG] Animation complete, showing priority window");
+              setShowPriorityWindow(true);
+            } else {
+              setIsAnimatingOut(false);
+            }
+          }, modalCloseDuration);
+        } else {
+          console.log("[ANIMATION-DEBUG] Enrollment finished before debounce, skipping cinematic");
+        }
+      }, CINEMATIC_DEBOUNCE_MS);
     } else if (!isEnrolling && (showPriorityWindow || isAnimatingOut)) {
-      console.log(
-        "[ANIMATION-DEBUG] Resetting animation state (isEnrolling false)",
-      );
+      console.log("[ANIMATION-DEBUG] Resetting animation state (isEnrolling false)");
       setShowPriorityWindow(false);
       setIsAnimatingOut(false);
     }
+
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
   }, [
     isEnrolling,
     showPriorityWindow,
     isAnimatingOut,
     modalCloseDuration,
-    modalHandoffGap,
   ]);
+
 
   useEffect(() => {
     // Implement auto-open logic with a slight delay so page transitions nicely first
@@ -269,11 +284,14 @@ export function EnrollModal({
       }, animationDelay);
 
       isSuccessful = true;
-    } catch {
+    } catch (error) {
+      console.error("[ENROLL] handleEnrollFree fatal error:", error);
       setError();
-      toast.error("Failed to enroll. Please try again.");
+      toast.error("An unexpected error occurred. Please try again later.");
     } finally {
-      if (!isSuccessful) {
+      // Only reset to modal_open if we aren't in a success or terminal error state
+      const currentLifecycle = useEnrollmentStore.getState().lifecycle;
+      if (!isSuccessful && currentLifecycle !== "error" && currentLifecycle !== "auth_redirect") {
         setLifecycle("modal_open");
       }
     }
@@ -282,49 +300,35 @@ export function EnrollModal({
   return (
     <>
       {/* Main Enrollment Modal: close animation is driven by Dialog open state */}
-      {isModalOpen && !showPriorityWindow && (
-        <Dialog
-          open={!isAnimatingOut}
-          onOpenChange={(open) => {
-            // #region agent log
-            agentLog({
-              runId: "pre",
-              hypothesisId: "H2",
-              location:
-                "src/components/courses/enroll-modal.tsx:DialogOnOpenChange",
-              message: "Enroll Dialog onOpenChange",
-              data: {
-                open,
-                isEnrolling,
-                lifecycle: useEnrollmentStore.getState().lifecycle,
-              },
-              timestamp: Date.now(),
-            });
-            // #endregion agent log
-
-            if (!open && !isEnrolling) {
-              closeModal();
-              onDismiss?.();
-            }
-          }}
-        >
-          <EnrollModalContent
-            course={course}
-            isEnrolling={isEnrolling}
-            isSuccess={isSuccess}
-            isPaid={isPaid}
-            shouldReduceMotion={Boolean(shouldReduceMotion)}
-            visualPhase={visualPhase}
-            keynoteTransition={keynoteTransition}
-            processingStep={processingStep}
-            processingSteps={processingSteps}
-            handleEnrollFree={handleEnrollFree}
-            closeModal={closeModal}
-            onDismiss={onDismiss}
-            setLifecycle={setLifecycle}
-            overlayClassName={overlayClassName}
-          />
-        </Dialog>
+      {isModalOpen && (
+        <div style={{ display: showPriorityWindow ? "none" : "block" }}>
+          <Dialog
+            open={!isAnimatingOut && !showPriorityWindow}
+            onOpenChange={(open) => {
+              if (!open && !isEnrolling) {
+                closeModal();
+                onDismiss?.();
+              }
+            }}
+          >
+            <EnrollModalContent
+              course={course}
+              isEnrolling={isEnrolling}
+              isSuccess={isSuccess}
+              isPaid={isPaid}
+              shouldReduceMotion={Boolean(shouldReduceMotion)}
+              visualPhase={visualPhase}
+              keynoteTransition={keynoteTransition}
+              processingStep={processingStep}
+              processingSteps={processingSteps}
+              handleEnrollFree={handleEnrollFree}
+              closeModal={closeModal}
+              onDismiss={onDismiss}
+              setLifecycle={setLifecycle}
+              overlayClassName={overlayClassName}
+            />
+          </Dialog>
+        </div>
       )}
 
       {/* Priority Enrollment Window Modal */}

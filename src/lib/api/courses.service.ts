@@ -188,16 +188,20 @@ const parseApiErrorMessage = (error: unknown, fallback: string): string => {
     typeof error === "object" &&
     error !== null &&
     "error" in error &&
-    typeof error.error === "object" &&
-    error.error !== null &&
-    "message" in error.error &&
-    typeof error.error.message === "string"
+    typeof (error as any).error === "object" &&
+    (error as any).error !== null &&
+    "message" in (error as any).error &&
+    typeof (error as any).error.message === "string"
   ) {
-    return error.error.message;
+    return (error as any).error.message;
   }
   if (error instanceof Error && error.message) {
     return error.message;
   }
+  if (typeof error === "string" && error.length > 0) {
+    return error;
+  }
+  console.warn("[API] parseApiErrorMessage used fallback:", fallback, "for error:", error);
   return fallback;
 };
 
@@ -231,11 +235,17 @@ const throwApiError = (
   fallback: string,
   status?: number,
 ): never => {
-  throw new ApiRequestError(
-    parseApiErrorMessage(error, fallback),
-    status ?? 500,
-    parseApiErrorCode(error),
-  );
+  const message = parseApiErrorMessage(error, fallback);
+  const code = parseApiErrorCode(error);
+  
+  console.error("[API] throwApiError:", {
+    message,
+    status: status ?? 500,
+    code,
+    originalError: error,
+  });
+
+  throw new ApiRequestError(message, status ?? 500, code);
 };
 
 const createRequestUrl = (
@@ -508,7 +518,7 @@ export const coursesService = {
     } catch (error) {
       if (
         error instanceof ApiRequestError &&
-        (error.status === 404 || error.code === "NOT_FOUND")
+        (error.status === 404 || error.code === "NOT_FOUND" || error.code === "course_not_found")
       ) {
         console.warn(
           "[COURSES_SERVICE] /enroll/free not found, falling back to legacy /enroll endpoint",
@@ -537,8 +547,8 @@ export const coursesService = {
         }
       }
 
-      console.error("[COURSES_SERVICE] enrollFree threw error:", error);
-      return throwApiError(error, "Failed to enroll");
+      console.error("[COURSES_SERVICE] enrollFree threw final error:", error);
+      return throwApiError(error, "Enrollment failed on server. Please try again.");
     }
   },
 

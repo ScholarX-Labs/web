@@ -17,10 +17,18 @@ export interface EnrollmentMappedError {
 }
 
 export const mapEnrollmentError = (error: unknown): EnrollmentMappedError => {
-  if (error instanceof ApiRequestError) {
+  // Use both instanceof and structural checking for robust error identification across HMR boundaries
+  const isApiError =
+    error instanceof ApiRequestError ||
+    (typeof error === "object" &&
+      error !== null &&
+      (error as any).name === "ApiRequestError");
+
+  if (isApiError) {
+    const apiError = error as ApiRequestError;
     return {
-      code: error.code ?? toFallbackCode(error.status),
-      message: error.message || DEFAULT_MESSAGE,
+      code: apiError.code ?? toFallbackCode(apiError.status),
+      message: apiError.message || DEFAULT_MESSAGE,
     };
   }
 
