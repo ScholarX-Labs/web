@@ -19,6 +19,7 @@ import { useFlipAnimation } from "@/hooks/use-flip-animation";
 interface CourseDetailSheetProps {
   course: Course;
   intent: CourseSurfaceIntent;
+  isStacked?: boolean;
   originRect?: DOMRect | null;
   onClose: () => void;
   onEnrollIntent: () => void;
@@ -34,6 +35,7 @@ const learningOutcomes = [
 export function CourseDetailSheet({
   course,
   intent,
+  isStacked = false,
   originRect,
   onClose,
   onEnrollIntent,
@@ -199,13 +201,37 @@ export function CourseDetailSheet({
         <div className="absolute right-[14%] top-[8%] h-64 w-64 rounded-full bg-blue-500/12 blur-3xl" />
       </motion.div>
 
-      <div
-        ref={sheetRef}
-        className={cn(
-          "relative z-10 w-full max-w-6xl overflow-hidden rounded-[28px] border border-white/30 bg-white/95 shadow-[0_48px_140px_rgba(15,23,42,0.4)] ring-1 ring-slate-100/80 dark:border-slate-800/70 dark:bg-slate-950/95 dark:ring-slate-800/80",
-          "max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3rem)]",
-        )}
+      <motion.div
+        animate={
+          isStacked
+            ? {
+                scale: 0.94,
+                y: -12,
+                opacity: 0.85,
+                filter: "blur(4px)",
+              }
+            : {
+                scale: 1,
+                y: 0,
+                opacity: 1,
+                filter: "blur(0px)",
+              }
+        }
+        transition={{
+          type: "spring",
+          stiffness: 280,
+          damping: 32,
+          mass: 1,
+        }}
+        className="relative z-10 flex w-full items-start justify-center"
       >
+        <div
+          ref={sheetRef}
+          className={cn(
+            "relative w-full max-w-6xl overflow-hidden rounded-[28px] border border-white/30 bg-white/95 shadow-[0_48px_140px_rgba(15,23,42,0.4)] ring-1 ring-slate-100/80 dark:border-slate-800/70 dark:bg-slate-950/95 dark:ring-slate-800/80",
+            "max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3rem)]",
+          )}
+        >
         <div className="pointer-events-none absolute inset-x-0 top-0 z-20 h-14 bg-linear-to-b from-white/70 to-transparent dark:from-slate-900/50" />
 
         <div className="flex flex-col lg:flex-row">
@@ -349,7 +375,8 @@ export function CourseDetailSheet({
             </div>
           </div>
         </div>
-      </div>
+        </div>
+      </motion.div>
     </motion.div>
   );
 }

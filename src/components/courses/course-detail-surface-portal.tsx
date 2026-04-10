@@ -65,6 +65,7 @@ export function CourseDetailSurfacePortal() {
         <CourseDetailSheet
           course={course}
           intent={intent}
+          isStacked={isEnrollmentModalOpen}
           originRect={originRect}
           onClose={closeCourseSheet}
           onEnrollIntent={() => {

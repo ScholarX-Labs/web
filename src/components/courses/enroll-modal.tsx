@@ -174,10 +174,10 @@ export function EnrollModal({
 
   const overlayClassName =
     visualPhase === "processing"
-      ? "z-85 bg-slate-950/50 supports-backdrop-filter:backdrop-blur-md transition-[opacity,background-color,backdrop-filter] duration-560 ease-[cubic-bezier(0.22,1,0.36,1)]"
+      ? "z-85 bg-slate-950/55 backdrop-blur-[12px] transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
       : visualPhase === "success"
-        ? "z-85 bg-slate-950/46 supports-backdrop-filter:backdrop-blur-sm transition-[opacity,background-color,backdrop-filter] duration-560 ease-[cubic-bezier(0.22,1,0.36,1)]"
-        : "z-85 bg-slate-950/42 supports-backdrop-filter:backdrop-blur-xs transition-[opacity,background-color,backdrop-filter] duration-560 ease-[cubic-bezier(0.22,1,0.36,1)]";
+        ? "z-85 bg-slate-950/48 backdrop-blur-[8px] transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
+        : "z-85 bg-slate-950/45 backdrop-blur-[6px] transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]";
 
   useEffect(() => {
     if (!isEnrolling) {
