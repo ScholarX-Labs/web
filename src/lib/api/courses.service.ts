@@ -205,7 +205,7 @@ const parseApiErrorMessage = (error: unknown, fallback: string): string => {
   return fallback;
 };
 
-const parseApiErrorCode = (error: unknown): EnrollmentErrorCode | undefined => {
+const parseApiErrorCode = (error: unknown): string | undefined => {
   if (
     typeof error === "object" &&
     error !== null &&
@@ -215,7 +215,7 @@ const parseApiErrorCode = (error: unknown): EnrollmentErrorCode | undefined => {
     "code" in error.error &&
     typeof error.error.code === "string"
   ) {
-    return error.error.code as EnrollmentErrorCode;
+    return error.error.code;
   }
 
   if (
@@ -224,10 +224,63 @@ const parseApiErrorCode = (error: unknown): EnrollmentErrorCode | undefined => {
     "code" in error &&
     typeof error.code === "string"
   ) {
-    return error.code as EnrollmentErrorCode;
+    return error.code;
   }
 
   return undefined;
+};
+
+const normalizeEnrollmentErrorCode = (
+  code: string | undefined,
+  status: number,
+): EnrollmentErrorCode | undefined => {
+  if (!code) {
+    if (status === 401 || status === 403) return "auth_required";
+    return undefined;
+  }
+
+  if (
+    code === "USER_NOT_FOUND" ||
+    code === "UNAUTHORIZED" ||
+    code === "AUTH_TOKEN_INVALID" ||
+    code === "AUTH_TOKEN_EXPIRED"
+  ) {
+    return "auth_required";
+  }
+
+  if (code === "COURSE_NOT_FOUND") {
+    return "course_not_found";
+  }
+
+  const allowedCodes: EnrollmentErrorCode[] = [
+    "auth_required",
+    "already_enrolled",
+    "course_not_found",
+    "payment_unavailable",
+    "validation_failure",
+    "network_transient",
+    "NOT_FOUND",
+    "unknown",
+  ];
+
+  if (allowedCodes.includes(code as EnrollmentErrorCode)) {
+    return code as EnrollmentErrorCode;
+  }
+
+  return undefined;
+};
+
+const isRouteNotFoundError = (
+  status: number,
+  code: string | undefined,
+  message: string,
+): boolean => {
+  if (status !== 404) return false;
+
+  // Legacy fallback is valid only when the endpoint itself does not exist.
+  if (code === "NOT_FOUND") return true;
+
+  return /cannot\s+(post|get|put|patch|delete)\b/i.test(message);
 };
 
 const throwApiError = (
@@ -236,7 +289,10 @@ const throwApiError = (
   status?: number,
 ): never => {
   const message = parseApiErrorMessage(error, fallback);
-  const code = parseApiErrorCode(error);
+  const code = normalizeEnrollmentErrorCode(
+    parseApiErrorCode(error),
+    status ?? 500,
+  );
   
   console.error("[API] throwApiError:", {
     message,
@@ -516,9 +572,21 @@ export const coursesService = {
       console.log("[COURSES_SERVICE] enrollFree returned:", result);
       return result;
     } catch (error) {
+      const status =
+        error instanceof ApiRequestError
+          ? error.status
+          : typeof error === "object" && error !== null && "status" in error
+            ? Number((error as { status?: unknown }).status)
+            : undefined;
+      const code =
+        error instanceof ApiRequestError
+          ? error.code
+          : parseApiErrorCode(error);
+      const message = parseApiErrorMessage(error, "Failed to enroll");
+
       if (
-        error instanceof ApiRequestError &&
-        (error.status === 404 || error.code === "NOT_FOUND" || error.code === "course_not_found")
+        typeof status === "number" &&
+        isRouteNotFoundError(status, code, message)
       ) {
         console.warn(
           "[COURSES_SERVICE] /enroll/free not found, falling back to legacy /enroll endpoint",

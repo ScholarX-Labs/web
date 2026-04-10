@@ -111,6 +111,11 @@ export function CourseCard({ course, className }: CourseCardProps) {
     event.preventDefault();
     event.stopPropagation();
 
+    if (course.isSubscribed) {
+      router.push(courseDetailHref);
+      return;
+    }
+
     const cardElement = event.currentTarget.closest(
       "[data-course-card]",
     ) as HTMLElement | null;
@@ -207,9 +212,14 @@ export function CourseCard({ course, className }: CourseCardProps) {
             <button
               type="button"
               onClick={handleEnrollClick}
-              className="absolute bottom-4 left-4 rounded-full bg-hero-blue px-3 py-1.5 text-xs font-semibold text-white shadow-lg transition-colors hover:bg-hero-blue-dark"
+              className={cn(
+                "absolute bottom-4 left-4 rounded-full px-3 py-1.5 text-xs font-semibold text-white shadow-lg transition-colors",
+                course.isSubscribed 
+                  ? "bg-emerald-500 hover:bg-emerald-600" 
+                  : "bg-hero-blue hover:bg-hero-blue-dark"
+              )}
             >
-              Enroll
+              {course.isSubscribed ? "Go to Course" : "Enroll"}
             </button>
           </div>
 

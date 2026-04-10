@@ -25,7 +25,26 @@ export function EnrollModalActions({
 }: EnrollModalActionsProps) {
   return (
     <div className="pt-2">
-      {!isPaid ? (
+      {course.isSubscribed ? (
+        <motion.div whileHover={{ scale: 1.015 }} whileTap={{ scale: 0.985 }}>
+          <button
+            onClick={() => {
+              // Usually closeModal is handled by the parent, but here we just want to ensure navigation
+              // onSubmit in this context might be wired to enrollment, so we'll use a direct link or trigger
+              // For now, mirroring the "Continue" behavior
+              window.location.href = `/courses/${course.slug}`;
+            }}
+            className="group relative w-full overflow-hidden rounded-xl bg-emerald-500 px-6 py-4 font-bold text-white shadow-lg shadow-emerald-500/20 transition-all active:scale-[0.98] hover:bg-emerald-600"
+          >
+            <span className="relative z-10 flex items-center justify-between">
+              <span className="flex items-center gap-2">
+                Continue Learning
+              </span>
+              <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </span>
+          </button>
+        </motion.div>
+      ) : !isPaid ? (
         <motion.div
           animate={
             shouldReduceMotion ? undefined : { scale: isEnrolling ? 1 : 1 }
@@ -100,51 +119,61 @@ export function EnrollModalActions({
         </motion.div>
       )}
 
-      <AnimatePresence>
-        {isEnrolling && (
-          <motion.div
-            initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -4 }}
-            transition={{ duration: shouldReduceMotion ? 0.16 : 0.25 }}
-            className="mt-3 space-y-2"
-          >
-            <div className="overflow-hidden rounded-full bg-slate-100/90 p-1 dark:bg-slate-800/80">
+      {!course.isSubscribed && (
+        <>
+          <AnimatePresence>
+            {isEnrolling && (
               <motion.div
-                className="h-1.5 rounded-full bg-linear-to-r from-cyan-500 via-hero-blue to-orange-400"
-                animate={
-                  shouldReduceMotion
-                    ? { width: "66%" }
-                    : { width: ["24%", "76%", "42%", "85%"] }
+                initial={
+                  shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 8 }
                 }
-                transition={
-                  shouldReduceMotion
-                    ? { duration: 0.2 }
-                    : { duration: 1.3, repeat: Infinity, ease: "easeInOut" }
+                animate={{ opacity: 1, y: 0 }}
+                exit={
+                  shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -4 }
                 }
-              />
-            </div>
+                transition={{ duration: shouldReduceMotion ? 0.16 : 0.25 }}
+                className="mt-3 space-y-2"
+              >
+                <div className="overflow-hidden rounded-full bg-slate-100/90 p-1 dark:bg-slate-800/80">
+                  <motion.div
+                    className="h-1.5 rounded-full bg-linear-to-r from-cyan-500 via-hero-blue to-orange-400"
+                    animate={
+                      shouldReduceMotion
+                        ? { width: "66%" }
+                        : { width: ["24%", "76%", "42%", "85%"] }
+                    }
+                    transition={
+                      shouldReduceMotion
+                        ? { duration: 0.2 }
+                        : { duration: 1.3, repeat: Infinity, ease: "easeInOut" }
+                    }
+                  />
+                </div>
 
-            <motion.p
-              key={processingStep}
-              initial={
-                shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 5 }
-              }
-              animate={{ opacity: 1, y: 0 }}
-              exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -5 }}
-              transition={{ duration: shouldReduceMotion ? 0.12 : 0.22 }}
-              className="text-center text-[12px] font-medium text-slate-600 dark:text-slate-300"
-            >
-              {processingSteps[processingStep]}
-            </motion.p>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                <motion.p
+                  key={processingStep}
+                  initial={
+                    shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 5 }
+                  }
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={
+                    shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -5 }
+                  }
+                  transition={{ duration: shouldReduceMotion ? 0.12 : 0.22 }}
+                  className="text-center text-[12px] font-medium text-slate-600 dark:text-slate-300"
+                >
+                  {processingSteps[processingStep]}
+                </motion.p>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-      <p className="mt-4 flex items-center justify-center gap-1.5 px-4 text-center text-xs text-slate-500">
-        <CreditCard className="h-3.5 w-3.5" />
-        Secure enrollment. Cancel anytime within 30 days.
-      </p>
+          <p className="mt-4 flex items-center justify-center gap-1.5 px-4 text-center text-xs text-slate-500">
+            <CreditCard className="h-3.5 w-3.5" />
+            Secure enrollment. Cancel anytime within 30 days.
+          </p>
+        </>
+      )}
     </div>
   );
 }

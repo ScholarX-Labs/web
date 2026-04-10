@@ -245,18 +245,31 @@ export function LatestCourseCard({
 
           {/* Enroll row */}
           <div className="flex items-center gap-3 mt-auto pt-2">
-            <Link
-              href={`${courseDetailHref}?intent=enroll`}
-              onClick={(event) => handleSurfaceLinkClick(event, "enroll")}
-              className="group/btn relative flex-1 overflow-hidden flex items-center justify-center gap-2 bg-linear-to-r from-hero-blue to-hero-blue-dark text-white text-sm font-bold rounded-full py-3 shadow-lg shadow-hero-blue/30 transition-transform active:scale-[0.98]"
-            >
-              {/* Shimmer sweep effect inside button */}
-              <span className="absolute inset-0 w-full h-full bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 ease-in-out" />
-              <span className="relative z-10 flex items-center gap-1.5">
-                Enroll Now
-                <ChevronRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
-              </span>
-            </Link>
+            {course.isSubscribed ? (
+              <Link
+                href={courseDetailHref}
+                onClick={(event) => handleSurfaceLinkClick(event, "details")}
+                className="group/btn relative flex-1 overflow-hidden flex items-center justify-center gap-2 bg-linear-to-r from-emerald-500 to-emerald-600 text-white text-sm font-bold rounded-full py-3 shadow-lg shadow-emerald-500/30 transition-transform active:scale-[0.98]"
+              >
+                <span className="absolute inset-0 w-full h-full bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 ease-in-out" />
+                <span className="relative z-10 flex items-center gap-1.5">
+                  Resume Learning
+                  <ChevronRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
+                </span>
+              </Link>
+            ) : (
+              <Link
+                href={`${courseDetailHref}?intent=enroll`}
+                onClick={(event) => handleSurfaceLinkClick(event, "enroll")}
+                className="group/btn relative flex-1 overflow-hidden flex items-center justify-center gap-2 bg-linear-to-r from-hero-blue to-hero-blue-dark text-white text-sm font-bold rounded-full py-3 shadow-lg shadow-hero-blue/30 transition-transform active:scale-[0.98]"
+              >
+                <span className="absolute inset-0 w-full h-full bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 ease-in-out" />
+                <span className="relative z-10 flex items-center gap-1.5">
+                  Enroll Now
+                  <ChevronRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
+                </span>
+              </Link>
+            )}
 
             {/* Rating badge */}
             {course.rating !== undefined && (
