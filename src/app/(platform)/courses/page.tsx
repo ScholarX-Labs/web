@@ -1,12 +1,21 @@
 import { CoursesHero } from "@/components/courses/courses-hero";
 import { LatestCoursesSection } from "@/components/courses/latest-courses-section";
-import { coursesService } from "@/lib/api/courses.service";
+import { createNextCourseDomain } from "@/domain/courses";
+import { getSession } from "@/lib/dal";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 async function getLatestCourses() {
   try {
-    const data = await coursesService.list({ page: 1, limit: 9 });
+    const session = await getSession();
+    const courseDomain = createNextCourseDomain();
+    const data = await courseDomain.catalog.list(
+      {
+        page: 1,
+        limit: 9,
+      },
+      session?.user.id,
+    );
     return data.items;
   } catch {
     return [];

@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { coursesService } from "@/lib/api/courses.service";
+import { createNextCourseDomain } from "@/domain/courses";
 import { CourseHero } from "./_components/course-hero";
 import { CourseStickyCta } from "./_components/course-sticky-cta";
 import { CourseCurriculum } from "./_components/course-curriculum";
@@ -20,9 +20,8 @@ export async function generateMetadata({
   const { slug } = await params;
   try {
     const session = await getSession();
-    // Use session token if available to fetch user-specific metadata if needed
-    // Note: Reusing getBySlug here without token for generic metadata is fine, or include token.
-    const course = await coursesService.getBySlug(slug, session?.session.token);
+    const courseDomain = createNextCourseDomain();
+    const course = await courseDomain.catalog.getBySlug(slug, session?.user.id);
     return {
       title: `${course.title} | ScholarX`,
       description: course.description,
@@ -45,7 +44,8 @@ export default async function CourseDetailPage({
   const session = await getSession();
 
   try {
-    course = await coursesService.getBySlug(slug, session?.session.token);
+    const courseDomain = createNextCourseDomain();
+    course = await courseDomain.catalog.getBySlug(slug, session?.user.id);
   } catch {
     notFound();
   }

@@ -15,10 +15,8 @@ const getBridgeSecret = (): string => {
   return secret;
 };
 
-const createSignature = (
-  payload: string,
-  secret: string,
-): string => createHmac("sha256", secret).update(payload).digest("hex");
+const createSignature = (payload: string, secret: string): string =>
+  createHmac("sha256", secret).update(payload).digest("hex");
 
 export interface InternalAuthIdentity {
   userId: string;
@@ -32,9 +30,10 @@ export const createInternalAuthHeaders = (
   const secret = getBridgeSecret();
   const issuedAt = nowSeconds;
   const expiresAt = nowSeconds + DEFAULT_TOKEN_TTL_SECONDS;
-  const sessionId = identity.sessionId && identity.sessionId.trim().length > 0
-    ? identity.sessionId
-    : randomUUID();
+  const sessionId =
+    identity.sessionId && identity.sessionId.trim().length > 0
+      ? identity.sessionId
+      : randomUUID();
 
   const payload = `${identity.userId}.${sessionId}.${issuedAt}.${expiresAt}`;
   const signature = createSignature(payload, secret);

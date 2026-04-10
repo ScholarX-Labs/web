@@ -7,6 +7,8 @@
     "dev": "next dev",
     "start": "next start",
     "lint": "eslint",
+    "test": "node --import tsx --test src/**/*.test.ts",
+    "test:api": "node --import tsx --test src/app/api/**/*.test.ts",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
     "db:migrate": "drizzle-kit migrate",

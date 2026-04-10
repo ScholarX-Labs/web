@@ -201,7 +201,12 @@ const parseApiErrorMessage = (error: unknown, fallback: string): string => {
   if (typeof error === "string" && error.length > 0) {
     return error;
   }
-  console.warn("[API] parseApiErrorMessage used fallback:", fallback, "for error:", error);
+  console.warn(
+    "[API] parseApiErrorMessage used fallback:",
+    fallback,
+    "for error:",
+    error,
+  );
   return fallback;
 };
 
@@ -293,7 +298,7 @@ const throwApiError = (
     parseApiErrorCode(error),
     status ?? 500,
   );
-  
+
   console.error("[API] throwApiError:", {
     message,
     status: status ?? 500,
@@ -310,15 +315,19 @@ const createRequestUrl = (
 ) => {
   console.log("[API] createRequestUrl called with path:", path);
   const configuredBase = env.NEXT_PUBLIC_API_BASE_URL.trim();
+  const effectiveBase = /localhost:3001/i.test(configuredBase)
+    ? env.NEXT_PUBLIC_API_URL.trim()
+    : configuredBase;
   console.log("[API] configuredBase from env:", configuredBase);
+  console.log("[API] effectiveBase:", effectiveBase);
 
-  const url = /^https?:\/\//i.test(configuredBase)
-    ? new URL(path, configuredBase)
+  const url = /^https?:\/\//i.test(effectiveBase)
+    ? new URL(path, effectiveBase)
     : new URL(
-        `${(configuredBase.startsWith("/") ? configuredBase : `/${configuredBase}`).replace(/\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`,
+        `${(effectiveBase.startsWith("/") ? effectiveBase : `/${effectiveBase}`).replace(/\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`,
         typeof window !== "undefined"
           ? window.location.origin
-          : "http://localhost",
+          : "http://localhost:3000",
       );
   console.log("[API] constructed URL:", url.toString());
 
@@ -616,7 +625,10 @@ export const coursesService = {
       }
 
       console.error("[COURSES_SERVICE] enrollFree threw final error:", error);
-      return throwApiError(error, "Enrollment failed on server. Please try again.");
+      return throwApiError(
+        error,
+        "Enrollment failed on server. Please try again.",
+      );
     }
   },
 
