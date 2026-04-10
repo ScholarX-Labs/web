@@ -7,6 +7,7 @@ import { EnrollModal } from "./enroll-modal";
 import { CourseDetailSheet } from "./course-detail-sheet";
 import { useCourseSheetStore } from "@/stores/course-sheet.store";
 import { useEnrollmentStore } from "@/stores/enrollment.store";
+import { agentLog } from "@/lib/debug/agent-log";
 
 export function CourseDetailSurfacePortal() {
   const [mounted, setMounted] = useState(false);
@@ -41,26 +42,48 @@ export function CourseDetailSurfacePortal() {
 
   if (!mounted || !course || !isOpen) return null;
 
-  const shouldShowCourseSheet = intent !== "enroll" || !isEnrollmentModalOpen;
+  // #region agent log
+  agentLog({
+    runId: "pre",
+    hypothesisId: "H1",
+    location: "src/components/courses/course-detail-surface-portal.tsx:render",
+    message: "CourseDetailSurfacePortal render gate",
+    data: {
+      isOpen,
+      hasCourse: Boolean(course),
+      intent,
+      isEnrollmentModalOpen,
+      hasOriginRect: Boolean(originRect),
+    },
+    timestamp: Date.now(),
+  });
+  // #endregion agent log
 
   return createPortal(
     <>
       <AnimatePresence>
-        {shouldShowCourseSheet && (
-          <CourseDetailSheet
-            course={course}
-            intent={intent}
-            originRect={originRect}
-            onClose={closeCourseSheet}
-            onEnrollIntent={() => setIntent("enroll")}
-          />
-        )}
+        <CourseDetailSheet
+          course={course}
+          intent={intent}
+          originRect={originRect}
+          onClose={closeCourseSheet}
+          onEnrollIntent={() => {
+            setIntent("enroll");
+            useEnrollmentStore.getState().openModal();
+          }}
+        />
       </AnimatePresence>
 
       <EnrollModal
         course={course}
         autoOpen={intent === "enroll"}
-        onDismiss={closeCourseSheet}
+        onDismiss={() => {
+          // If the user dismisses the enroll modal, we want the underlying main modal to become 
+          // fully interactive again, so we switch its intent back to "details".
+          if (intent === "enroll") {
+            setIntent("details");
+          }
+        }}
       />
     </>,
     document.body,

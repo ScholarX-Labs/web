@@ -13,6 +13,7 @@ import { executeEnrollment } from "@/lib/enrollment/enrollment-executor";
 import { EnrollmentContext } from "@/lib/enrollment/types";
 import { emitEnrollmentEvent } from "@/lib/telemetry/enrollment-events";
 import { EnrollModalContent } from "./enroll-modal-content";
+import { agentLog } from "@/lib/debug/agent-log";
 
 interface EnrollModalProps {
   course: Course;
@@ -120,9 +121,37 @@ export function EnrollModal({
   useEffect(() => {
     // Implement auto-open logic with a slight delay so page transitions nicely first
     if (autoOpen && !hasAutoOpened) {
+      // #region agent log
+      agentLog({
+        runId: "pre",
+        hypothesisId: "H1",
+        location: "src/components/courses/enroll-modal.tsx:autoOpenEffect",
+        message: "autoOpen scheduled openModal",
+        data: {
+          autoOpen,
+          hasAutoOpened,
+          enrollmentLifecycle: useEnrollmentStore.getState().lifecycle,
+        },
+        timestamp: Date.now(),
+      });
+      // #endregion agent log
+
       const timer = setTimeout(() => {
         openModal();
         setHasAutoOpened(true);
+
+        // #region agent log
+        agentLog({
+          runId: "pre",
+          hypothesisId: "H1",
+          location: "src/components/courses/enroll-modal.tsx:autoOpenEffectTimer",
+          message: "autoOpen timer fired: openModal called",
+          data: {
+            enrollmentLifecycle: useEnrollmentStore.getState().lifecycle,
+          },
+          timestamp: Date.now(),
+        });
+        // #endregion agent log
       }, 600);
       return () => clearTimeout(timer);
     }
@@ -253,6 +282,22 @@ export function EnrollModal({
         <Dialog
           open={!isAnimatingOut}
           onOpenChange={(open) => {
+            // #region agent log
+            agentLog({
+              runId: "pre",
+              hypothesisId: "H2",
+              location:
+                "src/components/courses/enroll-modal.tsx:DialogOnOpenChange",
+              message: "Enroll Dialog onOpenChange",
+              data: {
+                open,
+                isEnrolling,
+                lifecycle: useEnrollmentStore.getState().lifecycle,
+              },
+              timestamp: Date.now(),
+            });
+            // #endregion agent log
+
             if (!open && !isEnrolling) {
               closeModal();
               onDismiss?.();

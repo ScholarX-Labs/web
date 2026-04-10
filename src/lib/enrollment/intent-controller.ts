@@ -10,6 +10,7 @@ import {
   EnrollmentSourceSurface,
 } from "@/lib/enrollment/types";
 import { emitEnrollmentEvent } from "@/lib/telemetry/enrollment-events";
+import { agentLog } from "@/lib/debug/agent-log";
 
 interface OpenFromCtaInput {
   course: Course;
@@ -86,9 +87,40 @@ export function useEnrollIntentController() {
         sourceSurface: context.command.source,
         correlationId: context.command.correlationId,
       });
+
+      // #region agent log
+      agentLog({
+        runId: "pre",
+        hypothesisId: "H1",
+        location: "src/lib/enrollment/intent-controller.ts:openFromCard",
+        message: "openFromCard invoked",
+        data: {
+          courseId: course.id,
+          source,
+          hasOriginRect: Boolean(originRect),
+        },
+        timestamp: Date.now(),
+      });
+      // #endregion agent log
+
       markPrecheck(context);
       setIntent("enroll");
       openCourseSheet(course, "enroll", originRect);
+
+      // #region agent log
+      agentLog({
+        runId: "pre",
+        hypothesisId: "H1",
+        location: "src/lib/enrollment/intent-controller.ts:openFromCard",
+        message:
+          "openFromCard dispatched markPrecheck + setIntent(enroll) + openCourseSheet",
+        data: {
+          courseId: course.id,
+          intent: "enroll",
+        },
+        timestamp: Date.now(),
+      });
+      // #endregion agent log
     },
   };
 }
