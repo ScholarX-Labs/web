@@ -91,33 +91,43 @@ export function EnrollModal({
   useEffect(() => {
     let timer: NodeJS.Timeout;
     const CINEMATIC_DEBOUNCE_MS = 700;
-    
+
     if (isEnrolling && !showPriorityWindow && !isAnimatingOut) {
-      console.log("[ANIMATION-DEBUG] Intent to transition detected, starting debounce timer");
-      
+      console.log(
+        "[ANIMATION-DEBUG] Intent to transition detected, starting debounce timer",
+      );
+
       // Debounce the cinematic sequence to avoid flicker on fast failures
       timer = setTimeout(() => {
         // Double-check we are still in the processing phase before starting animation
         const currentLifecycle = useEnrollmentStore.getState().lifecycle;
         if (currentLifecycle === "processing") {
-          console.log("[ANIMATION-DEBUG] Debounce complete, starting exit animation");
+          console.log(
+            "[ANIMATION-DEBUG] Debounce complete, starting exit animation",
+          );
           setIsAnimatingOut(true);
-          
+
           // Hand off to priority window after exit animation duration
           setTimeout(() => {
             if (useEnrollmentStore.getState().isEnrolling) {
-              console.log("[ANIMATION-DEBUG] Animation complete, showing priority window");
+              console.log(
+                "[ANIMATION-DEBUG] Animation complete, showing priority window",
+              );
               setShowPriorityWindow(true);
             } else {
               setIsAnimatingOut(false);
             }
           }, modalCloseDuration);
         } else {
-          console.log("[ANIMATION-DEBUG] Enrollment finished before debounce, skipping cinematic");
+          console.log(
+            "[ANIMATION-DEBUG] Enrollment finished before debounce, skipping cinematic",
+          );
         }
       }, CINEMATIC_DEBOUNCE_MS);
     } else if (!isEnrolling && (showPriorityWindow || isAnimatingOut)) {
-      console.log("[ANIMATION-DEBUG] Resetting animation state (isEnrolling false)");
+      console.log(
+        "[ANIMATION-DEBUG] Resetting animation state (isEnrolling false)",
+      );
       setShowPriorityWindow(false);
       setIsAnimatingOut(false);
     }
@@ -125,13 +135,7 @@ export function EnrollModal({
     return () => {
       if (timer) clearTimeout(timer);
     };
-  }, [
-    isEnrolling,
-    showPriorityWindow,
-    isAnimatingOut,
-    modalCloseDuration,
-  ]);
-
+  }, [isEnrolling, showPriorityWindow, isAnimatingOut, modalCloseDuration]);
 
   useEffect(() => {
     // Implement auto-open logic with a slight delay so page transitions nicely first
@@ -159,7 +163,8 @@ export function EnrollModal({
         agentLog({
           runId: "pre",
           hypothesisId: "H1",
-          location: "src/components/courses/enroll-modal.tsx:autoOpenEffectTimer",
+          location:
+            "src/components/courses/enroll-modal.tsx:autoOpenEffectTimer",
           message: "autoOpen timer fired: openModal called",
           data: {
             enrollmentLifecycle: useEnrollmentStore.getState().lifecycle,
@@ -209,6 +214,11 @@ export function EnrollModal({
 
   const handleEnrollFree = async () => {
     console.log("[ENROLL] handleEnrollFree clicked - courseId:", course.id);
+    if (course.isSubscribed) {
+      toast.info("You are already enrolled in this course.");
+      router.push(ROUTES.COURSE_DETAIL(course.slug ?? course.id));
+      return;
+    }
     console.log(
       "[ANIMATION-DEBUG] Starting enrollment - will trigger exit animation",
     );
@@ -291,7 +301,11 @@ export function EnrollModal({
     } finally {
       // Only reset to modal_open if we aren't in a success or terminal error state
       const currentLifecycle = useEnrollmentStore.getState().lifecycle;
-      if (!isSuccessful && currentLifecycle !== "error" && currentLifecycle !== "auth_redirect") {
+      if (
+        !isSuccessful &&
+        currentLifecycle !== "error" &&
+        currentLifecycle !== "auth_redirect"
+      ) {
         setLifecycle("modal_open");
       }
     }
