@@ -38,12 +38,14 @@ export function EnrollModalTitleMedia({
 
       <div className="flex gap-4">
         <motion.div
-          className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl shadow-md"
-          initial={{ scale: 0.92, rotate: -2, opacity: 0.8 }}
-          animate={{ scale: 1, rotate: 0, opacity: 1 }}
+          className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)]"
+          initial={{ scale: 0.88, rotate: -3, filter: "blur(4px)", opacity: 0 }}
+          animate={{ scale: 1, rotate: 0, filter: "blur(0px)", opacity: 1 }}
           transition={{
-            duration: 0.42,
-            ease: [0.32, 0.72, 0, 1],
+            type: "spring",
+            stiffness: 260,
+            damping: 28,
+            delay: shouldReduceMotion ? 0 : 0.12,
           }}
         >
           <Image

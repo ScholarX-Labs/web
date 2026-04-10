@@ -29,8 +29,9 @@ export function EnrollModalBenefits({
       >
         <motion.li
           className="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-300"
-          initial={shouldReduceMotion ? undefined : { opacity: 0, x: -6 }}
-          animate={shouldReduceMotion ? undefined : { opacity: 1, x: 0 }}
+          initial={shouldReduceMotion ? undefined : { opacity: 0, x: -8 }}
+          whileInView={shouldReduceMotion ? undefined : { opacity: 1, x: 0 }}
+          transition={{ type: "spring", stiffness: 300, damping: 24 }}
         >
           <PlayCircle className="h-5 w-5 text-hero-blue" />
           {durationLabel || "12 hours"} of high-quality video content
@@ -38,8 +39,9 @@ export function EnrollModalBenefits({
 
         <motion.li
           className="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-300"
-          initial={shouldReduceMotion ? undefined : { opacity: 0, x: -6 }}
-          animate={shouldReduceMotion ? undefined : { opacity: 1, x: 0 }}
+          initial={shouldReduceMotion ? undefined : { opacity: 0, x: -8 }}
+          whileInView={shouldReduceMotion ? undefined : { opacity: 1, x: 0 }}
+          transition={{ type: "spring", stiffness: 300, damping: 24 }}
         >
           <Award className="h-5 w-5 text-hero-blue" />
           Certificate of completion included
@@ -47,8 +49,9 @@ export function EnrollModalBenefits({
 
         <motion.li
           className="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-300"
-          initial={shouldReduceMotion ? undefined : { opacity: 0, x: -6 }}
-          animate={shouldReduceMotion ? undefined : { opacity: 1, x: 0 }}
+          initial={shouldReduceMotion ? undefined : { opacity: 0, x: -8 }}
+          whileInView={shouldReduceMotion ? undefined : { opacity: 1, x: 0 }}
+          transition={{ type: "spring", stiffness: 300, damping: 24 }}
         >
           <ShieldCheck className="h-5 w-5 text-hero-blue" />
           Lifetime access to all updates

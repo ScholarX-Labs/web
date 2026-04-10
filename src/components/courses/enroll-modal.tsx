@@ -84,8 +84,8 @@ export function EnrollModal({
     ],
     [],
   );
-  const modalCloseDuration = shouldReduceMotion ? 100 : 120;
-  const modalHandoffGap = shouldReduceMotion ? 0 : 20;
+  const modalCloseDuration = shouldReduceMotion ? 100 : 450;
+  const modalHandoffGap = shouldReduceMotion ? 0 : 40;
 
   // Handle transition from main modal to priority enrollment window
   useEffect(() => {
@@ -163,10 +163,14 @@ export function EnrollModal({
     : isEnrolling
       ? "processing"
       : "open";
-  const keynoteEasing: [number, number, number, number] = [0.22, 1, 0.36, 1];
   const keynoteTransition = shouldReduceMotion
     ? { duration: 0.15 }
-    : { duration: 0.56, ease: keynoteEasing };
+    : {
+        type: "spring" as const,
+        stiffness: 280,
+        damping: 32,
+        mass: 1,
+      };
 
   const overlayClassName =
     visualPhase === "processing"

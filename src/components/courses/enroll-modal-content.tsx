@@ -43,6 +43,33 @@ export function EnrollModalContent({
   setLifecycle,
   overlayClassName,
 }: EnrollModalContentProps) {
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: shouldReduceMotion ? 0 : 0.08,
+        delayChildren: shouldReduceMotion ? 0 : 0.05,
+      },
+    },
+    exit: {
+      opacity: 0,
+      scale: 0.98,
+      y: 8,
+      transition: { duration: 0.2 },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 12, scale: 0.985 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: keynoteTransition,
+    },
+  };
+
   return (
     <DialogContent
       onInteractOutside={(event) => {
@@ -83,39 +110,37 @@ export function EnrollModalContent({
           {!isSuccess ? (
             <motion.div
               key="enroll-form"
-              initial={
-                shouldReduceMotion
-                  ? { opacity: 0 }
-                  : { opacity: 0, scale: 0.95, y: 14 }
-              }
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={
-                shouldReduceMotion
-                  ? { opacity: 0 }
-                  : { opacity: 0, scale: 0.98, y: 8 }
-              }
-              transition={keynoteTransition}
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
             >
-              <EnrollModalTitleMedia
-                course={course}
-                shouldReduceMotion={shouldReduceMotion}
-              />
+              <motion.div variants={itemVariants}>
+                <EnrollModalTitleMedia
+                  course={course}
+                  shouldReduceMotion={shouldReduceMotion}
+                />
+              </motion.div>
 
               <div className="p-6 space-y-6">
-                <EnrollModalBenefits
-                  shouldReduceMotion={shouldReduceMotion}
-                  durationLabel={course.duration}
-                />
+                <motion.div variants={itemVariants}>
+                  <EnrollModalBenefits
+                    shouldReduceMotion={shouldReduceMotion}
+                    durationLabel={course.duration}
+                  />
+                </motion.div>
 
-                <EnrollModalActions
-                  course={course}
-                  isPaid={isPaid}
-                  isEnrolling={isEnrolling}
-                  shouldReduceMotion={shouldReduceMotion}
-                  processingStep={processingStep}
-                  processingSteps={processingSteps}
-                  onSubmit={handleEnrollFree}
-                />
+                <motion.div variants={itemVariants}>
+                  <EnrollModalActions
+                    course={course}
+                    isPaid={isPaid}
+                    isEnrolling={isEnrolling}
+                    shouldReduceMotion={shouldReduceMotion}
+                    processingStep={processingStep}
+                    processingSteps={processingSteps}
+                    onSubmit={handleEnrollFree}
+                  />
+                </motion.div>
               </div>
             </motion.div>
           ) : (
