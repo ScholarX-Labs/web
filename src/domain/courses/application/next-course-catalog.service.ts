@@ -95,10 +95,18 @@ export class NextCourseCatalogService {
         )
       : new Set<string>();
 
+    const mapped = result.items.map((item) =>
+      toCourse(item, subscribedCourseIds.has(item.id)),
+    );
+
+    // Put enrolled courses first within the returned page
+    mapped.sort((a, b) => {
+      if (a.isSubscribed === b.isSubscribed) return 0;
+      return a.isSubscribed ? -1 : 1;
+    });
+
     return {
-      items: result.items.map((item) =>
-        toCourse(item, subscribedCourseIds.has(item.id)),
-      ),
+      items: mapped,
       pagination: this.toPagination(result.totalCourses, page, limit),
     };
   }
