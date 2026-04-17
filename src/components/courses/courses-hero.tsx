@@ -202,6 +202,9 @@ export function CoursesHero() {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => {
+                  window.scrollBy({ top: 600, behavior: "smooth" });
+                }}
                 aria-label="Search"
                 className="p-3 bg-white/50 dark:bg-white/10 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/80 transition-colors shrink-0 shadow-sm"
               >

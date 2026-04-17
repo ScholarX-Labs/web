@@ -1,5 +1,5 @@
 import { CoursesHero } from "@/components/courses/courses-hero";
-import { LatestCoursesSection } from "@/components/courses/latest-courses-section";
+import { CoursesView } from "@/components/courses/courses-view";
 import { createNextCourseDomain } from "@/domain/courses";
 import { getSession } from "@/lib/dal";
 
@@ -28,7 +28,7 @@ export default async function CoursesPage() {
   return (
     <div className="w-full flex flex-col pb-10">
       <CoursesHero />
-      <LatestCoursesSection courses={courses} />
+      <CoursesView courses={courses} />
     </div>
   );
 }
