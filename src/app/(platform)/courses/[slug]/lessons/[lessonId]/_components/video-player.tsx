@@ -27,6 +27,13 @@ interface VideoPlayerProps {
   thumbnails?: string;
   poster?: string;
   className?: string;
+
+  /** Fired frequently during playback to track where the user is */
+  onTimeUpdate?: (currentTime: number) => void;
+  /** Fired when playback pauses, providing a reliable point to save progress */
+  onPause?: (currentTime: number) => void;
+  /** Fired exactly when the video reaches the end */
+  onEnded?: () => void;
 }
 
 /**
@@ -43,7 +50,16 @@ interface VideoPlayerProps {
  *   - No qualities have loaded yet
  */
 export const VideoPlayer = memo(
-  ({ title, src, thumbnails, poster, className }: VideoPlayerProps) => {
+  ({
+    title,
+    src,
+    thumbnails,
+    poster,
+    className,
+    onTimeUpdate,
+    onPause,
+    onEnded,
+  }: VideoPlayerProps) => {
     return (
       <div
         className={cn(
@@ -59,6 +75,10 @@ export const VideoPlayer = memo(
           playsInline
           className="w-full aspect-video"
           crossOrigin
+          // --- Tracking Callbacks ---
+          onTimeUpdate={(e) => onTimeUpdate?.(e.detail.currentTime)}
+          onPause={(e) => onPause?.(e.detail.currentTime)}
+          onEnd={() => onEnded?.()}
         >
           <MediaProvider />
           <DefaultVideoLayout
