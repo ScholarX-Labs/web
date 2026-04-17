@@ -5,6 +5,7 @@ import { useUiStore } from "@/stores/ui.store";
 import { CourseGrid } from "./course-grid";
 import { CourseCard } from "./course-card";
 import { Course } from "@/types/course.types";
+import { CourseDetailSurfacePortal } from "./course-detail-surface-portal";
 
 // Maps hero filter pill labels to course category/level values
 const FILTER_MAP: Record<string, (course: Course) => boolean> = {
@@ -65,6 +66,8 @@ export function CoursesFilterSection({ courses }: CoursesFilterSectionProps) {
           </p>
         </div>
       )}
+
+      <CourseDetailSurfacePortal />
     </div>
   );
 }

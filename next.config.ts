@@ -14,3 +14,11 @@ const nextConfig: NextConfig = {
   },
 };
 export default nextConfig;
+
+// Optional Cloudflare helper used for local dev. Make this import safe
+// so builds won't fail when the package isn't installed (CI/Vercel).
+// import("@opennextjs/cloudflare")
+//   .then((m) => m.initOpenNextCloudflareForDev?.())
+//   .catch(() => {
+//     // no-op when package is missing
+//   });
