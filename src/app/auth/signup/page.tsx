@@ -147,11 +147,11 @@ export default function Page() {
   return (
     <section
       aria-label="signup-form"
-      className="bg-auth-surface h-full w-full flex justify-center items-center p-4"
+      className="bg-auth-surface min-h-screen w-full flex justify-center items-center p-4"
     >
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="min-h-[75%] lg:w-[37.5%] w-1/2 p-6 rounded-2xl flex flex-col gap-4"
+        className="w-full max-w-md md:max-w-lg p-6 rounded-2xl flex flex-col gap-4 bg-white/80 backdrop-blur-sm shadow-sm"
       >
         <h2 className="text-center text-3xl font-semibold">
           Create your account
@@ -162,7 +162,7 @@ export default function Page() {
             {serverError}
           </p>
         )}
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           <Field
             label="First Name"
             {...register("firstName")}
@@ -226,7 +226,7 @@ export default function Page() {
           type="submit"
           disabled={isAnySubmitting}
           className={
-            "text-primary-foreground max-w-64 self-center w-1/2 " +
+            "text-primary-foreground w-full sm:w-1/2 max-w-64 self-center " +
             (isAnySubmitting ? "cursor-not-allowed" : "cursor-pointer")
           }
         >

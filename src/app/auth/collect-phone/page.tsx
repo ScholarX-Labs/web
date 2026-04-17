@@ -15,8 +15,8 @@ export default async function Page() {
   }
 
   return (
-    <section className="bg-auth-surface h-full w-full flex justify-center items-center p-4">
-      <div className="min-h-[75%] lg:w-[37.5%] w-1/2 p-6 rounded-2xl flex flex-col gap-4">
+    <section className="bg-auth-surface min-h-screen w-full flex justify-center items-center p-4">
+      <div className="w-full max-w-md md:max-w-lg p-6 rounded-2xl flex flex-col gap-4 bg-white/80 backdrop-blur-sm shadow-sm">
         <h2 className="text-center text-3xl font-semibold">
           Add your phone number
         </h2>

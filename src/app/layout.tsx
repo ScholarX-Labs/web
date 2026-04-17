@@ -3,9 +3,11 @@ import { Geist, Geist_Mono, Inter } from "next/font/google";
 import { AppProviders } from "@/providers/app-providers";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
-import SignoutButton from "./auth/_components/SignoutButton";
+import "./globals.css";
 import { getSession } from "@/lib/dal";
 import { isDevAuthBypassEnabled } from "@/config/dev-auth-bypass";
+import Footer from "@/components/Footer";
+import Header from "@/components/Header";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -36,6 +38,7 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <Header />
         <AppProviders>
           <TooltipProvider>
             {isDevAuthBypassEnabled ? (
@@ -44,10 +47,10 @@ export default async function RootLayout({
                 bypassed.
               </div>
             ) : null}
-            {currentUser ? <SignoutButton /> : null}
             {children}
           </TooltipProvider>
         </AppProviders>
+        <Footer />
       </body>
     </html>
   );
