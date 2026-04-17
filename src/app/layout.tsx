@@ -3,7 +3,7 @@ import { Geist, Geist_Mono, Inter } from "next/font/google";
 import { AppProviders } from "@/providers/app-providers";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
-import SignoutButton from "./auth/_components/SignoutButton";
+import "./globals.css";
 import { getSession } from "@/lib/dal";
 import { isDevAuthBypassEnabled } from "@/config/dev-auth-bypass";
 import Footer from "@/components/Footer";
@@ -47,7 +47,6 @@ export default async function RootLayout({
                 bypassed.
               </div>
             ) : null}
-            {currentUser && !isDevAuthBypassEnabled ? <SignoutButton /> : null}
             {children}
           </TooltipProvider>
         </AppProviders>
