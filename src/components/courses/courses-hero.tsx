@@ -171,7 +171,7 @@ export function CoursesHero() {
                     <DropdownMenuItem 
                       key={label}
                       className={cn(
-                        "flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer text-sm font-semibold transition-colors outline-none",
+                        "flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer text-sm font-semibold transition-all duration-300 ease-out outline-none",
                         "hover:text-white focus:text-white",
                         hoverBg
                       )}
