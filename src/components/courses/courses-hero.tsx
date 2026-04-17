@@ -8,11 +8,21 @@ import {
   Laptop,
   Globe,
   ChevronDown,
+  Monitor,
+  PenTool,
+  Database,
+  Cpu,
 } from "lucide-react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useUiStore } from "@/stores/ui.store";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const FILTER_TAGS = [
   { label: "Career Preparation", icon: Briefcase, value: "Career Preparation" },
@@ -24,6 +34,13 @@ const FILTER_TAGS = [
     icon: Globe,
     value: "International Opportunities",
   },
+] as const;
+
+const COURSE_CATEGORIES = [
+  { label: "Engineering", icon: Monitor, colorClass: "text-blue-500", hoverBg: "hover:bg-blue-500 focus:bg-blue-500 dark:hover:bg-blue-500 dark:focus:bg-blue-500" },
+  { label: "Design", icon: PenTool, colorClass: "text-pink-500", hoverBg: "hover:bg-pink-500 focus:bg-pink-500 dark:hover:bg-pink-500 dark:focus:bg-pink-500" },
+  { label: "Backend", icon: Database, colorClass: "text-emerald-500", hoverBg: "hover:bg-emerald-500 focus:bg-emerald-500 dark:hover:bg-emerald-500 dark:focus:bg-emerald-500" },
+  { label: "Systems", icon: Cpu, colorClass: "text-purple-500", hoverBg: "hover:bg-purple-500 focus:bg-purple-500 dark:hover:bg-purple-500 dark:focus:bg-purple-500" },
 ] as const;
 
 const containerVariants = {
@@ -133,15 +150,43 @@ export function CoursesHero() {
               variants={itemVariants}
               className="flex items-center w-full max-w-lg bg-white/40 dark:bg-black/20 backdrop-blur-3xl rounded-full p-2 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/50 dark:border-white/10 transition-all duration-300 focus-within:ring-2 focus-within:ring-hero-blue/30 focus-within:shadow-[0_8px_30px_rgba(59,130,246,0.15)] mb-8"
             >
-              <motion.button 
-                type="button"
-                whileHover={{ scale: 1.02, y: -1 }}
-                whileTap={{ scale: 0.96 }}
-                className="flex items-center gap-1.5 bg-hero-blue/90 hover:bg-hero-blue backdrop-blur-md text-white px-5 py-3 rounded-full font-semibold text-sm transition-all duration-300 shadow-[0_2px_10px_rgba(59,130,246,0.2)] shrink-0 cursor-pointer"
-              >
-                Categories
-                <ChevronDown className="w-4 h-4 opacity-70" />
-              </motion.button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <motion.button 
+                    type="button"
+                    whileHover={{ scale: 1.02, y: -1 }}
+                    whileTap={{ scale: 0.96 }}
+                    className="flex items-center gap-1.5 bg-hero-blue/90 hover:bg-hero-blue backdrop-blur-md text-white px-5 py-3 rounded-full font-semibold text-sm transition-all duration-300 shadow-[0_2px_10px_rgba(59,130,246,0.2)] shrink-0 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-hero-blue/50"
+                  >
+                    Categories
+                    <ChevronDown className="w-4 h-4 opacity-70" />
+                  </motion.button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent 
+                  align="start"
+                  sideOffset={12}
+                  className="w-56 p-2 rounded-2xl bg-white/60 dark:bg-black/30 backdrop-blur-2xl border-white/40 dark:border-white/10 shadow-[0_10px_40px_rgba(0,0,0,0.08)]"
+                >
+                  {COURSE_CATEGORIES.map(({ label, icon: Icon, colorClass, hoverBg }) => (
+                    <DropdownMenuItem 
+                      key={label}
+                      className={cn(
+                        "flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer text-sm font-semibold transition-colors outline-none",
+                        "hover:text-white focus:text-white",
+                        hoverBg
+                      )}
+                      onSelect={(e) => {
+                        // Responding to interaction gracefully without heavy functionality logic
+                      }}
+                    >
+                      <div className={cn("p-1.5 rounded-lg bg-white/70 dark:bg-white/5 backdrop-blur-md shadow-sm border border-white/20 dark:border-white/5", colorClass)}>
+                        <Icon className="w-4 h-4" />
+                      </div>
+                      {label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
               <input
                 type="text"
                 placeholder="Search anything"
