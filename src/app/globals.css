@@ -282,6 +282,39 @@
     min-inline-size: clamp(4.75rem, 13vw, 6rem);
     text-align: center;
   }
+
+  /* ── Premium Scrollbar ───────────────────────────────────── */
+  .premium-scrollbar [data-slot="scroll-area-scrollbar"] {
+    width: 6px !important;
+    margin: 4px 2px;
+    background: transparent;
+    opacity: 0;
+    transition: opacity 300ms ease, width 300ms ease;
+  }
+
+  .premium-scrollbar:hover [data-slot="scroll-area-scrollbar"] {
+    opacity: 1;
+  }
+
+  .premium-scrollbar [data-slot="scroll-area-thumb"] {
+    @apply bg-slate-300/60 dark:bg-slate-700/60;
+    border: none;
+    border-radius: 10px;
+    transition: background 200ms ease;
+  }
+
+  .premium-scrollbar [data-slot="scroll-area-thumb"]:hover {
+    @apply bg-slate-400/80 dark:bg-slate-600/80;
+  }
+
+  .premium-scrollbar [data-slot="scroll-area-viewport"] {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .premium-scrollbar [data-slot="scroll-area-viewport"]::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 @keyframes user-bubble-enter {
