@@ -1,5 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { MouseEvent } from "react";
+import { useRouter } from "next/navigation";
 import { Course } from "@/types/course.types";
 import { ROUTES } from "@/lib/routes";
 import { SpotlightCard } from "@/components/animations/spotlight-card";
@@ -16,6 +20,9 @@ import { CourseMeta } from "./course-meta";
 import { InstructorInfo } from "./instructor-info";
 import { cn } from "@/lib/utils";
 import { Monitor, PenTool, Database, Cpu, Tag } from "lucide-react";
+import { useMediaQuery } from "@/hooks/use-media-query";
+import { useCourseSheetStore } from "@/stores/course-sheet.store";
+import { useEnrollIntentController } from "@/lib/enrollment/intent-controller";
 
 const CATEGORY_STYLES: Record<
   string,
@@ -60,10 +67,96 @@ interface CourseCardProps {
 }
 
 export function CourseCard({ course, className }: CourseCardProps) {
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
+  const router = useRouter();
+  const openCourseSheet = useCourseSheetStore((state) => state.openCourseSheet);
+  const { openFromCard } = useEnrollIntentController();
+  const courseDetailHref = ROUTES.COURSE_DETAIL(course.slug ?? course.id);
+
+  const handleCardClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (!isDesktop) return;
+
+    if (
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey ||
+      event.button !== 0
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const cardElement = event.currentTarget;
+    const gridElement = cardElement.closest(
+      "[data-catalog-grid]",
+    ) as HTMLElement | null;
+
+    cardElement.setAttribute("data-active-card", "true");
+    cardElement.style.transition = "opacity 160ms ease-out";
+    cardElement.style.opacity = "0.3";
+
+    if (gridElement) {
+      gridElement.setAttribute("data-active-grid", "true");
+      gridElement.style.contain = "layout";
+      gridElement.style.pointerEvents = "none";
+    }
+
+    openCourseSheet(course, "details", cardElement.getBoundingClientRect());
+  };
+
+  const handleEnrollClick = (event: MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (course.isSubscribed) {
+      router.push(courseDetailHref);
+      return;
+    }
+
+    const cardElement = event.currentTarget.closest(
+      "[data-course-card]",
+    ) as HTMLElement | null;
+
+    if (!cardElement) {
+      router.push(`${courseDetailHref}?intent=enroll`);
+      return;
+    }
+
+    if (!isDesktop) {
+      router.push(`${courseDetailHref}?intent=enroll`);
+      return;
+    }
+
+    const gridElement = cardElement.closest(
+      "[data-catalog-grid]",
+    ) as HTMLElement | null;
+
+    cardElement.setAttribute("data-active-card", "true");
+    cardElement.style.transition = "opacity 160ms ease-out";
+    cardElement.style.opacity = "0.3";
+
+    if (gridElement) {
+      gridElement.setAttribute("data-active-grid", "true");
+      gridElement.style.contain = "layout";
+      gridElement.style.pointerEvents = "none";
+    }
+
+    openFromCard({
+      course,
+      source: "course_card",
+      originRect: cardElement.getBoundingClientRect(),
+    });
+  };
+
   return (
     <Link
-      href={ROUTES.COURSE_DETAIL(course.slug)}
-      className="block outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-[1.5rem] h-full"
+      href={courseDetailHref}
+      onClick={handleCardClick}
+      data-course-card
+      className="course-card block outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-[1.5rem] h-full"
     >
       <SpotlightCard className="h-full group/spotlight rounded-[1.5rem] bg-card/40 dark:bg-card/20 backdrop-blur-xl border-border/40 hover:border-primary/20 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5">
         <Card
@@ -72,8 +165,10 @@ export function CourseCard({ course, className }: CourseCardProps) {
             className,
           )}
         >
-          {/* Image Area */}
-          <div className="relative aspect-video w-full overflow-hidden mb-2 rounded-t-[1.5rem]">
+          <div
+            className="relative aspect-video w-full overflow-hidden mb-2 rounded-t-[1.5rem]"
+            style={{ viewTransitionName: `course-thumbnail-${course.slug}` }}
+          >
             <Image
               src={
                 course.thumbnail ||
@@ -113,6 +208,19 @@ export function CourseCard({ course, className }: CourseCardProps) {
                 className="bg-black/60 backdrop-blur-xl px-3 py-1.5 rounded-full text-sm border border-white/10 text-white"
               />
             </div>
+
+            <button
+              type="button"
+              onClick={handleEnrollClick}
+              className={cn(
+                "absolute bottom-4 left-4 rounded-full px-3 py-1.5 text-xs font-semibold text-white shadow-lg transition-colors",
+                course.isSubscribed 
+                  ? "bg-emerald-500 hover:bg-emerald-600" 
+                  : "bg-hero-blue hover:bg-hero-blue-dark"
+              )}
+            >
+              {course.isSubscribed ? "Go to Course" : "Enroll"}
+            </button>
           </div>
 
           {/* Content Area */}

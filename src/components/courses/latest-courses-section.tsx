@@ -2,18 +2,22 @@
 
 import { useCallback, useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { Course } from "@/types/course.types";
 import { LatestCourseCard } from "./latest-course-card";
 import { cn } from "@/lib/utils";
+import { CourseDetailSurfacePortal } from "./course-detail-surface-portal";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 interface LatestCoursesSectionProps {
   courses: Course[];
 }
 
 export function LatestCoursesSection({ courses }: LatestCoursesSectionProps) {
+  const prefersReducedMotion = useReducedMotion();
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: false,
     align: "start",
@@ -22,6 +26,7 @@ export function LatestCoursesSection({ courses }: LatestCoursesSectionProps) {
 
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(true);
+  const [activeCardIndex, setActiveCardIndex] = useState<number | null>(null);
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
@@ -31,7 +36,7 @@ export function LatestCoursesSection({ courses }: LatestCoursesSectionProps) {
 
   useEffect(() => {
     if (!emblaApi) return;
-    
+
     // Defer the initial setting to avoid synchronous setState warning
     Promise.resolve().then(onSelect);
 
@@ -46,8 +51,20 @@ export function LatestCoursesSection({ courses }: LatestCoursesSectionProps) {
   const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
   const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
 
+  const getRippleDelay = (index: number) => {
+    if (!isDesktop || prefersReducedMotion) return 0;
+
+    const columns = 3;
+    const row = Math.floor(index / columns);
+    const col = index % columns;
+    return row * 0.08 + col * 0.045;
+  };
+
   return (
-    <section className="px-4 md:px-8 lg:px-16 py-16 bg-white">
+    <section
+      data-catalog-grid
+      className="px-4 md:px-8 lg:px-16 py-16 bg-white transition-[opacity,filter] duration-300 ease-out data-[dimmed=true]:opacity-40 data-[dimmed=true]:blur-[10px] data-[dimmed=true]:pointer-events-none"
+    >
       {/* ── Section header ─────────────────────────────────────── */}
       <div className="flex items-end justify-between mb-10">
         <div>
@@ -89,12 +106,36 @@ export function LatestCoursesSection({ courses }: LatestCoursesSectionProps) {
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex gap-6">
           {courses.map((course, index) => (
-            <div
+            <motion.div
               key={course.id}
-              className="flex-[0_0_100%] sm:flex-[0_0_calc(50%-12px)] lg:flex-[0_0_calc(33.333%-16px)] min-w-0"
+              className={cn(
+                "flex-[0_0_100%] sm:flex-[0_0_calc(50%-12px)] lg:flex-[0_0_calc(33.333%-16px)] min-w-0 transition-[opacity,transform,filter] duration-300 ease-out motion-reduce:transition-opacity motion-reduce:duration-200 motion-reduce:transform-none motion-reduce:filter-none",
+                activeCardIndex !== null && activeCardIndex !== index
+                  ? "opacity-65 scale-[0.985]"
+                  : "opacity-100 scale-100",
+              )}
+              initial={
+                isDesktop && !prefersReducedMotion
+                  ? { opacity: 0, y: 16, scale: 0.985, filter: "blur(6px)" }
+                  : false
+              }
+              animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+              transition={{
+                duration: isDesktop && !prefersReducedMotion ? 0.55 : 0.2,
+                delay: getRippleDelay(index),
+                ease: [0.32, 0.72, 0, 1],
+              }}
+              onMouseEnter={() => setActiveCardIndex(index)}
+              onMouseLeave={() => setActiveCardIndex(null)}
+              onFocusCapture={() => setActiveCardIndex(index)}
+              onBlurCapture={(event) => {
+                if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+                  setActiveCardIndex(null);
+                }
+              }}
             >
               <LatestCourseCard course={course} index={index} />
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
@@ -136,6 +177,8 @@ export function LatestCoursesSection({ courses }: LatestCoursesSectionProps) {
           <ChevronRight className="w-5 h-5" />
         </motion.button>
       </motion.div>
+
+      <CourseDetailSurfacePortal />
     </section>
   );
 }

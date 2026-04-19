@@ -56,7 +56,7 @@ export default function Page() {
     control,
     formState: { errors, isSubmitting },
   } = useForm<SignupForm>({
-    resolver: zodResolver(signupSchema),
+    resolver: zodResolver(signupSchema as any),
     defaultValues: {
       firstName: "",
       lastName: "",

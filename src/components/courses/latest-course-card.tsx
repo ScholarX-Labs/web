@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { MouseEvent, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -21,6 +21,9 @@ import { HoverMedia } from "./card-parts/hover-media";
 import { CourseCategoryBadge } from "./card-parts/course-badges";
 import { SocialProofRibbon } from "./card-parts/social-proof-ribbon";
 import { CoursePriceDisplay } from "./card-parts/course-price-display";
+import { useMediaQuery } from "@/hooks/use-media-query";
+import { useCourseSheetStore } from "@/stores/course-sheet.store";
+import { useEnrollIntentController } from "@/lib/enrollment/intent-controller";
 
 interface LatestCourseCardProps {
   course: Course;
@@ -34,8 +37,64 @@ export function LatestCourseCard({
   index = 0,
 }: LatestCourseCardProps) {
   const [wishlisted, setWishlisted] = useState(false);
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
+  const openCourseSheet = useCourseSheetStore((state) => state.openCourseSheet);
+  const { openFromCard } = useEnrollIntentController();
+  const courseDetailHref = ROUTES.COURSE_DETAIL(course.slug ?? course.id);
 
   const isPaid = (course.price ?? 0) > 0;
+
+  const handleSurfaceLinkClick = (
+    event: MouseEvent<HTMLAnchorElement>,
+    intent: "details" | "enroll",
+  ) => {
+    if (!isDesktop) return;
+
+    if (
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey ||
+      event.button !== 0
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const cardElement = event.currentTarget.closest(
+      "[data-course-card]",
+    ) as HTMLElement | null;
+    const gridElement = event.currentTarget.closest(
+      "[data-catalog-grid]",
+    ) as HTMLElement | null;
+
+    if (cardElement) {
+      cardElement.setAttribute("data-active-card", "true");
+      cardElement.style.transition = "opacity 160ms ease-out";
+      cardElement.style.opacity = "0.3";
+    }
+
+    if (gridElement) {
+      gridElement.setAttribute("data-active-grid", "true");
+      gridElement.style.contain = "layout";
+      gridElement.style.pointerEvents = "none";
+    }
+
+    const originRect = event.currentTarget.getBoundingClientRect();
+
+    if (intent === "enroll") {
+      openFromCard({
+        course,
+        source: "latest_course_card",
+        originRect,
+      });
+      return;
+    }
+
+    openCourseSheet(course, intent, originRect);
+  };
 
   const instructorInitials =
     course.instructor?.name
@@ -50,6 +109,7 @@ export function LatestCourseCard({
 
   return (
     <motion.div
+      data-course-card
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.15 }}
@@ -69,8 +129,10 @@ export function LatestCourseCard({
         {/* Subtle hover background glow */}
         <div className="absolute inset-0 bg-linear-to-br from-hero-blue/4 via-transparent to-hero-orange/3 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-[1.5rem] pointer-events-none z-0" />
 
-        {/* ── Image block ──────────────────────────────────────── */}
-        <div className="relative aspect-4/3 w-full rounded-t-[1.5rem] overflow-hidden shrink-0 z-10 group/image">
+        <div
+          className="relative aspect-4/3 w-full rounded-t-[1.5rem] overflow-hidden shrink-0 z-10 group/image"
+          style={{ viewTransitionName: `course-thumbnail-${course.slug}` }}
+        >
           <HoverMedia
             thumbnail={course.thumbnail}
             title={course.title}
@@ -183,17 +245,31 @@ export function LatestCourseCard({
 
           {/* Enroll row */}
           <div className="flex items-center gap-3 mt-auto pt-2">
-            <Link
-              href={ROUTES.COURSE_DETAIL(course.slug)}
-              className="group/btn relative flex-1 overflow-hidden flex items-center justify-center gap-2 bg-linear-to-r from-hero-blue to-hero-blue-dark text-white text-sm font-bold rounded-full py-3 shadow-lg shadow-hero-blue/30 transition-transform active:scale-[0.98]"
-            >
-              {/* Shimmer sweep effect inside button */}
-              <span className="absolute inset-0 w-full h-full bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 ease-in-out" />
-              <span className="relative z-10 flex items-center gap-1.5">
-                Enroll Now
-                <ChevronRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
-              </span>
-            </Link>
+            {course.isSubscribed ? (
+              <Link
+                href={courseDetailHref}
+                onClick={(event) => handleSurfaceLinkClick(event, "details")}
+                className="group/btn relative flex-1 overflow-hidden flex items-center justify-center gap-2 bg-linear-to-r from-emerald-500 to-emerald-600 text-white text-sm font-bold rounded-full py-3 shadow-lg shadow-emerald-500/30 transition-transform active:scale-[0.98]"
+              >
+                <span className="absolute inset-0 w-full h-full bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 ease-in-out" />
+                <span className="relative z-10 flex items-center gap-1.5">
+                  Resume Learning
+                  <ChevronRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
+                </span>
+              </Link>
+            ) : (
+              <Link
+                href={`${courseDetailHref}?intent=enroll`}
+                onClick={(event) => handleSurfaceLinkClick(event, "enroll")}
+                className="group/btn relative flex-1 overflow-hidden flex items-center justify-center gap-2 bg-linear-to-r from-hero-blue to-hero-blue-dark text-white text-sm font-bold rounded-full py-3 shadow-lg shadow-hero-blue/30 transition-transform active:scale-[0.98]"
+              >
+                <span className="absolute inset-0 w-full h-full bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 ease-in-out" />
+                <span className="relative z-10 flex items-center gap-1.5">
+                  Enroll Now
+                  <ChevronRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
+                </span>
+              </Link>
+            )}
 
             {/* Rating badge */}
             {course.rating !== undefined && (
@@ -238,7 +314,8 @@ export function LatestCourseCard({
             )}
 
             <Link
-              href={ROUTES.COURSE_DETAIL(course.slug)}
+              href={courseDetailHref}
+              onClick={(event) => handleSurfaceLinkClick(event, "details")}
               className="text-xs font-bold text-hero-blue hover:text-hero-blue-dark shrink-0 flex items-center gap-1 group/link transition-colors"
             >
               Details

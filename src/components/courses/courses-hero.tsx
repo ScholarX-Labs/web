@@ -7,10 +7,22 @@ import {
   DollarSign,
   Laptop,
   Globe,
+  ChevronDown,
+  Monitor,
+  PenTool,
+  Database,
+  Cpu,
 } from "lucide-react";
 import Image from "next/image";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useUiStore } from "@/stores/ui.store";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const FILTER_TAGS = [
   { label: "Career Preparation", icon: Briefcase, value: "Career Preparation" },
@@ -23,6 +35,30 @@ const FILTER_TAGS = [
     value: "International Opportunities",
   },
 ] as const;
+
+const COURSE_CATEGORIES = [
+  { label: "Engineering", icon: Monitor, colorClass: "text-blue-500", hoverBg: "hover:bg-blue-500 focus:bg-blue-500 dark:hover:bg-blue-500 dark:focus:bg-blue-500" },
+  { label: "Design", icon: PenTool, colorClass: "text-pink-500", hoverBg: "hover:bg-pink-500 focus:bg-pink-500 dark:hover:bg-pink-500 dark:focus:bg-pink-500" },
+  { label: "Backend", icon: Database, colorClass: "text-emerald-500", hoverBg: "hover:bg-emerald-500 focus:bg-emerald-500 dark:hover:bg-emerald-500 dark:focus:bg-emerald-500" },
+  { label: "Systems", icon: Cpu, colorClass: "text-purple-500", hoverBg: "hover:bg-purple-500 focus:bg-purple-500 dark:hover:bg-purple-500 dark:focus:bg-purple-500" },
+] as const;
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.15, delayChildren: 0.1 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 100, damping: 15 },
+  },
+};
 
 export function CoursesHero() {
   const {
@@ -87,22 +123,70 @@ export function CoursesHero() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
           {/* Left Column: Text & Search */}
-          <div className="flex flex-col max-w-2xl">
-            <h1 className="text-5xl lg:text-7xl font-extrabold text-hero-heading leading-[1.1] tracking-tight mb-6">
+          <motion.div 
+            className="flex flex-col max-w-2xl"
+            variants={containerVariants}
+            initial="hidden"
+            animate="show"
+          >
+            <motion.h1 
+              variants={itemVariants}
+              className="text-5xl lg:text-7xl font-extrabold text-hero-heading leading-[1.1] tracking-tight mb-6"
+            >
               Discover
               <br />
               Our Courses
-            </h1>
+            </motion.h1>
 
-            <p className="text-lg md:text-xl text-hero-body mb-10 font-medium max-w-lg leading-relaxed">
+            <motion.p 
+              variants={itemVariants}
+              className="text-lg md:text-xl text-hero-body mb-10 font-medium max-w-lg leading-relaxed"
+            >
               Scholarships, Mentorship &amp; Skill Development Opportunities
-            </p>
+            </motion.p>
 
             {/* Search Bar */}
-            <div className="flex items-center w-full max-w-lg bg-white rounded-full p-2 shadow-sm border border-black/5 transition-shadow hover:shadow-md mb-8">
-              <button className="bg-hero-blue text-white px-6 py-3 rounded-full font-medium text-sm transition-colors hover:bg-hero-blue-dark shrink-0">
-                Categories
-              </button>
+            <motion.div 
+              variants={itemVariants}
+              className="flex items-center w-full max-w-lg bg-white/40 dark:bg-black/20 backdrop-blur-3xl rounded-full p-2 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/50 dark:border-white/10 transition-all duration-300 focus-within:ring-2 focus-within:ring-hero-blue/30 focus-within:shadow-[0_8px_30px_rgba(59,130,246,0.15)] mb-8"
+            >
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <motion.button 
+                    type="button"
+                    whileHover={{ scale: 1.02, y: -1 }}
+                    whileTap={{ scale: 0.96 }}
+                    className="flex items-center gap-1.5 bg-hero-blue/90 hover:bg-hero-blue backdrop-blur-md text-white px-5 py-3 rounded-full font-semibold text-sm transition-all duration-300 shadow-[0_2px_10px_rgba(59,130,246,0.2)] shrink-0 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-hero-blue/50"
+                  >
+                    Categories
+                    <ChevronDown className="w-4 h-4 opacity-70" />
+                  </motion.button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent 
+                  align="start"
+                  sideOffset={12}
+                  className="w-56 p-2 rounded-2xl bg-white/60 dark:bg-black/30 backdrop-blur-2xl border-white/40 dark:border-white/10 shadow-[0_10px_40px_rgba(0,0,0,0.08)]"
+                >
+                  {COURSE_CATEGORIES.map(({ label, icon: Icon, colorClass, hoverBg }) => (
+                    <DropdownMenuItem 
+                      key={label}
+                      className={cn(
+                        "flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer text-sm font-semibold transition-colors outline-none",
+                        "hover:text-white focus:text-white",
+                        hoverBg
+                      )}
+                      onSelect={(e) => {
+                        // Responding to interaction gracefully without heavy functionality logic
+                      }}
+                    >
+                      <div className={cn("p-1.5 rounded-lg bg-white/70 dark:bg-white/5 backdrop-blur-md shadow-sm border border-white/20 dark:border-white/5", colorClass)}>
+                        <Icon className="w-4 h-4" />
+                      </div>
+                      {label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
               <input
                 type="text"
                 placeholder="Search anything"
@@ -110,36 +194,52 @@ export function CoursesHero() {
                 onChange={(e) => setCourseSearch(e.target.value)}
                 className="flex-1 bg-transparent border-none px-5 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-0 min-w-0"
               />
-              <button
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 aria-label="Search"
-                className="p-3 text-muted-foreground hover:text-foreground transition-colors shrink-0"
+                className="p-3 bg-white/50 dark:bg-white/10 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/80 transition-colors shrink-0 shadow-sm"
               >
                 <Search className="w-5 h-5" />
-              </button>
-            </div>
+              </motion.button>
+            </motion.div>
 
             {/* Filter Pill Tags */}
-            <div className="flex flex-wrap gap-3">
+            <motion.div 
+              variants={itemVariants}
+              className="flex flex-wrap gap-3"
+            >
               {FILTER_TAGS.map(({ label, icon: Icon, value }) => {
                 const isActive = activeCourseFilters.includes(value);
                 return (
-                  <button
+                  <motion.button
+                    whileHover={{ y: -2 }}
+                    whileTap={{ scale: 0.96 }}
                     key={value}
                     onClick={() => toggleCourseFilter(value)}
                     className={cn(
-                      "inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full border text-xs font-semibold shadow-sm transition-all duration-200 hover:-translate-y-0.5 cursor-pointer",
+                      "inline-flex items-center gap-1.5 px-4 py-2 rounded-full border text-xs font-semibold transition-all duration-300 cursor-pointer overflow-hidden relative",
                       isActive
-                        ? "bg-hero-blue border-hero-blue text-white"
-                        : "bg-[#fdf2ee] border-[#d6aca3] text-[#a85a46]",
+                        ? "bg-linear-to-r from-hero-blue to-[#4fabe3] border-transparent text-white shadow-[0_4px_14px_rgba(59,130,246,0.4)]"
+                        : "bg-white/40 dark:bg-card/20 backdrop-blur-xl border-white/50 dark:border-white/10 shadow-sm text-foreground/80 hover:bg-white/60 hover:shadow-md",
                     )}
                   >
-                    <Icon className="w-3.5 h-3.5" />
-                    {label}
-                  </button>
+                    <Icon className={cn("w-3.5 h-3.5", isActive ? "text-white" : "opacity-70")} />
+                    <span className="relative z-10">{label}</span>
+                    {isActive && (
+                      <motion.div
+                        layoutId="activeFilterGlow"
+                        className="absolute inset-0 bg-white/10 rounded-full pointer-events-none"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.2 }}
+                      />
+                    )}
+                  </motion.button>
                 );
               })}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
           {/* ─────────────────────────────────────────────────────────────
                Right Column — figures + floating badges
