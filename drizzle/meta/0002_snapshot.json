@@ -1,12 +1,12 @@
 {
-  "id": "82150347-cff1-40cb-8428-1ec4aefb0aae",
-  "prevId": "8f373a36-4967-4556-8f45-1825637484d0",
+  "id": "5736ce4a-afae-4877-b63b-7b7a99fddf6a",
+  "prevId": "226c57e1-680d-46aa-a1bc-6d99c19d3795",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.account": {
+    "auth.account": {
       "name": "account",
-      "schema": "",
+      "schema": "auth",
       "columns": {
         "id": {
           "name": "id",
@@ -113,6 +113,7 @@
             "user_id"
           ],
           "tableTo": "user",
+          "schemaTo": "auth",
           "columnsTo": [
             "id"
           ],
@@ -126,9 +127,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.session": {
+    "auth.session": {
       "name": "session",
-      "schema": "",
+      "schema": "auth",
       "columns": {
         "id": {
           "name": "id",
@@ -211,6 +212,7 @@
             "user_id"
           ],
           "tableTo": "user",
+          "schemaTo": "auth",
           "columnsTo": [
             "id"
           ],
@@ -232,9 +234,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.user": {
+    "auth.user": {
       "name": "user",
-      "schema": "",
+      "schema": "auth",
       "columns": {
         "id": {
           "name": "id",
@@ -412,13 +414,15 @@
           "name": "saved_opportunities",
           "type": "text[]",
           "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": "'{}'"
         },
         "registered_events": {
           "name": "registered_events",
           "type": "text[]",
           "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": "'{}'"
         }
       },
       "indexes": {},
@@ -444,9 +448,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.verification": {
+    "auth.verification": {
       "name": "verification",
-      "schema": "",
+      "schema": "auth",
       "columns": {
         "id": {
           "name": "id",
@@ -510,10 +514,85 @@
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
+    },
+    "public.contact_us": {
+      "name": "contact_us",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "first_name": {
+          "name": "first_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "last_name": {
+          "name": "last_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "phone_number": {
+          "name": "phone_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "message": {
+          "name": "message",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "status_enum",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'pending'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
     }
   },
-  "enums": {},
-  "schemas": {},
+  "enums": {
+    "public.status_enum": {
+      "name": "status_enum",
+      "schema": "public",
+      "values": [
+        "pending",
+        "resolved"
+      ]
+    }
+  },
+  "schemas": {
+    "auth": "auth"
+  },
   "views": {},
   "sequences": {},
   "roles": {},

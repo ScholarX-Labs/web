@@ -8,7 +8,7 @@ import {
   index,
 } from "drizzle-orm/pg-core";
 
-const authSchema = pgSchema("auth");
+export const authSchema = pgSchema("auth");
 
 export const user = authSchema.table("user", {
   id: text("id").primaryKey(),
