@@ -5,6 +5,10 @@ import { useLessonProgress } from "@/hooks/use-lesson-progress";
 import { VideoPlayer } from "./video-player";
 import { LessonMeta } from "./lesson-meta";
 import { LessonSidebar } from "./lesson-sidebar";
+import { motion } from "framer-motion";
+import { useUILayoutStore } from "@/store/ui-layout-store";
+import { cn } from "@/lib/utils";
+import { springApple } from "@/lib/motion-variants";
 import type { MediaPlayerInstance } from "@vidstack/react";
 
 interface LessonClientBridgeProps {
@@ -36,6 +40,7 @@ export function LessonClientBridge({
   lessons,
 }: LessonClientBridgeProps) {
   const playerRef = useRef<MediaPlayerInstance>(null);
+  const { isFocusMode } = useUILayoutStore();
 
   // 1. Initialize Progress Tracking
   const {
@@ -62,9 +67,24 @@ export function LessonClientBridge({
   };
 
   return (
-    <main className="flex flex-1 flex-col lg:flex-row gap-6 p-4 lg:p-6 xl:p-8 w-full max-w-[1800px] mx-auto">
+    <motion.main
+      layout
+      transition={springApple}
+      className={cn(
+        "flex flex-1 flex-col lg:flex-row mx-auto transition-all duration-700",
+        isFocusMode 
+          ? "w-screen max-w-none p-10 min-h-[100vh] justify-center items-center gap-0" 
+          : "w-full max-w-[1800px] p-4 lg:p-6 xl:p-8 gap-6"
+      )}
+    >
       {/* ── LEFT: VIDEO + META ───────────────────────────── */}
-      <div className="flex flex-1 flex-col gap-5 min-w-0">
+      <motion.div
+        layout
+        className={cn(
+          "flex flex-col min-w-0 transition-all duration-700",
+          isFocusMode ? "w-full max-w-[1400px] gap-0" : "flex-1 gap-5"
+        )}
+      >
         {/* Video Player */}
         <VideoPlayer
           ref={playerRef}
@@ -95,7 +115,7 @@ export function LessonClientBridge({
           resumePoint={resumePoint}
           onResume={handleResume}
         />
-      </div>
+      </motion.div>
 
       {/* ── RIGHT: CURRICULUM SIDEBAR ───────────────────── */}
       <LessonSidebar
@@ -110,6 +130,6 @@ export function LessonClientBridge({
           ...(lessons[1]?.id && { [lessons[1].id]: 100 }),
         }}
       />
-    </main>
+    </motion.main>
   );
 }

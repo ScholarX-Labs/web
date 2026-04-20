@@ -8,7 +8,7 @@ import { FloatingPanel } from "@/components/ui/glass-panel";
 import { ProgressRing } from "@/components/ui/progress-ring";
 import { useUILayoutStore } from "@/store/ui-layout-store";
 import { motion } from "framer-motion";
-import { staggerContainer, staggerItem, focusModeTransition } from "@/lib/motion-variants";
+import { staggerContainer, staggerItem, sidebarFocusVariants } from "@/lib/motion-variants";
 import React from "react";
 
 interface LessonContent {
@@ -205,9 +205,14 @@ export const LessonSidebar = React.memo(function LessonSidebar({
     <>
       {/* Desktop Sidebar — FloatingPanel with Focus Mode transition */}
       <motion.div
+        variants={sidebarFocusVariants}
+        initial="visible"
         animate={isFocusMode ? "hidden" : "visible"}
-        variants={focusModeTransition}
-        className={cn("flex-shrink-0 lg:block", isFocusMode && "pointer-events-none")}
+        className={cn(
+          "flex-shrink-0 lg:block overflow-hidden",
+          className
+        )}
+        style={{ "--sidebar-width": "380px" } as any}
       >
         <FloatingPanel
           className={cn("flex flex-col p-6 h-fit self-start", className)}

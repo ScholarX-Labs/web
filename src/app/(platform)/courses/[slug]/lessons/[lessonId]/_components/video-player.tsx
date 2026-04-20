@@ -13,7 +13,7 @@ import "@vidstack/react/player/styles/default/layouts/video.css";
 import { cn } from "@/lib/utils";
 import { HeatmapTimeline } from "./heatmap-timeline";
 import { motion } from "framer-motion";
-import { fadeSlideIn } from "@/lib/motion-variants";
+import { fadeSlideIn, focusModeTransition, springApple } from "@/lib/motion-variants";
 
 import { useUILayoutStore } from "@/store/ui-layout-store";
 
@@ -66,19 +66,26 @@ export const VideoPlayer = React.forwardRef<MediaPlayerInstance, VideoPlayerProp
         <div className="pointer-events-none absolute -bottom-10 inset-x-8 h-20 bg-blue-500/10 blur-[40px] rounded-[50%] z-0" />
         <motion.div
           animate={{
-            scale: isFocusMode ? 1.02 : 1,
-            y: isFocusMode ? 20 : 0,
+            scale: 1,
+            y: 0,
             zIndex: isFocusMode ? 45 : 10,
           }}
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          transition={springApple}
           className={cn(
-            "relative w-full overflow-hidden",
+            "relative w-full transition-all duration-700",
+            isFocusMode ? "overflow-visible" : "overflow-hidden w-full",
             "rounded-2xl lg:rounded-3xl",
             "border border-white/10",
             "shadow-2xl transition-shadow duration-500",
             className
           )}
-          style={{
+          style={isFocusMode ? {
+            width: "min(calc(100vw - 80px), calc((100vh - 120px) * (16 / 9)))",
+            height: "auto",
+            aspectRatio: "16 / 9",
+            margin: "auto",
+            boxShadow: "0 40px 100px -20px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05)",
+          } : {
             boxShadow: "0 40px 100px -20px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05)",
           }}
         >

@@ -7,7 +7,7 @@ import { useUILayoutStore } from "@/store/ui-layout-store";
 import { useFocusMode } from "@/hooks/use-focus-mode";
 import { NotesPanelOverlay } from "./notes-panel-overlay";
 import { ResourcesBottomSheet } from "./resources-bottom-sheet";
-import { FocusModeControls } from "./focus-mode-controls";
+import { FocusToggleFloating } from "./focus-toggle-floating";
 
 interface LessonLayoutShellProps {
   children: React.ReactNode;
@@ -88,13 +88,13 @@ export function LessonLayoutShell({ children, lessonKey }: LessonLayoutShellProp
             <AnimatePresence>
               {isResourcesSheetOpen && <ResourcesBottomSheet />}
             </AnimatePresence>
-
-            {/* Focus Mode Controls */}
-            <AnimatePresence>
-              {isFocusMode && <FocusModeControls />}
-            </AnimatePresence>
           </Drawer>
         </LayoutGroup>
+
+        {/* Floating Glass Focus Toggle (Dock) — Appears only in Focus Mode */}
+        <AnimatePresence>
+          {isFocusMode && <FocusToggleFloating variant="floating" />}
+        </AnimatePresence>
       </div>
     </MotionConfig>
   );

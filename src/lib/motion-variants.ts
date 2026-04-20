@@ -126,3 +126,94 @@ export const scaleFade: Variants = {
   visible: { opacity: 1, scale: 1,    y:  0, transition: springSnappy },
   exit:    { opacity: 0, scale: 0.95, y: -8, transition: { duration: 0.15 } },
 };
+
+// ─── Apple-Caliber Focus Orchestration ───────────────────────────────────────
+
+/** 
+ * Apple Physics: High stiffness, precise damping. 
+ * Mimics the responsive-yet-stable feel of macOS/iOS. 
+ */
+export const springApple: Transition = {
+  type: "spring",
+  stiffness: 80,
+  damping: 20,
+  mass: 1.1,
+};
+
+/**
+ * Sidebar Compression: "Drops off the flank"
+ * Animates width to 0 while sliding and fading for a cinematic exit.
+ */
+export const sidebarFocusVariants: Variants = {
+  visible: {
+    width: "var(--sidebar-width, 380px)",
+    opacity: 1,
+    x: 0,
+    filter: "blur(0px)",
+    transition: springApple,
+  },
+  hidden: {
+    width: 0,
+    opacity: 0,
+    x: 40,
+    filter: "blur(12px)",
+    transition: {
+      ...springApple,
+      width: { duration: 0.6, ease: [0.32, 0.72, 0, 1] }, // Smoother width collapse
+      opacity: { duration: 0.3 },
+    },
+  },
+};
+
+/**
+ * Metadata Fade: Clears the stage for the video.
+ */
+export const metaFocusVariants: Variants = {
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: springApple,
+  },
+  hidden: {
+    opacity: 0,
+    height: 0,
+    marginTop: 0,
+    marginBottom: 0,
+    overflow: "hidden",
+    filter: "blur(20px)",
+    display: "none",
+    transition: {
+      ...springApple,
+      height: { duration: 0.6 },
+      opacity: { duration: 0.3 },
+      display: { delay: 0.6 } // Wait for exit animation
+    },
+  },
+};
+/**
+ * Dock Dock: macOS-style floating control
+ */
+export const dockVariants: Variants = {
+  hidden: { 
+    y: 100, 
+    opacity: 0, 
+    scale: 0.8,
+    filter: "blur(10px)"
+  },
+  visible: { 
+    y: 0, 
+    opacity: 1, 
+    scale: 1,
+    filter: "blur(0px)",
+    transition: {
+      ...springApple,
+      delay: 0.4 // Wait for page entry
+    }
+  },
+  exit: { 
+    y: 100, 
+    opacity: 0, 
+    transition: { duration: 0.3 }
+  }
+};

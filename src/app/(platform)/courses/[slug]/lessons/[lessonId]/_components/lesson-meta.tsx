@@ -14,7 +14,7 @@ import { ResumePromptBanner } from "./resume-prompt-banner";
 import { AnimatedButton } from "@/components/ui/animated-button";
 import { ContextTooltip } from "@/components/ui/context-tooltip";
 import { useUILayoutStore } from "@/store/ui-layout-store";
-import { staggerContainer, staggerItem, scaleFade } from "@/lib/motion-variants";
+import { staggerContainer, staggerItem, scaleFade, metaFocusVariants } from "@/lib/motion-variants";
 import { zIndex } from "@/lib/design-tokens";
 
 interface LessonMetaProps {
@@ -131,7 +131,7 @@ export function LessonMeta({
   const [toast, setToast] = useState({ visible: false, message: "" });
   const [activeTabOverride, setActiveTabOverride] = useState<"notes" | undefined>(undefined);
   const [showResumePrompt, setShowResumePrompt] = useState(!!resumePoint);
-  const { setNotesOverlayOpen } = useUILayoutStore();
+  const { setNotesOverlayOpen, isFocusMode } = useUILayoutStore();
 
   const showToast = useCallback((message: string) => {
     setToast({ visible: true, message });
@@ -207,11 +207,16 @@ export function LessonMeta({
       )}
 
       <motion.div
-        variants={staggerContainer}
-        initial="hidden"
-        animate="visible"
-        className="flex flex-col gap-5"
+        variants={metaFocusVariants}
+        animate={isFocusMode ? "hidden" : "visible"}
+        className="flex flex-col gap-10"
       >
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+          className="flex flex-col gap-5"
+        >
         {/* ─── PROGRESS BAR ─── */}
         <motion.div variants={staggerItem} className="flex flex-col gap-2.5">
           <div className="flex items-center justify-between">
@@ -354,6 +359,7 @@ export function LessonMeta({
           )}
         </motion.div>
       </motion.div>
-    </>
-  );
+    </motion.div>
+  </>
+);
 }

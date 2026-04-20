@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { AnimatedButton } from "@/components/ui/animated-button";
 import { ContextTooltip } from "@/components/ui/context-tooltip";
 import { MobileCurriculumTrigger } from "./mobile-curriculum-trigger";
+import { FocusToggleFloating } from "./focus-toggle-floating";
 import { useUILayoutStore } from "@/store/ui-layout-store";
 import { focusModeTransition } from "@/lib/motion-variants";
 import { zIndex } from "@/lib/design-tokens";
@@ -86,26 +87,8 @@ export function LessonHeader({ slug, lessonTitle }: LessonHeaderProps) {
         {/* Mobile curriculum button */}
         <MobileCurriculumTrigger />
 
-        {/* Focus Mode Toggle */}
-        <ContextTooltip content={isFocusMode ? "Exit Focus Mode" : "Focus Mode"}>
-          <AnimatedButton
-            aria-label={isFocusMode ? "Exit Focus Mode" : "Enter Focus Mode"}
-            aria-pressed={isFocusMode}
-            onClick={toggleFocusMode}
-            className={[
-              "hidden sm:flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-xl border transition-all",
-              isFocusMode
-                ? "bg-blue-500/20 border-blue-500/40 text-blue-300"
-                : "bg-white/10 hover:bg-white/20 border-white/10 text-white/70",
-            ].join(" ")}
-          >
-            {isFocusMode ? (
-              <><EyeOff className="w-3.5 h-3.5" />Exit Focus</>
-            ) : (
-              <><Eye className="w-3.5 h-3.5" />Focus</>
-            )}
-          </AnimatedButton>
-        </ContextTooltip>
+        {/* Focus Mode Toggle (Header Variant) */}
+        <FocusToggleFloating variant="header" />
 
         {/* Share button */}
         <ContextTooltip content={copied ? "Copied!" : "Share lesson"}>
