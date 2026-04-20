@@ -1,9 +1,9 @@
 import { Metadata } from "next";
-import { VideoPlayer } from "./_components/video-player";
-import { LessonSidebar } from "./_components/lesson-sidebar";
+import { Suspense } from "react";
 import { LessonLayoutShell } from "./_components/lesson-layout-shell";
 import { LessonHeader } from "./_components/lesson-header";
-import { LessonMeta } from "./_components/lesson-meta";
+import { LessonClientBridge } from "./_components/lesson-client-bridge";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface LessonPageProps {
   params: Promise<{ slug: string; lessonId: string }>;
@@ -19,7 +19,7 @@ export async function generateMetadata({
   };
 }
 
-// MOCK DATA for layout testing
+// MOCK DATA for layout testing — In production, this would be a server action or API call
 const MOCK_LESSONS = [
   { id: "lesson-1", title: "Introduction to the Core Concepts", duration: "5:23", isCompleted: true },
   { id: "lesson-2", title: "Setting up your Environment", duration: "12:45", isCompleted: true },
@@ -34,73 +34,80 @@ export default async function LessonPage({ params }: LessonPageProps) {
   const lessonIndex = MOCK_LESSONS.findIndex((l) => l.id === currentLesson.id);
 
   return (
-    // Pass lessonId as lessonKey to trigger AnimatePresence lesson transitions
     <LessonLayoutShell lessonKey={lessonId}>
       {/* ─────────────────────────────────────────────────────────────
           CINEMATIC AMBIENT MESH — creates the color field that
-          glass surfaces refract. Fixed so it stays during scroll.
+          glass surfaces refract. Fixed and animated for "life".
          ───────────────────────────────────────────────────────────── */}
-      <div key="ambient-mesh" className="pointer-events-none fixed inset-0 z-0">
+      <div key="ambient-mesh" className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
         <div className="absolute inset-0 bg-[#050812]" />
-        {/* Top-left hero glow */}
-        <div className="absolute -top-[20%] -left-[10%] h-[70vh] w-[70vh] rounded-full bg-blue-600/25 blur-[130px]" />
-        {/* Mid-right accent */}
-        <div className="absolute top-[30%] -right-[5%] h-[50vh] w-[50vh] rounded-full bg-violet-600/20 blur-[110px]" />
-        {/* Bottom emerald wash */}
-        <div className="absolute -bottom-[10%] left-[25%] h-[55vh] w-[55vh] rounded-full bg-emerald-500/10 blur-[140px]" />
+
+        {/* Global Drift Animations */}
+        <style>{`
+          @keyframes drift-halo {
+            0% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(50px, 80px) scale(1.15); }
+            66% { transform: translate(-30px, 40px) scale(0.9); }
+            100% { transform: translate(0, 0) scale(1); }
+          }
+          .animate-halo {
+            animation: drift-halo 30s ease-in-out infinite alternate;
+          }
+          .animate-halo-slow {
+            animation: drift-halo 45s ease-in-out infinite alternate-reverse;
+          }
+        `}</style>
+        
+        {/* Top-left hero glow (Blue) */}
+        <div className="animate-halo absolute -top-[20%] -left-[10%] h-[90vh] w-[90vh] rounded-full bg-blue-600/20 blur-[130px]" />
+        
+        {/* Mid-right accent (Violet) */}
+        <div className="animate-halo-slow absolute top-[30%] -right-[5%] h-[70vh] w-[70vh] rounded-full bg-violet-600/15 blur-[110px]" />
+        
+        {/* Bottom wash (Cyan/Emerald) */}
+        <div className="animate-halo absolute -bottom-[10%] left-[25%] h-[60vh] w-[60vh] rounded-full bg-cyan-500/10 blur-[140px]" />
+        
         {/* Noise texture for cinematic film grain */}
         <div
           className="absolute inset-0 opacity-[0.04] mix-blend-overlay"
-          style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E\")" }}
+          style={{ backgroundImage: "url('https://grainy-gradients.vercel.app/noise.svg')" }}
         />
       </div>
 
       {/* ─────────────────────────────────────────────────────────────
-          FULL-SCREEN LAYOUT SHELL
+          LAYERED LAYOUT
          ───────────────────────────────────────────────────────────── */}
       <div key="lesson-content" className="relative z-10 flex min-h-[100dvh] flex-col text-white font-sans">
         
         {/* STICKY GLASS HEADER */}
         <LessonHeader slug={slug} lessonTitle={currentLesson.title} />
 
-        {/* THEATER STAGE — main content area */}
-        <main className="flex flex-1 flex-col lg:flex-row gap-6 p-4 lg:p-6 xl:p-8 w-full max-w-[1800px] mx-auto">
-          
-          {/* ── LEFT: VIDEO + META ───────────────────────────── */}
-          <div className="flex flex-1 flex-col gap-5 min-w-0">
-            
-            {/* Video Player — 16:9 aspect, fills available width */}
-            <VideoPlayer
-              key={currentLesson.id}
-              title={currentLesson.title}
-              src="youtube/_cMxraX_5RE"
-              thumbnails="https://files.vidstack.io/sprite-fight/thumbnails.vtt"
-            />
-
-            {/* ── LESSON META BLOCK ── */}
-            <LessonMeta
-              lessonId={currentLesson.id}
-              title={currentLesson.title}
-              lessonIndex={lessonIndex}
-              totalLessons={MOCK_LESSONS.length}
-              courseSlug={slug}
-              prevLessonId={MOCK_LESSONS[lessonIndex - 1]?.id}
-              prevLessonTitle={MOCK_LESSONS[lessonIndex - 1]?.title}
-              nextLessonId={MOCK_LESSONS[lessonIndex + 1]?.id}
-              nextLessonTitle={MOCK_LESSONS[lessonIndex + 1]?.title}
-              duration="18 min"
-            />
-          </div>
-
-          {/* ── RIGHT: CURRICULUM SIDEBAR ───────────────────── */}
-          <LessonSidebar
+        {/* CONTENT BRIDGE — Wires up interactive states (Client) */}
+        <Suspense fallback={<LessonLoadingSkeleton />}>
+          <LessonClientBridge
+            lessonId={lessonId}
             courseSlug={slug}
-            currentLessonId={currentLesson.id}
+            lessonTitle={currentLesson.title}
+            lessonIndex={lessonIndex + 1}
+            totalLessons={MOCK_LESSONS.length}
+            prevLesson={MOCK_LESSONS[lessonIndex - 1]}
+            nextLesson={MOCK_LESSONS[lessonIndex + 1]}
             lessons={MOCK_LESSONS}
-            className="hidden lg:flex shrink-0 w-80 xl:w-96"
           />
-        </main>
+        </Suspense>
       </div>
     </LessonLayoutShell>
+  );
+}
+
+function LessonLoadingSkeleton() {
+  return (
+    <div className="flex flex-1 flex-col lg:flex-row gap-6 p-6 lg:p-8 w-full max-w-[1800px] mx-auto animate-pulse">
+      <div className="flex flex-1 flex-col gap-6">
+        <div className="aspect-video w-full rounded-3xl bg-white/5" />
+        <div className="h-40 w-full rounded-2xl bg-white/5" />
+      </div>
+      <div className="hidden lg:block w-80 xl:w-96 rounded-3xl bg-white/5" />
+    </div>
   );
 }

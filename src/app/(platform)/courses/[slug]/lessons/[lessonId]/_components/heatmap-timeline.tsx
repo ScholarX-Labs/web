@@ -27,18 +27,23 @@ export const HeatmapTimeline = React.memo(function HeatmapTimeline({
   const width = 100; // viewBox width units
   const height = 24; // viewBox height units
   const bucketWidth = width / buckets.length;
-  const minOpacity = 0.08;
+  const minOpacity = 0.04; // Near-invisible base
 
   return (
     <svg
       viewBox={`0 0 ${width} ${height}`}
       preserveAspectRatio="none"
-      className={cn("w-full h-6 block", className)}
+      className={cn(
+        "w-full h-full block transition-opacity duration-700",
+        "opacity-20 group-hover:opacity-100", // "Ghost" state until hover
+        className
+      )}
       aria-hidden="true"
     >
       {buckets.map((value, i) => {
-        const opacity = minOpacity + value * (1 - minOpacity);
-        const barHeight = 4 + value * (height - 4); // min 4px, max full height
+        // High-end vibrant color scaling
+        const opacity = minOpacity + value * 0.9;
+        const barHeight = 2 + value * (height - 2); 
         return (
           <rect
             key={i}
@@ -46,8 +51,10 @@ export const HeatmapTimeline = React.memo(function HeatmapTimeline({
             y={height - barHeight}
             width={bucketWidth - 1}
             height={barHeight}
-            rx={1}
-            fill={`rgba(59,130,246,${opacity.toFixed(2)})`}
+            rx={0.5}
+            fill="#3b82f6" // blue-500
+            style={{ opacity }}
+            className="transition-all duration-1000 ease-out"
           />
         );
       })}

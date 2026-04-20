@@ -49,22 +49,32 @@ export const VideoPlayer = memo(
     const seekFromRef = useRef<number>(0);
 
     return (
-      <motion.div
-        layoutId={layoutId}
-        {...fadeSlideIn}
-        className={cn(
-          "group relative w-full overflow-hidden",
-          "rounded-2xl lg:rounded-3xl",
-          "ring-1 ring-white/10",
-          "shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_20px_60px_-10px_rgba(0,0,0,0.8),0_0_80px_-20px_rgba(59,130,246,0.25)]",
-          className
-        )}
-      >
-        {/* Inner glow on top edge for depth */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent z-10" />
+      <div className="group relative w-full">
+        {/* Atmospheric Ambilight (Breathing Glow) */}
+        <div className="pointer-events-none absolute -inset-6 z-0 hidden lg:block">
+          <div className="absolute inset-0 rounded-[3rem] bg-blue-600/15 blur-[60px] animate-pulse duration-[10000ms]" />
+          <div className="absolute inset-x-20 inset-y-10 rounded-[3rem] bg-violet-600/10 blur-[80px] animate-pulse duration-[15000ms] delay-1000" />
+        </div>
 
-        {/* Ambilight halo on hover */}
-        <div className="pointer-events-none absolute -inset-[1px] rounded-[inherit] opacity-0 group-hover:opacity-100 transition-opacity duration-700 bg-gradient-to-b from-blue-500/10 via-transparent to-violet-500/10 z-0" />
+        {/* Floor Reflection Shadow */}
+        <div className="pointer-events-none absolute -bottom-10 inset-x-8 h-20 bg-blue-500/10 blur-[40px] rounded-[50%] z-0" />
+
+        <motion.div
+          layoutId={layoutId}
+          {...fadeSlideIn}
+          className={cn(
+            "relative w-full overflow-hidden z-10",
+            "rounded-2xl lg:rounded-3xl",
+            "border border-white/10",
+            "shadow-2xl",
+            className
+          )}
+          style={{
+            boxShadow: "0 40px 100px -20px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05)",
+          }}
+        >
+          {/* Inner glass light reflection (Apple-style top edge highlight) */}
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent z-20" />
 
         <MediaPlayer
           title={title}
@@ -108,6 +118,7 @@ export const VideoPlayer = memo(
           </div>
         )}
       </motion.div>
+    </div>
     );
   }
 );

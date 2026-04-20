@@ -5,7 +5,6 @@ import { AnimatePresence, LayoutGroup, MotionConfig, motion } from "framer-motio
 import { Drawer } from "@/components/ui/drawer-sheet";
 import { useUILayoutStore } from "@/store/ui-layout-store";
 import { useFocusMode } from "@/hooks/use-focus-mode";
-import { focusModeTransition } from "@/lib/motion-variants";
 import { NotesPanelOverlay } from "./notes-panel-overlay";
 import { ResourcesBottomSheet } from "./resources-bottom-sheet";
 import { FocusModeControls } from "./focus-mode-controls";
@@ -28,48 +27,62 @@ export function LessonLayoutShell({ children, lessonKey }: LessonLayoutShellProp
   }, []);
 
   if (!mounted) {
-    return <>{children}</>;
+    return <div style={{ backgroundColor: "#050812", minHeight: "100vh" }}>{children}</div>;
   }
 
   return (
     <MotionConfig reducedMotion="user">
-      <LayoutGroup>
-        <Drawer
-          open={isDrawerOpen}
-          onOpenChange={setDrawerOpen}
-          shouldScaleBackground
-        >
-          {/* Lesson-to-lesson directional transition wrapper */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={lessonKey}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -16 }}
-              transition={{ duration: 0.25, ease: "easeOut" }}
-              className="contents"
-            >
-              {children}
-            </motion.div>
-          </AnimatePresence>
+      <div
+        className="relative min-h-[100dvh] w-full selection:bg-blue-500/30 overflow-x-hidden"
+        style={{
+          backgroundColor: "#050812",
+          paddingTop: "2rem", // Extra space for the floating island header
+        }}
+      >
+        {/* Cinematic Screen Grain Overlay */}
+        <div 
+          className="pointer-events-none fixed inset-0 z-50 opacity-[0.03] mix-blend-overlay"
+          style={{ backgroundImage: "url('https://grainy-gradients.vercel.app/noise.svg')" }}
+        />
 
-          {/* ── Overlay Layers ──────────────────────────────────────────── */}
-          {/* Notes Panel (slide-in) */}
-          <AnimatePresence>
-            {isNotesOverlayOpen && <NotesPanelOverlay />}
-          </AnimatePresence>
+        <LayoutGroup>
+          <Drawer
+            open={isDrawerOpen}
+            onOpenChange={setDrawerOpen}
+            shouldScaleBackground
+          >
+            {/* Lesson-to-lesson directional transition wrapper */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={lessonKey}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -16 }}
+                transition={{ duration: 0.25, ease: "easeOut" }}
+                className="contents"
+              >
+                {children}
+              </motion.div>
+            </AnimatePresence>
 
-          {/* Resources Bottom Sheet */}
-          <AnimatePresence>
-            {isResourcesSheetOpen && <ResourcesBottomSheet />}
-          </AnimatePresence>
+            {/* ── Overlay Layers ──────────────────────────────────────────── */}
+            {/* Notes Panel (slide-in) */}
+            <AnimatePresence>
+              {isNotesOverlayOpen && <NotesPanelOverlay />}
+            </AnimatePresence>
 
-          {/* Focus Mode Controls */}
-          <AnimatePresence>
-            {isFocusMode && <FocusModeControls />}
-          </AnimatePresence>
-        </Drawer>
-      </LayoutGroup>
+            {/* Resources Bottom Sheet */}
+            <AnimatePresence>
+              {isResourcesSheetOpen && <ResourcesBottomSheet />}
+            </AnimatePresence>
+
+            {/* Focus Mode Controls */}
+            <AnimatePresence>
+              {isFocusMode && <FocusModeControls />}
+            </AnimatePresence>
+          </Drawer>
+        </LayoutGroup>
+      </div>
     </MotionConfig>
   );
 }

@@ -38,16 +38,15 @@ export function LessonHeader({ slug, lessonTitle }: LessonHeaderProps) {
 
   return (
     <motion.header
-      initial={{ y: -60, opacity: 0 }}
+      initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ type: "spring", stiffness: 260, damping: 28 }}
+      transition={{ type: "spring", stiffness: 200, damping: 25, delay: 0.1 }}
       variants={focusModeTransition}
-      className="sticky top-0 flex items-center justify-between gap-4 px-4 lg:px-6 py-3 shrink-0"
+      className="sticky top-4 z-50 mx-auto flex w-[95%] max-w-[1400px] items-center justify-between gap-4 rounded-[2rem] border border-white/10 px-6 py-3.5 shadow-2xl backdrop-blur-3xl"
       style={{
         zIndex: zIndex.modal,
-        background: "linear-gradient(to bottom, rgba(5,8,18,0.95) 0%, rgba(5,8,18,0.7) 70%, transparent 100%)",
-        WebkitBackdropFilter: "blur(20px)",
-        backdropFilter: "blur(20px)",
+        backgroundColor: "rgba(5, 8, 18, 0.65)",
+        boxShadow: "0 20px 50px -10px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.05)",
       }}
     >
       {/* LEFT — Back navigation + breadcrumb */}

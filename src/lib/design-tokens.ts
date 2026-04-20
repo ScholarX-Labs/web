@@ -43,13 +43,22 @@ export type RadiusKey = keyof typeof radius;
 // Named by semantic meaning, not visual appearance.
 
 export const shadow = {
-  ambient:  '0 0 80px -20px rgba(59,130,246,0.25)',         // Blue ambilight around video
-  elevated: '0 20px 60px -10px rgba(0,0,0,0.8)',            // High-elevation floating panels
-  floating: '0 8px 30px rgba(0,0,0,0.2)',                   // Mid-elevation cards
-  inner:    'inset 0 1px 0 0 rgba(255,255,255,0.05)',        // Subtle top-edge inner light
+  // Multi-layered "Atmospheric" shadows for Apple-style depth
+  ambient:  '0 0 100px -30px rgba(59,130,246,0.35), 0 0 40px -15px rgba(59,130,246,0.2)',
+  elevated: '0 30px 90px -15px rgba(0,0,0,0.7), 0 10px 30px -5px rgba(0,0,0,0.4)',
+  floating: '0 8px 30px -5px rgba(0,0,0,0.2), 0 2px 10px -2px rgba(0,0,0,0.1)',
+  inner:    'inset 0 1px 0 0 rgba(255,255,255,0.08)',
 } as const;
 
 export type ShadowKey = keyof typeof shadow;
+
+// ─── Vibe: Ambient Glow Tokens ──────────────────────────────────────────────
+// Purpose-built for Ambilight and background halos.
+export const vibe = {
+  primary: 'rgba(59, 130, 246, 0.4)', // Vibrant Blue
+  accent:  'rgba(139, 92, 246, 0.3)', // Soft Violet
+  surface: 'rgba(255, 255, 255, 0.03)',
+} as const;
 
 // ─── Duration Budget ──────────────────────────────────────────────────────────
 // Millisecond values for animation timing.

@@ -213,102 +213,89 @@ export function LessonMeta({
         className="flex flex-col gap-5"
       >
         {/* ─── PROGRESS BAR ─── */}
-        <motion.div variants={staggerItem} className="flex flex-col gap-2">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-white/50 font-medium">Course Progress</span>
-            <span className="text-white/80 font-semibold tabular-nums">
-              {lessonIndex + 1} / {totalLessons}
+        <motion.div variants={staggerItem} className="flex flex-col gap-2.5">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30">Course Momentum</span>
+            <span className="text-xs font-bold text-blue-400 tabular-nums">
+              {lessonIndex + 1} of {totalLessons} Lessons
             </span>
           </div>
-          <div className="h-1.5 w-full rounded-full bg-white/10 overflow-hidden">
+          <div className="h-1 w-full rounded-full bg-white/5 overflow-hidden">
             <motion.div
-              className="h-full rounded-full bg-gradient-to-r from-blue-500 to-violet-500"
+              className="h-full rounded-full bg-gradient-to-r from-blue-500 via-indigo-500 to-violet-500"
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.8, ease: "easeOut", delay: 0.4 }}
+              transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
             />
           </div>
         </motion.div>
 
         {/* ─── LESSON TITLE + ACTIONS ─── */}
-        <motion.div variants={staggerItem} className="flex items-start justify-between gap-4">
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-blue-400">
-              <BookOpen className="w-3.5 h-3.5" />
-              Lesson {lessonIndex + 1}
+        <motion.div variants={staggerItem} className="flex items-start justify-between gap-6">
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center w-6 h-6 rounded-full bg-blue-500/20 border border-blue-500/40">
+                <BookOpen className="w-3 h-3 text-blue-400" />
+              </div>
+              <span className="text-[10px] font-black uppercase tracking-[0.25em] text-blue-400/80">Episode {lessonIndex + 1}</span>
             </div>
-            <h1 className="text-2xl lg:text-3xl xl:text-4xl font-bold tracking-tight text-white leading-tight">
+            <h1 className="text-3xl lg:text-4xl xl:text-5xl font-black tracking-tighter text-white leading-[0.95] drop-shadow-sm">
               {title}
             </h1>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex items-center gap-2 shrink-0 pt-1">
-            <ContextTooltip content={isBookmarked ? "Remove bookmark" : "Bookmark lesson"}>
+          {/* Action Buttons — Spatial Glass Icons */}
+          <div className="flex items-center gap-2.5 shrink-0">
+            <ContextTooltip content={isBookmarked ? "Saved" : "Save Lesson"}>
               <AnimatedButton
                 onClick={handleBookmark}
-                aria-label={isBookmarked ? "Remove bookmark" : "Bookmark lesson"}
-                aria-pressed={isBookmarked}
                 className={cn(
-                  "w-9 h-9 rounded-xl backdrop-blur-sm border flex items-center justify-center transition-all",
+                  "w-11 h-11 rounded-2xl flex items-center justify-center transition-all duration-500 shadow-lg",
                   isBookmarked
-                    ? "bg-blue-500/20 border-blue-500/40 text-blue-400"
-                    : "bg-white/10 hover:bg-white/20 border-white/10 text-white/70"
+                    ? "bg-blue-600 text-white shadow-blue-500/20"
+                    : "bg-white/5 hover:bg-white/10 text-white/40 border border-white/10"
                 )}
               >
-                <Bookmark className={cn("w-4 h-4 transition-all", isBookmarked && "fill-current")} />
+                <Bookmark className={cn("w-5 h-5", isBookmarked && "fill-current")} />
               </AnimatedButton>
             </ContextTooltip>
 
-            <ContextTooltip content="Share lesson">
-              <AnimatedButton
-                onClick={handleShare}
-                aria-label="Share lesson"
-                className="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white/70 transition-colors"
-              >
-                <Share2 className="w-4 h-4" />
-              </AnimatedButton>
-            </ContextTooltip>
-
-            <div className="relative">
-              <ContextTooltip content="More options">
+            <ContextTooltip content="More Options">
+              <div className="relative">
                 <AnimatedButton
                   onClick={() => setShowMoreOptions((v) => !v)}
-                  aria-label="More options"
-                  aria-expanded={showMoreOptions}
                   className={cn(
-                    "w-9 h-9 rounded-xl backdrop-blur-sm border flex items-center justify-center transition-all",
-                    showMoreOptions
-                      ? "bg-white/20 border-white/20 text-white"
-                      : "bg-white/10 hover:bg-white/20 border-white/10 text-white/70"
+                    "w-11 h-11 rounded-2xl flex items-center justify-center transition-all duration-500 border border-white/10",
+                    showMoreOptions ? "bg-white/20 text-white" : "bg-white/5 hover:bg-white/10 text-white/40"
                   )}
                 >
-                  <MoreHorizontal className="w-4 h-4" />
+                  <MoreHorizontal className="w-5 h-5" />
                 </AnimatedButton>
-              </ContextTooltip>
-              <MoreOptionsDropdown
-                open={showMoreOptions}
-                onClose={() => setShowMoreOptions(false)}
-                items={moreOptions}
-              />
-            </div>
+                <MoreOptionsDropdown
+                  open={showMoreOptions}
+                  onClose={() => setShowMoreOptions(false)}
+                  items={moreOptions}
+                />
+              </div>
+            </ContextTooltip>
           </div>
         </motion.div>
 
         {/* ─── Stats Badges ─── */}
-        <motion.div variants={staggerItem} className="flex flex-wrap gap-3">
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.07] border border-white/10 text-xs font-medium text-white/70">
+        <motion.div variants={staggerItem} className="flex flex-wrap gap-4 items-center">
+          <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-white/40 py-1 border-b border-white/10">
             <Clock className="w-3.5 h-3.5" />
             {duration}
           </div>
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-xs font-medium text-emerald-400">
-            <CheckCircle2 className="w-3.5 h-3.5" />
-            In Progress
+          <div className="w-1 h-1 rounded-full bg-white/20" />
+          <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-emerald-400 py-1">
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            Live Learning
           </div>
         </motion.div>
 
-        {/* ─── TABS: Overview / Notes / Resources ─── */}
-        <motion.div variants={staggerItem}>
+        {/* ─── TABS ─── */}
+        <motion.div variants={staggerItem} className="mt-4">
           <LessonTabs
             lessonId={lessonId}
             courseSlug={courseSlug}
@@ -318,19 +305,20 @@ export function LessonMeta({
         </motion.div>
 
         {/* ─── PREV / NEXT NAVIGATION ─── */}
-        <motion.div variants={staggerItem} className="grid grid-cols-2 gap-3">
+        <motion.div variants={staggerItem} className="grid grid-cols-2 gap-4 mt-4">
           {prevLessonId ? (
             <Link
               href={`/courses/${courseSlug}/lessons/${prevLessonId}`}
-              className="group flex items-center gap-3 rounded-2xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.08] hover:border-white/20 p-4 transition-all duration-200"
+              className="group relative flex items-center gap-4 rounded-3xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 p-5 transition-all duration-500 overflow-hidden"
             >
-              <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center shrink-0 group-hover:bg-white/20 transition-colors">
-                <ChevronLeft className="w-4 h-4 text-white/70" />
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="relative z-10 w-10 h-10 rounded-2xl bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-blue-500/20 group-hover:text-blue-400 transition-all">
+                <ChevronLeft className="w-5 h-5" />
               </div>
-              <div className="flex flex-col min-w-0">
-                <span className="text-xs text-white/40 font-medium">Previous</span>
-                <span className="text-sm font-semibold text-white/80 truncate">
-                  {prevLessonTitle ?? "Previous Lesson"}
+              <div className="relative z-10 flex flex-col min-w-0">
+                <span className="text-[10px] font-black uppercase tracking-widest text-white/30">Previous</span>
+                <span className="text-sm font-bold text-white/70 group-hover:text-white truncate">
+                  {prevLessonTitle ?? "Back"}
                 </span>
               </div>
             </Link>
@@ -341,16 +329,17 @@ export function LessonMeta({
           {nextLessonId && (
             <Link
               href={`/courses/${courseSlug}/lessons/${nextLessonId}`}
-              className="group flex items-center justify-end gap-3 rounded-2xl bg-gradient-to-br from-blue-600/30 to-violet-600/20 hover:from-blue-600/40 hover:to-violet-600/30 border border-blue-500/20 hover:border-blue-500/40 p-4 transition-all duration-200"
+              className="group relative flex items-center justify-end gap-4 rounded-3xl bg-[#101428] border border-blue-500/20 p-5 transition-all duration-500 overflow-hidden"
             >
-              <div className="flex flex-col items-end min-w-0">
-                <span className="text-xs text-blue-300/70 font-medium">Next Up</span>
-                <span className="text-sm font-semibold text-white/90 truncate">
-                  {nextLessonTitle ?? "Next Lesson"}
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-violet-600/10 opacity-40 group-hover:opacity-70 transition-opacity" />
+              <div className="relative z-10 flex flex-col items-end min-w-0">
+                <span className="text-[10px] font-black uppercase tracking-widest text-blue-400/80">Next Up</span>
+                <span className="text-sm font-bold text-white group-hover:scale-[1.02] origin-right transition-transform truncate">
+                  {nextLessonTitle ?? "Continue"}
                 </span>
               </div>
-              <div className="w-8 h-8 rounded-xl bg-blue-500/30 flex items-center justify-center shrink-0 group-hover:bg-blue-500/50 transition-colors">
-                <ChevronRight className="w-4 h-4 text-white" />
+              <div className="relative z-10 w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-[0_0_20px_rgba(37,99,235,0.4)] group-hover:shadow-[0_0_30px_rgba(37,99,235,0.6)] group-hover:scale-110 transition-all">
+                <ChevronRight className="w-5 h-5" />
               </div>
             </Link>
           )}
