@@ -4,8 +4,12 @@ import { PlayCircle, Lock, CheckCircle2, BookOpen } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { DrawerContent } from "@/components/ui/drawer-sheet";
+import { FloatingPanel } from "@/components/ui/glass-panel";
+import { ProgressRing } from "@/components/ui/progress-ring";
 import { useUILayoutStore } from "@/store/ui-layout-store";
 import { motion } from "framer-motion";
+import { staggerContainer, staggerItem } from "@/lib/motion-variants";
+import React from "react";
 
 interface LessonContent {
   id: string;
@@ -21,31 +25,21 @@ interface LessonSidebarProps {
   currentLessonId: string;
   lessons: LessonContent[];
   className?: string;
+  /** Optional per-lesson watch percentage map: lessonId → 0-100 */
+  progress?: Record<string, number>;
 }
 
-const listVariants = {
-  visible: { transition: { staggerChildren: 0.05 } },
-  hidden: {},
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, x: 12 },
-  visible: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 300, damping: 24 } },
-};
-
-export function LessonSidebar({
+const SidebarInner = React.memo(function SidebarInner({
   courseSlug,
   currentLessonId,
   lessons,
-  className,
-}: LessonSidebarProps) {
-  const { isDrawerOpen, setDrawerOpen } = useUILayoutStore();
+  progress,
+}: Omit<LessonSidebarProps, "className">) {
+  const { setDrawerOpen } = useUILayoutStore();
   const completedCount = lessons.filter((l) => l.isCompleted).length;
-  
-  // Calculate total duration (mock calculation assuming 15m average if not provided properly)
-  const totalDuration = "1h 45m"; 
+  const totalDuration = "1h 45m";
 
-  const SidebarContent = () => (
+  return (
     <div className="flex h-full flex-col gap-6 text-white">
       {/* Header Section */}
       <div className="flex flex-col gap-4">
@@ -67,7 +61,7 @@ export function LessonSidebar({
           </div>
         </div>
 
-        {/* Course Progress Mini Map */}
+        {/* Course Progress Bar */}
         <div className="flex flex-col gap-1.5">
           <div className="h-1 w-full rounded-full bg-white/5 overflow-hidden">
             <motion.div
@@ -80,26 +74,30 @@ export function LessonSidebar({
         </div>
       </div>
 
-      {/* Lessons List Container */}
+      {/* Lessons List */}
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-2 group cursor-default">
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/20 group-hover:text-blue-400/40 transition-colors">Section 1: Fundamentals</span>
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/20 group-hover:text-blue-400/40 transition-colors">
+            Section 1: Fundamentals
+          </span>
           <div className="h-px flex-1 bg-white/[0.03]" />
         </div>
 
         <motion.nav
-          variants={listVariants}
+          variants={staggerContainer}
           initial="hidden"
           animate="visible"
           className="flex flex-col gap-1.5 overflow-y-auto max-h-[50vh] xl:max-h-[60vh] pr-1.5 -mr-1.5 custom-scrollbar"
         >
           {lessons.map((lesson, index) => {
             const isCurrent = lesson.id === currentLessonId;
+            const lessonProgress = progress?.[lesson.id] ?? 0;
+            const isInProgress = !lesson.isCompleted && !lesson.isLocked && lessonProgress > 0 && lessonProgress < 100;
 
             return (
               <motion.div
                 key={lesson.id}
-                variants={itemVariants}
+                variants={staggerItem}
                 whileHover={!lesson.isLocked ? { x: 4, backgroundColor: "rgba(255,255,255,0.04)" } : {}}
                 whileTap={!lesson.isLocked ? { scale: 0.985 } : {}}
                 transition={{ type: "spring", stiffness: 400, damping: 28 }}
@@ -128,6 +126,16 @@ export function LessonSidebar({
                       ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
                       : "bg-white/5 text-white/20 border border-white/5"
                   )}>
+                    {/* ProgressRing overlay for in-progress lessons */}
+                    {isInProgress && (
+                      <ProgressRing
+                        value={lessonProgress}
+                        size={28}
+                        strokeWidth={2}
+                        className="absolute inset-0"
+                      />
+                    )}
+
                     {lesson.isLocked ? (
                       <Lock className="w-3 h-3" />
                     ) : lesson.isCompleted ? (
@@ -151,14 +159,23 @@ export function LessonSidebar({
                       {lesson.title}
                     </span>
                     <div className="flex items-center gap-2">
-                       <span className="text-[10px] font-medium text-white/20 flex items-center gap-1 uppercase tracking-wider">
-                         <PlayCircle className="w-2.5 h-2.5" />
+                      <span className="text-[10px] font-medium text-white/20 flex items-center gap-1 uppercase tracking-wider">
+                        <PlayCircle className="w-2.5 h-2.5" />
                         {lesson.duration}
                       </span>
+                      {/* Per-lesson progress bar */}
+                      {lessonProgress > 0 && !lesson.isCompleted && (
+                        <div className="flex-1 h-0.5 rounded-full bg-white/5 overflow-hidden max-w-[40px]">
+                          <div
+                            className="h-full rounded-full bg-blue-500/60"
+                            style={{ width: `${lessonProgress}%` }}
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
 
-                  {/* Active Slide-in Indicator */}
+                  {/* Active Indicator — layoutId animates between lessons */}
                   {isCurrent && (
                     <motion.div
                       layoutId="active-pill"
@@ -174,29 +191,44 @@ export function LessonSidebar({
       </div>
     </div>
   );
+});
+
+export const LessonSidebar = React.memo(function LessonSidebar({
+  courseSlug,
+  currentLessonId,
+  lessons,
+  className,
+  progress,
+}: LessonSidebarProps) {
+  const { isDrawerOpen } = useUILayoutStore();
 
   return (
     <>
-      {/* Desktop Sidebar — h-fit for short lists, and max-h for long lists */}
-      <aside
-        className={cn(
-          "flex flex-col rounded-[24px] p-6 h-fit self-start",
-          "bg-white/[0.03] backdrop-blur-[40px]",
-          "border border-white/10 shadow-[20px_20px_60px_-15px_rgba(0,0,0,0.5),inset_0_1px_0_0_rgba(255,255,255,0.05)]",
-          className
-        )}
+      {/* Desktop Sidebar — FloatingPanel with proper elevation token */}
+      <FloatingPanel
+        className={cn("flex flex-col p-6 h-fit self-start", className)}
+        style={{ borderRadius: "1.5rem" }}
       >
-        <SidebarContent />
-      </aside>
+        <SidebarInner
+          courseSlug={courseSlug}
+          currentLessonId={currentLessonId}
+          lessons={lessons}
+          progress={progress}
+        />
+      </FloatingPanel>
 
       {/* Mobile Curriculum Drawer */}
       {isDrawerOpen && (
         <DrawerContent className="p-6 bg-[#050812]/95 backdrop-blur-[60px] border-t border-white/10 rounded-t-[32px]">
           <div className="w-12 h-1.5 bg-white/10 rounded-full mx-auto mb-6" />
-          <SidebarContent />
+          <SidebarInner
+            courseSlug={courseSlug}
+            currentLessonId={currentLessonId}
+            lessons={lessons}
+            progress={progress}
+          />
         </DrawerContent>
       )}
     </>
   );
-}
-
+});

@@ -34,7 +34,8 @@ export default async function LessonPage({ params }: LessonPageProps) {
   const lessonIndex = MOCK_LESSONS.findIndex((l) => l.id === currentLesson.id);
 
   return (
-    <LessonLayoutShell>
+    // Pass lessonId as lessonKey to trigger AnimatePresence lesson transitions
+    <LessonLayoutShell lessonKey={lessonId}>
       {/* ─────────────────────────────────────────────────────────────
           CINEMATIC AMBIENT MESH — creates the color field that
           glass surfaces refract. Fixed so it stays during scroll.

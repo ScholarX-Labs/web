@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ChevronLeft, ChevronRight, BookOpen, Clock, CheckCircle2,
@@ -10,6 +10,12 @@ import {
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { LessonTabs } from "./lesson-tabs";
+import { ResumePromptBanner } from "./resume-prompt-banner";
+import { AnimatedButton } from "@/components/ui/animated-button";
+import { ContextTooltip } from "@/components/ui/context-tooltip";
+import { useUILayoutStore } from "@/store/ui-layout-store";
+import { staggerContainer, staggerItem, scaleFade } from "@/lib/motion-variants";
+import { zIndex } from "@/lib/design-tokens";
 
 interface LessonMetaProps {
   lessonId: string;
@@ -22,19 +28,11 @@ interface LessonMetaProps {
   nextLessonId?: string;
   nextLessonTitle?: string;
   duration?: string;
+  resumePoint?: number | null;
+  onResume?: (position: number) => void;
 }
 
-const containerVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.08, delayChildren: 0.1 } },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } },
-};
-
-// ── Inline Toast ──────────────────────────────────────────────
+// ── Inline Toast ───────────────────────────────────────────────────────────────
 function Toast({ message, visible }: { message: string; visible: boolean }) {
   return (
     <AnimatePresence>
@@ -44,7 +42,8 @@ function Toast({ message, visible }: { message: string; visible: boolean }) {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 8, scale: 0.95 }}
           transition={{ type: "spring", stiffness: 400, damping: 28 }}
-          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[200] flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white text-sm font-medium shadow-xl"
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white text-sm font-medium shadow-xl"
+          style={{ zIndex: zIndex.toast }}
         >
           <Check className="w-4 h-4 text-emerald-400" />
           {message}
@@ -54,7 +53,7 @@ function Toast({ message, visible }: { message: string; visible: boolean }) {
   );
 }
 
-// ── More Options Dropdown ─────────────────────────────────────
+// ── More Options Dropdown ──────────────────────────────────────────────────────
 interface DropdownItem {
   icon: React.ReactNode;
   label: string;
@@ -63,27 +62,21 @@ interface DropdownItem {
   danger?: boolean;
 }
 
-function MoreOptionsDropdown({
-  open,
-  onClose,
-  items,
-}: {
-  open: boolean;
-  onClose: () => void;
-  items: DropdownItem[];
+function MoreOptionsDropdown({ open, onClose, items }: {
+  open: boolean; onClose: () => void; items: DropdownItem[];
 }) {
   return (
     <AnimatePresence>
       {open && (
         <>
-          {/* Backdrop */}
-          <div className="fixed inset-0 z-[100]" onClick={onClose} />
+          <div className="fixed inset-0" style={{ zIndex: zIndex.modal - 1 }} onClick={onClose} />
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: -8 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: -8 }}
-            transition={{ type: "spring", stiffness: 400, damping: 30 }}
-            className="absolute right-0 top-12 z-[101] w-64 rounded-2xl overflow-hidden bg-[#0d1225]/95 backdrop-blur-2xl border border-white/10 shadow-[0_20px_60px_-10px_rgba(0,0,0,0.7)]"
+            variants={scaleFade}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="absolute right-0 top-12 w-64 rounded-2xl overflow-hidden bg-[#0d1225]/95 backdrop-blur-2xl border border-white/10 shadow-[0_20px_60px_-10px_rgba(0,0,0,0.7)]"
+            style={{ zIndex: zIndex.modal }}
           >
             <div className="p-1.5 flex flex-col gap-0.5">
               {items.map((item) => (
@@ -117,7 +110,7 @@ function MoreOptionsDropdown({
   );
 }
 
-// ── Main Component ────────────────────────────────────────────
+// ── Main Component ─────────────────────────────────────────────────────────────
 export function LessonMeta({
   lessonId,
   title,
@@ -129,12 +122,16 @@ export function LessonMeta({
   nextLessonId,
   nextLessonTitle,
   duration = "18 min",
+  resumePoint,
+  onResume,
 }: LessonMetaProps) {
   const progress = ((lessonIndex + 1) / totalLessons) * 100;
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [showMoreOptions, setShowMoreOptions] = useState(false);
   const [toast, setToast] = useState({ visible: false, message: "" });
   const [activeTabOverride, setActiveTabOverride] = useState<"notes" | undefined>(undefined);
+  const [showResumePrompt, setShowResumePrompt] = useState(!!resumePoint);
+  const { setNotesOverlayOpen } = useUILayoutStore();
 
   const showToast = useCallback((message: string) => {
     setToast({ visible: true, message });
@@ -143,17 +140,14 @@ export function LessonMeta({
 
   const handleShare = useCallback(async () => {
     const url = window.location.href;
-    const shareData = { title: `Lesson: ${title}`, url };
     try {
-      if (navigator.share && navigator.canShare(shareData)) {
-        await navigator.share(shareData);
+      if (navigator.share && navigator.canShare({ title: `Lesson: ${title}`, url })) {
+        await navigator.share({ title: `Lesson: ${title}`, url });
       } else {
         await navigator.clipboard.writeText(url);
         showToast("Link copied to clipboard");
       }
-    } catch {
-      // User cancelled or no clipboard API
-    }
+    } catch { /* cancelled */ }
   }, [title, showToast]);
 
   const handleBookmark = useCallback(() => {
@@ -175,7 +169,8 @@ export function LessonMeta({
       icon: <NotebookPen className="w-3.5 h-3.5" />,
       label: "Take Notes",
       description: "Open note-taking panel",
-      onClick: () => setActiveTabOverride("notes"),
+      // Use overlay instead of tab switch
+      onClick: () => setNotesOverlayOpen(true),
     },
     {
       icon: <Link2 className="w-3.5 h-3.5" />,
@@ -199,14 +194,26 @@ export function LessonMeta({
     <>
       <Toast visible={toast.visible} message={toast.message} />
 
+      {/* Resume Prompt Banner */}
+      {showResumePrompt && resumePoint != null && (
+        <ResumePromptBanner
+          resumePoint={resumePoint}
+          onResume={(pos) => {
+            onResume?.(pos);
+            setShowResumePrompt(false);
+          }}
+          onDismiss={() => setShowResumePrompt(false)}
+        />
+      )}
+
       <motion.div
-        variants={containerVariants}
+        variants={staggerContainer}
         initial="hidden"
         animate="visible"
         className="flex flex-col gap-5"
       >
         {/* ─── PROGRESS BAR ─── */}
-        <motion.div variants={itemVariants} className="flex flex-col gap-2">
+        <motion.div variants={staggerItem} className="flex flex-col gap-2">
           <div className="flex items-center justify-between text-sm">
             <span className="text-white/50 font-medium">Course Progress</span>
             <span className="text-white/80 font-semibold tabular-nums">
@@ -224,7 +231,7 @@ export function LessonMeta({
         </motion.div>
 
         {/* ─── LESSON TITLE + ACTIONS ─── */}
-        <motion.div variants={itemVariants} className="flex items-start justify-between gap-4">
+        <motion.div variants={staggerItem} className="flex items-start justify-between gap-4">
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-blue-400">
               <BookOpen className="w-3.5 h-3.5" />
@@ -237,51 +244,48 @@ export function LessonMeta({
 
           {/* Action Buttons */}
           <div className="flex items-center gap-2 shrink-0 pt-1">
-            {/* Bookmark */}
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={handleBookmark}
-              className={cn(
-                "w-9 h-9 rounded-xl backdrop-blur-sm border flex items-center justify-center transition-all",
-                isBookmarked
-                  ? "bg-blue-500/20 border-blue-500/40 text-blue-400"
-                  : "bg-white/10 hover:bg-white/20 border-white/10 text-white/70"
-              )}
-              aria-label={isBookmarked ? "Remove bookmark" : "Bookmark lesson"}
-              aria-pressed={isBookmarked}
-            >
-              <Bookmark className={cn("w-4 h-4 transition-all", isBookmarked && "fill-current")} />
-            </motion.button>
-
-            {/* Share */}
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={handleShare}
-              className="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white/70 transition-colors"
-              aria-label="Share lesson"
-            >
-              <Share2 className="w-4 h-4" />
-            </motion.button>
-
-            {/* More Options */}
-            <div className="relative">
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={() => setShowMoreOptions((v) => !v)}
+            <ContextTooltip content={isBookmarked ? "Remove bookmark" : "Bookmark lesson"}>
+              <AnimatedButton
+                onClick={handleBookmark}
+                aria-label={isBookmarked ? "Remove bookmark" : "Bookmark lesson"}
+                aria-pressed={isBookmarked}
                 className={cn(
                   "w-9 h-9 rounded-xl backdrop-blur-sm border flex items-center justify-center transition-all",
-                  showMoreOptions
-                    ? "bg-white/20 border-white/20 text-white"
+                  isBookmarked
+                    ? "bg-blue-500/20 border-blue-500/40 text-blue-400"
                     : "bg-white/10 hover:bg-white/20 border-white/10 text-white/70"
                 )}
-                aria-label="More options"
-                aria-expanded={showMoreOptions}
               >
-                <MoreHorizontal className="w-4 h-4" />
-              </motion.button>
+                <Bookmark className={cn("w-4 h-4 transition-all", isBookmarked && "fill-current")} />
+              </AnimatedButton>
+            </ContextTooltip>
+
+            <ContextTooltip content="Share lesson">
+              <AnimatedButton
+                onClick={handleShare}
+                aria-label="Share lesson"
+                className="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white/70 transition-colors"
+              >
+                <Share2 className="w-4 h-4" />
+              </AnimatedButton>
+            </ContextTooltip>
+
+            <div className="relative">
+              <ContextTooltip content="More options">
+                <AnimatedButton
+                  onClick={() => setShowMoreOptions((v) => !v)}
+                  aria-label="More options"
+                  aria-expanded={showMoreOptions}
+                  className={cn(
+                    "w-9 h-9 rounded-xl backdrop-blur-sm border flex items-center justify-center transition-all",
+                    showMoreOptions
+                      ? "bg-white/20 border-white/20 text-white"
+                      : "bg-white/10 hover:bg-white/20 border-white/10 text-white/70"
+                  )}
+                >
+                  <MoreHorizontal className="w-4 h-4" />
+                </AnimatedButton>
+              </ContextTooltip>
               <MoreOptionsDropdown
                 open={showMoreOptions}
                 onClose={() => setShowMoreOptions(false)}
@@ -292,7 +296,7 @@ export function LessonMeta({
         </motion.div>
 
         {/* ─── Stats Badges ─── */}
-        <motion.div variants={itemVariants} className="flex flex-wrap gap-3">
+        <motion.div variants={staggerItem} className="flex flex-wrap gap-3">
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.07] border border-white/10 text-xs font-medium text-white/70">
             <Clock className="w-3.5 h-3.5" />
             {duration}
@@ -304,7 +308,7 @@ export function LessonMeta({
         </motion.div>
 
         {/* ─── TABS: Overview / Notes / Resources ─── */}
-        <motion.div variants={itemVariants}>
+        <motion.div variants={staggerItem}>
           <LessonTabs
             lessonId={lessonId}
             courseSlug={courseSlug}
@@ -314,7 +318,7 @@ export function LessonMeta({
         </motion.div>
 
         {/* ─── PREV / NEXT NAVIGATION ─── */}
-        <motion.div variants={itemVariants} className="grid grid-cols-2 gap-3">
+        <motion.div variants={staggerItem} className="grid grid-cols-2 gap-3">
           {prevLessonId ? (
             <Link
               href={`/courses/${courseSlug}/lessons/${prevLessonId}`}

@@ -1,11 +1,15 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import Link from "next/link";
-import { ChevronLeft, Share2, Tv2, Check } from "lucide-react";
+import { ChevronLeft, Share2, Tv2, Check, Eye, EyeOff } from "lucide-react";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { AnimatedButton } from "@/components/ui/animated-button";
+import { ContextTooltip } from "@/components/ui/context-tooltip";
 import { MobileCurriculumTrigger } from "./mobile-curriculum-trigger";
+import { useUILayoutStore } from "@/store/ui-layout-store";
+import { focusModeTransition } from "@/lib/motion-variants";
+import { zIndex } from "@/lib/design-tokens";
 
 interface LessonHeaderProps {
   slug: string;
@@ -14,6 +18,7 @@ interface LessonHeaderProps {
 
 export function LessonHeader({ slug, lessonTitle }: LessonHeaderProps) {
   const [copied, setCopied] = useState(false);
+  const { isFocusMode, toggleFocusMode } = useUILayoutStore();
 
   const handleShare = useCallback(async () => {
     const url = window.location.href;
@@ -36,8 +41,10 @@ export function LessonHeader({ slug, lessonTitle }: LessonHeaderProps) {
       initial={{ y: -60, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ type: "spring", stiffness: 260, damping: 28 }}
-      className="sticky top-0 z-50 flex items-center justify-between gap-4 px-4 lg:px-6 py-3 shrink-0"
+      variants={focusModeTransition}
+      className="sticky top-0 flex items-center justify-between gap-4 px-4 lg:px-6 py-3 shrink-0"
       style={{
+        zIndex: zIndex.modal,
         background: "linear-gradient(to bottom, rgba(5,8,18,0.95) 0%, rgba(5,8,18,0.7) 70%, transparent 100%)",
         WebkitBackdropFilter: "blur(20px)",
         backdropFilter: "blur(20px)",
@@ -45,15 +52,20 @@ export function LessonHeader({ slug, lessonTitle }: LessonHeaderProps) {
     >
       {/* LEFT — Back navigation + breadcrumb */}
       <div className="flex items-center gap-3 min-w-0">
-        <motion.div whileHover={{ x: -3 }} whileTap={{ scale: 0.9 }} transition={{ type: "spring", stiffness: 400 }}>
-          <Link
-            href={`/courses/${slug}`}
-            className="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center transition-colors"
+        <ContextTooltip content="Back to course">
+          <AnimatedButton
             aria-label="Back to course"
+            className="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center"
+            onClick={() => {}}
           >
-            <ChevronLeft className="w-4 h-4 text-white" />
-          </Link>
-        </motion.div>
+            <Link
+              href={`/courses/${slug}`}
+              className="flex items-center justify-center w-full h-full"
+            >
+              <ChevronLeft className="w-4 h-4 text-white" />
+            </Link>
+          </AnimatedButton>
+        </ContextTooltip>
 
         {/* Divider + Breadcrumb */}
         <div className="hidden sm:flex items-center gap-3 min-w-0">
@@ -72,26 +84,42 @@ export function LessonHeader({ slug, lessonTitle }: LessonHeaderProps) {
         {/* Mobile curriculum button */}
         <MobileCurriculumTrigger />
 
+        {/* Focus Mode Toggle */}
+        <ContextTooltip content={isFocusMode ? "Exit Focus Mode" : "Focus Mode"}>
+          <AnimatedButton
+            aria-label={isFocusMode ? "Exit Focus Mode" : "Enter Focus Mode"}
+            aria-pressed={isFocusMode}
+            onClick={toggleFocusMode}
+            className={[
+              "hidden sm:flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-xl border transition-all",
+              isFocusMode
+                ? "bg-blue-500/20 border-blue-500/40 text-blue-300"
+                : "bg-white/10 hover:bg-white/20 border-white/10 text-white/70",
+            ].join(" ")}
+          >
+            {isFocusMode ? (
+              <><EyeOff className="w-3.5 h-3.5" />Exit Focus</>
+            ) : (
+              <><Eye className="w-3.5 h-3.5" />Focus</>
+            )}
+          </AnimatedButton>
+        </ContextTooltip>
+
         {/* Share button */}
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={handleShare}
-          className="hidden sm:flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 transition-all"
-          style={{ color: copied ? "rgb(52 211 153)" : "rgba(255,255,255,0.7)" }}
-        >
-          {copied ? (
-            <>
-              <Check className="w-3.5 h-3.5" />
-              Copied!
-            </>
-          ) : (
-            <>
-              <Share2 className="w-3.5 h-3.5" />
-              Share
-            </>
-          )}
-        </motion.button>
+        <ContextTooltip content={copied ? "Copied!" : "Share lesson"}>
+          <AnimatedButton
+            aria-label="Share lesson"
+            onClick={handleShare}
+            className="hidden sm:flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 transition-all"
+            style={{ color: copied ? "rgb(52 211 153)" : "rgba(255,255,255,0.7)" }}
+          >
+            {copied ? (
+              <><Check className="w-3.5 h-3.5" />Copied!</>
+            ) : (
+              <><Share2 className="w-3.5 h-3.5" />Share</>
+            )}
+          </AnimatedButton>
+        </ContextTooltip>
 
         {/* In Progress badge */}
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-blue-500/15 border border-blue-500/30">

@@ -1,12 +1,15 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   BookOpen, NotebookPen, FolderOpen, Plus, Trash2,
   File, Link2, Video, Download, ExternalLink, Clock, StickyNote
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useNotes } from "@/hooks/use-notes";
+import { fadeSlideUp, staggerContainer, staggerItem } from "@/lib/motion-variants";
+import { AnimatedButton } from "@/components/ui/animated-button";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -126,11 +129,12 @@ export function LessonTabs({
   onTabChange,
 }: LessonTabsProps) {
   const [activeTab, setActiveTab] = useState<TabId>(initialTab ?? "overview");
-  const [notes, setNotes] = useState<Note[]>([]);
-  const [noteInput, setNoteInput] = useState("");
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editText, setEditText] = useState("");
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // SRP: All notes CRUD logic delegated to useNotes hook
+  const {
+    notes, noteInput, setNoteInput, editingId, editText, setEditText,
+    textareaRef, handleAddNote, handleDeleteNote, handleSaveEdit, startEdit, cancelEdit,
+  } = useNotes({ lessonId, courseSlug });
 
   // React to external tab override (e.g. from More Options dropdown)
   useEffect(() => {
@@ -140,54 +144,6 @@ export function LessonTabs({
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialTab]);
-
-  const storageKey = `notes:${courseSlug}:${lessonId}`;
-
-  // Load notes from localStorage
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(storageKey);
-      if (stored) setNotes(JSON.parse(stored));
-    } catch { /* ignore */ }
-  }, [storageKey]);
-
-  // Persist notes to localStorage
-  const persistNotes = useCallback((updated: Note[]) => {
-    setNotes(updated);
-    try {
-      localStorage.setItem(storageKey, JSON.stringify(updated));
-    } catch { /* ignore */ }
-  }, [storageKey]);
-
-  const handleAddNote = useCallback(() => {
-    const text = noteInput.trim();
-    if (!text) return;
-
-    const now = new Date();
-    const timestamp = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
-
-    const newNote: Note = {
-      id: `${Date.now()}-${Math.random()}`,
-      text,
-      timestamp,
-      createdAt: now.getTime(),
-    };
-    persistNotes([newNote, ...notes]);
-    setNoteInput("");
-    textareaRef.current?.focus();
-  }, [noteInput, notes, persistNotes]);
-
-  const handleDeleteNote = useCallback((id: string) => {
-    persistNotes(notes.filter((n) => n.id !== id));
-  }, [notes, persistNotes]);
-
-  const handleSaveEdit = useCallback((id: string) => {
-    const text = editText.trim();
-    if (!text) return;
-    persistNotes(notes.map((n) => n.id === id ? { ...n, text } : n));
-    setEditingId(null);
-    setEditText("");
-  }, [editText, notes, persistNotes]);
 
   return (
     <div className="flex flex-col rounded-2xl overflow-hidden border border-white/[0.08] bg-white/[0.03] backdrop-blur-sm">
@@ -332,7 +288,7 @@ export function LessonTabs({
                             />
                             <div className="flex gap-2 justify-end">
                               <button
-                                onClick={() => { setEditingId(null); setEditText(""); }}
+                                onClick={cancelEdit}
                                 className="px-3 py-1.5 text-xs font-semibold text-white/40 hover:text-white/70 transition-colors"
                               >
                                 Cancel
@@ -350,7 +306,7 @@ export function LessonTabs({
                           <>
                             <p
                               className="text-sm text-white/70 leading-relaxed cursor-pointer hover:text-white/90 transition-colors"
-                              onClick={() => { setEditingId(note.id); setEditText(note.text); }}
+                              onClick={() => startEdit(note)}
                             >
                               {note.text}
                             </p>

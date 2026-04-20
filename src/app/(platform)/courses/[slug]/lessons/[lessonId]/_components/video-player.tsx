@@ -1,7 +1,7 @@
 "use client";
 
-import React, { memo } from "react";
-import { MediaPlayer, MediaProvider } from "@vidstack/react";
+import React, { memo, useRef } from "react";
+import { MediaPlayer, MediaProvider, type MediaPlayerInstance } from "@vidstack/react";
 import {
   defaultLayoutIcons,
   DefaultVideoLayout,
@@ -11,9 +11,9 @@ import "@vidstack/react/player/styles/default/theme.css";
 import "@vidstack/react/player/styles/default/layouts/video.css";
 
 import { cn } from "@/lib/utils";
-import { QualitySelector } from "./quality-selector";
+import { HeatmapTimeline } from "./heatmap-timeline";
 import { motion } from "framer-motion";
-import { useUILayoutStore } from "@/store/ui-layout-store";
+import { fadeSlideIn } from "@/lib/motion-variants";
 
 interface VideoPlayerProps {
   title: string;
@@ -22,9 +22,13 @@ interface VideoPlayerProps {
   poster?: string;
   className?: string;
   layoutId?: string;
+  /** From useLessonProgress */
+  heatmapBuckets?: number[];
   onTimeUpdate?: (currentTime: number) => void;
   onPause?: (currentTime: number) => void;
+  onSeeked?: (from: number, to: number) => void;
   onEnded?: () => void;
+  onDurationChange?: (duration: number) => void;
 }
 
 export const VideoPlayer = memo(
@@ -35,33 +39,31 @@ export const VideoPlayer = memo(
     poster,
     className,
     layoutId = "video-player",
+    heatmapBuckets,
     onTimeUpdate,
     onPause,
+    onSeeked,
     onEnded,
+    onDurationChange,
   }: VideoPlayerProps) => {
-    const { setActiveLayoutId } = useUILayoutStore();
+    const seekFromRef = useRef<number>(0);
 
     return (
       <motion.div
         layoutId={layoutId}
-        initial={{ opacity: 0, scale: 0.98 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+        {...fadeSlideIn}
         className={cn(
           "group relative w-full overflow-hidden",
-          // Premium rounded shape
           "rounded-2xl lg:rounded-3xl",
-          // Layered border — inner glow + outer shadow
           "ring-1 ring-white/10",
-          // Cinematic volumetric shadow — blue ambilight
           "shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_20px_60px_-10px_rgba(0,0,0,0.8),0_0_80px_-20px_rgba(59,130,246,0.25)]",
           className
         )}
       >
         {/* Inner glow on top edge for depth */}
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent z-10" />
-        
-        {/* Ambilight halo that pulses on hover */}
+
+        {/* Ambilight halo on hover */}
         <div className="pointer-events-none absolute -inset-[1px] rounded-[inherit] opacity-0 group-hover:opacity-100 transition-opacity duration-700 bg-gradient-to-b from-blue-500/10 via-transparent to-violet-500/10 z-0" />
 
         <MediaPlayer
@@ -70,18 +72,41 @@ export const VideoPlayer = memo(
           playsInline
           className="w-full aspect-video"
           crossOrigin
-          onTimeUpdate={(e) => onTimeUpdate?.(e.detail.currentTime)}
-          onPause={(e) => onPause?.(e.detail.currentTime)}
+          onTimeUpdate={(detail) => {
+            if (typeof detail === "number") onTimeUpdate?.(detail);
+          }}
+          onPause={(detail) => {
+            if (typeof detail === "number") onPause?.(detail);
+          }}
+          onSeeked={(detail) => {
+            if (typeof detail === "number") {
+              onSeeked?.(seekFromRef.current, detail);
+            }
+          }}
+          onSeeking={(detail) => {
+            if (typeof detail === "number") {
+              seekFromRef.current = detail;
+            }
+          }}
           onEnd={() => onEnded?.()}
+          onDurationChange={(detail) => {
+            if (typeof detail === "number") onDurationChange?.(detail);
+          }}
         >
           <MediaProvider />
           <DefaultVideoLayout
             thumbnails={thumbnails}
             icons={defaultLayoutIcons}
             poster={poster}
-            slots={{ settingsAfter: <QualitySelector /> }}
           />
         </MediaPlayer>
+
+        {/* Heatmap overlay — above video, below VidStack controls */}
+        {heatmapBuckets && heatmapBuckets.length > 0 && (
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-[52px]">
+            <HeatmapTimeline buckets={heatmapBuckets} />
+          </div>
+        )}
       </motion.div>
     );
   }
