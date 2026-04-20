@@ -15,6 +15,8 @@ import { HeatmapTimeline } from "./heatmap-timeline";
 import { motion } from "framer-motion";
 import { fadeSlideIn } from "@/lib/motion-variants";
 
+import { useUILayoutStore } from "@/store/ui-layout-store";
+
 interface VideoPlayerProps {
   title: string;
   src: string;
@@ -31,7 +33,7 @@ interface VideoPlayerProps {
   onDurationChange?: (duration: number) => void;
 }
 
-export const VideoPlayer = memo(
+export const VideoPlayer = React.forwardRef<MediaPlayerInstance, VideoPlayerProps>(
   ({
     title,
     src,
@@ -45,28 +47,35 @@ export const VideoPlayer = memo(
     onSeeked,
     onEnded,
     onDurationChange,
-  }: VideoPlayerProps) => {
+  }, ref) => {
     const seekFromRef = useRef<number>(0);
+    const { isFocusMode } = useUILayoutStore();
 
     return (
       <div className="group relative w-full">
         {/* Atmospheric Ambilight (Breathing Glow) */}
-        <div className="pointer-events-none absolute -inset-6 z-0 hidden lg:block">
-          <div className="absolute inset-0 rounded-[3rem] bg-blue-600/15 blur-[60px] animate-pulse duration-[10000ms]" />
-          <div className="absolute inset-x-20 inset-y-10 rounded-[3rem] bg-violet-600/10 blur-[80px] animate-pulse duration-[15000ms] delay-1000" />
+        <div className={cn(
+          "pointer-events-none absolute -inset-6 z-0 hidden lg:block transition-opacity duration-1000",
+          isFocusMode ? "opacity-100" : "opacity-60"
+        )}>
+          <div className="absolute inset-0 rounded-[3rem] bg-blue-600/20 blur-[80px] animate-pulse duration-[10000ms]" />
+          <div className="absolute inset-x-20 inset-y-10 rounded-[3rem] bg-violet-600/15 blur-[100px] animate-pulse duration-[15000ms] delay-1000" />
         </div>
 
         {/* Floor Reflection Shadow */}
         <div className="pointer-events-none absolute -bottom-10 inset-x-8 h-20 bg-blue-500/10 blur-[40px] rounded-[50%] z-0" />
-
         <motion.div
-          layoutId={layoutId}
-          {...fadeSlideIn}
+          animate={{
+            scale: isFocusMode ? 1.02 : 1,
+            y: isFocusMode ? 20 : 0,
+            zIndex: isFocusMode ? 45 : 10,
+          }}
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
           className={cn(
-            "relative w-full overflow-hidden z-10",
+            "relative w-full overflow-hidden",
             "rounded-2xl lg:rounded-3xl",
             "border border-white/10",
-            "shadow-2xl",
+            "shadow-2xl transition-shadow duration-500",
             className
           )}
           style={{
@@ -77,6 +86,7 @@ export const VideoPlayer = memo(
           <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent z-20" />
 
         <MediaPlayer
+          ref={ref}
           title={title}
           src={src}
           playsInline

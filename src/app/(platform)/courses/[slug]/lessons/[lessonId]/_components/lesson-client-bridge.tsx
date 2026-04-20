@@ -105,6 +105,9 @@ export function LessonClientBridge({
         className="hidden lg:flex shrink-0 w-80 xl:w-96"
         progress={{
           [lessonId]: progress?.watchedPercentage ?? 0,
+          // Mock progress for previous lessons to make UI feel "Wired"
+          ...(lessons[0]?.id && { [lessons[0].id]: 100 }),
+          ...(lessons[1]?.id && { [lessons[1].id]: 100 }),
         }}
       />
     </main>

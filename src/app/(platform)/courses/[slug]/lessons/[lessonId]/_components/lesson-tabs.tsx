@@ -8,8 +8,10 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNotes } from "@/hooks/use-notes";
+import { useUILayoutStore } from "@/store/ui-layout-store";
 import { fadeSlideUp, staggerContainer, staggerItem } from "@/lib/motion-variants";
 import { AnimatedButton } from "@/components/ui/animated-button";
+import { ContextTooltip } from "@/components/ui/context-tooltip";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -136,14 +138,24 @@ export function LessonTabs({
     textareaRef, handleAddNote, handleDeleteNote, handleSaveEdit, startEdit, cancelEdit,
   } = useNotes({ lessonId, courseSlug });
 
+  const { setResourcesSheetOpen } = useUILayoutStore();
+
+  // React to tab changes
+  useEffect(() => {
+    if (activeTab === "resources") {
+      setResourcesSheetOpen(true);
+      // Optional: switch back to overview so the "background" content remains stable
+      // or keep it for the inline view. I'll stay on resources for now.
+    }
+  }, [activeTab, setResourcesSheetOpen]);
+
   // React to external tab override (e.g. from More Options dropdown)
   useEffect(() => {
     if (initialTab) {
       setActiveTab(initialTab);
       onTabChange?.();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialTab]);
+  }, [initialTab, onTabChange]);
 
   return (
     <div className="flex flex-col rounded-2xl overflow-hidden border border-white/[0.08] bg-white/[0.03] backdrop-blur-sm">

@@ -4,6 +4,7 @@ import { useCallback, useState } from "react";
 import Link from "next/link";
 import { ChevronLeft, Share2, Tv2, Check, Eye, EyeOff } from "lucide-react";
 import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 import { AnimatedButton } from "@/components/ui/animated-button";
 import { ContextTooltip } from "@/components/ui/context-tooltip";
 import { MobileCurriculumTrigger } from "./mobile-curriculum-trigger";
@@ -38,11 +39,13 @@ export function LessonHeader({ slug, lessonTitle }: LessonHeaderProps) {
 
   return (
     <motion.header
-      initial={{ y: -100, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ type: "spring", stiffness: 200, damping: 25, delay: 0.1 }}
+      initial={{ y: -24, opacity: 0 }}
+      animate={isFocusMode ? "hidden" : "visible"}
       variants={focusModeTransition}
-      className="sticky top-4 z-50 mx-auto flex w-[95%] max-w-[1400px] items-center justify-between gap-4 rounded-[2rem] border border-white/10 px-6 py-3.5 shadow-2xl backdrop-blur-3xl"
+      className={cn(
+        "sticky top-4 z-50 mx-auto flex w-[95%] max-w-[1400px] items-center justify-between gap-4 rounded-[2rem] border border-white/10 px-6 py-3.5 shadow-2xl backdrop-blur-3xl transition-all duration-700",
+        isFocusMode ? "pointer-events-none" : "pointer-events-auto"
+      )}
       style={{
         zIndex: zIndex.modal,
         backgroundColor: "rgba(5, 8, 18, 0.65)",

@@ -59,8 +59,8 @@ export function ResourcesBottomSheet({ resources = DEFAULT_RESOURCES }: Resource
                 <FolderOpen className="w-4 h-4 text-violet-400" />
               </div>
               <div>
-                <h2 className="text-sm font-bold text-white">Resources</h2>
-                <span className="text-[10px] text-white/40">{resources.length} items</span>
+                <VaulDrawer.Title className="text-sm font-bold text-white">Resources</VaulDrawer.Title>
+                <VaulDrawer.Description className="text-[10px] text-white/40">{resources.length} items</VaulDrawer.Description>
               </div>
             </div>
             <AnimatedButton

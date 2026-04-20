@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ChevronLeft, ChevronRight, BookOpen, Clock, CheckCircle2,
   Share2, Bookmark, MoreHorizontal, Check, Link2,
-  Flag, NotebookPen, Gauge
+  Flag, NotebookPen, Gauge, Plus
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -257,6 +257,15 @@ export function LessonMeta({
                 )}
               >
                 <Bookmark className={cn("w-5 h-5", isBookmarked && "fill-current")} />
+              </AnimatedButton>
+            </ContextTooltip>
+
+            <ContextTooltip content="Quick Note">
+              <AnimatedButton
+                onClick={() => setNotesOverlayOpen(true)}
+                className="w-11 h-11 rounded-2xl bg-white/5 hover:bg-white/10 text-white/40 border border-white/10 flex items-center justify-center transition-all duration-500"
+              >
+                <Plus className="w-5 h-5 group-hover:scale-110 transition-transform" />
               </AnimatedButton>
             </ContextTooltip>
 

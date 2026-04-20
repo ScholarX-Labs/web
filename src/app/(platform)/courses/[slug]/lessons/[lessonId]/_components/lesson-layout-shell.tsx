@@ -39,9 +39,22 @@ export function LessonLayoutShell({ children, lessonKey }: LessonLayoutShellProp
           paddingTop: "2rem", // Extra space for the floating island header
         }}
       >
+        {/* 🎭 Theater Dimmer Overlay — Activated in Focus Mode */}
+        <AnimatePresence>
+          {isFocusMode && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.8, ease: "easeInOut" }}
+              className="fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px] pointer-events-none"
+            />
+          )}
+        </AnimatePresence>
+
         {/* Cinematic Screen Grain Overlay */}
         <div 
-          className="pointer-events-none fixed inset-0 z-50 opacity-[0.03] mix-blend-overlay"
+          className="pointer-events-none fixed inset-0 z-50 opacity-[0.02] mix-blend-overlay"
           style={{ backgroundImage: "url('https://grainy-gradients.vercel.app/noise.svg')" }}
         />
 

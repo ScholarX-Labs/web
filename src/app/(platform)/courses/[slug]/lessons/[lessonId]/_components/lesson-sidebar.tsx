@@ -8,7 +8,7 @@ import { FloatingPanel } from "@/components/ui/glass-panel";
 import { ProgressRing } from "@/components/ui/progress-ring";
 import { useUILayoutStore } from "@/store/ui-layout-store";
 import { motion } from "framer-motion";
-import { staggerContainer, staggerItem } from "@/lib/motion-variants";
+import { staggerContainer, staggerItem, focusModeTransition } from "@/lib/motion-variants";
 import React from "react";
 
 interface LessonContent {
@@ -199,22 +199,28 @@ export const LessonSidebar = React.memo(function LessonSidebar({
   className,
   progress,
 }: LessonSidebarProps) {
-  const { isDrawerOpen } = useUILayoutStore();
+  const { isDrawerOpen, isFocusMode } = useUILayoutStore();
 
   return (
     <>
-      {/* Desktop Sidebar — FloatingPanel with proper elevation token */}
-      <FloatingPanel
-        className={cn("flex flex-col p-6 h-fit self-start", className)}
-        style={{ borderRadius: "1.5rem" }}
+      {/* Desktop Sidebar — FloatingPanel with Focus Mode transition */}
+      <motion.div
+        animate={isFocusMode ? "hidden" : "visible"}
+        variants={focusModeTransition}
+        className={cn("flex-shrink-0 lg:block", isFocusMode && "pointer-events-none")}
       >
-        <SidebarInner
-          courseSlug={courseSlug}
-          currentLessonId={currentLessonId}
-          lessons={lessons}
-          progress={progress}
-        />
-      </FloatingPanel>
+        <FloatingPanel
+          className={cn("flex flex-col p-6 h-fit self-start", className)}
+          style={{ borderRadius: "1.5rem" }}
+        >
+          <SidebarInner
+            courseSlug={courseSlug}
+            currentLessonId={currentLessonId}
+            lessons={lessons}
+            progress={progress}
+          />
+        </FloatingPanel>
+      </motion.div>
 
       {/* Mobile Curriculum Drawer */}
       {isDrawerOpen && (

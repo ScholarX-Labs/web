@@ -90,7 +90,14 @@ function computeHeatmapBuckets(
   videoDuration: number
 ): number[] {
   const buckets = new Array<number>(HEATMAP_BUCKETS).fill(0);
-  if (videoDuration <= 0 || pauseEvents.length === 0) return buckets;
+  
+  // Fallback: Generate subtle "atmospheric noise" if no data exists
+  if (pauseEvents.length === 0) {
+    // Return a stable "mesh" of low values (0.05 - 0.15) for background texture
+    return buckets.map((_, i) => 0.05 + (Math.sin(i * 0.8) + 1) * 0.05);
+  }
+
+  if (videoDuration <= 0) return buckets;
 
   const bucketWidth = videoDuration / HEATMAP_BUCKETS;
 
@@ -103,7 +110,7 @@ function computeHeatmapBuckets(
   }
 
   const max = Math.max(...buckets, 1);
-  return buckets.map((v) => v / max); // Normalize to 0–1
+  return buckets.map((v) => Math.max(0.05, v / max)); // Ensure baseline visibility
 }
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────

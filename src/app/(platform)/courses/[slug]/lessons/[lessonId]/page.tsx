@@ -67,17 +67,12 @@ export default async function LessonPage({ params }: LessonPageProps) {
         {/* Bottom wash (Cyan/Emerald) */}
         <div className="animate-halo absolute -bottom-[10%] left-[25%] h-[60vh] w-[60vh] rounded-full bg-cyan-500/10 blur-[140px]" />
         
-        {/* Noise texture for cinematic film grain */}
-        <div
-          className="absolute inset-0 opacity-[0.04] mix-blend-overlay"
-          style={{ backgroundImage: "url('https://grainy-gradients.vercel.app/noise.svg')" }}
-        />
       </div>
 
       {/* ─────────────────────────────────────────────────────────────
           LAYERED LAYOUT
          ───────────────────────────────────────────────────────────── */}
-      <div key="lesson-content" className="relative z-10 flex min-h-[100dvh] flex-col text-white font-sans">
+      <div key="lesson-content" className="relative flex min-h-[100dvh] flex-col text-white font-sans">
         
         {/* STICKY GLASS HEADER */}
         <LessonHeader slug={slug} lessonTitle={currentLesson.title} />
