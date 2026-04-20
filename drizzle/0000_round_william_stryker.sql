@@ -1,5 +1,7 @@
 CREATE SCHEMA "auth";
 --> statement-breakpoint
+CREATE SCHEMA "courses";
+--> statement-breakpoint
 CREATE TYPE "public"."status_enum" AS ENUM('pending', 'resolved');--> statement-breakpoint
 CREATE TABLE "auth"."account" (
 	"id" text PRIMARY KEY NOT NULL,

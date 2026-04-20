@@ -1,5 +1,5 @@
 {
-  "id": "26e4d93e-57f8-4181-9d00-9de62c0b15bf",
+  "id": "17b9ed3f-b210-40b2-8497-d5545622a9be",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -854,7 +854,8 @@
     }
   },
   "schemas": {
-    "auth": "auth"
+    "auth": "auth",
+    "courses": "courses"
   },
   "sequences": {},
   "roles": {},

@@ -11,7 +11,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { user as dbUsers } from "@/db/schema/auth-schema";
 
-const coursesSchema = pgSchema("courses");
+export const coursesSchema = pgSchema("courses");
 
 export const dbCourses = coursesSchema.table("courses", {
   id: uuid("id").primaryKey(),
@@ -54,3 +54,4 @@ export const dbSubscriptions = coursesSchema.table("subscriptions", {
   paymentId: varchar("payment_id", { length: 255 }),
   enrolledAt: timestamp("enrolled_at"),
 });
+export { dbUsers };

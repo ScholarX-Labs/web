@@ -11,23 +11,34 @@ if (!fs.existsSync(SCHEMA_PATH)) {
 let content = fs.readFileSync(SCHEMA_PATH, "utf-8");
 
 // 1. Ensure 'sql' is imported from drizzle-orm
-if (!content.includes('import { sql } from "drizzle-orm"')) {
-  content = content.replace(
-    'import { relations } from "drizzle-orm";',
-    'import { relations, sql } from "drizzle-orm";',
-  );
+const drizzleImportRegex =
+  /import\s*\{([\s\S]*?)\}\s*from\s*["']drizzle-orm["'];?/g;
+if (content.includes('from "drizzle-orm"')) {
+  if (!/\bsql\b/.test(content.match(drizzleImportRegex)?.[0] || "")) {
+    content = content.replace(drizzleImportRegex, (match, imports) => {
+      if (imports.includes("sql")) return match;
+      const trimmedImports = imports.trim();
+      if (trimmedImports.endsWith(",")) {
+        return `import { ${trimmedImports} sql } from "drizzle-orm";`;
+      }
+      return `import { ${trimmedImports}${trimmedImports ? ", " : ""}sql } from "drizzle-orm";`;
+    });
+  }
+} else {
+  content = `import { sql } from "drizzle-orm";\n` + content;
 }
 
 // 2. Fix array defaults
 // Finds: .array().default([])
 // Replaces with: .array().default(sql`'{}'::text[]`)
-const arrayDefaultRegex = /\.array\(\)\.default\(\[\]\)/g;
+const arrayDefaultRegex = /\.array\(\)\.default\(\[\]\)/;
 const fixedArrayDefault = ".array().default(sql`'{}'::text[]`)";
 
-if (arrayDefaultRegex.test(content)) {
-  console.log("Fixing array defaults...");
-  content = content.replace(arrayDefaultRegex, fixedArrayDefault);
-}
+console.log("Fixing array defaults...");
+content = content.replace(
+  new RegExp(arrayDefaultRegex, "g"),
+  fixedArrayDefault,
+);
 
 // 3. Optional: Add a comment to the top to warn other developers
 const warning =
