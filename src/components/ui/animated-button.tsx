@@ -39,7 +39,7 @@ export const AnimatedButton = React.forwardRef<
       whileHover={tapScale.whileHover}
       whileTap={tapScale.whileTap}
       transition={tapScale.transition}
-      className={cn("transition-colors", className)}
+      className={cn("transition-colors cursor-pointer", className)}
       {...(props as React.ComponentPropsWithoutRef<typeof motion.button>)}
     >
       {children}

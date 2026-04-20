@@ -19,10 +19,34 @@ interface FocusToggleFloatingProps {
 export function FocusToggleFloating({ variant = "floating" }: FocusToggleFloatingProps) {
   const { isFocusMode, toggleFocusMode } = useUILayoutStore();
   const [mounted, setMounted] = React.useState(false);
+  const [isVisible, setIsVisible] = React.useState(true);
+  const timeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const resetTimer = React.useCallback(() => {
+    setIsVisible(true);
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    if (variant === "floating" && isFocusMode) {
+      timeoutRef.current = setTimeout(() => setIsVisible(false), 3000);
+    }
+  }, [variant, isFocusMode]);
 
   React.useEffect(() => {
     setMounted(true);
-  }, []);
+    resetTimer();
+
+    if (variant === "floating" && isFocusMode) {
+      window.addEventListener("mousemove", resetTimer);
+      window.addEventListener("keydown", resetTimer);
+      window.addEventListener("touchstart", resetTimer);
+    }
+
+    return () => {
+      window.removeEventListener("mousemove", resetTimer);
+      window.removeEventListener("keydown", resetTimer);
+      window.removeEventListener("touchstart", resetTimer);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, [variant, isFocusMode, resetTimer]);
 
   if (!mounted) return null;
 
@@ -30,7 +54,7 @@ export function FocusToggleFloating({ variant = "floating" }: FocusToggleFloatin
     <motion.div
       layoutId="focus-toggle"
       initial="hidden"
-      animate="visible"
+      animate={isVisible ? "visible" : { opacity: 0, y: 20, scale: 0.95, pointerEvents: "none" }}
       exit="exit"
       variants={dockVariants}
       className={cn(
