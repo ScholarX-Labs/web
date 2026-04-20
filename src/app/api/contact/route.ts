@@ -5,8 +5,14 @@ import { contactUs } from "@/db/schema/contact-us-schema";
 
 import { contactSchema } from "@/app/contact/contact.schema";
 
+const MAX_CONTACT_BODY_BYTES = 16 * 1024;
+
 export async function POST(req: Request) {
   let body: unknown;
+  const contentLength = req.headers.get("content-length");
+  if (contentLength && Number(contentLength) > MAX_CONTACT_BODY_BYTES) {
+    return Response.json({ error: "request body too large" }, { status: 413 });
+  }
 
   try {
     body = await req.json();

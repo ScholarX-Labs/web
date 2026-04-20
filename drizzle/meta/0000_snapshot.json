@@ -1,5 +1,5 @@
 {
-  "id": "0322d947-77e7-4f32-a910-eeafc950df43",
+  "id": "26e4d93e-57f8-4181-9d00-9de62c0b15bf",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -415,14 +415,14 @@
           "type": "text[]",
           "primaryKey": false,
           "notNull": false,
-          "default": "'{}'"
+          "default": "'{}'::text[]"
         },
         "registered_events": {
           "name": "registered_events",
           "type": "text[]",
           "primaryKey": false,
           "notNull": false,
-          "default": "'{}'"
+          "default": "'{}'::text[]"
         }
       },
       "indexes": {},
@@ -560,7 +560,7 @@
           "type": "status_enum",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "'pending'"
         },
         "created_at": {
@@ -573,6 +573,269 @@
       },
       "indexes": {},
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "courses.courses": {
+      "name": "courses",
+      "schema": "courses",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "slug": {
+          "name": "slug",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "title": {
+          "name": "title",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "varchar(2000)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "image_url": {
+          "name": "image_url",
+          "type": "varchar(1000)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "video_preview_url": {
+          "name": "video_preview_url",
+          "type": "varchar(1000)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "category": {
+          "name": "category",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "level": {
+          "name": "level",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "current_price": {
+          "name": "current_price",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "original_price": {
+          "name": "original_price",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "instructor_id": {
+          "name": "instructor_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rating": {
+          "name": "rating",
+          "type": "numeric(3, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "total_ratings": {
+          "name": "total_ratings",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "duration": {
+          "name": "duration",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lessons_count": {
+          "name": "lessons_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "videos_count": {
+          "name": "videos_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "students_count": {
+          "name": "students_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_bestseller": {
+          "name": "is_bestseller",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "urgency_text": {
+          "name": "urgency_text",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tags": {
+          "name": "tags",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "requires_form": {
+          "name": "requires_form",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "courses_instructor_id_user_id_fk": {
+          "name": "courses_instructor_id_user_id_fk",
+          "tableFrom": "courses",
+          "tableTo": "user",
+          "schemaTo": "auth",
+          "columnsFrom": [
+            "instructor_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "courses.subscriptions": {
+      "name": "subscriptions",
+      "schema": "courses",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "course_id": {
+          "name": "course_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "amount": {
+          "name": "amount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "payment_id": {
+          "name": "payment_id",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "enrolled_at": {
+          "name": "enrolled_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "subscriptions_user_id_user_id_fk": {
+          "name": "subscriptions_user_id_user_id_fk",
+          "tableFrom": "subscriptions",
+          "tableTo": "user",
+          "schemaTo": "auth",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "subscriptions_course_id_courses_id_fk": {
+          "name": "subscriptions_course_id_courses_id_fk",
+          "tableFrom": "subscriptions",
+          "tableTo": "courses",
+          "schemaTo": "courses",
+          "columnsFrom": [
+            "course_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},

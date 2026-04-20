@@ -11,15 +11,17 @@ export const contactSchema = z.object({
     .trim()
     .min(1, { message: "Last name is required" })
     .max(50, { message: "Last name must be 50 characters or less" }),
-  email: z.email({ message: "Enter a valid email address" }),
+  email: z
+    .string()
+    .trim()
+    .pipe(z.email({ message: "Enter a valid email address" })),
   phoneNumber: z
     .string()
+    .trim()
     .max(25, { message: "Phone number must be 25 characters or less" })
     .optional()
-    .or(z.literal(""))
     .transform((value) => {
-      const trimmed = value?.trim();
-      return trimmed ? trimmed : undefined;
+      return value ? value : undefined;
     }),
   message: z
     .string()

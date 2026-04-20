@@ -9,7 +9,7 @@ import {
   numeric,
   jsonb,
 } from "drizzle-orm/pg-core";
-export { user as dbUsers } from "@/db/schema/auth-schema";
+import { user as dbUsers } from "@/db/schema/auth-schema";
 
 const coursesSchema = pgSchema("courses");
 
@@ -24,7 +24,7 @@ export const dbCourses = coursesSchema.table("courses", {
   level: varchar("level", { length: 50 }),
   currentPrice: integer("current_price").notNull(),
   originalPrice: integer("original_price"),
-  instructorId: text("instructor_id"),
+  instructorId: text("instructor_id").references(() => dbUsers.id),
   status: varchar("status", { length: 50 }).notNull(),
   rating: numeric("rating", { precision: 3, scale: 2 }),
   totalRatings: integer("total_ratings"),
@@ -42,8 +42,12 @@ export const dbCourses = coursesSchema.table("courses", {
 
 export const dbSubscriptions = coursesSchema.table("subscriptions", {
   id: uuid("id").primaryKey().defaultRandom(),
-  userId: text("user_id").notNull(),
-  courseId: uuid("course_id").notNull(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => dbUsers.id, { onDelete: "cascade" }),
+  courseId: uuid("course_id")
+    .notNull()
+    .references(() => dbCourses.id),
   amount: integer("amount"),
   status: varchar("status", { length: 50 }),
   isActive: boolean("is_active"),

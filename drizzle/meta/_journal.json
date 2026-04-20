@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1776632658312,
-      "tag": "0000_real_the_professor",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1776633037063,
-      "tag": "0001_patch_gpa_to_numeric",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1776633052293,
-      "tag": "0002_patch_array_text_columns_default",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1775823604871,
-      "tag": "0004_aspiring_reptil",
+      "when": 1776721048163,
+      "tag": "0000_lame_wolf_cub",
       "breakpoints": true
     }
   ]

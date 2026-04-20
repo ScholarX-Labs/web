@@ -9,6 +9,6 @@ export const contactUs = pgTable("contact_us", {
   email: text("email").notNull(),
   phoneNumber: text("phone_number"),
   message: text("message").notNull(),
-  status: statusEnum("status").default("pending"),
+  status: statusEnum("status").notNull().default("pending"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

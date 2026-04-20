@@ -8,6 +8,7 @@ import { getSession } from "@/lib/dal";
 import { isDevAuthBypassEnabled } from "@/config/dev-auth-bypass";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import SignoutButton from "./auth/_components/SignoutButton";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
