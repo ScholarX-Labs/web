@@ -2,6 +2,7 @@
   "name": "web",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "next build",
     "dev": "next dev",
@@ -9,7 +10,8 @@
     "lint": "eslint",
     "test": "node --import tsx --test src/**/*.test.ts",
     "test:api": "node --import tsx --test src/app/api/**/*.test.ts",
-    "db:generate": "drizzle-kit generate",
+    "db:fix-schema": "node scripts/fix-auth-schema.js",
+    "db:generate": "pnpm db:fix-schema && drizzle-kit generate",
     "db:push": "drizzle-kit push",
     "db:migrate": "drizzle-kit migrate",
     "build:cloudflare": "opennextjs-cloudflare build",
