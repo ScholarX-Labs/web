@@ -12,43 +12,21 @@ import "@vidstack/react/player/styles/default/layouts/video.css";
 
 import { cn } from "@/lib/utils";
 import { QualitySelector } from "./quality-selector";
+import { motion } from "framer-motion";
+import { useUILayoutStore } from "@/store/ui-layout-store";
 
 interface VideoPlayerProps {
-  /** Accessible title shown in the player and for screen readers. */
   title: string;
-  /**
-   * Video source. Accepts any VidStack-compatible src string:
-   * - HLS manifest:  "https://cdn.example.com/stream.m3u8"
-   * - DASH manifest: "https://cdn.example.com/stream.mpd"
-   * - YouTube:       "youtube/<VIDEO_ID>"      (quality selector auto-hides)
-   * - Direct MP4:    "https://cdn.example.com/video.mp4"
-   */
   src: string;
   thumbnails?: string;
   poster?: string;
   className?: string;
-
-  /** Fired frequently during playback to track where the user is */
+  layoutId?: string;
   onTimeUpdate?: (currentTime: number) => void;
-  /** Fired when playback pauses, providing a reliable point to save progress */
   onPause?: (currentTime: number) => void;
-  /** Fired exactly when the video reaches the end */
   onEnded?: () => void;
 }
 
-/**
- * VideoPlayer — Single-responsibility component for video playback.
- *
- * Quality control is delegated to `<QualitySelector>` which resolves options
- * from VidStack's media context via `useVideoQualityOptions()`. The selector
- * is injected into the DefaultVideoLayout chrome through the `slots.settingsAfter`
- * slot — no custom layout required.
- *
- * The selector gracefully self-hides when:
- *   - The source is YouTube (read-only quality list)
- *   - The source is a flat MP4 (no renditions)
- *   - No qualities have loaded yet
- */
 export const VideoPlayer = memo(
   ({
     title,
@@ -56,26 +34,42 @@ export const VideoPlayer = memo(
     thumbnails,
     poster,
     className,
+    layoutId = "video-player",
     onTimeUpdate,
     onPause,
     onEnded,
   }: VideoPlayerProps) => {
+    const { setActiveLayoutId } = useUILayoutStore();
+
     return (
-      <div
+      <motion.div
+        layoutId={layoutId}
+        initial={{ opacity: 0, scale: 0.98 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
         className={cn(
-          "relative w-full overflow-hidden rounded-3xl bg-black",
-          "ring-1 ring-slate-900/10 dark:ring-white/10",
-          "shadow-2xl shadow-black/40 dark:shadow-black/60",
+          "group relative w-full overflow-hidden",
+          // Premium rounded shape
+          "rounded-2xl lg:rounded-3xl",
+          // Layered border — inner glow + outer shadow
+          "ring-1 ring-white/10",
+          // Cinematic volumetric shadow — blue ambilight
+          "shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_20px_60px_-10px_rgba(0,0,0,0.8),0_0_80px_-20px_rgba(59,130,246,0.25)]",
           className
         )}
       >
+        {/* Inner glow on top edge for depth */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent z-10" />
+        
+        {/* Ambilight halo that pulses on hover */}
+        <div className="pointer-events-none absolute -inset-[1px] rounded-[inherit] opacity-0 group-hover:opacity-100 transition-opacity duration-700 bg-gradient-to-b from-blue-500/10 via-transparent to-violet-500/10 z-0" />
+
         <MediaPlayer
           title={title}
           src={src}
           playsInline
           className="w-full aspect-video"
           crossOrigin
-          // --- Tracking Callbacks ---
           onTimeUpdate={(e) => onTimeUpdate?.(e.detail.currentTime)}
           onPause={(e) => onPause?.(e.detail.currentTime)}
           onEnd={() => onEnded?.()}
@@ -85,18 +79,10 @@ export const VideoPlayer = memo(
             thumbnails={thumbnails}
             icons={defaultLayoutIcons}
             poster={poster}
-            slots={{
-              /**
-               * VidStack slots let us inject custom UI nodes directly into the
-               * player chrome without overriding the entire layout.
-               * `settingsAfter` places our picker right after the native settings
-               * gear icon in the bottom-right control bar.
-               */
-              settingsAfter: <QualitySelector />,
-            }}
+            slots={{ settingsAfter: <QualitySelector /> }}
           />
         </MediaPlayer>
-      </div>
+      </motion.div>
     );
   }
 );
