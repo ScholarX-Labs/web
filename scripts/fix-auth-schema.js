@@ -14,7 +14,7 @@ let content = fs.readFileSync(SCHEMA_PATH, "utf-8");
 if (!content.includes('import { sql } from "drizzle-orm"')) {
   content = content.replace(
     'import { relations } from "drizzle-orm";',
-    'import { relations, sql } from "drizzle-orm";'
+    'import { relations, sql } from "drizzle-orm";',
   );
 }
 
@@ -22,7 +22,7 @@ if (!content.includes('import { sql } from "drizzle-orm"')) {
 // Finds: .array().default([])
 // Replaces with: .array().default(sql`'{}'::text[]`)
 const arrayDefaultRegex = /\.array\(\)\.default\(\[\]\)/g;
-const fixedArrayDefault = '.array().default(sql`\'{}\'::text[]`)';
+const fixedArrayDefault = ".array().default(sql`'{}'::text[]`)";
 
 if (arrayDefaultRegex.test(content)) {
   console.log("Fixing array defaults...");
@@ -30,9 +30,10 @@ if (arrayDefaultRegex.test(content)) {
 }
 
 // 3. Optional: Add a comment to the top to warn other developers
-const warning = "// [AUTO-FIXED] Array defaults and other Postgres-specific patches applied by scripts/fix-auth-schema.js\n";
+const warning =
+  "// [AUTO-FIXED] Array defaults and other Postgres-specific patches applied by scripts/fix-auth-schema.js\n";
 if (!content.startsWith(warning)) {
-    content = warning + content;
+  content = warning + content;
 }
 
 fs.writeFileSync(SCHEMA_PATH, content);
