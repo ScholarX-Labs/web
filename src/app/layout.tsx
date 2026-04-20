@@ -3,11 +3,11 @@ import { Geist, Geist_Mono, Inter } from "next/font/google";
 import { AppProviders } from "@/providers/app-providers";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
-import "./globals.css";
 import { getSession } from "@/lib/dal";
 import { isDevAuthBypassEnabled } from "@/config/dev-auth-bypass";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import { GlobalShellExclusions } from "@/components/global-shell-exclusions";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -38,19 +38,25 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Header />
-        <AppProviders>
-          <TooltipProvider>
-            {isDevAuthBypassEnabled ? (
-              <div className="w-full bg-amber-200 px-4 py-2 text-center text-xs font-semibold tracking-wide text-amber-950">
-                DEV_AUTH_BYPASS is ON: authentication and route protection are
-                bypassed.
-              </div>
-            ) : null}
-            {children}
-          </TooltipProvider>
-        </AppProviders>
-        <Footer />
+        <div vaul-drawer-wrapper="">
+          <GlobalShellExclusions>
+            <Header />
+          </GlobalShellExclusions>
+          <AppProviders>
+            <TooltipProvider>
+              {isDevAuthBypassEnabled ? (
+                <div className="w-full bg-amber-200 px-4 py-2 text-center text-xs font-semibold tracking-wide text-amber-950">
+                  DEV_AUTH_BYPASS is ON: authentication and route protection are
+                  bypassed.
+                </div>
+              ) : null}
+              {children}
+            </TooltipProvider>
+          </AppProviders>
+          <GlobalShellExclusions>
+            <Footer />
+          </GlobalShellExclusions>
+        </div>
       </body>
     </html>
   );
