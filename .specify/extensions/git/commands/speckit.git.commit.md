@@ -15,7 +15,7 @@ This command is invoked as a hook after (or before) core commands. It:
 3. Looks up the specific event key to see if auto-commit is enabled
 4. Falls back to `auto_commit.default` if no event-specific key exists
 5. Uses the per-command `message` if configured, otherwise a default message
-6. If enabled and there are uncommitted changes, runs `git add .` + `git commit`
+6. If enabled and there are uncommitted changes, the command will first show the pending changes and require explicit confirmation before staging and committing all changes. In interactive shells the user is prompted `Stage all changes and commit? [y/N]` — only `y`/`Y` proceeds to run `git add .` and `git commit`. In non-interactive environments auto-commit will skip and exit with a message; to allow non-interactive auto-commit, configure an explicit `paths` pathspec in the `auto_commit` event configuration (see Configuration section) so the command stages only known Spec Kit outputs rather than `.`.
 
 ## Execution
 
