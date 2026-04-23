@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { useUiStore } from "@/stores/ui.store";
 import { CourseGrid } from "./course-grid";
-import { CourseCard } from "./course-card";
+import { LatestCourseCard } from "./latest-course-card";
 import { Course } from "@/types/course.types";
 import { CourseDetailSurfacePortal } from "./course-detail-surface-portal";
 
@@ -52,8 +52,8 @@ export function CoursesFilterSection({ courses }: CoursesFilterSectionProps) {
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-12 w-full">
       {filtered.length > 0 ? (
         <CourseGrid>
-          {filtered.map((course) => (
-            <CourseCard key={course.id} course={course} />
+          {filtered.map((course, index) => (
+            <LatestCourseCard key={course.id} course={course} index={index} />
           ))}
         </CourseGrid>
       ) : (

@@ -171,7 +171,7 @@ export function CoursesHero() {
                     <DropdownMenuItem 
                       key={label}
                       className={cn(
-                        "flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer text-sm font-semibold transition-colors outline-none",
+                        "flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer text-sm font-semibold transition-all duration-300 ease-out outline-none group",
                         "hover:text-white focus:text-white",
                         hoverBg
                       )}
@@ -179,7 +179,12 @@ export function CoursesHero() {
                         // Responding to interaction gracefully without heavy functionality logic
                       }}
                     >
-                      <div className={cn("p-1.5 rounded-lg bg-white/70 dark:bg-white/5 backdrop-blur-md shadow-sm border border-white/20 dark:border-white/5", colorClass)}>
+                      <div className={cn(
+                        "p-1.5 rounded-lg bg-white/70 dark:bg-white/5 backdrop-blur-md shadow-sm border border-white/20 dark:border-white/5 transition-all duration-300 ease-out", 
+                        "group-hover:bg-transparent group-hover:border-transparent group-hover:shadow-none group-hover:text-white",
+                        "group-focus:bg-transparent group-focus:border-transparent group-focus:shadow-none group-focus:text-white",
+                        colorClass
+                      )}>
                         <Icon className="w-4 h-4" />
                       </div>
                       {label}
@@ -197,6 +202,9 @@ export function CoursesHero() {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => {
+                  window.scrollBy({ top: 600, behavior: "smooth" });
+                }}
                 aria-label="Search"
                 className="p-3 bg-white/50 dark:bg-white/10 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/80 transition-colors shrink-0 shadow-sm"
               >
