@@ -10,6 +10,7 @@ import { useUILayoutStore } from "@/store/ui-layout-store";
 import { cn } from "@/lib/utils";
 import { springApple } from "@/lib/motion-variants";
 import type { MediaPlayerInstance } from "@vidstack/react";
+import type { LessonSummary } from "@/types/course.types";
 
 interface LessonClientBridgeProps {
   lessonId: string;
@@ -19,7 +20,7 @@ interface LessonClientBridgeProps {
   totalLessons: number;
   prevLesson?: { id: string; title: string };
   nextLesson?: { id: string; title: string };
-  lessons: any[]; // The full curriculum array
+  lessons: LessonSummary[]; // The full curriculum array
 }
 
 /**
@@ -60,9 +61,28 @@ export function LessonClientBridge({
 
   // 2. Resume Handler
   const handleResume = (position: number) => {
-    if (playerRef.current) {
-      playerRef.current.currentTime = position;
-      playerRef.current.play();
+    const player = playerRef.current;
+    if (!player) return;
+
+    // Some player implementations return a Promise from `play()` (modern browsers).
+    // Await resolution before seeking to avoid seek-during-load races.
+    try {
+      const maybePromise = player.play?.();
+      if (maybePromise && typeof (maybePromise as any).then === "function") {
+        (maybePromise as Promise<void>)
+          .then(() => {
+            // Ensure player still exists before seeking
+            if (playerRef.current) playerRef.current.currentTime = position;
+          })
+          .catch((err) => {
+            console.error("Failed to resume playback:", err);
+          });
+      } else {
+        // play() did not return a promise — perform best-effort seek immediately
+        player.currentTime = position;
+      }
+    } catch (err) {
+      console.error("Error while attempting to resume playback:", err);
     }
   };
 
@@ -85,20 +105,38 @@ export function LessonClientBridge({
           isFocusMode ? "w-full max-w-[1400px] gap-0" : "flex-1 gap-5"
         )}
       >
-        {/* Video Player */}
-        <VideoPlayer
-          ref={playerRef}
-          key={lessonId}
-          title={lessonTitle}
-          src="youtube/_cMxraX_5RE"
-          thumbnails="https://files.vidstack.io/sprite-fight/thumbnails.vtt"
-          heatmapBuckets={heatmapBuckets}
-          onTimeUpdate={onTimeUpdate}
-          onPause={onPause}
-          onSeeked={onSeeked}
-          onEnded={onEnded}
-          onDurationChange={setVideoDuration}
-        />
+        {/* Video Player: use lesson-provided media when available */}
+        {(() => {
+          const currentLesson = lessons.find((l) => l.id === lessonId);
+          const mediaSrc = currentLesson?.media?.src;
+          const thumbnails = currentLesson?.media?.thumbnails;
+          const poster = currentLesson?.media?.poster;
+
+          if (!mediaSrc) {
+            return (
+              <div className="w-full aspect-video rounded-3xl bg-white/5 flex items-center justify-center text-white/40">
+                Video unavailable
+              </div>
+            );
+          }
+
+          return (
+            <VideoPlayer
+              ref={playerRef}
+              key={lessonId}
+              title={lessonTitle}
+              src={mediaSrc}
+              thumbnails={thumbnails}
+              poster={poster}
+              heatmapBuckets={heatmapBuckets}
+              onTimeUpdate={onTimeUpdate}
+              onPause={onPause}
+              onSeeked={onSeeked}
+              onEnded={onEnded}
+              onDurationChange={setVideoDuration}
+            />
+          );
+        })()}
 
         {/* Lesson Meta */}
         <LessonMeta
