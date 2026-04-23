@@ -26,9 +26,6 @@ export function LessonLayoutShell({ children, lessonKey }: LessonLayoutShellProp
     setMounted(true);
   }, []);
 
-  if (!mounted) {
-    return <div style={{ backgroundColor: "#050812", minHeight: "100vh" }}>{children}</div>;
-  }
 
   return (
     <MotionConfig reducedMotion="user">
@@ -55,40 +52,44 @@ export function LessonLayoutShell({ children, lessonKey }: LessonLayoutShellProp
         {/* Cinematic Screen Grain Overlay */}
         <div 
           className="pointer-events-none fixed inset-0 z-50 opacity-[0.02] mix-blend-overlay"
-          style={{ backgroundImage: "url('https://grainy-gradients.vercel.app/noise.svg')" }}
+          style={{ backgroundImage: "url('/assets/noise.svg')" }}
         />
 
         <LayoutGroup>
-          <Drawer
-            open={isDrawerOpen}
-            onOpenChange={setDrawerOpen}
-            shouldScaleBackground
-          >
-            {/* Lesson-to-lesson directional transition wrapper */}
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={lessonKey}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -16 }}
-                transition={{ duration: 0.25, ease: "easeOut" }}
-                className="contents"
-              >
-                {children}
-              </motion.div>
-            </AnimatePresence>
+          {mounted ? (
+            <Drawer
+              open={isDrawerOpen}
+              onOpenChange={setDrawerOpen}
+              shouldScaleBackground
+            >
+              {/* Lesson-to-lesson directional transition wrapper */}
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={lessonKey}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -16 }}
+                  transition={{ duration: 0.25, ease: "easeOut" }}
+                  className="contents"
+                >
+                  {children}
+                </motion.div>
+              </AnimatePresence>
 
-            {/* ── Overlay Layers ──────────────────────────────────────────── */}
-            {/* Notes Panel (slide-in) */}
-            <AnimatePresence>
-              {isNotesOverlayOpen && <NotesPanelOverlay />}
-            </AnimatePresence>
+              {/* ── Overlay Layers ──────────────────────────────────────────── */}
+              {/* Notes Panel (slide-in) */}
+              <AnimatePresence>
+                {isNotesOverlayOpen && <NotesPanelOverlay />}
+              </AnimatePresence>
 
-            {/* Resources Bottom Sheet */}
-            <AnimatePresence>
-              {isResourcesSheetOpen && <ResourcesBottomSheet />}
-            </AnimatePresence>
-          </Drawer>
+              {/* Resources Bottom Sheet */}
+              <AnimatePresence>
+                {isResourcesSheetOpen && <ResourcesBottomSheet />}
+              </AnimatePresence>
+            </Drawer>
+          ) : (
+            children
+          )}
         </LayoutGroup>
 
         {/* Floating Glass Focus Toggle (Dock) — Appears only in Focus Mode */}
