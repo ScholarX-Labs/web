@@ -1,9 +1,11 @@
 import { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { LessonLayoutShell } from "./_components/lesson-layout-shell";
 import { LessonHeader } from "./_components/lesson-header";
 import { LessonClientBridge } from "./_components/lesson-client-bridge";
 import { Skeleton } from "@/components/ui/skeleton";
+import type { LessonSummary } from "@/types/course.types";
 
 interface LessonPageProps {
   params: Promise<{ slug: string; lessonId: string }>;
@@ -20,8 +22,19 @@ export async function generateMetadata({
 }
 
 // MOCK DATA for layout testing — In production, this would be a server action or API call
-const MOCK_LESSONS = [
-  { id: "lesson-1", title: "Introduction to the Core Concepts", duration: "5:23", isCompleted: true },
+const MOCK_LESSONS: LessonSummary[] = [
+  {
+    id: "lesson-1",
+    title: "Introduction to the Core Concepts",
+    duration: "5:23",
+    isCompleted: true,
+    media: {
+      // Public sample video for local/dev preview
+      src: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+      thumbnails: "",
+      poster: "https://placehold.co/1280x720/png?text=Lesson+1",
+    },
+  },
   { id: "lesson-2", title: "Setting up your Environment", duration: "12:45", isCompleted: true },
   { id: "lesson-3", title: "Understanding State and Lifecycle", duration: "18:10" },
   { id: "lesson-4", title: "Advanced Component Patterns", duration: "25:30", isLocked: true },
@@ -30,7 +43,27 @@ const MOCK_LESSONS = [
 
 export default async function LessonPage({ params }: LessonPageProps) {
   const { slug, lessonId } = await params;
-  const currentLesson = MOCK_LESSONS.find((l) => l.id === lessonId) || MOCK_LESSONS[0];
+
+  // Robust lookup: allow routes that use numeric lesson ids (e.g. /lessons/1)
+  // as well as full ids like "lesson-1". Prefer exact match first, then
+  // try numeric index mapping, then a `lesson-${id}` pattern.
+  let currentLesson = MOCK_LESSONS.find((l) => l.id === lessonId);
+  if (!currentLesson) {
+    const numeric = parseInt(lessonId, 10);
+    if (!isNaN(numeric)) {
+      // map 1 -> index 0
+      currentLesson = MOCK_LESSONS[numeric - 1];
+    }
+  }
+  if (!currentLesson) {
+    currentLesson = MOCK_LESSONS.find((l) => l.id === `lesson-${lessonId}`);
+  }
+
+  // If the lesson doesn't exist or is locked, return a 404.
+  if (!currentLesson || currentLesson.isLocked) {
+    notFound();
+  }
+
   const lessonIndex = MOCK_LESSONS.findIndex((l) => l.id === currentLesson.id);
 
   return (
