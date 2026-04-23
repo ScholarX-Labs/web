@@ -1,127 +1,178 @@
-import { 
-  Award, 
-  BookOpen, 
-  Users, 
-  CheckCircle, 
-  Code, 
-  Cpu,
-  GraduationCap,
+import {
+  Globe,
+  Users,
+  Target,
+  BookOpen,
   Briefcase,
-  Building
+  Calendar,
+  CircleDashed,
+  ArrowRight,
+  Check
 } from "lucide-react";
 
-export const HOME_DATA = {
-  hero: {
-    badge: "Now in Beta",
-    headline: [
-      "The premium learning",
-      "platform for the",
-      "next generation."
-    ],
-    subline: "Master high-demand skills with world-class curriculum designed by industry experts. Join ScholarX to unlock your potential.",
-    primaryCTA: { label: "Get Started", href: "/auth/signup" },
-    secondaryCTA: { label: "Explore Courses", href: "/courses" }
+// Hero Section
+export const HERO_CONTENT = {
+  title: "Empowering Youth",
+  subtitle: "Changing",
+  highlight: "Lives.",
+  description:
+    "ScholarX helps students and young professionals unlock global opportunities",
+  stats: {
+    count: "10,000",
+    text: "students worldwide",
   },
-  
-  features: [
-    {
-      id: "f1",
-      icon: Users,
-      title: "Expert Instructors",
-      description: "Learn directly from senior engineers and designers at top tech companies.",
-      accentClass: "text-blue-500 bg-blue-500/10"
-    },
-    {
-      id: "f2",
-      icon: BookOpen,
-      title: "Structured Learning",
-      description: "Carefully curated paths that take you from fundamentals to advanced concepts.",
-      accentClass: "text-purple-500 bg-purple-500/10"
-    },
-    {
-      id: "f3",
-      icon: Award,
-      title: "Recognized Certificates",
-      description: "Earn certificates that demonstrate your mastery and are valued by employers.",
-      accentClass: "text-amber-500 bg-amber-500/10"
-    },
-    {
-      id: "f4",
-      icon: Code,
-      title: "Project-Based",
-      description: "Build real-world applications to solidify your knowledge and portfolio.",
-      accentClass: "text-emerald-500 bg-emerald-500/10"
-    },
-    {
-      id: "f5",
-      icon: Cpu,
-      title: "AI Search",
-      description: "Instantly find answers across all course materials with our AI assistant.",
-      accentClass: "text-indigo-500 bg-indigo-500/10"
-    },
-    {
-      id: "f6",
-      icon: CheckCircle,
-      title: "Continuous Updates",
-      description: "Curriculum is constantly refreshed to keep pace with industry trends.",
-      accentClass: "text-rose-500 bg-rose-500/10"
-    }
-  ],
-
-  services: {
-    whyChoose: [
-      {
-        id: "w1",
-        icon: GraduationCap,
-        heading: "Academic Rigor",
-        body: "University-grade computer science foundations combined with modern tooling."
-      },
-      {
-        id: "w2",
-        icon: Briefcase,
-        heading: "Career Readiness",
-        body: "Curriculum aligned precisely with what hiring managers are looking for today."
-      },
-      {
-        id: "w3",
-        icon: Users,
-        heading: "Vibrant Community",
-        body: "Connect, collaborate, and grow with thousands of ambitious peers worldwide."
-      }
-    ],
-    whoWeHelp: [
-      {
-        id: "p1",
-        icon: GraduationCap,
-        label: "Aspiring Engineers",
-        description: "Looking to break into tech with strong fundamentals and practical skills."
-      },
-      {
-        id: "p2",
-        icon: Briefcase,
-        label: "Working Professionals",
-        description: "Aiming to upskill, transition roles, or stay ahead of the technology curve."
-      },
-      {
-        id: "p3",
-        icon: Building,
-        label: "Organizations",
-        description: "Seeking to train their teams efficiently with standardized, high-quality content."
-      }
-    ]
-  },
-
-  impact: [
-    { id: "i1", value: 12000, suffix: "+", label: "Active Learners", colorClass: "text-blue-500" },
-    { id: "i2", value: 80, suffix: "+", label: "Premium Courses", colorClass: "text-purple-500" },
-    { id: "i3", value: 50, suffix: "+", label: "Expert Instructors", colorClass: "text-emerald-500" },
-    { id: "i4", value: 15, suffix: "+", label: "Countries Reached", colorClass: "text-amber-500" }
-  ],
-
-  cta: {
-    headline: "Ready to elevate your skills?",
-    subline: "Join thousands of learners and start your journey today. Access world-class courses and build the career of your dreams.",
-    buttonLabel: "Get Started Now",
-    buttonHref: "/auth/signup"
-  }
 };
+
+export const HERO_BUTTONS = [
+  {
+    id: "explore",
+    text: "Explore Services",
+    type: "primary",
+    link: "/services",
+    icon: ArrowRight,
+  },
+  {
+    id: "join",
+    text: "Join our Community",
+    type: "secondary",
+    link: "/services",
+    icon: ArrowRight,
+  },
+];
+
+// Features Section
+export const FEATURES_CONTENT = {
+  title: "Welcome to",
+  highlight: "ScholarX",
+  description:
+    "ScholarX is dedicated to empowering students through education, mentorship, and community support. We believe in breaking down barriers and creating opportunities for ambitious learners worldwide",
+  cta: {
+    text: "Take the First Step Today!",
+    link: "/auth/signup",
+    icon: ArrowRight,
+  },
+  image: "/home-page/home-feature.jpg",
+  imageAlt: "ScholarX Education",
+};
+
+export const FEATURES_LIST = [
+  {
+    id: "training",
+    text: "Development Training Program",
+    icon: Check,
+  },
+  {
+    id: "community",
+    text: "Community Support",
+    icon: Check,
+  },
+  {
+    id: "resources",
+    text: "Resource Library",
+    icon: Check,
+  },
+];
+
+// Why Choose ScholarX Section
+export const WHY_CHOOSE_SECTION = {
+  title: "Why Choose",
+  highlight: "ScholarX?",
+  description:
+    "We're dedicated to making education accessible and providing the resources students need to succeed globally.",
+  theme: "light", // light background
+};
+
+export const WHY_CHOOSE_SERVICES = [
+  {
+    id: "scholarship",
+    icon: Globe,
+    title: "Scholarship Research",
+    description: "Access curated local and international scholarships",
+    color: "orange",
+  },
+  {
+    id: "mentorship",
+    icon: Users,
+    title: "Mentorship",
+    description: "Connect with experienced mentors in your field",
+    color: "orange",
+  },
+  {
+    id: "opportunities",
+    icon: Target,
+    title: "Opportunities",
+    description: "Discover global learning and career opportunities",
+    color: "orange",
+  },
+];
+
+// Who We Help Section
+export const WHO_WE_HELP_SECTION = {
+  title: "Who We",
+  highlight: "Help?",
+  description:
+    "We support students at every stage of their educational journey, providing tailored resources for their specific needs.",
+  theme: "white", // white background
+};
+
+export const WHO_WE_HELP_SERVICES = [
+  {
+    id: "highschool",
+    icon: BookOpen,
+    title: "High School Students",
+    description:
+      "Discover scholarships and prepare for university applications early.",
+    color: "black",
+  },
+  {
+    id: "university",
+    icon: Users,
+    title: "University Students",
+    description:
+      "Access mentorship, internships, and study-abroad opportunities.",
+    color: "black",
+  },
+  {
+    id: "graduates",
+    icon: Briefcase,
+    title: "Recent Graduates",
+    description:
+      "Find career guidance, advanced degrees, and professional development.",
+    color: "black",
+  },
+];
+
+// Impact Stats
+export const IMPACT_SECTION = {
+  title: "Our",
+  highlight: "Impact",
+  description:
+    "We're dedicated to making education accessible and providing the resources students need to succeed globally.",
+};
+
+export const IMPACT_STATS = [
+  {
+    id: "students",
+    icon: Users,
+    value: 15000,
+    label: "Students attended our programs",
+    suffix: "",
+    animationDuration: 2000,
+  },
+  {
+    id: "partners",
+    icon: CircleDashed,
+    value: 96,
+    label: "Partners",
+    suffix: "",
+    animationDuration: 1800,
+  },
+  {
+    id: "events",
+    icon: Calendar,
+    value: 38,
+    label: "Events and Programs",
+    suffix: "",
+    animationDuration: 1500,
+  },
+];

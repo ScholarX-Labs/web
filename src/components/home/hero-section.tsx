@@ -1,157 +1,89 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
-import { motion } from "framer-motion";
-import { HOME_DATA } from "@/lib/home-data";
-import { heroEntrance, tapScale } from "@/lib/motion-variants";
+import React, { memo } from "react";
 import Link from "next/link";
-import { ChevronDown } from "lucide-react";
+import { HERO_CONTENT, HERO_BUTTONS } from "@/lib/home-data";
 
-export default function HeroSection() {
-  const heroRef = useRef<HTMLElement>(null);
-  const textRef = useRef<HTMLDivElement>(null);
-  const orb1Ref = useRef<HTMLDivElement>(null);
-  const orb2Ref = useRef<HTMLDivElement>(null);
-  const bgGradientRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    // Check for reduced motion
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReducedMotion) return;
-
-    let ctx: any;
-
-    const initGsap = async () => {
-      const gsap = (await import("gsap")).default;
-      const { ScrollTrigger } = await import("gsap/ScrollTrigger");
-      gsap.registerPlugin(ScrollTrigger);
-
-      ctx = gsap.context(() => {
-        gsap.to(textRef.current, {
-          y: -60,
-          ease: "none",
-          scrollTrigger: { trigger: heroRef.current, start: "top top", end: "bottom top", scrub: 1 },
-        });
-        gsap.to(orb1Ref.current, {
-          y: -200,
-          ease: "none",
-          scrollTrigger: { trigger: heroRef.current, start: "top top", end: "bottom top", scrub: 1.5 },
-        });
-        gsap.to(orb2Ref.current, {
-          y: -80,
-          ease: "none",
-          scrollTrigger: { trigger: heroRef.current, start: "top top", end: "bottom top", scrub: 0.8 },
-        });
-        gsap.to(bgGradientRef.current, {
-          y: -120,
-          ease: "none",
-          scrollTrigger: { trigger: heroRef.current, start: "top top", end: "bottom top", scrub: 1.2 },
-        });
-      }, heroRef);
-    };
-
-    initGsap();
-
-    return () => {
-      if (ctx) ctx.revert();
-    };
-  }, []);
-
-  const { badge, headline, subline, primaryCTA, secondaryCTA } = HOME_DATA.hero;
-
+export const HeroSection = memo(function HeroSection() {
   return (
-    <section 
-      ref={heroRef}
-      className="min-h-screen relative overflow-hidden bg-[#0a0f1e] flex flex-col items-center justify-center pt-24 pb-12"
-      aria-label="ScholarX hero section"
-    >
-      {/* Background Parallax Layers */}
-      <div 
-        ref={bgGradientRef}
-        className="absolute inset-0 pointer-events-none transform-gpu opacity-40 mix-blend-screen"
-        style={{ background: "radial-gradient(circle at 50% 100%, rgba(59,130,246,0.15) 0%, transparent 60%)" }}
-      />
-      <div 
-        ref={orb1Ref}
-        className="absolute top-[10%] left-[15%] w-64 h-64 bg-blue-500/20 blur-[100px] rounded-full pointer-events-none transform-gpu"
-        aria-hidden="true"
-      />
-      <div 
-        ref={orb2Ref}
-        className="absolute bottom-[20%] right-[10%] w-96 h-96 bg-purple-500/20 blur-[120px] rounded-full pointer-events-none transform-gpu"
-        aria-hidden="true"
-      />
+    <section className="relative flex min-h-[calc(100vh-80px)] items-center overflow-hidden bg-gradient-to-br from-[#3399CC]/10 to-transparent px-8 py-15 md:min-h-auto md:px-5 md:py-10">
+      {/* Background Pattern */}
+      <div className="animate-[float_20s_ease-in-out_infinite] absolute -right-[10%] -top-[50%] h-[600px] w-[600px] rounded-full bg-[radial-gradient(circle,rgba(51,153,204,0.1)_0%,transparent_70%)]" />
 
-      <div className="absolute inset-0 bg-[#0a0f1e]/60 backdrop-blur-[40px] pointer-events-none z-0" />
-
-      {/* Content */}
-      <div className="container relative z-10 px-4 sm:px-6 lg:px-8 mx-auto flex flex-col items-center text-center">
-        <motion.div 
-          ref={textRef}
-          variants={heroEntrance} 
-          initial="hidden" 
-          animate="visible"
-          className="flex flex-col items-center max-w-4xl transform-gpu"
-        >
-          <motion.span 
-            variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
-            className="inline-flex items-center px-3 py-1 rounded-full border border-white/10 bg-white/5 text-sm font-medium text-white/80 mb-8 backdrop-blur-md shadow-inner"
-          >
-            {badge}
-          </motion.span>
-
-          <h1 className="text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-white mb-6">
-            {headline.map((line, i) => (
-              <motion.span 
-                key={i} 
-                className="block"
-                variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
-              >
-                {line}
-              </motion.span>
-            ))}
+      <div className="relative z-10 mx-auto grid w-full max-w-[1400px] grid-cols-1 items-center gap-15 lg:grid-cols-2">
+        {/* Text Section */}
+        <div className="animate-[fadeInLeft_0.8s_ease-out] text-center lg:text-left">
+          <h1 className="mb-6 animate-[fadeInUp_0.8s_ease-out_0.2s_both] text-[clamp(2rem,5vw,3.5rem)] font-bold leading-tight text-[#1a1a1a] md:text-[2rem]">
+            {HERO_CONTENT.title}
+            <br />
+            {HERO_CONTENT.subtitle}{" "}
+            <span className="relative inline-block text-[#3399CC] after:absolute after:-bottom-1 after:left-0 after:h-2 after:w-full after:animate-[slideInWidth_0.8s_ease-out_0.6s_both] after:rounded-md after:bg-gradient-to-r after:from-[#3399CC] after:to-[#3399CC]/30">
+              {HERO_CONTENT.highlight}
+            </span>
           </h1>
+          <p className="mx-auto mb-10 max-w-[540px] animate-[fadeInUp_0.8s_ease-out_0.3s_both] text-lg leading-[1.7] text-gray-600 lg:mx-0 md:text-base">
+            {HERO_CONTENT.description}
+          </p>
 
-          <motion.p 
-            variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
-            className="text-lg md:text-xl text-white/70 max-w-2xl mb-10 leading-relaxed"
-          >
-            {subline}
-          </motion.p>
+          {/* CTA Buttons */}
+          <div className="flex flex-col flex-wrap items-stretch justify-center gap-4 sm:flex-row lg:justify-start">
+            {HERO_BUTTONS.map((button, index) => {
+              const Icon = button.icon;
+              return (
+                <Link
+                  key={button.id}
+                  href={button.link}
+                  className="group relative inline-flex animate-[fadeInUp_0.8s_ease-out_both] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-xl border-none px-7 py-3.5 text-base font-semibold text-white shadow-[0_4px_15px_rgba(51,153,204,0.3)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(51,153,204,0.4)]"
+                  style={{
+                    animationDelay: `${400 + index * 100}ms`,
+                    background:
+                      button.type === "primary"
+                        ? "linear-gradient(135deg, #3399CC 0%, #2980b9 100%)"
+                        : "#385361",
+                  }}
+                >
+                  {/* Primary button pseudo element for hover shine */}
+                  {button.type === "primary" && (
+                    <span className="absolute inset-0 bg-gradient-to-br from-transparent to-white/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                  )}
+                  {button.text}
+                  <span className="text-xl transition-transform duration-300 group-hover:translate-x-1">
+                    <Icon className="h-5 w-5" />
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
 
-          <motion.div 
-            variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
-            className="flex flex-col sm:flex-row gap-4 items-center"
-          >
-            <motion.div whileHover={tapScale.whileHover} whileTap={tapScale.whileTap}>
-              <Link 
-                href={primaryCTA.href}
-                className="inline-flex h-12 items-center justify-center rounded-xl bg-white px-8 text-sm font-semibold text-[#0a0f1e] transition-colors hover:bg-white/90 shadow-[0_0_20px_rgba(255,255,255,0.3)]"
-              >
-                {primaryCTA.label}
-              </Link>
-            </motion.div>
-            
-            <motion.div whileHover={tapScale.whileHover} whileTap={tapScale.whileTap}>
-              <Link 
-                href={secondaryCTA.href}
-                className="inline-flex h-12 items-center justify-center rounded-xl border border-white/20 bg-white/5 px-8 text-sm font-semibold text-white transition-colors hover:bg-white/10 backdrop-blur-sm"
-              >
-                {secondaryCTA.label}
-              </Link>
-            </motion.div>
-          </motion.div>
-        </motion.div>
+        {/* Image & Social Proof */}
+        <div className="relative animate-[fadeInRight_0.8s_ease-out_0.4s_both]">
+          <div className="animate-[morph_8s_ease-in-out_infinite] relative mx-auto h-[350px] w-full max-w-[400px] bg-gradient-to-br from-[#3399CC] to-[#2980b9] bg-[url('/home-page/hero1.png')] bg-cover bg-center shadow-[0_20px_60px_rgba(51,153,204,0.3)] sm:h-[400px] sm:max-w-[500px] lg:h-[500px]">
+            {/* Decorative Elements */}
+            <div className="animate-[floatRotate1_12s_ease-in-out_infinite] absolute left-1/2 top-1/2 h-[calc(100%+40px)] w-[calc(100%+40px)] -translate-x-1/2 -translate-y-1/2 -rotate-3 rounded-[61%_39%_52%_48%/44%_59%_41%_56%] border-2 border-[#3399CC] opacity-60 lg:h-[520px] lg:w-[520px] max-sm:hidden" />
+            <div className="animate-[floatRotate2_14s_ease-in-out_infinite] absolute left-1/2 top-1/2 h-[calc(100%+40px)] w-[calc(100%+40px)] -translate-x-1/2 -translate-y-1/2 rotate-3 rounded-[65%_35%_50%_50%/40%_62%_38%_60%] border-2 border-[#3399CC] opacity-50 lg:h-[540px] lg:w-[540px] max-sm:hidden" />
+            <div className="animate-[floatRotate3_10s_ease-in-out_infinite] absolute left-1/2 top-1/2 h-[calc(100%+40px)] w-[calc(100%+40px)] -translate-x-1/2 -translate-y-1/2 rotate-[10deg] rounded-[55%_45%_60%_40%/50%_50%_50%_50%] border-2 border-[#3399CC] opacity-40 lg:h-[480px] lg:w-[480px] max-sm:hidden" />
+
+            {/* Social Proof Badge */}
+            <div className="animate-[pulse-shadow_3s_ease-in-out_infinite] absolute -bottom-2 -right-2 z-10 flex -rotate-6 flex-col gap-2 rounded-2xl bg-gradient-to-br from-[#3399CC] to-[#2980b9] p-3 shadow-[0_10px_30px_rgba(51,153,204,0.4),_0_0_0_1px_rgba(255,255,255,0.1)] backdrop-blur-md lg:-right-5 lg:bottom-5 lg:-rotate-[12deg] lg:p-4">
+              <div className="mb-1 flex items-center">
+                <div className="animate-[fadeInScale_0.5s_ease-out_0.6s_both] relative h-7 w-7 rounded-full border-2 border-[#134577] bg-white bg-[url('/home-page/avatar1.png')] bg-cover bg-center transition-transform duration-300 hover:scale-110 lg:h-8 lg:w-8" />
+                <div className="animate-[fadeInScale_0.5s_ease-out_0.7s_both] relative -ml-2 h-7 w-7 rounded-full border-2 border-[#134577] bg-white bg-[url('/home-page/avatar2.png')] bg-cover bg-center transition-transform duration-300 hover:scale-110 lg:h-8 lg:w-8" />
+                <div className="animate-[fadeInScale_0.5s_ease-out_0.8s_both] relative -ml-2 h-7 w-7 rounded-full border-2 border-[#134577] bg-white bg-[url('/home-page/avatar3.png')] bg-cover bg-center transition-transform duration-300 hover:scale-110 lg:h-8 lg:w-8" />
+                <div className="animate-[fadeInScale_0.5s_ease-out_0.9s_both] -ml-2 flex h-7 w-7 items-center justify-center rounded-full border-2 border-[#134577] bg-gradient-to-br from-[#FF6633] to-[#e55a2b] text-[10px] font-bold text-white lg:h-8 lg:w-8 lg:text-xs">
+                  10k+
+                </div>
+              </div>
+              <span className="animate-[fadeInUp_0.5s_ease-out_1s_both] text-xs font-medium leading-snug text-white lg:text-sm">
+                Join {HERO_CONTENT.stats.count}+<br />
+                {HERO_CONTENT.stats.text}
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
-
-      <motion.div 
-        initial={{ opacity: 0 }} 
-        animate={{ opacity: 1 }} 
-        transition={{ delay: 1, duration: 1 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 text-white/40 animate-bounce"
-      >
-        <ChevronDown className="w-6 h-6" />
-      </motion.div>
     </section>
   );
-}
+});
+
+export default HeroSection;

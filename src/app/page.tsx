@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
-import { MotionWrapper } from "@/components/home/motion-wrapper";
-import HeroWrapper from "@/components/home/hero-wrapper";
-import { FeaturesSection } from "@/components/home/features-section";
-import { ServicesSection } from "@/components/home/services-section";
-import ImpactSection from "./about/components/ImpactSection";
-import { HomeCTASection } from "@/components/home/home-cta-section";
+import HeroSection from "@/components/home/hero-section";
+import FeaturesSection from "@/components/home/features-section";
+import ServicesSection from "@/components/home/services-section";
+import ImpactSection from "@/components/home/impact-section";
+import { WHY_CHOOSE_SECTION, WHO_WE_HELP_SECTION } from "@/lib/home-data";
 
 export const metadata: Metadata = {
   title: "ScholarX — Premium Learning Platform",
@@ -19,14 +18,35 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <main className="w-full relative overflow-x-hidden">
-      <MotionWrapper>
-        <HeroWrapper />
-        <FeaturesSection />
-        <ServicesSection />
-        <ImpactSection title="Our Impact" items={[]} />
-        <HomeCTASection />
-      </MotionWrapper>
+    <main className="relative w-full overflow-x-hidden">
+      {/* Hero Section */}
+      <HeroSection />
+
+      {/* Features Section */}
+      <FeaturesSection />
+
+      {/* Why Choose ScholarX Section */}
+      <ServicesSection
+        title={WHY_CHOOSE_SECTION.title}
+        highlight={WHY_CHOOSE_SECTION.highlight}
+        description={WHY_CHOOSE_SECTION.description}
+        servicesKey="whyChoose"
+        theme="light"
+        watermarkImage="/assets/Images/WaterMark.png"
+      />
+
+      {/* Who We Help Section */}
+      <ServicesSection
+        title={WHO_WE_HELP_SECTION.title}
+        highlight={WHO_WE_HELP_SECTION.highlight}
+        description={WHO_WE_HELP_SECTION.description}
+        servicesKey="whoWeHelp"
+        theme="white"
+        watermarkImage="/assets/Images/image.png"
+      />
+
+      {/* Impact Section */}
+      <ImpactSection watermarkImage="/assets/Images/WaterMark.png" />
     </main>
   );
 }
