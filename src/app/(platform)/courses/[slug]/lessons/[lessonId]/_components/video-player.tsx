@@ -96,6 +96,7 @@ export const VideoPlayer = React.forwardRef<MediaPlayerInstance, VideoPlayerProp
           ref={ref}
           title={title}
           src={src}
+          autoPlay
           playsInline
           className="w-full aspect-video"
           crossOrigin
