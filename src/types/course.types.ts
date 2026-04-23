@@ -67,3 +67,17 @@ export interface Lesson {
   order: number;
   courseId: string;
 }
+
+// Lightweight lesson summary used by the lesson UI (server-provided)
+export interface LessonSummary {
+  id: string;
+  title: string;
+  duration: string;
+  isCompleted?: boolean;
+  isLocked?: boolean;
+  media?: {
+    src: string;
+    thumbnails?: string | string[];
+    poster?: string;
+  };
+}
