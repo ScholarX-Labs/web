@@ -1,0 +1,30 @@
+/* Home Page Main Styles */
+
+.page {
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+  background: #ffffff;
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Remove default margins */
+.page > * {
+  margin: 0;
+}
+
+/* Performance optimizations */
+.page * {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ensure images load efficiently */
+.page img {
+  max-width: 100%;
+  height: auto;
+}

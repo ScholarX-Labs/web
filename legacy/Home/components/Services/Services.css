@@ -1,0 +1,153 @@
+.bacground{
+    background-image: linear-gradient(#D6EBF5 80%, #FFFFFF00 100%);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 80px;
+
+}
+.bacground .water-mark{
+    width: 368px;
+    height: 368px;
+  position: absolute;
+  left: -10px;
+  background-color: #D6EBF5;
+  transform: rotate(60deg);
+  opacity: 22%;
+}
+
+.bacground2{
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 80px;
+    width: 100%;
+ 
+
+}
+.bacground2 .water-mark {
+    top: -50px;
+    width: 368px;
+    height: 368px;
+  position: absolute;
+  right: -10px;
+  color: white;
+  
+  transform: rotate(60deg);
+  opacity: 22%;
+}
+
+
+.container{
+    padding-top: 96px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+padding-bottom: 96px;
+/* padding-left: 52px;
+padding-right: 52px; */
+}
+
+.container h2{
+    font-size: 39px;
+    line-height: 100%;
+   font-weight: 500px;
+   text-align: center;
+}
+
+.container h2 span{
+    color: #3399CC;
+}
+.container p {
+    font-weight: 400px;
+    font-size: 20px;
+    color: #555555;
+    max-width: 630px;
+    height: 48px;
+    margin-top: 32px;
+    margin-bottom: 60px;
+    text-align: center;
+}
+
+
+.container .boxes{
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    z-index: 50;
+    justify-content: space-around;
+    gap: 25px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+.bacground2 .container .boxes .single-box{
+    box-shadow: 0 1px 1px 1px rgba(0, 0, 0, 0.1 );
+}
+.container .boxes .single-box{
+    width: calc(33.33% - 25px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #FFFFFF;
+    min-height: 214px;
+    max-width: 396px;
+    border-radius: 15px;
+    box-shadow: 0 1px 0px 0 rgba(0, 0, 0, 0.1);
+    text-align: center;
+    padding: 20px;
+    box-sizing: border-box;
+    transition: transform 0.3s ease;
+}
+
+.container .boxes .single-box:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.container .boxes .single-box .icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: #D6EBF5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30px;
+    color: #3399CC;
+    font-size: 2rem;
+}
+.container .boxes .single-box .group{
+    margin-top: 5px;
+    width: 100%;
+}
+.container .boxes .single-box .orange {
+    width: 100%;
+    font-weight: 400;
+    font-size: 25px;
+    color: #FF6633;
+    margin-top: 20px;
+}
+
+.container .boxes .single-box .black{
+    color: #0A1F29;
+    font-weight: 400;
+    font-size: 25px;
+    width: 100%;
+}
+.container .boxes .single-box p{
+    width: 100%;
+    font-weight: 400;
+    font-size: 16px;
+    margin-top: 10px;
+    color: #808080;
+    line-height: 1.4;
+}
+
+@media screen and (max-width: 768px) {
+    .container .boxes .single-box {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+}
