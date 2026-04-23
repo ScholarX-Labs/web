@@ -20,7 +20,7 @@ Run the appropriate script from the project root:
 
 If the extension scripts are not found, fall back to:
 - **Bash**: `git init && git add . && git commit -m "Initial commit from Specify template"`
-- **PowerShell**: `git init; git add .; git commit -m "Initial commit from Specify template"`
+- **PowerShell**: `git init; if ($LASTEXITCODE -ne 0) { Write-Error 'git init failed'; exit $LASTEXITCODE }; git add .; git commit -m "Initial commit from Specify template"`
 
 The script handles all checks internally:
 - Skips if Git is not available
