@@ -18,15 +18,20 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Pre-Execution Checks
 
+Before processing any extension hooks, resolve the `GIT_BRANCH_NAME` override (if provided) and make the resolved value available to hook execution.
+
+- Resolve `GIT_BRANCH_NAME` from user input (argument, env var, or config). If present, treat it as the authoritative branch name to be used by branch-creation hooks. If absent, leave resolution to the hook implementation.
+- Inject the resolved `GIT_BRANCH_NAME` into the hook execution context (for example, as an environment variable or explicit parameter) so that both optional and automatic pre-hooks receive the correct branch override when they run. Implementations that call a `HookExecutor` should pass this value in the executor's context (e.g., `HookExecutor.execute(hook, { env: { GIT_BRANCH_NAME: '<value>' } })`).
+
 **Check for extension hooks (before specification)**:
 - Check if `.specify/extensions.yml` exists in the project root.
 - If it exists, read it and look for entries under the `hooks.before_specify` key
 - If the YAML cannot be parsed or is invalid, skip hook checking silently and continue normally
 - Filter out hooks where `enabled` is explicitly `false`. Treat hooks without an `enabled` field as enabled by default.
 - For each remaining hook, do **not** attempt to interpret or evaluate hook `condition` expressions:
-  - If the hook has no `condition` field, or it is null/empty, treat the hook as executable
-  - If the hook defines a non-empty `condition`, skip the hook and leave condition evaluation to the HookExecutor implementation
-- For each executable hook, output the following based on its `optional` flag:
+   - If the hook has no `condition` field, or it is null/empty, treat the hook as executable
+   - If the hook defines a non-empty `condition`, skip the hook and leave condition evaluation to the HookExecutor implementation; ensure the HookExecutor is invoked with the resolved `GIT_BRANCH_NAME` in its evaluation/execution context.
+For each executable hook, output the following based on its `optional` flag:
   - **Optional hook** (`optional: true`):
     ```
     ## Extension Hooks
@@ -72,7 +77,7 @@ Given that feature description, do this:
 
    If a `before_specify` hook ran successfully in the Pre-Execution Checks above, it will have created/switched to a git branch and output JSON containing `BRANCH_NAME` and `FEATURE_NUM`. Note these values for reference, but the branch name does **not** dictate the spec directory name.
 
-   If the user explicitly provided `GIT_BRANCH_NAME`, pass it through to the hook so the branch script uses the exact value as the branch name (bypassing all prefix/suffix generation).
+   The `GIT_BRANCH_NAME` value is resolved before running pre-hooks and is available in the hook execution context. Branch-creation hooks should consume the resolved `GIT_BRANCH_NAME` (user-provided override or derived value) from their execution environment. If the user explicitly provided `GIT_BRANCH_NAME`, the hook should use that verbatim (bypassing auto-generated prefixes/suffixes).
 
 3. **Create the spec feature directory**:
 
