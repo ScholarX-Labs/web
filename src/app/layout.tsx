@@ -10,7 +10,6 @@ import Header from "@/components/Header";
 import { GlobalShellExclusions } from "@/components/global-shell-exclusions";
 import SignoutButton from "./auth/_components/SignoutButton";
 
-
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 const geistSans = Geist({
@@ -34,6 +33,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const currentUser = await getSession();
+  const IsDevShowSignOutButton = false; // Set to true to show sign-out button in dev when bypass is enabled
 
   return (
     <html lang="en" className={inter.variable}>
@@ -52,7 +52,9 @@ export default async function RootLayout({
                   bypassed.
                 </div>
               ) : null}
-              {currentUser && !isDevAuthBypassEnabled ? (
+              {IsDevShowSignOutButton &&
+              currentUser &&
+              !isDevAuthBypassEnabled ? (
                 <SignoutButton />
               ) : null}
               {children}
