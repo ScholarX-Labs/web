@@ -30,15 +30,50 @@ const MOCK_LESSONS: LessonSummary[] = [
     isCompleted: true,
     media: {
       // Public sample video for local/dev preview
-      src: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+      src: "https://youtu.be/55NvZjUZIO8",
       thumbnails: "",
       poster: "https://placehold.co/1280x720/png?text=Lesson+1",
     },
   },
-  { id: "lesson-2", title: "Setting up your Environment", duration: "12:45", isCompleted: true },
-  { id: "lesson-3", title: "Understanding State and Lifecycle", duration: "18:10" },
-  { id: "lesson-4", title: "Advanced Component Patterns", duration: "25:30", isLocked: true },
-  { id: "lesson-5", title: "Performance Optimization Tricks", duration: "14:15", isLocked: true },
+  {
+    id: "lesson-2",
+    title: "Setting up your Environment",
+    duration: "12:45",
+    isCompleted: true,
+    media: {
+      src: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+      poster: "https://placehold.co/1280x720/png?text=Lesson+2",
+    },
+  },
+  {
+    id: "lesson-3",
+    title: "Understanding State and Lifecycle",
+    duration: "18:10",
+    media: {
+      src: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+      poster: "https://placehold.co/1280x720/png?text=Lesson+3",
+    },
+  },
+  {
+    id: "lesson-4",
+    title: "Advanced Component Patterns",
+    duration: "25:30",
+    isLocked: true,
+    media: {
+      src: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+      poster: "https://placehold.co/1280x720/png?text=Lesson+4",
+    },
+  },
+  {
+    id: "lesson-5",
+    title: "Performance Optimization Tricks",
+    duration: "14:15",
+    isLocked: true,
+    media: {
+      src: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+      poster: "https://placehold.co/1280x720/png?text=Lesson+5",
+    },
+  },
 ];
 
 export default async function LessonPage({ params }: LessonPageProps) {
@@ -72,7 +107,10 @@ export default async function LessonPage({ params }: LessonPageProps) {
           CINEMATIC AMBIENT MESH — creates the color field that
           glass surfaces refract. Fixed and animated for "life".
          ───────────────────────────────────────────────────────────── */}
-      <div key="ambient-mesh" className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+      <div
+        key="ambient-mesh"
+        className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
+      >
         <div className="absolute inset-0 bg-[#050812]" />
 
         {/* Global Drift Animations */}
@@ -90,30 +128,31 @@ export default async function LessonPage({ params }: LessonPageProps) {
             animation: drift-halo 45s ease-in-out infinite alternate-reverse;
           }
         `}</style>
-        
+
         {/* Top-left hero glow (Blue) */}
         <div className="animate-halo absolute -top-[20%] -left-[10%] h-[90vh] w-[90vh] rounded-full bg-blue-600/20 blur-[130px]" />
-        
+
         {/* Mid-right accent (Violet) */}
         <div className="animate-halo-slow absolute top-[30%] -right-[5%] h-[70vh] w-[70vh] rounded-full bg-violet-600/15 blur-[110px]" />
-        
+
         {/* Bottom wash (Cyan/Emerald) */}
         <div className="animate-halo absolute -bottom-[10%] left-[25%] h-[60vh] w-[60vh] rounded-full bg-cyan-500/10 blur-[140px]" />
-        
       </div>
 
       {/* ─────────────────────────────────────────────────────────────
           LAYERED LAYOUT
          ───────────────────────────────────────────────────────────── */}
-      <div key="lesson-content" className="relative flex min-h-[100dvh] flex-col text-white font-sans">
-        
+      <div
+        key="lesson-content"
+        className="relative flex min-h-[100dvh] flex-col text-white font-sans"
+      >
         {/* STICKY GLASS HEADER */}
         <LessonHeader slug={slug} lessonTitle={currentLesson.title} />
 
         {/* CONTENT BRIDGE — Wires up interactive states (Client) */}
         <Suspense fallback={<LessonLoadingSkeleton />}>
           <LessonClientBridge
-            lessonId={lessonId}
+            lessonId={currentLesson.id}
             courseSlug={slug}
             lessonTitle={currentLesson.title}
             lessonIndex={lessonIndex + 1}
