@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ChevronLeft, ChevronRight, BookOpen, Clock, CheckCircle2,
@@ -125,29 +125,89 @@ export function LessonMeta({
   resumePoint,
   onResume,
 }: LessonMetaProps) {
-  const progress = ((lessonIndex + 1) / totalLessons) * 100;
+  const idx = Number(lessonIndex) || 0;
+  const total = Number(totalLessons) || 1;
+  const progress = (idx / total) * 100;
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [showMoreOptions, setShowMoreOptions] = useState(false);
   const [toast, setToast] = useState({ visible: false, message: "" });
+  const timerRef = useRef<number | null>(null);
   const [activeTabOverride, setActiveTabOverride] = useState<"notes" | undefined>(undefined);
   const [showResumePrompt, setShowResumePrompt] = useState(!!resumePoint);
   const { setNotesOverlayOpen, isFocusMode } = useUILayoutStore();
 
   const showToast = useCallback((message: string) => {
     setToast({ visible: true, message });
-    setTimeout(() => setToast((t) => ({ ...t, visible: false })), 2500);
+    // Clear any existing timer to avoid clobbering concurrent toasts
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+    timerRef.current = window.setTimeout(() => {
+      setToast((t) => ({ ...t, visible: false }));
+      timerRef.current = null;
+    }, 2500);
   }, []);
+
+  // Cleanup timer on unmount to avoid leaking timeouts
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, []);
+
+  // Ensure the resume prompt appears if resumePoint is loaded after mount.
+  useEffect(() => {
+    if (resumePoint != null && !showResumePrompt) {
+      setShowResumePrompt(true);
+    }
+  }, [resumePoint, showResumePrompt]);
 
   const handleShare = useCallback(async () => {
     const url = window.location.href;
+    // Prefer the Web Share API when available; fall back to clipboard.
     try {
-      if (navigator.share && navigator.canShare({ title: `Lesson: ${title}`, url })) {
-        await navigator.share({ title: `Lesson: ${title}`, url });
-      } else {
-        await navigator.clipboard.writeText(url);
-        showToast("Link copied to clipboard");
+      const canShareFn = typeof navigator !== "undefined" && typeof (navigator as any).canShare === "function";
+      const shareFn = typeof navigator !== "undefined" && typeof (navigator as any).share === "function";
+
+      if (shareFn) {
+        try {
+          // If canShare is available, check before calling share.
+          if (canShareFn) {
+            const can = (navigator as any).canShare({ title: `Lesson: ${title}`, url });
+            if (can) {
+              await (navigator as any).share({ title: `Lesson: ${title}`, url });
+              return;
+            }
+          } else {
+            // If canShare is not available, still try share and fall back on failure.
+            await (navigator as any).share({ title: `Lesson: ${title}`, url });
+            return;
+          }
+        } catch (err) {
+          // Sharing failed or was cancelled — fall back to clipboard below.
+        }
       }
-    } catch { /* cancelled */ }
+
+      // Fallback: use Clipboard API if available.
+      if (typeof navigator?.clipboard?.writeText === "function") {
+        try {
+          await navigator.clipboard.writeText(url);
+          showToast("Link copied to clipboard");
+          return;
+        } catch (err) {
+          showToast("Failed to copy link");
+          return;
+        }
+      }
+
+      // Last resort: inform the user sharing isn't supported.
+      showToast("Sharing not supported on this device");
+    } catch (err) {
+      showToast("Failed to share or copy link");
+    }
   }, [title, showToast]);
 
   const handleBookmark = useCallback(() => {
@@ -176,9 +236,17 @@ export function LessonMeta({
       icon: <Link2 className="w-3.5 h-3.5" />,
       label: "Copy Link",
       description: "Copy lesson URL to clipboard",
-      onClick: () => {
-        navigator.clipboard.writeText(window.location.href);
-        showToast("Link copied to clipboard");
+      onClick: async () => {
+        try {
+          if (typeof navigator?.clipboard?.writeText === "function") {
+            await navigator.clipboard.writeText(window.location.href);
+            showToast("Link copied to clipboard");
+          } else {
+            showToast("Copy not supported on this device");
+          }
+        } catch (err) {
+          showToast("Failed to copy link");
+        }
       },
     },
     {
@@ -222,7 +290,7 @@ export function LessonMeta({
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30">Course Momentum</span>
             <span className="text-xs font-bold text-blue-400 tabular-nums">
-              {lessonIndex + 1} of {totalLessons} Lessons
+              {idx} of {total} Lessons
             </span>
           </div>
           <div className="h-1 w-full rounded-full bg-white/5 overflow-hidden">
@@ -238,11 +306,11 @@ export function LessonMeta({
         {/* ─── LESSON TITLE + ACTIONS ─── */}
         <motion.div variants={staggerItem} className="flex items-start justify-between gap-6">
           <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3">
               <div className="flex items-center justify-center w-6 h-6 rounded-full bg-blue-500/20 border border-blue-500/40">
                 <BookOpen className="w-3 h-3 text-blue-400" />
               </div>
-              <span className="text-[10px] font-black uppercase tracking-[0.25em] text-blue-400/80">Episode {lessonIndex + 1}</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.25em] text-blue-400/80">Episode {idx}</span>
             </div>
             <h1 className="text-3xl lg:text-4xl xl:text-5xl font-black tracking-tighter text-white leading-[0.95] drop-shadow-sm">
               {title}
