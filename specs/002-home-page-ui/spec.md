@@ -5,6 +5,16 @@
 **Status**: Draft  
 **Input**: User description: "Imagine You are a Principal Frontend Engineer and Start Implementing that UI Home Page Using that Folder and Preferable the Same Design But Using Tailwind CSS using Apple UI UX best Practices and Glass Morphism and Smooth Pysics like animation"
 
+## Clarifications
+
+### Session 2026-04-23
+
+- Q: Which animation library strategy should be used? → A: Framer Motion (primary) + GSAP ScrollTrigger (hero/parallax scroll sequences)
+- Q: What is the color system / visual theme? → A: Light mode primary with selective dark-frosted hero/CTA panels
+- Q: What is the hero section scroll choreography? → A: Parallax scroll-through with layered depth (no scroll-jacking)
+- Q: What is the page content source? → A: Fully static — all section content in hardcoded TS constants, no API calls
+- Q: Where do the primary hero CTAs navigate? → A: "Get Started" → `/auth/sign-up` (primary), "Explore Courses" → `/courses` (secondary)
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Discovering Core Value Proposition (Priority: P1)
@@ -18,7 +28,7 @@ As a new visitor, I want to immediately understand the core value of ScholarX th
 **Acceptance Scenarios**:
 
 1. **Given** a visitor lands on the home page, **When** the page loads, **Then** a premium hero section with smooth physics-based entrance animations is displayed.
-2. **Given** the hero section is visible, **When** the user interacts with it (e.g., scrolling or hovering), **Then** glassmorphism visual effects respond fluidly.
+2. **Given** the hero section is visible, **When** the user scrolls down, **Then** multiple depth layers (headline text, background gradient, floating glow orbs) move at different parallax rates via GSAP ScrollTrigger — creating a natural sense of depth without locking scroll momentum.
 
 ---
 
@@ -60,12 +70,13 @@ As a visitor evaluating credibility, I want to see the platform's impact and sca
 ### Functional Requirements
 
 - **FR-001**: System MUST display a home page integrating Hero, Features, Services ("Why Choose ScholarX", "Who We Help"), and Impact sections based on the legacy structure.
-- **FR-002**: The UI MUST implement "Apple-caliber" design principles, including high cognitive clarity, minimalist layout, and sophisticated typography.
-- **FR-003**: The UI MUST incorporate glassmorphism aesthetics (translucent layers, background blur) where appropriate.
-- **FR-004**: System MUST include smooth, physics-based interactions and entrance animations for elements as they scroll into view.
+- **FR-002**: The UI MUST implement a **light mode primary** color system — crisp white/off-white surfaces, high-contrast typography, and luminous accent colors — following Apple Human Interface Guidelines. Dark-frosted panels (deep charcoal with `backdrop-filter` blur) are reserved exclusively for the Hero section and primary CTA blocks to create cinematic contrast and visual hierarchy.
+- **FR-003**: The UI MUST incorporate glassmorphism aesthetics (translucent frosted-glass layers, `backdrop-filter: blur`) specifically on the dark Hero overlay and CTA panels; remaining sections use clean light surfaces with subtle shadow and border tokens.
+- **FR-004**: System MUST use **Framer Motion** as the primary animation library (springs, variants, `AnimatePresence`, stagger reveals, layout animations) and **GSAP with ScrollTrigger** for a **parallax scroll-through** on the Hero section: text, background gradient, and floating glow orbs move at independent depth rates as the user scrolls naturally (no viewport pinning or scroll-jacking).
 - **FR-005**: System MUST ensure the design is fully responsive across mobile, tablet, and desktop viewports.
 - **FR-006**: System MUST respect user accessibility settings, including reduced motion preferences.
 - **FR-007**: System MUST provide appropriate fallback styles for older browsers that lack support for modern CSS features like `backdrop-filter`.
+- **FR-008**: The Hero section MUST render a **dual CTA** pattern: a primary button labelled **"Get Started"** navigating to `/auth/sign-up`, and a secondary button labelled **"Explore Courses"** navigating to `/courses`.
 
 ### Key Entities
 
@@ -82,5 +93,6 @@ As a visitor evaluating credibility, I want to see the platform's impact and sca
 
 ## Assumptions
 
-- The existing content (text, images, and data constants) from the legacy Home page will be reused without modification.
+- All home page section content (feature cards, impact metrics, service descriptions) is **fully static**, defined in a dedicated `home-data.ts` constants file. No API calls, `Suspense` boundaries, or skeleton loading states are required for page content.
+- The existing content (text, images, and data constants) from the legacy Home page will be reused and migrated to this constants file without modification.
 - The target audience expects a high-end, consumer-grade digital experience.
