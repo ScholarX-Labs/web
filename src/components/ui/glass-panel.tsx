@@ -21,7 +21,7 @@ type GlassPanelProps = Omit<HTMLMotionProps<"div">, "children"> & {
 export const GlassPanel = React.forwardRef<
   HTMLDivElement,
   GlassPanelProps
->(({ className, children, ...props }, ref) => {
+>(({ className, children, style, ...props }, ref) => {
   return (
     <motion.div
       ref={ref}
@@ -33,7 +33,7 @@ export const GlassPanel = React.forwardRef<
       )}
       style={{
         boxShadow: `${shadow.floating}, ${shadow.inner}`,
-        ...props.style,
+        ...style,
       }}
       {...props}
     >
