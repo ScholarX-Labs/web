@@ -149,21 +149,72 @@ if (-not $commitMsg) {
     $commitMsg = "[Spec Kit] Auto-commit $phase $commandName"
 }
 
-# Stage and commit
-# Relax ErrorActionPreference so CRLF warnings on stderr do not terminate,
-# while still allowing redirected error output to be captured for diagnostics.
-$savedEAP = $ErrorActionPreference
-$ErrorActionPreference = 'Continue'
-try {
-    $out = git add . 2>&1 | Out-String
-    if ($LASTEXITCODE -ne 0) { throw "git add failed: $out" }
-    $out = git commit -q -m $commitMsg 2>&1 | Out-String
-    if ($LASTEXITCODE -ne 0) { throw "git commit failed: $out" }
-} catch {
-    Write-Warning "[specify] Error: $_"
-    exit 1
-} finally {
-    $ErrorActionPreference = $savedEAP
-}
+# Prepare staging: show pending changes and require confirmation before staging all changes
+$porcelain = git status --porcelain 2>$null
+if ($porcelain) {
+    Write-Host "[specify] Uncommitted changes detected:" -ForegroundColor Yellow
+    git status --porcelain
+    # If explicit paths configured in YAML, stage only those (supports non-interactive)
+    $pathsSpec = @()
+    foreach ($line in Get-Content $configFile) {
+        if ($line -match '^[[:space:]]*paths:\s*(\[.*\])') {
+            $raw = $matches[1].Trim()
+            # crude parsing: remove [ ] and split on commas
+            $raw = $raw.Trim('[',']')
+            $parts = $raw -split ',' | ForEach-Object { $_.Trim() -replace '^["'']','' -replace '["'']$','' }
+            foreach ($p in $parts) { if ($p) { $pathsSpec += $p } }
+            break
+        }
+    }
 
-Write-Host "[OK] Changes committed $phase $commandName"
+    if ($pathsSpec.Count -gt 0) {
+        Write-Host "[specify] Staging configured paths: $($pathsSpec -join ', ')"
+        $savedEAP = $ErrorActionPreference
+        $ErrorActionPreference = 'Continue'
+        try {
+            $out = git add -- $pathsSpec 2>&1 | Out-String
+            if ($LASTEXITCODE -ne 0) { throw "git add failed: $out" }
+            $out = git commit -q -m $commitMsg 2>&1 | Out-String
+            if ($LASTEXITCODE -ne 0) { throw "git commit failed: $out" }
+        } catch {
+            Write-Warning "[specify] Error: $_"
+            exit 1
+        } finally {
+            $ErrorActionPreference = $savedEAP
+        }
+        Write-Host "[OK] Changes committed $phase $commandName"
+        exit 0
+    }
+
+    # Prompt interactively; Read-Host will throw in non-interactive sessions
+    try {
+        $resp = Read-Host "Stage all changes and commit? [y/N]"
+    } catch {
+        Write-Warning "[specify] Non-interactive session: auto-commit requires confirmation. Skipped auto-commit. To enable non-interactive auto-commit, configure explicit pathspecs under auto_commit in .specify/extensions/git/git-config.yml."
+        exit 0
+    }
+
+    if ($resp -match '^[Yy]') {
+        $savedEAP = $ErrorActionPreference
+        $ErrorActionPreference = 'Continue'
+        try {
+            $out = git add . 2>&1 | Out-String
+            if ($LASTEXITCODE -ne 0) { throw "git add failed: $out" }
+            $out = git commit -q -m $commitMsg 2>&1 | Out-String
+            if ($LASTEXITCODE -ne 0) { throw "git commit failed: $out" }
+        } catch {
+            Write-Warning "[specify] Error: $_"
+            exit 1
+        } finally {
+            $ErrorActionPreference = $savedEAP
+        }
+
+        Write-Host "[OK] Changes committed $phase $commandName"
+    } else {
+        Write-Host "[specify] Skipped auto-commit per user choice"
+        exit 0
+    }
+} else {
+    Write-Host "[specify] No changes to commit after $EventName" -ForegroundColor DarkGray
+    exit 0
+}
