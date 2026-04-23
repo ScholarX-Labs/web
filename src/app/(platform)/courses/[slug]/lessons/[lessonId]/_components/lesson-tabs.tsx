@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   BookOpen, NotebookPen, FolderOpen, Plus, Trash2,
-  File, Link2, Video, Download, ExternalLink, Clock, StickyNote
+  File, Link2, Video, Clock, StickyNote
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNotes } from "@/hooks/use-notes";
@@ -140,22 +140,27 @@ export function LessonTabs({
 
   const { setResourcesSheetOpen } = useUILayoutStore();
 
-  // React to tab changes
-  useEffect(() => {
-    if (activeTab === "resources") {
+  // Handler for tab clicks — ensures Resources sheet opens even when already active
+  const handleTabClick = useCallback((tab: TabId) => {
+    setActiveTab(tab);
+    if (tab === "resources") {
       setResourcesSheetOpen(true);
-      // Optional: switch back to overview so the "background" content remains stable
-      // or keep it for the inline view. I'll stay on resources for now.
     }
-  }, [activeTab, setResourcesSheetOpen]);
+    onTabChange?.();
+  }, [setResourcesSheetOpen, onTabChange]);
 
-  // React to external tab override (e.g. from More Options dropdown)
+  // React to external tab override (run only once when initialTab first arrives)
+  const seenInitialTabRef = useRef(false);
   useEffect(() => {
-    if (initialTab) {
+    if (!seenInitialTabRef.current && initialTab) {
+      seenInitialTabRef.current = true;
       setActiveTab(initialTab);
+      if (initialTab === "resources") {
+        setResourcesSheetOpen(true);
+      }
       onTabChange?.();
     }
-  }, [initialTab, onTabChange]);
+  }, [initialTab, onTabChange, setResourcesSheetOpen]);
 
   return (
     <div className="flex flex-col rounded-2xl overflow-hidden border border-white/[0.08] bg-white/[0.03] backdrop-blur-sm">
@@ -164,7 +169,7 @@ export function LessonTabs({
         {TABS.map((tab) => (
           <button
             key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
+            onClick={() => handleTabClick(tab.id)}
             className={cn(
               "relative flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-200",
               activeTab === tab.id
@@ -316,12 +321,14 @@ export function LessonTabs({
                         ) : (
                           /* View Mode */
                           <>
-                            <p
-                              className="text-sm text-white/70 leading-relaxed cursor-pointer hover:text-white/90 transition-colors"
+                            <button
+                              type="button"
                               onClick={() => startEdit(note)}
+                              aria-label={`Edit note ${note.id}`}
+                              className="text-left w-full text-sm text-white/70 leading-relaxed cursor-pointer hover:text-white/90 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/30"
                             >
                               {note.text}
-                            </p>
+                            </button>
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-1.5 text-[10px] text-white/20 font-medium">
                                 <Clock className="w-3 h-3" />
@@ -347,67 +354,7 @@ export function LessonTabs({
             </motion.div>
           )}
 
-          {/* ── RESOURCES ── */}
-          {activeTab === "resources" && (
-            <motion.div
-              key="resources"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.18 }}
-              className="flex flex-col gap-2"
-            >
-              {resources.map((resource) => {
-                const meta = resourceMeta[resource.type];
-                const isExternal = resource.url.startsWith("http");
-                return (
-                  <motion.a
-                    key={resource.id}
-                    href={resource.url}
-                    target={isExternal ? "_blank" : undefined}
-                    rel={isExternal ? "noopener noreferrer" : undefined}
-                    download={!isExternal && resource.url !== "#" ? true : undefined}
-                    whileHover={{ x: 3 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 28 }}
-                    className="group flex items-center gap-4 rounded-xl border border-white/[0.07] bg-white/[0.03] hover:border-white/10 hover:bg-white/[0.05] p-4 transition-all duration-200 cursor-pointer"
-                  >
-                    {/* Icon */}
-                    <div className={cn(
-                      "w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border",
-                      meta.bg, meta.color
-                    )}>
-                      {meta.icon}
-                    </div>
-
-                    {/* Text */}
-                    <div className="flex flex-col gap-0.5 min-w-0 flex-1">
-                      <span className="text-sm font-semibold text-white/80 group-hover:text-white transition-colors truncate">
-                        {resource.title}
-                      </span>
-                      <span className="text-xs text-white/30 truncate">{resource.description}</span>
-                    </div>
-
-                    {/* Action + Size */}
-                    <div className="flex flex-col items-end gap-1 shrink-0">
-                      {resource.size && (
-                        <span className="text-[10px] font-bold text-white/20 tabular-nums">{resource.size}</span>
-                      )}
-                      <div className={cn(
-                        "w-7 h-7 rounded-lg flex items-center justify-center transition-colors",
-                        meta.bg, meta.color, "group-hover:opacity-100 opacity-60"
-                      )}>
-                        {isExternal ? (
-                          <ExternalLink className="w-3 h-3" />
-                        ) : (
-                          <Download className="w-3 h-3" />
-                        )}
-                      </div>
-                    </div>
-                  </motion.a>
-                );
-              })}
-            </motion.div>
-          )}
+          {/* Resources are handled by the ResourcesBottomSheet; removed inline rendering to avoid duplicate UI. */}
         </AnimatePresence>
       </div>
     </div>
