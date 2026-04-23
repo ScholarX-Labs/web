@@ -72,7 +72,7 @@ export function CourseStickyCta({ course }: CourseStickyCtaProps) {
                 </button>
                 {isEnrolled ? (
                   <Link
-                    href={ROUTES.LESSON(course.slug, "1")}
+                    href={ROUTES.LESSON(course.slug, "lesson-1")}
                     className="flex-1 sm:flex-none flex items-center justify-center px-8 py-3 rounded-full font-bold text-white bg-linear-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 shadow-lg shadow-emerald-500/20 transition-all active:scale-95"
                   >
                     Resume Learning
