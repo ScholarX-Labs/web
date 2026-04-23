@@ -8,6 +8,8 @@ import { isDevAuthBypassEnabled } from "@/config/dev-auth-bypass";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { GlobalShellExclusions } from "@/components/global-shell-exclusions";
+import SignoutButton from "./auth/_components/SignoutButton";
+
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -36,7 +38,7 @@ export default async function RootLayout({
   return (
     <html lang="en" className={inter.variable}>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col`}
       >
         <div vaul-drawer-wrapper="">
           <GlobalShellExclusions>
@@ -49,6 +51,9 @@ export default async function RootLayout({
                   DEV_AUTH_BYPASS is ON: authentication and route protection are
                   bypassed.
                 </div>
+              ) : null}
+              {currentUser && !isDevAuthBypassEnabled ? (
+                <SignoutButton />
               ) : null}
               {children}
             </TooltipProvider>

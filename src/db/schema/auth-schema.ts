@@ -1,14 +1,16 @@
-import { relations } from "drizzle-orm";
+// [AUTO-FIXED] Array defaults and other Postgres-specific patches applied by scripts/fix-auth-schema.js
+import { relations, sql } from "drizzle-orm";
 import {
   pgSchema,
   text,
   timestamp,
   boolean,
   integer,
+  numeric,
   index,
 } from "drizzle-orm/pg-core";
 
-const authSchema = pgSchema("auth");
+export const authSchema = pgSchema("auth");
 
 export const user = authSchema.table("user", {
   id: text("id").primaryKey(),
@@ -42,8 +44,8 @@ export const user = authSchema.table("user", {
   nationality: text("nationality"),
   city: text("city"),
   currentInterest: text("current_interest"),
-  savedOpportunities: text("saved_opportunities").array().default([]),
-  registeredEvents: text("registered_events").array().default([]),
+  savedOpportunities: text("saved_opportunities").array().default(sql`'{}'::text[]`),
+  registeredEvents: text("registered_events").array().default(sql`'{}'::text[]`),
 });
 
 export const session = authSchema.table(
