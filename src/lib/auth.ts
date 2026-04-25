@@ -3,129 +3,12 @@ import { APIError, createAuthMiddleware } from "better-auth/api";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
 import { db } from "@/db";
-import { and, eq, gte, like, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import * as schema from "@/db/schema/auth-schema";
-import { admin, bearer, emailOTP, phoneNumber } from "better-auth/plugins";
+import { admin, bearer, phoneNumber } from "better-auth/plugins";
 import { parsePhoneNumberWithError } from "libphonenumber-js";
 import { z } from "zod";
 import { sendEmail } from "./email";
-import { randomUUID } from "node:crypto";
-
-const EMAIL_OTP_RATE_LIMIT_IDENTIFIER = "email-otp-rate-limit";
-const EMAIL_OTP_HOURLY_LIMIT = 4;
-const EMAIL_OTP_DAILY_LIMIT = 10;
-const ONE_HOUR_IN_MS = 60 * 60 * 1000;
-const ONE_DAY_IN_MS = 24 * ONE_HOUR_IN_MS;
-const EMAIL_OTP_EXPIRY_IN_SECONDS = 10 * 60;
-
-function normalizeEmailAddress(email: string): string {
-  return email.trim().toLowerCase();
-}
-
-function escapeLikePattern(value: string): string {
-  return value.replace(/[%_\\]/g, "\\$&");
-}
-
-async function assertEmailOtpSendLimit(email: string): Promise<void> {
-  const now = Date.now();
-  const normalizedEmail = normalizeEmailAddress(email);
-
-  await db.transaction(async (tx) => {
-    const hourlyCount = await countOtpSendsSince(
-      normalizedEmail,
-      new Date(now - ONE_HOUR_IN_MS),
-      tx,
-    );
-    const dailyCount = await countOtpSendsSince(
-      normalizedEmail,
-      new Date(now - ONE_DAY_IN_MS),
-      tx,
-    );
-
-    if (hourlyCount >= EMAIL_OTP_HOURLY_LIMIT) {
-      throw new APIError("TOO_MANY_REQUESTS", {
-        message: "ERR_EMAIL_OTP_RATE_LIMIT_HOURLY",
-      });
-    }
-
-    if (dailyCount >= EMAIL_OTP_DAILY_LIMIT) {
-      throw new APIError("TOO_MANY_REQUESTS", {
-        message: "ERR_EMAIL_OTP_RATE_LIMIT_DAILY",
-      });
-    }
-
-    // record intent to send (provisional) to prevent race conditions
-    await recordEmailOtpSend(normalizedEmail, tx);
-  });
-}
-
-async function countOtpSendsSince(
-  email: string,
-  since: Date,
-  tx: any = db,
-): Promise<number> {
-  const escapedEmail = escapeLikePattern(email);
-  const identifierPrefix = `${EMAIL_OTP_RATE_LIMIT_IDENTIFIER}:${escapedEmail}:%`;
-  const [result] = await tx
-    .select({ count: sql<number>`count(*)` })
-    .from(schema.verification)
-    .where(
-      and(
-        like(schema.verification.identifier, identifierPrefix),
-        gte(schema.verification.createdAt, since),
-      ),
-    );
-
-  return Number(result?.count ?? 0);
-}
-
-async function recordEmailOtpSend(email: string, tx: any = db): Promise<void> {
-  const normalizedEmail = normalizeEmailAddress(email);
-  const uniqueId = randomUUID();
-
-  await tx.insert(schema.verification).values({
-    id: randomUUID(),
-    identifier: `${EMAIL_OTP_RATE_LIMIT_IDENTIFIER}:${normalizedEmail}:${Date.now()}:${uniqueId}`,
-    value: "sent",
-    expiresAt: new Date(Date.now() + ONE_DAY_IN_MS + ONE_HOUR_IN_MS),
-  });
-}
-
-function getOtpEmailContent(
-  type: string,
-  otp: string,
-): {
-  subject: string;
-  text: string;
-} {
-  switch (type) {
-    case "email-verification":
-      return {
-        subject: "Your ScholarX email verification code",
-        text: `Your ScholarX verification code is ${otp}. It expires in 10 minutes.`,
-      };
-    case "sign-in":
-      return {
-        subject: "Your ScholarX sign-in code",
-        text: `Your ScholarX sign-in code is ${otp}. It expires in 10 minutes.`,
-      };
-    case "forget-password":
-      return {
-        subject: "Your ScholarX password reset code",
-        text: `Your ScholarX password reset code is ${otp}. It expires in 10 minutes.`,
-      };
-    case "change-email":
-      return {
-        subject: "Your ScholarX email change code",
-        text: `Your ScholarX email change code is ${otp}. It expires in 10 minutes.`,
-      };
-    default:
-      return {
-        subject: "Your ScholarX verification code",
-        text: `Your ScholarX verification code is ${otp}. It expires in 10 minutes.`,
-      };
-  }
-}
 
 export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL,
@@ -135,7 +18,19 @@ export const auth = betterAuth({
     enabled: true,
   },
   emailVerification: {
-    async afterEmailVerification() {
+    sendVerificationEmail: async ({ user, url }) => {
+      try {
+        await sendEmail({
+          to: user.email,
+          subject: "Verify your email address",
+          text: `Click the link to verify your email: ${url}`,
+        });
+      } catch (error) {
+        console.error("[sendVerificationEmail] sendEmail failed", error);
+        throw error;
+      }
+    },
+    async afterEmailVerification(user, request) {
       // Actions after user verified email
     },
     autoSignInAfterVerification: true,
@@ -144,17 +39,6 @@ export const auth = betterAuth({
   },
   hooks: {
     before: createAuthMiddleware(async (ctx) => {
-      if (ctx.path === "/email-otp/send-verification-otp") {
-        const requestEmail =
-          typeof ctx.body?.email === "string" ? ctx.body.email : "";
-
-        if (requestEmail) {
-          await assertEmailOtpSendLimit(requestEmail);
-        }
-
-        return;
-      }
-
       if (ctx.path !== "/sign-up/email") {
         return;
       }
@@ -179,7 +63,7 @@ export const auth = betterAuth({
             });
           }
           normalizedPhone = parsedPhone.number;
-        } catch {
+        } catch (error) {
           throw new APIError("BAD_REQUEST", {
             message: "ERR_INVALID_PHONE",
           });
@@ -335,38 +219,5 @@ export const auth = betterAuth({
       },
     },
   },
-  plugins: [
-    nextCookies(),
-    emailOTP({
-      otpLength: 6,
-      expiresIn: EMAIL_OTP_EXPIRY_IN_SECONDS,
-      overrideDefaultEmailVerification: true,
-      rateLimit: {
-        // Keep plugin-level throttle permissive and enforce product limits per email in middleware.
-        window: 60,
-        max: 100,
-      },
-      sendVerificationOTP: async ({ email, otp, type }) => {
-        const normalizedEmail = normalizeEmailAddress(email);
-        const { subject, text } = getOtpEmailContent(type, otp);
-
-        console.log(`[TEST] Verification OTP for ${normalizedEmail}: ${otp}`);
-
-        try {
-          /* Temporarily disabled for testing
-          await sendEmail({
-            to: normalizedEmail,
-            subject,
-            text,
-          });
-          */
-        } finally {
-          await recordEmailOtpSend(normalizedEmail);
-        }
-      },
-    }),
-    phoneNumber(),
-    admin(),
-    bearer(),
-  ],
+  plugins: [nextCookies(), phoneNumber(), admin(), bearer()],
 });

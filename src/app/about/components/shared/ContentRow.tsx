@@ -5,7 +5,7 @@ import type { AboutImage } from "../../constants";
 type ContentRowProps = {
   label?: string;
   title?: string;
-  content: string | readonly string[];
+  content: string | string[];
   image: AboutImage;
   reversed?: boolean;
   delay?: number;
