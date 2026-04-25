@@ -135,7 +135,7 @@ export const auth = betterAuth({
         const requestType =
           typeof ctx.body?.type === "string" ? ctx.body.type : "";
 
-        if (requestType === "email-verification" && requestEmail) {
+        if (requestEmail) {
           await assertEmailOtpSendLimit(requestEmail);
         }
 
@@ -342,10 +342,7 @@ export const auth = betterAuth({
           subject,
           text,
         });
-
-        if (type === "email-verification") {
-          await recordEmailOtpSend(normalizedEmail);
-        }
+        await recordEmailOtpSend(normalizedEmail);
       },
     }),
     phoneNumber(),

@@ -10,32 +10,45 @@ type VerifyEmailOtpFormProps = {
   email: string;
 };
 
-function getFriendlyError(message?: string): string {
-  if (!message) {
+type AuthError = {
+  message?: string;
+  code?: string;
+};
+
+function getFriendlyError(error?: AuthError): string {
+  if (!error) {
     return "Something went wrong. Please try again.";
   }
 
-  if (message.includes("ERR_EMAIL_OTP_RATE_LIMIT_HOURLY")) {
+  const { message, code } = error;
+
+  if (
+    code === "ERR_EMAIL_OTP_RATE_LIMIT_HOURLY" ||
+    message?.includes("ERR_EMAIL_OTP_RATE_LIMIT_HOURLY")
+  ) {
     return "You have reached the hourly limit. You can request up to 4 codes per hour.";
   }
 
-  if (message.includes("ERR_EMAIL_OTP_RATE_LIMIT_DAILY")) {
+  if (
+    code === "ERR_EMAIL_OTP_RATE_LIMIT_DAILY" ||
+    message?.includes("ERR_EMAIL_OTP_RATE_LIMIT_DAILY")
+  ) {
     return "You have reached the daily limit. You can request up to 10 codes per day.";
   }
 
-  if (message.includes("OTP_EXPIRED")) {
+  if (code === "OTP_EXPIRED" || message?.includes("OTP_EXPIRED")) {
     return "This code has expired. Request a new code and try again.";
   }
 
-  if (message.includes("INVALID_OTP")) {
+  if (code === "INVALID_OTP" || message?.includes("INVALID_OTP")) {
     return "The code is invalid. Please check it and try again.";
   }
 
-  if (message.includes("TOO_MANY_ATTEMPTS")) {
+  if (code === "TOO_MANY_ATTEMPTS" || message?.includes("TOO_MANY_ATTEMPTS")) {
     return "Too many incorrect attempts. Request a new code and try again.";
   }
 
-  return message;
+  return message || "Something went wrong. Please try again.";
 }
 
 export default function VerifyEmailOtpForm({ email }: VerifyEmailOtpFormProps) {
@@ -69,7 +82,7 @@ export default function VerifyEmailOtpForm({ email }: VerifyEmailOtpFormProps) {
       });
 
       if (error) {
-        setErrorMessage(getFriendlyError(error.message));
+        setErrorMessage(getFriendlyError(error));
         return;
       }
 
@@ -98,7 +111,7 @@ export default function VerifyEmailOtpForm({ email }: VerifyEmailOtpFormProps) {
       });
 
       if (error) {
-        setErrorMessage(getFriendlyError(error.message));
+        setErrorMessage(getFriendlyError(error));
         return;
       }
 
