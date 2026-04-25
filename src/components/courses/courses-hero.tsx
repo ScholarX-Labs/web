@@ -12,6 +12,8 @@ import {
   PenTool,
   Database,
   Cpu,
+  Check,
+  X,
 } from "lucide-react";
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -66,7 +68,14 @@ export function CoursesHero() {
     activeCourseFilters,
     setCourseSearch,
     toggleCourseFilter,
+    clearCourseFilters,
   } = useUiStore();
+
+  const activeCategory = COURSE_CATEGORIES.find((cat) =>
+    activeCourseFilters.includes(cat.label)
+  );
+
+  const hasActiveFilters = activeCourseFilters.length > 0 || courseSearch.trim().length > 0;
 
   return (
     <section
@@ -158,8 +167,8 @@ export function CoursesHero() {
                     whileTap={{ scale: 0.96 }}
                     className="flex items-center gap-1.5 bg-hero-blue/90 hover:bg-hero-blue backdrop-blur-md text-white px-5 py-3 rounded-full font-semibold text-sm transition-all duration-300 shadow-[0_2px_10px_rgba(59,130,246,0.2)] shrink-0 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-hero-blue/50"
                   >
-                    Categories
-                    <ChevronDown className="w-4 h-4 opacity-70" />
+                    {activeCategory ? activeCategory.label : "Categories"}
+                    <ChevronDown className={cn("w-4 h-4 transition-transform duration-300", activeCategory && "rotate-180")} />
                   </motion.button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent 
@@ -175,19 +184,24 @@ export function CoursesHero() {
                         "hover:text-white focus:text-white",
                         hoverBg
                       )}
-                      onSelect={(e) => {
-                        // Responding to interaction gracefully without heavy functionality logic
+                      onSelect={() => {
+                        toggleCourseFilter(label);
                       }}
                     >
-                      <div className={cn(
-                        "p-1.5 rounded-lg bg-white/70 dark:bg-white/5 backdrop-blur-md shadow-sm border border-white/20 dark:border-white/5 transition-all duration-300 ease-out", 
-                        "group-hover:bg-transparent group-hover:border-transparent group-hover:shadow-none group-hover:text-white",
-                        "group-focus:bg-transparent group-focus:border-transparent group-focus:shadow-none group-focus:text-white",
-                        colorClass
-                      )}>
-                        <Icon className="w-4 h-4" />
+                      <div className="flex items-center gap-3 flex-1">
+                        <div className={cn(
+                          "p-1.5 rounded-lg bg-white/70 dark:bg-white/5 backdrop-blur-md shadow-sm border border-white/20 dark:border-white/5 transition-all duration-300 ease-out", 
+                          "group-hover:bg-transparent group-hover:border-transparent group-hover:shadow-none group-hover:text-white",
+                          "group-focus:bg-transparent group-focus:border-transparent group-focus:shadow-none group-focus:text-white",
+                          colorClass
+                        )}>
+                          <Icon className="w-4 h-4" />
+                        </div>
+                        {label}
                       </div>
-                      {label}
+                      {activeCourseFilters.includes(label) && (
+                        <Check className="w-4 h-4 text-white ml-auto" />
+                      )}
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
@@ -246,6 +260,43 @@ export function CoursesHero() {
                   </motion.button>
                 );
               })}
+
+              {/* Category Pills (Dynamic) */}
+              {COURSE_CATEGORIES.map(({ label, icon: Icon }) => {
+                if (!activeCourseFilters.includes(label)) return null;
+                return (
+                  <motion.button
+                    initial={{ opacity: 0, scale: 0.8, x: -10 }}
+                    animate={{ opacity: 1, scale: 1, x: 0 }}
+                    exit={{ opacity: 0, scale: 0.8, x: -10 }}
+                    whileHover={{ y: -2 }}
+                    whileTap={{ scale: 0.96 }}
+                    key={`cat-${label}`}
+                    onClick={() => toggleCourseFilter(label)}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-transparent bg-linear-to-r from-hero-blue to-[#4fabe3] text-white shadow-[0_4px_14px_rgba(59,130,246,0.4)] text-xs font-semibold transition-all duration-300 cursor-pointer relative"
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    <span className="relative z-10">{label}</span>
+                    <X className="w-3 h-3 ml-1 opacity-70 hover:opacity-100" />
+                  </motion.button>
+                );
+              })}
+
+              {/* Clear All Button */}
+              {hasActiveFilters && (
+                <motion.button
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={clearCourseFilters}
+                  className="text-xs font-bold text-hero-blue hover:text-hero-blue/80 px-2 py-2 transition-colors cursor-pointer flex items-center gap-1"
+                >
+                  <X className="w-3.5 h-3.5" />
+                  Clear All
+                </motion.button>
+              )}
             </motion.div>
           </motion.div>
 

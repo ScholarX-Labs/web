@@ -3,11 +3,11 @@ import { Geist, Geist_Mono, Inter } from "next/font/google";
 import { AppProviders } from "@/providers/app-providers";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
-import "./globals.css";
 import { getSession } from "@/lib/dal";
 import { isDevAuthBypassEnabled } from "@/config/dev-auth-bypass";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import { GlobalShellExclusions } from "@/components/global-shell-exclusions";
 import SignoutButton from "./auth/_components/SignoutButton";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -33,14 +33,17 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const currentUser = await getSession();
+  const IsDevShowSignOutButton = false; // Set to true to show sign-out button in dev when bypass is enabled
 
   return (
     <html lang="en" className={inter.variable}>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col`}
       >
-        <Header />
-        <main className="flex-1 flex flex-col">
+        <div vaul-drawer-wrapper="">
+          <GlobalShellExclusions>
+            <Header />
+          </GlobalShellExclusions>
           <AppProviders>
             <TooltipProvider>
               {isDevAuthBypassEnabled ? (
@@ -52,8 +55,10 @@ export default async function RootLayout({
               {children}
             </TooltipProvider>
           </AppProviders>
-        </main>
-        <Footer />
+          <GlobalShellExclusions>
+            <Footer />
+          </GlobalShellExclusions>
+        </div>
       </body>
     </html>
   );
