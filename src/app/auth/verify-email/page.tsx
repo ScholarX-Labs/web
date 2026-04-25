@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
-import ResendVerificationEmailButton from "@/app/auth/_components/ResendVerificationEmailButton";
 import SignoutButton from "@/app/auth/_components/SignoutButton";
+import VerifyEmailOtpForm from "@/app/auth/_components/VerifyEmailOtpForm";
 import { getSession } from "@/lib/dal";
 import { ROUTES } from "@/lib/routes";
 
@@ -30,10 +30,10 @@ export default async function VerifyEmailPage() {
           you can access protected features.
         </p>
         <p className="text-center text-sm text-muted-foreground">
-          Send a verification link to <strong>{session.user.email}</strong> to
-          continue.
+          Enter the 6-digit verification code sent to
+          <strong> {session.user.email}</strong>.
         </p>
-        <ResendVerificationEmailButton email={session.user.email} />
+        <VerifyEmailOtpForm email={session.user.email} />
         <SignoutButton className="w-fit self-center p-1" />
       </div>
     </section>

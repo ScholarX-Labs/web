@@ -3,8 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { sendVerificationEmail } from "@/lib/auth-client";
-import { ROUTES } from "@/lib/routes";
+import { emailOtp } from "@/lib/auth-client";
 
 type ResendVerificationEmailButtonProps = {
   email: string;
@@ -28,22 +27,30 @@ export default function ResendVerificationEmailButton({
     setErrorMessage(null);
 
     try {
-      const { error } = await sendVerificationEmail({
+      const { error } = await emailOtp.sendVerificationOtp({
         email,
-        callbackURL: ROUTES.HOME,
+        type: "email-verification",
       });
 
       if (error) {
-        setErrorMessage(
-          error.message ?? "Failed to resend verification email. Try again.",
-        );
+        if (error.message?.includes("ERR_EMAIL_OTP_RATE_LIMIT_HOURLY")) {
+          setErrorMessage("You can request up to 4 codes per hour.");
+          return;
+        }
+
+        if (error.message?.includes("ERR_EMAIL_OTP_RATE_LIMIT_DAILY")) {
+          setErrorMessage("You can request up to 10 codes per day.");
+          return;
+        }
+
+        setErrorMessage(error.message ?? "Failed to resend verification code.");
         return;
       }
 
-      setMessage("Verification email sent. Please check your inbox.");
+      setMessage("Verification code sent. Please check your inbox.");
       router.refresh();
     } catch {
-      setErrorMessage("Failed to resend verification email. Try again.");
+      setErrorMessage("Failed to resend verification code. Try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -60,8 +67,8 @@ export default function ResendVerificationEmailButton({
         {isSubmitting
           ? "Sending..."
           : message
-            ? "Resend Verification Email"
-            : "Send Verification Email"}
+            ? "Resend Verification Code"
+            : "Send Verification Code"}
       </Button>
       {message ? (
         <p className="text-sm text-center text-emerald-700">{message}</p>
