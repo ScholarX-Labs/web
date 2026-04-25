@@ -52,11 +52,6 @@ export default async function RootLayout({
                   bypassed.
                 </div>
               ) : null}
-              {IsDevShowSignOutButton &&
-              currentUser &&
-              !isDevAuthBypassEnabled ? (
-                <SignoutButton />
-              ) : null}
               {children}
             </TooltipProvider>
           </AppProviders>
