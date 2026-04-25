@@ -26,10 +26,47 @@ function escapeLikePattern(value: string): string {
   return value.replace(/[%_\\]/g, "\\$&");
 }
 
-async function countOtpSendsSince(email: string, since: Date): Promise<number> {
+async function assertEmailOtpSendLimit(email: string): Promise<void> {
+  const now = Date.now();
+  const normalizedEmail = normalizeEmailAddress(email);
+
+  await db.transaction(async (tx) => {
+    const hourlyCount = await countOtpSendsSince(
+      normalizedEmail,
+      new Date(now - ONE_HOUR_IN_MS),
+      tx,
+    );
+    const dailyCount = await countOtpSendsSince(
+      normalizedEmail,
+      new Date(now - ONE_DAY_IN_MS),
+      tx,
+    );
+
+    if (hourlyCount >= EMAIL_OTP_HOURLY_LIMIT) {
+      throw new APIError("TOO_MANY_REQUESTS", {
+        message: "ERR_EMAIL_OTP_RATE_LIMIT_HOURLY",
+      });
+    }
+
+    if (dailyCount >= EMAIL_OTP_DAILY_LIMIT) {
+      throw new APIError("TOO_MANY_REQUESTS", {
+        message: "ERR_EMAIL_OTP_RATE_LIMIT_DAILY",
+      });
+    }
+
+    // record intent to send (provisional) to prevent race conditions
+    await recordEmailOtpSend(normalizedEmail, tx);
+  });
+}
+
+async function countOtpSendsSince(
+  email: string,
+  since: Date,
+  tx: any = db,
+): Promise<number> {
   const escapedEmail = escapeLikePattern(email);
   const identifierPrefix = `${EMAIL_OTP_RATE_LIMIT_IDENTIFIER}:${escapedEmail}:%`;
-  const [result] = await db
+  const [result] = await tx
     .select({ count: sql<number>`count(*)` })
     .from(schema.verification)
     .where(
@@ -42,33 +79,11 @@ async function countOtpSendsSince(email: string, since: Date): Promise<number> {
   return Number(result?.count ?? 0);
 }
 
-async function assertEmailOtpSendLimit(email: string): Promise<void> {
-  const now = Date.now();
-  const normalizedEmail = normalizeEmailAddress(email);
-
-  const [hourlyCount, dailyCount] = await Promise.all([
-    countOtpSendsSince(normalizedEmail, new Date(now - ONE_HOUR_IN_MS)),
-    countOtpSendsSince(normalizedEmail, new Date(now - ONE_DAY_IN_MS)),
-  ]);
-
-  if (hourlyCount >= EMAIL_OTP_HOURLY_LIMIT) {
-    throw new APIError("TOO_MANY_REQUESTS", {
-      message: "ERR_EMAIL_OTP_RATE_LIMIT_HOURLY",
-    });
-  }
-
-  if (dailyCount >= EMAIL_OTP_DAILY_LIMIT) {
-    throw new APIError("TOO_MANY_REQUESTS", {
-      message: "ERR_EMAIL_OTP_RATE_LIMIT_DAILY",
-    });
-  }
-}
-
-async function recordEmailOtpSend(email: string): Promise<void> {
+async function recordEmailOtpSend(email: string, tx: any = db): Promise<void> {
   const normalizedEmail = normalizeEmailAddress(email);
   const uniqueId = randomUUID();
 
-  await db.insert(schema.verification).values({
+  await tx.insert(schema.verification).values({
     id: randomUUID(),
     identifier: `${EMAIL_OTP_RATE_LIMIT_IDENTIFIER}:${normalizedEmail}:${Date.now()}:${uniqueId}`,
     value: "sent",
@@ -132,8 +147,6 @@ export const auth = betterAuth({
       if (ctx.path === "/email-otp/send-verification-otp") {
         const requestEmail =
           typeof ctx.body?.email === "string" ? ctx.body.email : "";
-        const requestType =
-          typeof ctx.body?.type === "string" ? ctx.body.type : "";
 
         if (requestEmail) {
           await assertEmailOtpSendLimit(requestEmail);
@@ -337,12 +350,19 @@ export const auth = betterAuth({
         const normalizedEmail = normalizeEmailAddress(email);
         const { subject, text } = getOtpEmailContent(type, otp);
 
-        await sendEmail({
-          to: normalizedEmail,
-          subject,
-          text,
-        });
-        await recordEmailOtpSend(normalizedEmail);
+        console.log(`[TEST] Verification OTP for ${normalizedEmail}: ${otp}`);
+
+        try {
+          /* Temporarily disabled for testing
+          await sendEmail({
+            to: normalizedEmail,
+            subject,
+            text,
+          });
+          */
+        } finally {
+          await recordEmailOtpSend(normalizedEmail);
+        }
       },
     }),
     phoneNumber(),

@@ -1,10 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { emailOtp } from "@/lib/auth-client";
+import { cn } from "@/lib/utils";
 
 type VerifyEmailOtpFormProps = {
   email: string;
@@ -53,17 +53,60 @@ function getFriendlyError(error?: AuthError): string {
 
 export default function VerifyEmailOtpForm({ email }: VerifyEmailOtpFormProps) {
   const router = useRouter();
-  const [otp, setOtp] = useState("");
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [isVerifying, setIsVerifying] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [countdown, setCountdown] = useState(60);
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  const otpIsValid = useMemo(() => /^\d{6}$/.test(otp), [otp]);
+  const otpString = useMemo(() => otp.join(""), [otp]);
+  const otpIsValid = useMemo(() => /^\d{6}$/.test(otpString), [otpString]);
 
-  const handleOtpChange = (value: string) => {
-    const digitsOnly = value.replace(/\D/g, "").slice(0, 6);
-    setOtp(digitsOnly);
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (countdown > 0) {
+      timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+    }
+    return () => clearTimeout(timer);
+  }, [countdown]);
+
+  const handleOtpChange = (index: number, value: string) => {
+    const digit = value.replace(/\D/g, "").slice(-1);
+    if (!digit && value !== "") return;
+
+    const newOtp = [...otp];
+    newOtp[index] = digit;
+    setOtp(newOtp);
+
+    if (digit && index < 5) {
+      inputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleKeyDown = (
+    index: number,
+    e: React.KeyboardEvent<HTMLInputElement>,
+  ) => {
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData
+      .getData("text")
+      .replace(/\D/g, "")
+      .slice(0, 6);
+    const newOtp = [...otp];
+    pastedData.split("").forEach((char, i) => {
+      newOtp[i] = char;
+    });
+    setOtp(newOtp);
+    const lastIndex = Math.min(pastedData.length, 5);
+    inputRefs.current[lastIndex]?.focus();
   };
 
   const handleVerify = async () => {
@@ -78,7 +121,7 @@ export default function VerifyEmailOtpForm({ email }: VerifyEmailOtpFormProps) {
     try {
       const { error } = await emailOtp.verifyEmail({
         email,
-        otp,
+        otp: otpString,
       });
 
       if (error) {
@@ -96,7 +139,7 @@ export default function VerifyEmailOtpForm({ email }: VerifyEmailOtpFormProps) {
   };
 
   const handleResend = async () => {
-    if (isResending) {
+    if (isResending || countdown > 0) {
       return;
     }
 
@@ -116,6 +159,7 @@ export default function VerifyEmailOtpForm({ email }: VerifyEmailOtpFormProps) {
       }
 
       setSuccessMessage("A verification code was sent to your inbox.");
+      setCountdown(60);
     } catch {
       setErrorMessage("Failed to send a new code. Please try again.");
     } finally {
@@ -124,44 +168,91 @@ export default function VerifyEmailOtpForm({ email }: VerifyEmailOtpFormProps) {
   };
 
   return (
-    <div className="flex flex-col gap-3">
-      <Input
-        id="email-otp"
-        value={otp}
-        onChange={(event) => handleOtpChange(event.target.value)}
-        inputMode="numeric"
-        autoComplete="one-time-code"
-        pattern="[0-9]*"
-        maxLength={6}
-        placeholder="Enter 6-digit code"
-        aria-label="6 digit verification code"
-        disabled={isVerifying || isResending}
-      />
-      <Button
-        type="button"
-        onClick={handleVerify}
-        disabled={!otpIsValid || isVerifying || isResending}
-        className="w-full hover:cursor-pointer"
-      >
-        {isVerifying ? "Verifying..." : "Verify Email"}
-      </Button>
-      <Button
-        type="button"
-        variant="outline"
-        onClick={handleResend}
-        disabled={isResending || isVerifying}
-        className="w-full hover:cursor-pointer"
-      >
-        {isResending ? "Sending code..." : "Resend Verification Code"}
-      </Button>
-      {successMessage ? (
-        <p className="text-sm text-center text-emerald-700">{successMessage}</p>
-      ) : null}
-      {errorMessage ? (
-        <p role="alert" className="text-sm text-center text-destructive">
-          {errorMessage}
+    <div className="flex flex-col items-center gap-8 w-full max-w-md mx-auto py-4">
+      <div className="text-center space-y-2">
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">
+          Enter OTP
+        </h1>
+        <p className="text-muted-foreground text-sm">
+          We&apos;ve sent an OTP Code to your Email,
         </p>
-      ) : null}
+      </div>
+
+      <div
+        className="flex gap-2 sm:gap-4 justify-center w-full"
+        onPaste={handlePaste}
+      >
+        {otp.map((digit, index) => (
+          <input
+            key={index}
+            ref={(el) => {
+              inputRefs.current[index] = el;
+            }}
+            type="text"
+            inputMode="numeric"
+            maxLength={1}
+            value={digit}
+            onChange={(e) => handleOtpChange(index, e.target.value)}
+            onKeyDown={(e) => handleKeyDown(index, e)}
+            className={cn(
+              "w-12 h-14 sm:w-16 sm:h-20 text-2xl sm:text-3xl font-bold text-center",
+              "border-2 rounded-2xl bg-background transition-all duration-200",
+              "focus:outline-none focus:ring-2 focus:ring-offset-2",
+              digit
+                ? "border-hero-blue text-hero-blue shadow-[0_4px_12px_rgba(51,153,204,0.1)]"
+                : "border-gray-200 text-foreground",
+              "disabled:opacity-50 disabled:cursor-not-allowed",
+            )}
+            disabled={isVerifying || isResending}
+          />
+        ))}
+      </div>
+
+      <div className="text-center space-y-6 w-full">
+        {countdown > 0 ? (
+          <p className="text-sm text-gray-500">
+            You can request another code in{" "}
+            <span className="text-[#ff6b6b] font-semibold">{countdown}s</span>
+          </p>
+        ) : (
+          <div className="h-5" />
+        )}
+
+        <div className="flex flex-col gap-3 w-full">
+          <Button
+            type="button"
+            onClick={handleVerify}
+            disabled={!otpIsValid || isVerifying || isResending}
+            className="w-full h-12 text-lg font-semibold bg-hero-blue hover:bg-[#2d88b6] transition-colors rounded-xl text-white border-none shadow-md hover:cursor-pointer"
+          >
+            {isVerifying ? "Verifying..." : "Verify"}
+          </Button>
+
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleResend}
+            disabled={isResending || countdown > 0}
+            className="w-full h-12 text-lg font-semibold border-hero-blue text-hero-blue hover:bg-hero-blue/5 transition-colors rounded-xl hover:cursor-pointer"
+          >
+            {isResending ? "Resending..." : "Resend"}
+          </Button>
+        </div>
+
+        {errorMessage && (
+          <p
+            role="alert"
+            className="text-sm font-medium text-destructive animate-in fade-in slide-in-from-top-1"
+          >
+            {errorMessage}
+          </p>
+        )}
+        {successMessage && !errorMessage && (
+          <p className="text-sm font-medium text-emerald-600 animate-in fade-in slide-in-from-top-1">
+            {successMessage}
+          </p>
+        )}
+      </div>
     </div>
   );
 }
