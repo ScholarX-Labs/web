@@ -350,16 +350,12 @@ export const auth = betterAuth({
         const normalizedEmail = normalizeEmailAddress(email);
         const { subject, text } = getOtpEmailContent(type, otp);
 
-        console.log(`[TEST] Verification OTP for ${normalizedEmail}: ${otp}`);
-
         try {
-          /* Temporarily disabled for testing
           await sendEmail({
             to: normalizedEmail,
             subject,
             text,
           });
-          */
         } finally {
           await recordEmailOtpSend(normalizedEmail);
         }
