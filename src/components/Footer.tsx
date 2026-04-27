@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Rubik } from "next/font/google";
 import { Mail, Phone } from "lucide-react";
 import { FaLinkedinIn, FaInstagram, FaFacebook } from "react-icons/fa6";
+import { ROUTES } from "@/lib/routes";
 
 const rubik = Rubik({ subsets: ["latin"] });
 
@@ -14,7 +15,10 @@ function Footer() {
       <section className="grid grid-cols-1 gap-10 md:gap-0 md:grid-cols-4 md:grid-rows-1 align-middle text-center md:text-start">
         {/* Image section  */}
         <section className="">
-          <Link href="/" className="flex justify-center align-middle p-6">
+          <Link
+            href={ROUTES.HOME}
+            className="flex justify-center align-middle p-6"
+          >
             <Image
               alt="ScholarX logo"
               src={Scholarx_vertical_logo}
@@ -32,17 +36,17 @@ function Footer() {
         {/* Quick links section */}
         <section className="flex flex-col gap-5">
           <h3 className="text-xl">Quick links</h3>
-          <div className="flex flex-col justify-center align-middle gap-2">
-            <Link className="w-fit mx-auto md:m-0" href="/">
+          <div className="grid grid-cols-2 grid-rows-2 lg:flex lg:flex-col lg:justify-center gap-2">
+            <Link className="w-fit mx-auto md:m-0" href={ROUTES.HOME}>
               Home
             </Link>
-            <Link className="w-fit mx-auto md:m-0" href="/about">
+            <Link className="w-fit mx-auto md:m-0" href={ROUTES.ABOUT}>
               About us
             </Link>
-            <Link className="w-fit mx-auto md:m-0" href="/services">
+            <Link className="w-fit mx-auto md:m-0" href={ROUTES.SERVICES}>
               Our services
             </Link>
-            <Link className="w-fit mx-auto md:m-0" href="/courses">
+            <Link className="w-fit mx-auto md:m-0" href={ROUTES.COURSES}>
               Courses
             </Link>
           </div>
@@ -50,7 +54,7 @@ function Footer() {
         {/* Contact us section */}
         <section className="flex flex-col gap-5">
           <h3 className="text-xl">Contact us</h3>
-          <div className="flex flex-col gap-3 text-center md:text-left">
+          <div className="grid grid-cols-2 lg:flex lg:flex-col gap-3 text-center md:text-left">
             <a
               href="mailto:scholarx.eg@gmail.com"
               className="inline-flex items-start justify-center md:justify-start gap-2 text-white hover:text-blue-400 hover:underline w-fit mx-auto md:mx-0"

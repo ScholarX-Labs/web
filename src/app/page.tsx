@@ -4,6 +4,8 @@ import FeaturesSection from "@/components/home/features-section";
 import ServicesSection from "@/components/home/services-section";
 import ImpactSection from "@/components/home/impact-section";
 import { WHY_CHOOSE_SECTION, WHO_WE_HELP_SECTION } from "@/lib/home-data";
+import Link from "next/link";
+import { ROUTES } from "@/lib/routes";
 
 export const metadata: Metadata = {
   title: "ScholarX — Premium Learning Platform",
@@ -15,6 +17,7 @@ export const metadata: Metadata = {
     type: "website",
   },
 };
+
 
 export default function HomePage() {
   return (
