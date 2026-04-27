@@ -6,6 +6,7 @@ import { LessonHeader } from "./_components/lesson-header";
 import { LessonClientBridge } from "./_components/lesson-client-bridge";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { LessonSummary } from "@/types/course.types";
+import { requireSession } from "@/lib/dal";
 
 interface LessonPageProps {
   params: Promise<{ slug: string; lessonId: string }>;
@@ -78,6 +79,8 @@ const MOCK_LESSONS: LessonSummary[] = [
 
 export default async function LessonPage({ params }: LessonPageProps) {
   const { slug, lessonId } = await params;
+
+  await requireSession();
 
   // Robust lookup: allow routes that use numeric lesson ids (e.g. /lessons/1)
   // as well as full ids like "lesson-1". Prefer exact match first, then

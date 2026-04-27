@@ -9,6 +9,8 @@ import { EnrollModal } from "@/components/courses/enroll-modal";
 
 import { getSession } from "@/lib/dal";
 
+export const dynamic = "force-dynamic";
+
 interface CourseDetailPageProps {
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ intent?: string }>;
