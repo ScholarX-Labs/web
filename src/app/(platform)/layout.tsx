@@ -1,4 +1,3 @@
-import { requireSession } from "@/lib/dal";
 import React from "react";
 
 /**
