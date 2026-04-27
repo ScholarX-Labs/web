@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import HeroSection from "@/components/home/hero-section";
+import HeroWrapper from "@/components/home/hero-wrapper";
 import FeaturesSection from "@/components/home/features-section";
 import ServicesSection from "@/components/home/services-section";
 import ImpactSection from "@/components/home/impact-section";
@@ -23,7 +23,7 @@ export default function HomePage() {
   return (
     <main className="relative w-full overflow-x-hidden">
       {/* Hero Section */}
-      <HeroSection />
+      <HeroWrapper />
 
       {/* Features Section */}
       <FeaturesSection />
