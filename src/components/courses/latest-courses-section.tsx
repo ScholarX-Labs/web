@@ -10,6 +10,7 @@ import { LatestCourseCard } from "./latest-course-card";
 import { cn } from "@/lib/utils";
 import { CourseDetailSurfacePortal } from "./course-detail-surface-portal";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { ROUTES } from "@/lib/routes";
 
 interface LatestCoursesSectionProps {
   courses: Course[];
@@ -94,7 +95,7 @@ export function LatestCoursesSection({ courses }: LatestCoursesSectionProps) {
           transition={{ duration: 0.4, delay: 0.2 }}
         >
           <Link
-            href="/courses"
+            href={ROUTES.COURSES}
             className="text-hero-blue text-sm font-medium hover:underline underline-offset-2"
           >
             See more →
@@ -129,7 +130,11 @@ export function LatestCoursesSection({ courses }: LatestCoursesSectionProps) {
               onMouseLeave={() => setActiveCardIndex(null)}
               onFocusCapture={() => setActiveCardIndex(index)}
               onBlurCapture={(event) => {
-                if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+                if (
+                  !event.currentTarget.contains(
+                    event.relatedTarget as Node | null,
+                  )
+                ) {
                   setActiveCardIndex(null);
                 }
               }}

@@ -1,5 +1,5 @@
 import Link from "next/link";
-
+import { ROUTES } from "@/lib/routes";
 
 export default function Home() {
   return (
@@ -24,13 +24,13 @@ export default function Home() {
         </p>
         <div className="flex items-center gap-4">
           <Link
-            href="/courses"
+            href={ROUTES.COURSES}
             className="inline-flex items-center justify-center rounded-full bg-primary px-8 py-3.5 text-sm font-semibold text-primary-foreground shadow-lg hover:bg-primary/90 transition-all hover:scale-105 active:scale-95"
           >
             Explore Courses
           </Link>
           <Link
-            href="/about"
+            href={ROUTES.ABOUT}
             className="inline-flex items-center justify-center rounded-full bg-secondary px-8 py-3.5 text-sm font-semibold text-secondary-foreground shadow-sm hover:bg-secondary/80 transition-all hover:scale-105 active:scale-95"
           >
             Learn More
