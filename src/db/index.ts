@@ -12,8 +12,13 @@ if (!connectionString) {
 const parsedUrl = new url.URL(connectionString);
 const enableSsl = process.env.DATABASE_SSL?.toLowerCase() === "true";
 if (enableSsl) {
-  if (!parsedUrl.searchParams.has("sslmode")) {
-    // Prefer verify-full in production when TLS is required
+  const currentSslMode = parsedUrl.searchParams.get("sslmode");
+  if (
+    !currentSslMode ||
+    ["prefer", "require", "verify-ca"].includes(currentSslMode)
+  ) {
+    // Force verify-full to avoid deprecation warnings and ensure strict TLS validation.
+    // The 'pg' driver currently treats 'require' etc. as 'verify-full' but will change this in v9.
     parsedUrl.searchParams.set("sslmode", "verify-full");
   }
 }
