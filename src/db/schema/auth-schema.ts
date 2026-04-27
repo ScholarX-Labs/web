@@ -1,4 +1,5 @@
 // [AUTO-FIXED] Array defaults and other Postgres-specific patches applied by scripts/fix-auth-schema.js
+// [AUTO-FIXED] Array defaults and other Postgres-specific patches applied by scripts/fix-auth-schema.js
 import { relations, sql } from "drizzle-orm";
 import {
   pgSchema,
@@ -46,6 +47,9 @@ export const user = authSchema.table("user", {
   currentInterest: text("current_interest"),
   savedOpportunities: text("saved_opportunities").array().default(sql`'{}'::text[]`),
   registeredEvents: text("registered_events").array().default(sql`'{}'::text[]`),
+  // Certification Module: public portfolio
+  portfolioUsername: text("portfolio_username").unique(),
+  portfolioEnabled: boolean("portfolio_enabled").notNull().default(false),
 });
 
 export const session = authSchema.table(
