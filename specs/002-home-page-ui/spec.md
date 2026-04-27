@@ -13,7 +13,7 @@
 - Q: What is the color system / visual theme? → A: Light mode primary with selective dark-frosted hero/CTA panels
 - Q: What is the hero section scroll choreography? → A: Parallax scroll-through with layered depth (no scroll-jacking)
 - Q: What is the page content source? → A: Fully static — all section content in hardcoded TS constants, no API calls
-- Q: Where do the primary hero CTAs navigate? → A: "Get Started" → `/auth/sign-up` (primary), "Explore Courses" → `/courses` (secondary)
+- Q: Where do the primary hero CTAs navigate? → A: "Get Started" → `/auth/signup` (primary), "Explore Courses" → `/courses` (secondary)
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -76,7 +76,7 @@ As a visitor evaluating credibility, I want to see the platform's impact and sca
 - **FR-005**: System MUST ensure the design is fully responsive across mobile, tablet, and desktop viewports.
 - **FR-006**: System MUST respect user accessibility settings, including reduced motion preferences.
 - **FR-007**: System MUST provide appropriate fallback styles for older browsers that lack support for modern CSS features like `backdrop-filter`.
-- **FR-008**: The Hero section MUST render a **dual CTA** pattern: a primary button labelled **"Get Started"** navigating to `/auth/sign-up`, and a secondary button labelled **"Explore Courses"** navigating to `/courses`.
+- **FR-008**: The Hero section MUST render a **dual CTA** pattern: a primary button labelled **"Get Started"** navigating to `/auth/signup`, and a secondary button labelled **"Explore Courses"** navigating to `/courses`.
 
 ### Key Entities
 

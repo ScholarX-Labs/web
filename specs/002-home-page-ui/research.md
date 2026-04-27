@@ -44,7 +44,7 @@
 
 ## 3. Auth Route — Sign-Up URL Correction
 
-**Decision**: Hero "Get Started" CTA navigates to `/auth/signup` (not `/auth/sign-up` as noted in spec).
+**Decision**: Hero "Get Started" CTA navigates to `/auth/signup`.
 
 **Rationale**: The actual Next.js route is `src/app/auth/signup/` — confirmed by directory listing. The spec had a minor typo. All CTAs will use the correct route.
 
