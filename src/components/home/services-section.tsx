@@ -73,8 +73,11 @@ export const ServicesSection = memo(function ServicesSection({
   servicesKey,
   theme = "light",
   watermarkImage,
-}: Omit<ServicesSectionProps, "services"> & { servicesKey: "whyChoose" | "whoWeHelp" }) {
-  const services = servicesKey === "whyChoose" ? WHY_CHOOSE_SERVICES : WHO_WE_HELP_SERVICES;
+}: Omit<ServicesSectionProps, "services"> & {
+  servicesKey: "whyChoose" | "whoWeHelp";
+}) {
+  const services =
+    servicesKey === "whyChoose" ? WHY_CHOOSE_SERVICES : WHO_WE_HELP_SERVICES;
 
   return (
     <section

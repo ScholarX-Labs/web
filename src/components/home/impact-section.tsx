@@ -2,7 +2,13 @@
 
 import React, { memo, useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import { motion } from "framer-motion";
 import { IMPACT_SECTION, IMPACT_STATS } from "@/lib/home-data";
+import { 
+  statCardReveal, 
+  statIconReveal, 
+  statIconFloating 
+} from "@/lib/motion-variants";
 
 interface StatItem {
   id: string;
@@ -78,29 +84,47 @@ const StatCard = memo(function StatCard({
   }, [isVisible, value, animationDuration, delay]);
 
   return (
-    <div
+    <motion.div
       ref={cardRef}
-      className="group relative flex min-h-[214px] w-full max-w-[396px] animate-[fadeInScale_0.6s_ease-out_forwards] cursor-pointer flex-col items-center justify-center overflow-hidden rounded-[15px] bg-white p-7 text-center opacity-0 shadow-[0_1px_3px_rgba(0,0,0,0.08)] transition-all duration-400 hover:-translate-y-2.5 hover:scale-[1.02] hover:shadow-[0_15px_40px_rgba(51,153,204,0.2),_0_0_0_1px_rgba(51,153,204,0.15)] max-md:min-h-[180px] max-md:max-w-full max-md:px-4 max-md:py-6"
-      style={{ animationDelay: `${delay}ms` }}
+      variants={statCardReveal}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.3 }}
+      className="group relative flex min-h-[214px] w-full max-w-[396px] cursor-pointer flex-col items-center justify-center overflow-hidden rounded-[15px] bg-white p-7 text-center shadow-[0_1px_3px_rgba(0,0,0,0.08)] transition-all duration-400 hover:-translate-y-2.5 hover:scale-[1.02] hover:shadow-[0_15px_40px_rgba(51,153,204,0.2),_0_0_0_1px_rgba(51,153,204,0.15)] max-md:min-h-[180px] max-md:max-w-full max-md:px-4 max-md:py-6"
+      style={{ transitionDelay: `${delay}ms` }}
     >
       {/* Background radial gradient expansion on hover */}
       <div className="absolute left-1/2 top-1/2 h-0 w-0 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(51,153,204,0.1)_0%,transparent_70%)] transition-all duration-600 group-hover:h-[300px] group-hover:w-[300px]" />
 
       <div className="relative z-10 mb-4 flex items-center gap-4 max-sm:flex-col max-sm:gap-2">
         {Icon && (
-          <div className="flex h-[60px] w-[60px] animate-[float_3s_ease-in-out_infinite] items-center justify-center max-md:h-[50px] max-md:w-[50px]">
-            <Icon className="h-12 w-12 text-[#3399CC] drop-shadow-[0_2px_8px_rgba(51,153,204,0.3)] transition-all duration-300 group-hover:-rotate-3 group-hover:scale-[1.15] group-hover:drop-shadow-[0_4px_12px_rgba(51,153,204,0.5)] max-md:h-10 max-md:w-10" />
-          </div>
+          <motion.div 
+            variants={statIconReveal}
+            className="flex h-[60px] w-[60px] items-center justify-center max-md:h-[50px] max-md:w-[50px]"
+          >
+            <motion.div
+              variants={statIconFloating}
+              animate="animate"
+            >
+              <Icon className="h-12 w-12 text-[#3399CC] drop-shadow-[0_2px_8px_rgba(51,153,204,0.3)] transition-all duration-300 group-hover:-rotate-3 group-hover:scale-[1.15] group-hover:drop-shadow-[0_4px_12px_rgba(51,153,204,0.5)] max-md:h-10 max-md:w-10" />
+            </motion.div>
+          </motion.div>
         )}
-        <span className="relative animate-[slideInRight_0.6s_ease-out] text-[49px] font-bold leading-none text-[#FF6633] [text-shadow:0_2px_10px_rgba(255,102,51,0.2)] max-md:text-[40px] max-sm:text-[36px]">
+        <motion.span 
+          initial={{ opacity: 0, x: -20 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="relative text-[49px] font-bold leading-none text-[#FF6633] [text-shadow:0_2px_10px_rgba(255,102,51,0.2)] max-md:text-[40px] max-sm:text-[36px]"
+        >
           {count.toLocaleString()}
           {suffix}
-        </span>
+        </motion.span>
       </div>
       <h3 className="relative z-10 m-0 px-2.5 text-[25px] font-medium leading-[1.3] text-[#0A1F29] max-md:text-[20px] max-sm:text-[18px]">
         {label}
       </h3>
-    </div>
+    </motion.div>
   );
 });
 
