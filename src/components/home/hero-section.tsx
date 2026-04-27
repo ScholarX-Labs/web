@@ -6,14 +6,14 @@ import { HERO_CONTENT, HERO_BUTTONS } from "@/lib/home-data";
 
 export const HeroSection = memo(function HeroSection() {
   return (
-    <section className="relative flex min-h-[calc(100vh-80px)] items-center overflow-hidden bg-gradient-to-br from-[#3399CC]/10 to-transparent px-8 py-15 md:min-h-auto md:px-5 md:py-10">
+    <section className="relative flex min-h-[calc(100vh-80px)] items-center overflow-hidden bg-gradient-to-br from-[#3399CC]/10 to-transparent px-8 py-15 max-md:min-h-auto max-md:px-5 max-md:py-10">
       {/* Background Pattern */}
       <div className="animate-[float_20s_ease-in-out_infinite] absolute -right-[10%] -top-[50%] h-[600px] w-[600px] rounded-full bg-[radial-gradient(circle,rgba(51,153,204,0.1)_0%,transparent_70%)]" />
 
       <div className="relative z-10 mx-auto grid w-full max-w-[1400px] grid-cols-1 items-center gap-15 lg:grid-cols-2">
         {/* Text Section */}
         <div className="animate-[fadeInLeft_0.8s_ease-out] text-center lg:text-left">
-          <h1 className="mb-6 animate-[fadeInUp_0.8s_ease-out_0.2s_both] text-[clamp(2rem,5vw,3.5rem)] font-bold leading-tight text-[#1a1a1a] md:text-[2rem]">
+          <h1 className="mb-6 animate-[fadeInUp_0.8s_ease-out_0.2s_both] text-[clamp(2rem,5vw,3.5rem)] font-bold leading-tight text-[#1a1a1a] max-md:text-[2rem]">
             {HERO_CONTENT.title}
             <br />
             {HERO_CONTENT.subtitle}{" "}
@@ -21,7 +21,7 @@ export const HeroSection = memo(function HeroSection() {
               {HERO_CONTENT.highlight}
             </span>
           </h1>
-          <p className="mx-auto mb-10 max-w-[540px] animate-[fadeInUp_0.8s_ease-out_0.3s_both] text-lg leading-[1.7] text-gray-600 lg:mx-0 md:text-base">
+          <p className="mx-auto mb-10 max-w-[540px] animate-[fadeInUp_0.8s_ease-out_0.3s_both] text-lg leading-[1.7] text-gray-600 lg:mx-0 max-md:text-base">
             {HERO_CONTENT.description}
           </p>
 

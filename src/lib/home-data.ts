@@ -26,16 +26,16 @@ export const HERO_CONTENT = {
 export const HERO_BUTTONS = [
   {
     id: "explore",
-    text: "Explore Services",
+    text: "Get Started",
     type: "primary",
-    link: "/services",
+    link: "/auth/signup",
     icon: ArrowRight,
   },
   {
     id: "join",
-    text: "Join our Community",
+    text: "Explore Courses",
     type: "secondary",
-    link: "/services",
+    link: "/courses",
     icon: ArrowRight,
   },
 ];
