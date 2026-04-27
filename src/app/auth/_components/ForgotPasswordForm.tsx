@@ -16,7 +16,6 @@ type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 
 export default function ForgotPasswordForm() {
   const [success, setSuccess] = useState(false);
-  const [serverError, setServerError] = useState<string | null>(null);
 
   const {
     register,
@@ -30,18 +29,16 @@ export default function ForgotPasswordForm() {
   });
 
   const onSubmit = async (data: ForgotPasswordFormData) => {
-    setServerError(null);
-
     const { error } = await authClient.requestPasswordReset({
       email: data.email,
       redirectTo: "/auth/reset-password",
     });
 
     if (error) {
-      setServerError(error.message ?? "An error occurred. Please try again.");
-    } else {
-      setSuccess(true);
+      console.error("Password reset request failed", error);
     }
+
+    setSuccess(true);
   };
 
   if (success) {
@@ -61,18 +58,12 @@ export default function ForgotPasswordForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
       <h2 className="text-center text-3xl font-semibold mb-2">
-        Reset Password
+        Request Reset Password Link
       </h2>
       <p className="text-center text-sm text-muted-foreground mb-4">
         Enter your email address and we&apos;ll send you a link to reset your
         password.
       </p>
-
-      {serverError && (
-        <p role="alert" className="text-destructive text-sm text-center">
-          {serverError}
-        </p>
-      )}
 
       <Field
         label="Email"

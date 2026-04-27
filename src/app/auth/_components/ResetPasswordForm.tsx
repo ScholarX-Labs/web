@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -11,20 +11,30 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-const resetPasswordSchema = z.object({
-  password: z
-    .string()
-    .min(8, { message: "Password must be at least 8 characters" })
-    .max(128, { message: "Password is too long" })
-    .regex(/[A-Z]/, {
-      message: "Password must contain at least one uppercase letter",
-    })
-    .regex(/[a-z]/, {
-      message: "Password must contain at least one lowercase letter",
-    })
-    .regex(/[0-9]/, { message: "Password must contain at least one number" }),
-  confirmPassword: z.string(),
-});
+const resetPasswordSchema = z
+  .object({
+    password: z
+      .string()
+      .min(8, { message: "Password must be at least 8 characters" })
+      .max(128, { message: "Password is too long" })
+      .regex(/[A-Z]/, {
+        message: "Password must contain at least one uppercase letter",
+      })
+      .regex(/[a-z]/, {
+        message: "Password must contain at least one lowercase letter",
+      })
+      .regex(/[0-9]/, { message: "Password must contain at least one number" }),
+    confirmPassword: z.string(),
+  })
+  .superRefine((values, ctx) => {
+    if (values.password !== values.confirmPassword) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["confirmPassword"],
+        message: "Passwords do not match",
+      });
+    }
+  });
 
 type ResetPasswordForm = z.infer<typeof resetPasswordSchema>;
 
@@ -34,14 +44,10 @@ export default function ResetPasswordForm() {
   const [serverError, setServerError] = useState<string | null>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
-
-  useEffect(() => {
-    if (searchParams.get("error") === "INVALID_TOKEN") {
-      setServerError(
-        "This reset link is invalid or expired. Please request a new one.",
-      );
-    }
-  }, [searchParams]);
+  const urlError =
+    searchParams.get("error") === "INVALID_TOKEN"
+      ? "This reset link is invalid or expired. Please request a new one."
+      : null;
 
   const {
     register,
@@ -85,12 +91,12 @@ export default function ResetPasswordForm() {
   return (
     <div className="w-full max-w-md mx-auto bg-white rounded-2xl p-8 shadow-[0_4px_24px_rgba(0,0,0,0.06)]">
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
-        {serverError && (
+        {(serverError ?? urlError) && (
           <p
             role="alert"
             className="text-destructive text-sm text-center font-medium bg-destructive/10 p-2 rounded-md"
           >
-            {serverError}
+            {serverError ?? urlError}
           </p>
         )}
 
