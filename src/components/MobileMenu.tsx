@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Scholarx_horizontal_logo from "../../public/ScholarX-Logo-horizontal-Blue-Solid-Small_ScholarX.png";
+import { ROUTES } from "@/lib/routes";
 
 interface MobileMenuProps {
   isLoggedIn: boolean;
@@ -33,7 +34,7 @@ export default function MobileMenu({ isLoggedIn }: MobileMenuProps) {
       <SheetContent side="top" className="w-full p-6">
         <SheetHeader className="p-0">
           <SheetTitle className="sr-only">Menu</SheetTitle>
-          <Link href="/" className="flex items-center gap-2">
+          <Link href={ROUTES.HOME} className="flex items-center gap-2">
             <Image
               alt="ScholarX logo"
               src={Scholarx_horizontal_logo}
@@ -45,35 +46,35 @@ export default function MobileMenu({ isLoggedIn }: MobileMenuProps) {
         </SheetHeader>
         <nav className="flex flex-col gap-4 mt-8">
           <Link
-            href="/"
+            href={ROUTES.HOME}
             onClick={() => setOpen(false)}
             className="text-lg font-medium transition-colors hover:text-primary"
           >
             Home
           </Link>
           <Link
-            href="/about"
+            href={ROUTES.ABOUT}
             onClick={() => setOpen(false)}
             className="text-lg font-medium transition-colors hover:text-primary"
           >
             About us
           </Link>
           <Link
-            href="/courses"
+            href={ROUTES.COURSES}
             onClick={() => setOpen(false)}
             className="text-lg font-medium transition-colors hover:text-primary"
           >
             Courses
           </Link>
           <Link
-            href="/opportunities"
+            href={ROUTES.OPPORTUNITIES}
             onClick={() => setOpen(false)}
             className="text-lg font-medium transition-colors hover:text-primary"
           >
             Opportunities
           </Link>
           <Link
-            href="/contact"
+            href={ROUTES.CONTACT}
             onClick={() => setOpen(false)}
             className="text-lg font-medium transition-colors hover:text-primary"
           >
@@ -83,7 +84,7 @@ export default function MobileMenu({ isLoggedIn }: MobileMenuProps) {
           {isLoggedIn ? (
             <div className="flex flex-col gap-4">
               <Link
-                href="/profile"
+                href={ROUTES.PROFILE}
                 onClick={() => setOpen(false)}
                 className="text-lg font-medium transition-colors hover:text-primary"
               >
@@ -97,14 +98,14 @@ export default function MobileMenu({ isLoggedIn }: MobileMenuProps) {
           ) : (
             <div className="flex flex-col gap-4">
               <Link
-                href="/auth/signin"
+                href={ROUTES.SIGNIN}
                 onClick={() => setOpen(false)}
                 className="flex w-full items-center justify-center px-4 py-2 rounded-sm text-primary border border-primary font-medium hover:bg-primary/10"
               >
                 Log in
               </Link>
               <Link
-                href="/auth/signup"
+                href={ROUTES.SIGNUP}
                 onClick={() => setOpen(false)}
                 className="flex w-full items-center justify-center px-4 py-2 rounded-md bg-primary text-white font-medium hover:bg-chart-5"
               >

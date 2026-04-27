@@ -3,8 +3,14 @@
  */
 export const ROUTES = {
   HOME: "/",
+  ABOUT: "/about",
+  SERVICES: "/services",
+  OPPORTUNITIES: "/opportunities",
+  CONTACT: "/contact",
+  PROFILE: "/profile",
   SIGNUP: "/auth/signup",
   SIGNIN: "/auth/signin",
+  FORGOT_PASSWORD: "/auth/forgot-password",
   VERIFY_EMAIL: "/auth/verify-email",
   PHONE_COLLECTION: "/auth/collect-phone",
   AI_SEARCH: "/ai-search",
