@@ -258,3 +258,55 @@ export const slideFromRight: Variants = {
   visible: { opacity: 1, x: 0, transition: springApple },
 };
 
+// ─── Impact Section Variants ──────────────────────────────────────────────────
+
+/**
+ * Stat Card Reveal: Scale and fade in with spring physics.
+ */
+export const statCardReveal: Variants = {
+  hidden: { opacity: 0, scale: 0.9, y: 20 },
+  visible: { 
+    opacity: 1, 
+    scale: 1, 
+    y: 0,
+    transition: { 
+      type: "spring", 
+      stiffness: 100, 
+      damping: 20,
+      mass: 1
+    } 
+  },
+};
+
+/**
+ * Stat Icon Reveal: Pop-in effect for the icon.
+ */
+export const statIconReveal: Variants = {
+  hidden: { opacity: 0, scale: 0, rotate: -20 },
+  visible: { 
+    opacity: 1, 
+    scale: 1, 
+    rotate: 0,
+    transition: { 
+      type: "spring", 
+      stiffness: 260, 
+      damping: 20,
+      delay: 0.2
+    } 
+  },
+};
+
+/**
+ * Stat Icon Floating: Continuous subtle movement.
+ */
+export const statIconFloating: Variants = {
+  animate: {
+    y: [0, -8, 0],
+    transition: {
+      duration: 4,
+      repeat: Infinity,
+      ease: "easeInOut",
+    },
+  },
+};
+
