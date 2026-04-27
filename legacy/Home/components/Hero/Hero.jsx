@@ -28,19 +28,17 @@ const Hero = memo(function Hero() {
               <Link
                 key={button.id}
                 to={button.link}
-                className={styles.buttonLink}
+                className={`${styles.buttonLink} ${
+                  button.type === "primary"
+                    ? styles.btnPrimary
+                    : styles.btnSecondary
+                }`}
                 style={{ animationDelay: `${400 + index * 100}ms` }}
+                role="button"
+                tabIndex={0}
               >
-                <button
-                  className={
-                    button.type === "primary"
-                      ? styles.btnPrimary
-                      : styles.btnSecondary
-                  }
-                >
-                  {button.text}
-                  <span className={styles.btnIcon}>{button.icon}</span>
-                </button>
+                {button.text}
+                <span className={styles.btnIcon}>{button.icon}</span>
               </Link>
             ))}
           </div>
