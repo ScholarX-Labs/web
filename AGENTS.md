@@ -1,6 +1,6 @@
 <!-- SPECKIT START -->
 
 Read the following plan for architectural and implementation context for the active feature:
-specs/001-premium-lesson-ui/plan.md
+specs/002-home-page-ui/plan.md
 
 <!-- SPECKIT END -->

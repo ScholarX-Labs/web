@@ -1,0 +1,46 @@
+.container{
+    margin: 100px 0;
+    scroll-margin-top: 115px;
+}
+
+.form{
+    background-color: #f8f9fb;
+    border-radius: 10px;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.message-form {
+    height: auto;
+    align-self: flex-start;
+}
+
+.schedule-form {
+    height: auto;
+    align-self: flex-start;
+}
+
+.title {
+    font-weight: 700;
+}
+
+.description {
+    font-size: 20px;
+}
+
+.btn{
+    font-size: 18px;
+    background:linear-gradient(to left, #97adcc, rgb(181, 209, 255), #97adcc);
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+}
+
+
+textarea.form-control {
+    min-height: 100px;
+    resize: vertical;
+}

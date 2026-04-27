@@ -1,42 +1,55 @@
+import type { Metadata } from "next";
+import HeroWrapper from "@/components/home/hero-wrapper";
+import FeaturesSection from "@/components/home/features-section";
+import ServicesSection from "@/components/home/services-section";
+import ImpactSection from "@/components/home/impact-section";
+import { WHY_CHOOSE_SECTION, WHO_WE_HELP_SECTION } from "@/lib/home-data";
 import Link from "next/link";
 import { ROUTES } from "@/lib/routes";
 
-export default function Home() {
+export const metadata: Metadata = {
+  title: "ScholarX — Premium Learning Platform",
+  description:
+    "Discover world-class courses crafted by industry experts. Join thousands of learners on ScholarX.",
+  openGraph: {
+    title: "ScholarX — Premium Learning Platform",
+    description: "Discover world-class courses crafted by industry experts.",
+    type: "website",
+  },
+};
+
+
+export default function HomePage() {
   return (
-    <div className="min-h-screen bg-background text-foreground font-sans w-full flex flex-col items-center justify-center relative overflow-hidden">
-      {/* Background radial gradient decoration */}
-      <div
-        className="absolute inset-0 z-0 pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(circle at 50% 30%, var(--primary) 0%, transparent 40%)",
-          opacity: 0.15,
-        }}
+    <main className="relative w-full overflow-x-hidden">
+      {/* Hero Section */}
+      <HeroWrapper />
+
+      {/* Features Section */}
+      <FeaturesSection />
+
+      {/* Why Choose ScholarX Section */}
+      <ServicesSection
+        title={WHY_CHOOSE_SECTION.title}
+        highlight={WHY_CHOOSE_SECTION.highlight}
+        description={WHY_CHOOSE_SECTION.description}
+        servicesKey="whyChoose"
+        theme="light"
+        watermarkImage="/assets/Images/WaterMark.png"
       />
 
-      <main className="z-10 flex flex-col items-center justify-center text-center max-w-4xl px-4 sm:px-6 lg:px-8">
-        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight bg-gradient-to-br from-foreground to-muted-foreground bg-clip-text text-transparent mb-6 drop-shadow-sm">
-          Welcome to ScholarX
-        </h1>
-        <p className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-2xl leading-relaxed">
-          The premium learning platform for the next generation of engineers,
-          designers, and creators.
-        </p>
-        <div className="flex items-center gap-4">
-          <Link
-            href={ROUTES.COURSES}
-            className="inline-flex items-center justify-center rounded-full bg-primary px-8 py-3.5 text-sm font-semibold text-primary-foreground shadow-lg hover:bg-primary/90 transition-all hover:scale-105 active:scale-95"
-          >
-            Explore Courses
-          </Link>
-          <Link
-            href={ROUTES.ABOUT}
-            className="inline-flex items-center justify-center rounded-full bg-secondary px-8 py-3.5 text-sm font-semibold text-secondary-foreground shadow-sm hover:bg-secondary/80 transition-all hover:scale-105 active:scale-95"
-          >
-            Learn More
-          </Link>
-        </div>
-      </main>
-    </div>
+      {/* Who We Help Section */}
+      <ServicesSection
+        title={WHO_WE_HELP_SECTION.title}
+        highlight={WHO_WE_HELP_SECTION.highlight}
+        description={WHO_WE_HELP_SECTION.description}
+        servicesKey="whoWeHelp"
+        theme="white"
+        watermarkImage="/assets/Images/image.png"
+      />
+
+      {/* Impact Section */}
+      <ImpactSection watermarkImage="/assets/Images/WaterMark.png" />
+    </main>
   );
 }

@@ -1,0 +1,79 @@
+.bacground{
+    background-image: linear-gradient(#D6EBF5 80%, #FFFFFF00 100%);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 80px;
+
+}
+.bacground .water-mark{
+    width: 368px;
+    height: 368px;
+  position: absolute;
+  left: -10px;
+  background-color: #D6EBF5;
+  transform: rotate(60deg);
+  opacity: 22%;
+}
+
+
+
+
+.container{
+    padding-top: 96px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+padding-bottom: 96px;
+padding-left: 52px;
+padding-right: 52px;
+}
+
+.container h2{
+    font-size: 39px;
+    line-height: 100%;
+   font-weight: 500px;
+   text-align: center;
+}
+
+.container h2 span{
+    color: #3399CC;
+}
+.container p {
+    font-weight: 400px;
+    font-size: 20px;
+    color: #555555;
+    max-width: 630px;
+    height: 48px;
+    margin-top: 32px;
+    margin-bottom: 60px;
+    text-align: center;
+}
+.container .boxes .single-box .groups{
+    display: flex;
+    margin-bottom: 10px;
+    gap: 4;
+    font-size: 49px;
+    padding-top: 20px;
+}
+.container .boxes .single-box .orang{
+    color: #FF6633;
+}
+.container .boxes .single-box .head{
+    padding: 20px;
+    font-size: 25px;
+ 
+    text-align: center;
+}
+
+.container .boxes .single-box .icons{
+    color: #3399CC;
+    margin-right: 20px;
+}
+
+
+
+
+
