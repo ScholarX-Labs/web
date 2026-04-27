@@ -41,11 +41,12 @@ export default function Contact() {
               className={`${styles.form} ${styles["message-form"]} w-75 p-5 text-start`}
             >
               <h4 className={`${styles.title} `}>Send us a Message</h4>
-              <form>
-                <label className="form-label ">name</label>
+              <form onSubmit={(e) => e.preventDefault()}>
+                <label htmlFor="name" className="form-label ">name</label>
                 <input
                   type="text"
                   id="name"
+                  name="name"
                   placeholder="name"
                   className="form-control mb-3"
                 />
@@ -54,12 +55,17 @@ export default function Contact() {
                 <input
                   type="text"
                   id="email"
+                  name="email"
                   placeholder="email"
                   className="form-control mb-3"
                 />
 
                 <label htmlFor="message">message</label>
-                <textarea className="form-control mb-3" id="message"></textarea>
+                <textarea
+                  className="form-control mb-3"
+                  id="message"
+                  name="message"
+                ></textarea>
                 <button type="submit" className={`w-100 ${styles.btn}`}>
                   {" "}
                   submit
