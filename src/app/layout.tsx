@@ -38,9 +38,9 @@ export default async function RootLayout({
   return (
     <html lang="en" className={inter.variable}>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
       >
-        <div vaul-drawer-wrapper="">
+        <div vaul-drawer-wrapper="" className="min-h-screen flex flex-col">
           <GlobalShellExclusions>
             <Header />
           </GlobalShellExclusions>
@@ -52,7 +52,7 @@ export default async function RootLayout({
                   bypassed.
                 </div>
               ) : null}
-              {children}
+              <main className="flex-1 flex flex-col">{children}</main>
             </TooltipProvider>
           </AppProviders>
           <GlobalShellExclusions>

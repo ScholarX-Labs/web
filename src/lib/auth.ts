@@ -133,6 +133,14 @@ export const auth = betterAuth({
   database: drizzleAdapter(db, { provider: "pg", schema }),
   emailAndPassword: {
     enabled: true,
+    resetPasswordTokenExpiresIn: 600,
+    sendResetPassword: async ({ user, url }) => {
+      await sendEmail({
+        to: user.email,
+        subject: "Reset your ScholarX password",
+        text: `Click the link to reset your ScholarX password: ${url}`,
+      });
+    },
   },
   emailVerification: {
     async afterEmailVerification() {
