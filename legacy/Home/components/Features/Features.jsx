@@ -35,13 +35,12 @@ const Features = memo(function Features() {
             ))}
           </ul>
 
-          <Link to={FEATURES_CONTENT.cta.link} className={styles.ctaLink}>
-            <button className={styles.ctaButton}>
-              {FEATURES_CONTENT.cta.text}
-              <span className={styles.ctaIcon}>
-                {FEATURES_CONTENT.cta.icon}
-              </span>
-            </button>
+          <Link
+            to={FEATURES_CONTENT.cta.link}
+            className={`${styles.ctaLink} ${styles.ctaButton}`}
+          >
+            {FEATURES_CONTENT.cta.text}
+            <span className={styles.ctaIcon}>{FEATURES_CONTENT.cta.icon}</span>
           </Link>
         </div>
 
