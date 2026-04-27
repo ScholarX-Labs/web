@@ -3,7 +3,10 @@ import HeroWrapper from "@/components/home/hero-wrapper";
 import FeaturesSection from "@/components/home/features-section";
 import ServicesSection from "@/components/home/services-section";
 import ImpactSection from "@/components/home/impact-section";
-import { WHY_CHOOSE_SECTION, WHO_WE_HELP_SECTION } from "@/lib/home-data";
+import {
+  WHY_CHOOSE_SECTION,
+  WHO_WE_HELP_SECTION,
+} from "@/lib/home-data";
 import Link from "next/link";
 import { ROUTES } from "@/lib/routes";
 
