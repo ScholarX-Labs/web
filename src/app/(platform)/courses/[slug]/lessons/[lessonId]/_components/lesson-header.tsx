@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Share2, Tv2, Check, Eye, EyeOff } from "lucide-react";
+import { ChevronLeft, Share2, Tv2, Check } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { AnimatedButton } from "@/components/ui/animated-button";
@@ -20,30 +20,35 @@ interface LessonHeaderProps {
 
 export function LessonHeader({ slug, lessonTitle }: LessonHeaderProps) {
   const [copied, setCopied] = useState(false);
-  const { isFocusMode, toggleFocusMode } = useUILayoutStore();
+  const { isFocusMode } = useUILayoutStore();
   const router = useRouter();
 
   const handleShare = useCallback(async () => {
     const url = window.location.href;
     const shareData = { title: `Lesson: ${lessonTitle}`, url };
     try {
-      const hasShare = typeof navigator !== "undefined" && typeof (navigator as any).share === "function";
-      const hasCanShare = typeof navigator !== "undefined" && typeof (navigator as any).canShare === "function";
+      const nav = navigator as Navigator & {
+        share?: (data: ShareData) => Promise<void>;
+        canShare?: (data: ShareData) => boolean;
+      };
+
+      const hasShare = typeof nav !== "undefined" && typeof nav.share === "function";
+      const hasCanShare = typeof nav !== "undefined" && typeof nav.canShare === "function";
 
       if (hasShare) {
         try {
           // If canShare exists, ask it first; otherwise assume share is available
-          if (hasCanShare) {
-            const can = (navigator as any).canShare(shareData);
+          if (hasCanShare && nav.canShare) {
+            const can = nav.canShare(shareData);
             if (can) {
-              await (navigator as any).share(shareData);
+              await nav.share!(shareData);
               return;
             }
           } else {
-            await (navigator as any).share(shareData);
+            await nav.share!(shareData);
             return;
           }
-        } catch (err) {
+        } catch {
           // Sharing failed or was cancelled — fall back to clipboard below.
         }
       }
