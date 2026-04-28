@@ -204,7 +204,7 @@ export const LessonSidebar = React.memo(function LessonSidebar({
           "flex-shrink-0 sticky top-28 h-[calc(100vh-140px)] flex flex-col min-h-0",
           className
         )}
-        style={{ "--sidebar-width": "380px" } as any}
+        style={{ "--sidebar-width": "380px" } as React.CSSProperties}
       >
         <FloatingPanel
           className="flex flex-col flex-1 min-h-0 p-6 w-full"
