@@ -306,12 +306,13 @@ export function useLessonProgress({
       progress.watchedPercentage >= COMPLETE_AT_PCT &&
       !progress.completedAt
     ) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       updateProgress((prev) => ({
         ...prev,
         completedAt: Date.now(),
       }), /* immediate */ true);
     }
-  }, [progress?.watchedPercentage, updateProgress]);
+  }, [progress?.watchedPercentage, updateProgress, progress?.completedAt]);
 
   // ── Cleanup: flush any pending progress for this lesson on unmount/pagehide/visibilitychange
   useEffect(() => {
