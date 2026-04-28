@@ -176,3 +176,17 @@ export const IMPACT_STATS = [
     animationDuration: 1500,
   },
 ];
+
+export const HOME_DATA = {
+  hero: HERO_CONTENT,
+  features: FEATURES_CONTENT,
+  whyChoose: WHY_CHOOSE_SECTION,
+  whoWeHelp: WHO_WE_HELP_SECTION,
+  impact: IMPACT_SECTION,
+  cta: {
+    headline: "Ready to Start Your Journey?",
+    subline: "Join thousands of students and young professionals who are unlocking their potential through ScholarX's global network and resources.",
+    buttonLabel: "Create Free Account",
+    buttonHref: "/auth/signup",
+  },
+};
