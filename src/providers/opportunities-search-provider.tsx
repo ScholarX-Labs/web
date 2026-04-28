@@ -53,7 +53,9 @@ export function OpportunitiesSearchProvider({
     });
 
     // Only update if actually different to avoid cycles
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSearchQuery((prev) => (prev !== newQuery ? newQuery : prev));
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setFilters((prev) => {
       const isDifferent = JSON.stringify(prev) !== JSON.stringify(nextFilters);
       return isDifferent ? nextFilters : prev;
