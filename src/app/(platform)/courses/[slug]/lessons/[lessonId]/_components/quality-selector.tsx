@@ -113,7 +113,7 @@ const QualityDropdown = forwardRef<HTMLDivElement, QualityDropdownProps>(
                 opt.select();
                 onClose();
               }}
-              badge={opt.quality?.height >= 720 ? "HD" : undefined}
+              badge={opt.quality && opt.quality.height >= 720 ? "HD" : undefined}
             />
           ))}
         </ul>
