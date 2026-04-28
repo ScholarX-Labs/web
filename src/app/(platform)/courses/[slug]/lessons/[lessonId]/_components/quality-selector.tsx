@@ -58,9 +58,10 @@ export function QualitySelector({ className }: { className?: string }) {
 // ─── Private sub-component: Dropdown ─────────────────────────────────────────
 
 import { forwardRef } from "react";
+import type { VideoQualityOption } from "@vidstack/react";
 
 interface QualityDropdownProps {
-  options: any; // Returning the complex options object from Vidstack
+  options: VideoQualityOption[];
   onClose: () => void;
 }
 
@@ -104,7 +105,7 @@ const QualityDropdown = forwardRef<HTMLDivElement, QualityDropdownProps>(
         </div>
 
         <ul className="flex flex-col gap-0.5 p-1.5">
-          {options.map((opt: any) => (
+          {options.map((opt) => (
             <QualityOption
               key={opt.value}
               label={opt.label}
