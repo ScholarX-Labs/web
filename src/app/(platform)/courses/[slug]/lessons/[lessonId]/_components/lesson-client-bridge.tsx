@@ -70,13 +70,14 @@ export function LessonClientBridge({
     videoDuration: 0, // Will be updated via setVideoDuration
   });
 
-  // 2. Certificate Completion — fires celebration modal + Server Action
+  // 2. Certificate Completion — fires when ALL lessons in the course are done
   const { showModal, isIssuing, result, dismiss } = useCertificateCompletion({
-    courseId: courseId ?? courseSlug, // fallback to slug if no real ID
+    courseId: courseId ?? courseSlug,
+    courseSlug,
     programName: programName ?? lessonTitle,
     seasonNumber,
     role: participantRole,
-    isCompleted: !!progress?.completedAt,
+    lessons, // hook scans all lesson progress records in localStorage
   });
 
   // 2. Resume Handler

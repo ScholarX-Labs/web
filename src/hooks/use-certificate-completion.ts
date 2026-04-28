@@ -2,14 +2,18 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { issueCertificateOnCompletion } from "@/actions/certificates/issue-certificate-on-completion.action";
+import type { LessonSummary } from "@/types/course.types";
 
-interface CompletionInput {
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+interface CourseCompletionInput {
   courseId: string;
+  courseSlug: string;
   programName: string;
   seasonNumber: number;
   role: "mentee" | "mentor";
-  /** Pass true when useLessonProgress fires completedAt for the first time */
-  isCompleted: boolean;
+  /** The full ordered lesson list for the course */
+  lessons: LessonSummary[];
 }
 
 interface CompletionResult {
@@ -31,55 +35,92 @@ interface UseCertificateCompletionReturn {
   dismiss: () => void;
 }
 
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+/**
+ * Reads each lesson's persisted progress from localStorage and returns
+ * true only if EVERY lesson in the course has a truthy `completedAt` value.
+ *
+ * This is the single source of truth for "course complete":
+ * all lessons must be individually marked done (≥ 80% watched) before
+ * the certificate issuance pipeline is triggered.
+ */
+function areAllLessonsComplete(
+  courseSlug: string,
+  lessons: LessonSummary[],
+): boolean {
+  if (lessons.length === 0) return false;
+  try {
+    return lessons.every((lesson) => {
+      const key = `progress:${courseSlug}:${lesson.id}`;
+      const raw = localStorage.getItem(key);
+      if (!raw) return false;
+      const p = JSON.parse(raw) as { completedAt?: number | null };
+      return !!p.completedAt;
+    });
+  } catch {
+    return false;
+  }
+}
+
+// ─── Hook ─────────────────────────────────────────────────────────────────────
+
 /**
  * useCertificateCompletion
  *
- * Orchestrates the celebration modal UX when a lesson's completion
- * threshold is crossed for the first time.
+ * Watches lesson progress across the entire course.
+ * When ALL lessons reach ≥ 80% watch threshold (tracked by `useLessonProgress`),
+ * this hook fires the `issueCertificateOnCompletion` Server Action exactly once
+ * and shows the celebration modal.
  *
- * Responsibilities (Single Responsibility Principle):
- * - Detects the first-time completion event from `isCompleted`
- * - Calls the `issueCertificateOnCompletion` Server Action exactly once
- *   (idempotent — guarded by a ref flag)
- * - Exposes modal visibility and result state to the consuming component
- *
- * The Server Action handles all auth, business logic, and DB work.
- * This hook is purely a UI-state coordinator.
+ * Design decisions:
+ * - Certificate is per-COURSE, not per-lesson.
+ * - The trigger is a localStorage scan of all lesson progress records —
+ *   no network call needed to determine completeness.
+ * - A ref flag (`hasTriggered`) ensures idempotency even if progress
+ *   state flickers or the component re-renders.
+ * - The Server Action handles auth and DB-level idempotency (one cert
+ *   per user/course/season).
  */
 export function useCertificateCompletion({
   courseId,
+  courseSlug,
   programName,
   seasonNumber,
   role,
-  isCompleted,
-}: CompletionInput): UseCertificateCompletionReturn {
+  lessons,
+}: CourseCompletionInput): UseCertificateCompletionReturn {
   const [showModal, setShowModal] = useState(false);
   const [isIssuing, setIsIssuing] = useState(false);
   const [result, setResult] = useState<CompletionResult | null>(null);
 
-  // Guard: only fire once per session even if isCompleted flickers
+  // Guard: fire the Server Action at most once per component lifecycle
   const hasTriggered = useRef(false);
 
   const dismiss = useCallback(() => setShowModal(false), []);
 
   useEffect(() => {
-    if (!isCompleted || hasTriggered.current) return;
+    // Re-check after every progress update (triggered by parent re-renders)
+    if (hasTriggered.current) return;
+    if (!areAllLessonsComplete(courseSlug, lessons)) return;
 
+    // All lessons done — trigger certificate issuance
     hasTriggered.current = true;
     setShowModal(true);
     setIsIssuing(true);
 
     issueCertificateOnCompletion({ courseId, programName, seasonNumber, role })
-      .then((res) => {
-        setResult(res);
-      })
-      .catch(() => {
-        setResult({ success: false, message: "Something went wrong. Please try again later." });
-      })
-      .finally(() => {
-        setIsIssuing(false);
-      });
-  }, [isCompleted, courseId, programName, seasonNumber, role]);
+      .then((res) => setResult(res))
+      .catch(() =>
+        setResult({
+          success: false,
+          message: "Something went wrong. Please try again later.",
+        }),
+      )
+      .finally(() => setIsIssuing(false));
+  });
+  // Intentionally no dependency array — re-evaluates on every render
+  // so it picks up localStorage changes from the progress hook.
 
   return { showModal, isIssuing, result, dismiss };
 }
