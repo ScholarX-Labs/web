@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence, Transition } from "framer-motion";
 import { Course } from "@/types/course.types";
-import { DialogContent } from "@/components/ui/dialog";
+import { DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { EnrollmentLifecycle } from "@/lib/enrollment/types";
 import { EnrollModalAmbient } from "./enroll-modal-ambient";
 import { EnrollModalTitleMedia } from "./enroll-modal-title-media";
@@ -91,6 +91,8 @@ export function EnrollModalContent({
       overlayClassName={overlayClassName}
       className="z-90 sm:max-w-md p-0 overflow-hidden rounded-3xl border border-slate-200/90 bg-white/95 shadow-[0_32px_95px_rgba(2,6,23,0.28)] ring-1 ring-slate-100/80 backdrop-blur-xl gap-0 dark:border-slate-800 dark:bg-card/95 dark:ring-slate-800/80"
     >
+      <DialogTitle className="sr-only">Enroll in Course</DialogTitle>
+
       <EnrollModalAmbient shouldReduceMotion={shouldReduceMotion} />
 
       <motion.div
