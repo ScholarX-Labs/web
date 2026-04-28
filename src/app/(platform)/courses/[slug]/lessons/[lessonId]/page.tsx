@@ -42,7 +42,7 @@ const MOCK_LESSONS: LessonSummary[] = [
     duration: "12:45",
     isCompleted: true,
     media: {
-      src: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+      src: "https://www.youtube.com/watch?v=kYm8xP1mG58",
       poster: "https://placehold.co/1280x720/png?text=Lesson+2",
     },
   },
@@ -51,7 +51,7 @@ const MOCK_LESSONS: LessonSummary[] = [
     title: "Understanding State and Lifecycle",
     duration: "18:10",
     media: {
-      src: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+      src: "https://www.youtube.com/watch?v=O6P86uwfdR0",
       poster: "https://placehold.co/1280x720/png?text=Lesson+3",
     },
   },
@@ -59,9 +59,9 @@ const MOCK_LESSONS: LessonSummary[] = [
     id: "lesson-4",
     title: "Advanced Component Patterns",
     duration: "25:30",
-    isLocked: true,
+    isLocked: false,
     media: {
-      src: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+      src: "https://www.youtube.com/watch?v=w7ejDZ8SWv8",
       poster: "https://placehold.co/1280x720/png?text=Lesson+4",
     },
   },
@@ -69,10 +69,80 @@ const MOCK_LESSONS: LessonSummary[] = [
     id: "lesson-5",
     title: "Performance Optimization Tricks",
     duration: "14:15",
-    isLocked: true,
+    isLocked: false,
     media: {
-      src: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+      src: "https://www.youtube.com/watch?v=sIjwL-4T-Z8",
       poster: "https://placehold.co/1280x720/png?text=Lesson+5",
+    },
+  },
+  {
+    id: "lesson-6",
+    title: "App Router Fundamentals",
+    duration: "21:10",
+    isLocked: false,
+    media: {
+      src: "https://www.youtube.com/watch?v=wm5gMKuwSYk",
+      poster: "https://placehold.co/1280x720/png?text=Lesson+6",
+    },
+  },
+  {
+    id: "lesson-7",
+    title: "Server vs Client Components",
+    duration: "19:45",
+    isLocked: false,
+    media: {
+      src: "https://www.youtube.com/watch?v=kYm8xP1mG58",
+      poster: "https://placehold.co/1280x720/png?text=Lesson+7",
+    },
+  },
+  {
+    id: "lesson-8",
+    title: "Data Fetching and Caching",
+    duration: "32:15",
+    isLocked: false,
+    media: {
+      src: "https://www.youtube.com/watch?v=O6P86uwfdR0",
+      poster: "https://placehold.co/1280x720/png?text=Lesson+8",
+    },
+  },
+  {
+    id: "lesson-9",
+    title: "Server Actions in Depth",
+    duration: "28:30",
+    isLocked: false,
+    media: {
+      src: "https://www.youtube.com/watch?v=w7ejDZ8SWv8",
+      poster: "https://placehold.co/1280x720/png?text=Lesson+9",
+    },
+  },
+  {
+    id: "lesson-10",
+    title: "Middleware and Edge Functions",
+    duration: "15:20",
+    isLocked: false,
+    media: {
+      src: "https://www.youtube.com/watch?v=sIjwL-4T-Z8",
+      poster: "https://placehold.co/1280x720/png?text=Lesson+10",
+    },
+  },
+  {
+    id: "lesson-11",
+    title: "Authentication Strategies",
+    duration: "26:45",
+    isLocked: false,
+    media: {
+      src: "https://www.youtube.com/watch?v=55NvZjUZIO8",
+      poster: "https://placehold.co/1280x720/png?text=Lesson+11",
+    },
+  },
+  {
+    id: "lesson-12",
+    title: "Deployment and Vercel",
+    duration: "18:50",
+    isLocked: false,
+    media: {
+      src: "https://www.youtube.com/watch?v=wm5gMKuwSYk",
+      poster: "https://placehold.co/1280x720/png?text=Lesson+12",
     },
   },
 ];
