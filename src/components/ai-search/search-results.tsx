@@ -68,6 +68,7 @@ export function SearchResults({
 
   // Reset visible count when results change (new search)
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setVisibleCount(PAGE_SIZE);
   }, [results]);
 
