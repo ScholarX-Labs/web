@@ -52,7 +52,7 @@ export function StaggerItem({ children, as, ...props }: StaggerItemProps) {
   // Use pre-defined components for common tags
   if (as === "li") {
     return (
-      <MotionLi variants={staggerItemVariants} {...(props as any)}>
+      <MotionLi variants={staggerItemVariants} {...(props as HTMLMotionProps<"li">)}>
         {children}
       </MotionLi>
     );
@@ -60,7 +60,7 @@ export function StaggerItem({ children, as, ...props }: StaggerItemProps) {
   
   if (as === "span") {
     return (
-      <MotionSpan variants={staggerItemVariants} {...(props as any)}>
+      <MotionSpan variants={staggerItemVariants} {...(props as HTMLMotionProps<"span">)}>
         {children}
       </MotionSpan>
     );
@@ -68,7 +68,7 @@ export function StaggerItem({ children, as, ...props }: StaggerItemProps) {
 
   if (as === "article") {
     return (
-      <MotionArticle variants={staggerItemVariants} {...(props as any)}>
+      <MotionArticle variants={staggerItemVariants} {...(props as HTMLMotionProps<"article">)}>
         {children}
       </MotionArticle>
     );
@@ -76,7 +76,7 @@ export function StaggerItem({ children, as, ...props }: StaggerItemProps) {
 
   if (as === "section") {
     return (
-      <MotionSection variants={staggerItemVariants} {...(props as any)}>
+      <MotionSection variants={staggerItemVariants} {...(props as HTMLMotionProps<"section">)}>
         {children}
       </MotionSection>
     );
@@ -84,7 +84,7 @@ export function StaggerItem({ children, as, ...props }: StaggerItemProps) {
 
   // Default to div
   return (
-    <MotionDiv variants={staggerItemVariants} {...(props as any)}>
+    <MotionDiv variants={staggerItemVariants} {...props}>
       {children}
     </MotionDiv>
   );
