@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
+/* eslint-disable @typescript-eslint/no-require-imports */
 const { Client } = require("pg");
 
 (async () => {
