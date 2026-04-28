@@ -45,9 +45,7 @@ export interface UseLessonProgressReturn {
 
 const HEATMAP_BUCKETS = 20;
 const DEBOUNCE_MS     = 500;
-/** A lesson is considered complete when the furthest timestamp reached
- *  equals or exceeds 80% of the total video duration. */
-const COMPLETE_AT_PCT = 80;
+const COMPLETE_AT_PCT = 90;
 
 // ─── Storage Helpers ──────────────────────────────────────────────────────────
 
