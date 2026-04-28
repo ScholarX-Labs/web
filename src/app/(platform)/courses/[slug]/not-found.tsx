@@ -12,7 +12,7 @@ export default function CourseNotFound() {
         Course Not Found
       </h1>
       <p className="text-base text-slate-500 dark:text-slate-400 max-w-md mb-10 leading-relaxed">
-        We couldn't track down the course you're looking for. It may have been
+        We couldn&apos;t track down the course you&apos;re looking for. It may have been
         retired or the link might be broken.
       </p>
       <div className="flex flex-col sm:flex-row gap-4 justify-center w-full sm:w-auto">
