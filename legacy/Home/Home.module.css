@@ -7,10 +7,6 @@
   background: #ffffff;
 }
 
-/* Smooth scroll behavior */
-html {
-  scroll-behavior: smooth;
-}
 
 /* Remove default margins */
 .page > * {

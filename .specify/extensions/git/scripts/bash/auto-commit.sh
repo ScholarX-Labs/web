@@ -159,7 +159,10 @@ if [ -n "$_porcelain" ]; then
     if [ ${#_paths_spec[@]} -gt 0 ]; then
         echo "[specify] Staging configured paths: ${_paths_spec[*]}"
         _git_out=$(git add -- "${_paths_spec[@]}" 2>&1) || { echo "[specify] Error: git add failed: $_git_out" >&2; exit 1; }
-        _git_out=$(git commit -q -m "$_commit_msg" 2>&1) || { echo "[specify] Error: git commit failed: $_git_out" >&2; exit 1; }
+        if [ -z "$(git diff --name-only --cached -- "${_paths_spec[@]}")" ]; then
+            exit 0
+        fi
+        _git_out=$(git commit -q -m "$_commit_msg" -- "${_paths_spec[@]}" 2>&1) || { echo "[specify] Error: git commit failed: $_git_out" >&2; exit 1; }
         echo "[OK] Changes committed ${_phase} ${_command_name}" >&2
         exit 0
     fi

@@ -182,7 +182,7 @@ export function useLessonProgress({
   // Lazily initialize progress and resumePoint from persisted storage to
   // avoid calling setState during mount effects. Read once and derive
   // initial values for `progress` and `resumePoint`.
-  const _initialStored = readProgress(courseSlug, lessonId);
+  const _initialStored = typeof window !== 'undefined' ? readProgress(courseSlug, lessonId) : null;
   const [progress, setProgress] = useState<LessonProgress | null>(() => {
     // Only reuse persisted progress when it represents an active, eligible
     // resume state. If the stored progress is completed or below the
