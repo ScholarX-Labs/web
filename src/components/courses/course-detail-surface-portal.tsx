@@ -40,24 +40,28 @@ export function CourseDetailSurfacePortal() {
     };
   }, [isOpen, mounted]);
 
-  if (!mounted || !course || !isOpen) return null;
+  useEffect(() => {
+    if (!mounted || !course || !isOpen) return;
 
-  // #region agent log
-  agentLog({
-    runId: "pre",
-    hypothesisId: "H1",
-    location: "src/components/courses/course-detail-surface-portal.tsx:render",
-    message: "CourseDetailSurfacePortal render gate",
-    data: {
-      isOpen,
-      hasCourse: Boolean(course),
-      intent,
-      isEnrollmentModalOpen,
-      hasOriginRect: Boolean(originRect),
-    },
-    timestamp: Date.now(),
-  });
-  // #endregion agent log
+    // #region agent log
+    agentLog({
+      runId: "pre",
+      hypothesisId: "H1",
+      location: "src/components/courses/course-detail-surface-portal.tsx:useEffect",
+      message: "CourseDetailSurfacePortal render gate",
+      data: {
+        isOpen,
+        hasCourse: Boolean(course),
+        intent,
+        isEnrollmentModalOpen,
+        hasOriginRect: Boolean(originRect),
+      },
+      timestamp: Date.now(),
+    });
+    // #endregion agent log
+  }, [mounted, course, isOpen, intent, isEnrollmentModalOpen, originRect]);
+
+  if (!mounted || !course || !isOpen) return null;
 
   return createPortal(
     <>
