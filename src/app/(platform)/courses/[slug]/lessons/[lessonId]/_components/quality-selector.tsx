@@ -8,14 +8,6 @@ import { cn } from "@/lib/utils";
 /**
  * QualitySelector — A premium, accessible quality picker that hooks
  * directly into VidStack's quality management API.
- *
- * Design Principles (SOLID):
- * - Single Responsibility: Renders quality options. Nothing else.
- * - Open/Closed: Extensible via className prop without modifying internals.
- * - Liskov: Can be dropped anywhere inside a <MediaPlayer> tree.
- *
- * @note This component MUST be rendered inside a <MediaPlayer> for
- * useVideoQualityOptions() to access the media context.
  */
 export function QualitySelector({ className }: { className?: string }) {
   const options = useVideoQualityOptions({ auto: true, sort: "descending" });
@@ -24,7 +16,7 @@ export function QualitySelector({ className }: { className?: string }) {
   const menuRef = useRef<HTMLDivElement>(null);
 
   // --- Guard: hide entirely when quality is not user-controllable (e.g. YouTube embed) ---
-  if (!canSetQuality || options.qualities.length === 0) {
+  if (!canSetQuality || options.length === 0) {
     return null;
   }
 
@@ -34,7 +26,6 @@ export function QualitySelector({ className }: { className?: string }) {
 
   return (
     <div className={cn("relative flex items-center", className)}>
-      {/* Trigger Button */}
       <button
         id="quality-selector-trigger"
         aria-haspopup="listbox"
@@ -46,14 +37,13 @@ export function QualitySelector({ className }: { className?: string }) {
           "bg-white/10 hover:bg-white/20 text-white",
           "border border-white/20 hover:border-white/40",
           "backdrop-blur-md transition-all duration-200 active:scale-95",
-          options.autoQuality && "text-white/70"
+          options.selectedValue === "auto" && "text-white/70"
         )}
       >
         <Gauge className="w-3.5 h-3.5 shrink-0" />
-        <span>{options.autoQuality ? "Auto" : selectedLabel}</span>
+        <span>{options.selectedValue === "auto" ? "Auto" : selectedLabel}</span>
       </button>
 
-      {/* Dropdown Menu — animated, glassmorphic */}
       {isOpen && (
         <QualityDropdown
           ref={menuRef}
@@ -70,13 +60,12 @@ export function QualitySelector({ className }: { className?: string }) {
 import { forwardRef } from "react";
 
 interface QualityDropdownProps {
-  options: ReturnType<typeof useVideoQualityOptions>;
+  options: any; // Returning the complex options object from Vidstack
   onClose: () => void;
 }
 
 const QualityDropdown = forwardRef<HTMLDivElement, QualityDropdownProps>(
   ({ options, onClose }, ref) => {
-    // Close on outside click
     useEffect(() => {
       const handler = (e: MouseEvent) => {
         if (ref && "current" in ref && ref.current && !ref.current.contains(e.target as Node)) {
@@ -87,7 +76,6 @@ const QualityDropdown = forwardRef<HTMLDivElement, QualityDropdownProps>(
       return () => document.removeEventListener("mousedown", handler);
     }, [onClose, ref]);
 
-    // Close on Escape
     useEffect(() => {
       const handler = (e: KeyboardEvent) => {
         if (e.key === "Escape") onClose();
@@ -116,27 +104,16 @@ const QualityDropdown = forwardRef<HTMLDivElement, QualityDropdownProps>(
         </div>
 
         <ul className="flex flex-col gap-0.5 p-1.5">
-          {/* Auto option */}
-          <QualityOption
-            label="Auto"
-            isSelected={options.autoQuality}
-            onClick={() => {
-              options.autoSelectQuality();
-              onClose();
-            }}
-          />
-
-          {/* Specific quality renditions, sorted descending (1080p → 360p) */}
-          {options.qualities.map((quality) => (
+          {options.map((opt: any) => (
             <QualityOption
-              key={quality.id}
-              label={`${quality.height}p`}
-              badge={quality.height >= 1080 ? "HD" : quality.height >= 720 ? "HD" : undefined}
-              isSelected={!options.autoQuality && options.selectedQuality?.id === quality.id}
+              key={opt.value}
+              label={opt.label}
+              isSelected={opt.selected}
               onClick={() => {
-                quality.select();
+                opt.select();
                 onClose();
               }}
+              badge={opt.quality?.height >= 720 ? "HD" : undefined}
             />
           ))}
         </ul>
@@ -147,8 +124,6 @@ const QualityDropdown = forwardRef<HTMLDivElement, QualityDropdownProps>(
 
 QualityDropdown.displayName = "QualityDropdown";
 
-// ─── Private atom: single option row ─────────────────────────────────────────
-
 interface QualityOptionProps {
   label: string;
   badge?: string;
@@ -158,10 +133,7 @@ interface QualityOptionProps {
 
 function QualityOption({ label, badge, isSelected, onClick }: QualityOptionProps) {
   return (
-    <li
-      role="option"
-      aria-selected={isSelected}
-    >
+    <li role="option" aria-selected={isSelected}>
       <button
         onClick={onClick}
         className={cn(
