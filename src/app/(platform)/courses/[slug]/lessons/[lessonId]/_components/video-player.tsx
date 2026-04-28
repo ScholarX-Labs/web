@@ -100,6 +100,7 @@ export const VideoPlayer = React.forwardRef<MediaPlayerInstance, VideoPlayerProp
           playsInline
           className="w-full aspect-video"
           crossOrigin
+          poster={poster}
           onTimeUpdate={(detail) => {
             if (typeof detail === "number") onTimeUpdate?.(detail);
           }}
@@ -125,7 +126,6 @@ export const VideoPlayer = React.forwardRef<MediaPlayerInstance, VideoPlayerProp
           <DefaultVideoLayout
             thumbnails={thumbnails}
             icons={defaultLayoutIcons}
-            poster={poster}
           />
         </MediaPlayer>
 
