@@ -1,6 +1,6 @@
 "use client";
 
-import { useVideoQualityOptions } from "@vidstack/react";
+import { useVideoQualityOptions, useMediaStore } from "@vidstack/react";
 import { CheckIcon, Gauge } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -19,11 +19,12 @@ import { cn } from "@/lib/utils";
  */
 export function QualitySelector({ className }: { className?: string }) {
   const options = useVideoQualityOptions({ auto: true, sort: "descending" });
+  const { canSetQuality } = useMediaStore();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   // --- Guard: hide entirely when quality is not user-controllable (e.g. YouTube embed) ---
-  if (!options.canSetQuality || options.qualities.length === 0) {
+  if (!canSetQuality || options.qualities.length === 0) {
     return null;
   }
 
