@@ -59,8 +59,27 @@ export function useAiChatQuery() {
 
       const data = await response.json();
       
+      interface ApiResult {
+        id: string;
+        score: number;
+        opportunity?: {
+          id?: string;
+          type?: { subtype?: string[] };
+          title?: string;
+          location?: string;
+          target_segment?: string[];
+          description?: string;
+          country?: string[];
+          degree?: string[];
+          funding_type?: string[];
+          deadline?: string;
+          link?: string;
+          verified?: boolean;
+        };
+      }
+
       // Safety checks / defaults mapping
-      const mappedOpportunities = (data.results || []).map((result: any) => {
+      const mappedOpportunities = (data.results || []).map((result: ApiResult) => {
         const opp = result.opportunity || {};
         return {
           id: opp.id || result.id || crypto.randomUUID(),
@@ -85,8 +104,8 @@ export function useAiChatQuery() {
         opportunities: mappedOpportunities.length > 0 ? mappedOpportunities : [],
       });
 
-    } catch (err: any) {
-      if (err.name === "AbortError") {
+    } catch (err: unknown) {
+      if (err instanceof Error && err.name === "AbortError") {
         console.log("Request intentionally aborted");
         return;
       }
