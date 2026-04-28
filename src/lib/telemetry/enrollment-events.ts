@@ -29,7 +29,6 @@ export type EnrollmentTelemetryEvent =
 export const emitEnrollmentEvent = (event: EnrollmentTelemetryEvent) => {
   if (process.env.NODE_ENV !== "production") {
     // Keep transport pluggable; this console path is a safe default.
-    // eslint-disable-next-line no-console
     console.debug("[telemetry]", event);
   }
 };
