@@ -85,7 +85,7 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
         if (!result.success) {
           toast.error(result.error || "Failed to update saved status. Please try again.");
         }
-      } catch (error) {
+      } catch {
         toast.error("An unexpected error occurred. Please try again.");
       }
     });
