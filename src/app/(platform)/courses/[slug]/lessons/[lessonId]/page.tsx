@@ -4,7 +4,6 @@ import { Suspense } from "react";
 import { LessonLayoutShell } from "./_components/lesson-layout-shell";
 import { LessonHeader } from "./_components/lesson-header";
 import { LessonClientBridge } from "./_components/lesson-client-bridge";
-import { Skeleton } from "@/components/ui/skeleton";
 import type { LessonSummary } from "@/types/course.types";
 import { requireSession } from "@/lib/dal";
 
