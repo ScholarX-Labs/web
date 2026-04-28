@@ -62,7 +62,7 @@ async function assertEmailOtpSendLimit(email: string): Promise<void> {
 async function countOtpSendsSince(
   email: string,
   since: Date,
-  tx: any = db,
+  tx: { select: any } = db as any,
 ): Promise<number> {
   const escapedEmail = escapeLikePattern(email);
   const identifierPrefix = `${EMAIL_OTP_RATE_LIMIT_IDENTIFIER}:${escapedEmail}:%`;
