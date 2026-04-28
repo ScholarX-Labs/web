@@ -63,6 +63,7 @@ async function assertEmailOtpSendLimit(email: string): Promise<void> {
 async function countOtpSendsSince(
   email: string,
   since: Date,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   tx: PgTransaction<any, any, any> | typeof db = db,
 ): Promise<number> {
   const escapedEmail = escapeLikePattern(email);
@@ -82,6 +83,7 @@ async function countOtpSendsSince(
 
 async function recordEmailOtpSend(
   email: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   tx: PgTransaction<any, any, any> | typeof db = db,
 ): Promise<void> {
   const normalizedEmail = normalizeEmailAddress(email);
