@@ -41,8 +41,19 @@ interface StaggerItemProps extends HTMLMotionProps<"div"> {
   as?: ElementType;
 }
 
+// Map common tags to their motion equivalents to avoid creating components during render
+const motionComponents: Record<string, any> = {
+  div: motion.div,
+  li: motion.li,
+  span: motion.span,
+  article: motion.article,
+  section: motion.section,
+  nav: motion.nav,
+};
+
 export function StaggerItem({ children, as, ...props }: StaggerItemProps) {
-  const Component = as ? motion.create(as) : motion.div;
+  const Component = as && typeof as === "string" ? motionComponents[as] || motion.create(as) : motion.div;
+  
   return (
     <Component variants={staggerItemVariants} {...props}>
       {children}
