@@ -16,6 +16,9 @@
 - Q: Should the recipient credential wallet include a public-facing portfolio page? → A: Yes — opt-in public profile page at `/u/:username/certificates`. Certificates are private by default; recipients explicitly toggle individual certificates to public. Profile page is SEO-indexed.
 - Q: What additional content should the public verification page display to maximise trust and convert verifiers into ScholarX users? → A: Course context + ScholarX CTA — add program duration, a skills/tags list associated with the program, instructor name (text only), and a "Learn more on ScholarX →" CTA button linking to the program page.
 - Q: Should certificate issuance in V1 be fully asynchronous (job queue) or synchronous? → A: Mixed-mode — single certificate issuance (one participant, triggered by completion event or admin) is synchronous. Bulk season issuance uses a lightweight database-backed async job pattern. No Redis or external queue infrastructure required for V1.
+- Q: How is a lesson officially marked as "Completed" by the system? → A: Automatic via Telemetry: The video player automatically reports watch percentage to the backend; completion triggers instantly when the threshold is reached.
+- Q: How is the watch percentage actually measured by telemetry? → A: Furthest Timestamp Reached: The system simply looks at the furthest point the user has reached in the video, even if they skipped directly to the end.
+- Q: Does the user receive an immediate in-app notification when the certificate is generated? → A: In-App Celebration + Email: A celebratory modal appears instantly over the video player with a button to view/claim the certificate, alongside the email.
 
 ---
 
@@ -154,6 +157,8 @@ A signed-in recipient can enable a public profile page at `/u/:username/certific
 
 - **FR-001**: The system MUST automatically issue a certificate to a participant when they satisfy the completion criteria for their enrolled program: (a) their recorded lesson watch percentage meets or exceeds the course's configured minimum watch threshold, AND (b) if the course contains quizzes, they have passed all required quizzes with a score at or above the course's configured minimum quiz score. If a course has no quizzes, criterion (a) alone is sufficient. The system MUST NOT issue a certificate to a participant who does not meet these criteria.
 - **FR-001a**: Each program (course) MUST store a `CompletionCriteria` record defining: the minimum watch percentage (0–100, required), whether quizzes are required for that course (boolean), and the minimum quiz score (0–100, required when quizzes are enabled). These values MUST be configurable by an admin per course.
+- **FR-001b**: The system MUST rely on background telemetry from the video player to track watch percentage automatically. When the telemetry indicates the configured minimum watch threshold is reached (and any quizzes are passed), the lesson is marked completed and the certificate is issued instantly without requiring the user to explicitly acknowledge completion.
+- **FR-001c**: The video telemetry MUST calculate watch percentage based on the furthest timestamp reached by the user in the video, regardless of whether the user scrubbed/skipped ahead. Linear viewing of every segment is not enforced for completion.
 - **FR-002**: An admin MUST be able to manually issue a single certificate by providing recipient name, email, program, role, and completion date.
 - **FR-003**: An admin MUST be able to trigger bulk certificate issuance for all participants of a selected season from the admin dashboard.
 - **FR-004**: The system MUST generate two certificate outputs per participant: a PDF (A4, download-quality) and a PNG (1200×630, share-optimized for LinkedIn/OG).
@@ -169,6 +174,7 @@ A signed-in recipient can enable a public profile page at `/u/:username/certific
 **Claim & Email Notifications**
 
 - **FR-011**: Upon certificate generation, the system MUST send a branded claim email to the recipient containing a unique, single-use claim link.
+- **FR-011a**: When a certificate is issued to an active user (e.g., upon reaching the video watch threshold), the frontend MUST instantly display a celebratory modal over the video player. This modal MUST contain a button linking directly to view/claim the new certificate.
 - **FR-012**: The claim link MUST expire 30 days after issuance and become invalid after first successful use.
 - **FR-013**: An admin MUST be able to resend the claim email for any certificate with PENDING status.
 - **FR-014**: The system MUST automatically send a reminder email to all unclaimed recipients 7 days after initial issuance.
