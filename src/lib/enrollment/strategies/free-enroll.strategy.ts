@@ -7,7 +7,7 @@ import { mapEnrollmentError } from "@/lib/enrollment/error-mapper";
 
 export const executeFreeEnroll = async (
   context: EnrollmentContext,
-  apiClient: typeof coursesService = coursesService,
+  apiClient: Pick<typeof coursesService, "enrollFree"> = coursesService,
 ): Promise<EnrollmentExecutionResult> => {
   try {
     console.log(
