@@ -4,25 +4,15 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   BookOpen, NotebookPen, FolderOpen, Plus, Trash2,
-  File, Link2, Video, Clock, StickyNote
+  Clock, StickyNote
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNotes } from "@/hooks/use-notes";
 import { useUILayoutStore } from "@/store/ui-layout-store";
-import { fadeSlideUp, staggerContainer, staggerItem } from "@/lib/motion-variants";
-import { AnimatedButton } from "@/components/ui/animated-button";
-import { ContextTooltip } from "@/components/ui/context-tooltip";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
-
-interface Note {
-  id: string;
-  text: string;
-  timestamp: string;    // Human-readable time, e.g. "22:35"
-  createdAt: number;    // Unix ms
-}
 
 interface Resource {
   id: string;
@@ -82,33 +72,6 @@ const DEFAULT_RESOURCES: Resource[] = [
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Resource Icon + color map
-// ─────────────────────────────────────────────────────────────────────────────
-
-const resourceMeta: Record<Resource["type"], { icon: React.ReactNode; color: string; bg: string }> = {
-  pdf: {
-    icon: <File className="w-4 h-4" />,
-    color: "text-red-400",
-    bg: "bg-red-500/10 border-red-500/20",
-  },
-  code: {
-    icon: <File className="w-4 h-4" />,
-    color: "text-emerald-400",
-    bg: "bg-emerald-500/10 border-emerald-500/20",
-  },
-  link: {
-    icon: <Link2 className="w-4 h-4" />,
-    color: "text-blue-400",
-    bg: "bg-blue-500/10 border-blue-500/20",
-  },
-  video: {
-    icon: <Video className="w-4 h-4" />,
-    color: "text-violet-400",
-    bg: "bg-violet-500/10 border-violet-500/20",
-  },
-};
-
-// ─────────────────────────────────────────────────────────────────────────────
 // Tab Bar
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -126,6 +89,7 @@ export function LessonTabs({
   lessonId,
   courseSlug,
   description,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   resources = DEFAULT_RESOURCES,
   initialTab,
   onTabChange,
@@ -154,6 +118,7 @@ export function LessonTabs({
   useEffect(() => {
     if (!seenInitialTabRef.current && initialTab) {
       seenInitialTabRef.current = true;
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setActiveTab(initialTab);
       if (initialTab === "resources") {
         setResourcesSheetOpen(true);
