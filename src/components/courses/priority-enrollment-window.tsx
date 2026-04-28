@@ -321,7 +321,7 @@ export function PriorityEnrollmentWindow({
               className="space-y-3 rounded-xl border border-slate-100/50 bg-slate-50/50 p-4 dark:border-slate-800/50 dark:bg-slate-900/30"
             >
               <p className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
-                You're getting instant access to
+                You&apos;re getting instant access to
               </p>
               <motion.ul
                 className="space-y-2"
