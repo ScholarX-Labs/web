@@ -86,7 +86,7 @@ function _cancelPendingForKey(key: string) {
   if (!prev) return;
   try {
     if (prev.type === "idle" && "cancelIdleCallback" in globalThis) {
-      (globalThis as any).cancelIdleCallback(prev.id);
+      (globalThis as unknown as Window).cancelIdleCallback(prev.id);
     } else {
       clearTimeout(prev.id);
     }
@@ -105,7 +105,7 @@ function scheduleWriteProgress(progress: LessonProgress, delay = 0) {
   const scheduleIdleWrite = () => {
     const writeNow = () => _flushWriteForKey(key);
     if ("requestIdleCallback" in globalThis) {
-      const id = (globalThis as any).requestIdleCallback(writeNow, { timeout: 1000 });
+      const id = (globalThis as unknown as Window).requestIdleCallback(writeNow, { timeout: 1000 });
       _pendingHandle.set(key, { id, type: "idle" });
     } else {
       const id = setTimeout(writeNow, 0) as unknown as number;
@@ -312,7 +312,7 @@ export function useLessonProgress({
         completedAt: Date.now(),
       }), /* immediate */ true);
     }
-  }, [progress?.watchedPercentage, updateProgress, progress?.completedAt]);
+  }, [progress, updateProgress]);
 
   // ── Cleanup: flush any pending progress for this lesson on unmount/pagehide/visibilitychange
   useEffect(() => {
