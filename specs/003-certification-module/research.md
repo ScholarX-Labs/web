@@ -1,119 +1,131 @@
 # Research: Certification Module
-**Branch**: `003-certification-module` | **Date**: 2026-04-28
 
-All NEEDS CLARIFICATION items from Technical Context resolved here.
-
----
-
-## 1. PDF & PNG Certificate Generation
-
-**Decision**: `@react-pdf/renderer` for PDF generation; `sharp` + SVG (or `@react-pdf/renderer` PNG export) for the 1200×630 share image.
-
-**Rationale**: The project is a pure Next.js full-stack app — there is no separate NestJS backend. Puppeteer/Playwright are too heavy for this environment (serverless-compatible deployment, no Docker). `@react-pdf/renderer` runs natively in Node.js with no headless browser dependency, integrates cleanly with TypeScript and React component patterns already established in the project, and works inside Next.js Server Actions and Route Handlers. It produces pixel-consistent output and supports custom fonts, SVG, and image embedding. For the 1200×630 PNG share image, `@react-pdf/renderer` can render a PNG from a fixed-canvas React PDF document; alternatively, a lightweight `node-canvas` or SVG-to-PNG approach via `sharp` works for the simpler share-image format.
-
-**Alternatives considered**:
-- Puppeteer/Playwright: rejected — requires Chromium binary, extremely heavyweight for serverless, deployment complexity exceeds value.
-- pdf-lib / PDFKit: rejected — no React component model; pure coordinate-based layout is expensive to maintain as templates evolve.
-- External PDF API (PDFMonkey, Gotenberg): rejected — adds paid external dependency; unnecessary for the expected volume (~200 certs/season max).
+**Branch**: `003-certification-module` | **Date**: 2026-04-28 | **Phase**: 0
 
 ---
 
-## 2. Cryptographic Certificate Signing (HMAC-SHA256)
+## 1. Watch-Percentage Completion via Telemetry
 
-**Decision**: HMAC-SHA256 using Node.js built-in `crypto` module. Secret stored as `CERT_SIGNING_SECRET` environment variable. Signature computed over a canonical JSON payload (deterministic key order). Verified with `crypto.timingSafeEqual` to prevent timing attacks.
+**Decision**: The existing `useLessonProgress` hook already implements furthest-timestamp tracking (`watchedPercentage = max(prev, currentTimestamp / duration * 100)`). The `COMPLETE_AT_PCT` constant (currently `90`) can be promoted to a per-course configurable value read from `CompletionCriteria`. No new telemetry infrastructure is required.
 
-**Rationale**: Confirmed by spec clarification (Q1: HMAC, not RSA). The built-in `crypto` module requires no additional dependencies. `timingSafeEqual` is the industry-standard defence against timing oracle attacks on signature comparison. The canonical payload (sorted JSON keys) ensures the same data always produces the same signature, regardless of insertion order. Secret stored in env var, never in code or DB.
+**Rationale**: The hook fires every 500ms via VidStack's `onTimeUpdate` and persists to `localStorage`. The completion effect at line 306–318 already fires `completedAt` when the threshold is crossed. We need to:
+1. Replace the hardcoded `90` constant with a value passed from the course's `CompletionCriteria`.
+2. Add a callback prop (`onCompleted?: () => void`) to `useLessonProgress` that fires once when `completedAt` is first set.
+3. Surface that callback in `LessonClientBridge` to trigger the celebration modal and the certificate-issuance Server Action.
 
-**Canonical payload structure**:
-```json
-{
-  "certificateId": "...",
-  "recipientEmail": "...",
-  "recipientName": "...",
-  "programId": "...",
-  "seasonNumber": 1,
-  "role": "mentee|mentor",
-  "issuedAt": "ISO-8601"
-}
-```
-
-**Key rotation**: Rotate `CERT_SIGNING_SECRET` on suspected compromise; previously signed certs will fail verification after rotation (acceptable for V1; add versioned key IDs in V2 if needed).
-
-**Alternatives considered**:
-- RSA-2048 / AWS KMS: rejected per spec clarification — overkill for V1, adds infra complexity.
-- `jsonwebtoken` (JWT HS256): considered but rejected — over-engineered for a stored, non-expiring signature; adds a dependency unnecessarily.
+**Alternatives considered**: Segment-based tracking (rejected — spec clarification Q2 chose furthest-timestamp, simpler).
 
 ---
 
-## 3. Bulk Async Job Queue (No Redis)
+## 2. Database Schema — New Tables
 
-**Decision**: Custom DB-backed job table in the existing `courses` PostgreSQL schema (new `certificates` schema). A lightweight polling Server Action / API route processes pending bulk jobs. For V1's low volume (≤200 certs/season), simple polling every 2 seconds from the admin dashboard is sufficient.
+**Decision**: Four new Drizzle ORM tables in `src/db/schema/certification-schema.ts`, in the shared `public` PostgreSQL schema (consistent with the project pattern of `auth` schema for auth tables).
 
-**Pattern**:
-```
-1. Admin triggers bulk issue → INSERT into `certificate_jobs` table (status: PENDING)
-2. API returns job ID immediately
-3. A Next.js Route Handler at /api/certificates/jobs/[jobId]/process handles per-job execution
-4. Admin dashboard polls /api/certificates/jobs/[jobId] every 2s for progress
-5. Each job row tracks: totalCount, processedCount, failedCount, status
-```
+| Table | Key Fields | Notes |
+|-------|-----------|-------|
+| `completion_criteria` | `id`, `courseSlug` (FK/unique), `minWatchPct` (int), `quizzesRequired` (bool), `minQuizScore` (int nullable) | One row per course |
+| `certificates` | `id` (UUID), `shortId` (text unique), `courseSlug`, `userId` (FK), `status` (enum), `claimToken`, `claimTokenExpiry`, `claimedAt`, `pdfUrl`, `pngUrl`, `signatureFingerprint`, `isPublic` (bool default false), `metadata` (jsonb), timestamps | Core entity |
+| `certificate_events` | `id`, `certificateId` (FK), `eventType` (enum), `actorId` (FK nullable), `ipRegion`, `userAgent`, `metadata` (jsonb), `createdAt` | Immutable audit; append-only |
+| `bulk_issuance_jobs` | `id`, `courseSlug`, `triggeredBy`, `totalCount`, `processedCount`, `failedCount`, `status`, `createdAt`, `updatedAt` | Lightweight DB-backed async job |
 
-**Rationale**: No Redis or external queue needed. The existing PostgreSQL database handles concurrency correctly with `SELECT FOR UPDATE SKIP LOCKED`. This is the exact pattern recommended by Graphile Worker and validated by industry practice for low-volume queues. At ≤200 certs per season, even simple sequential processing completes in under 17 minutes (200 × 5s). A future upgrade to Graphile Worker or Trigger.dev is a drop-in replacement when volume grows.
+**Rationale**: The project uses Drizzle ORM + PostgreSQL. Keeping all certification tables in the same database and schema avoids cross-service complexity. The `user` table already has `portfolioUsername` and `portfolioEnabled` fields added.
 
-**Alternatives considered**:
-- Graphile Worker: excellent choice but adds a dependency; overkill for V1 at this volume.
-- Trigger.dev / Inngest: managed services, best for serverless; adds external dependency and vendor coupling.
-- Redis + BullMQ: explicitly rejected by spec clarification (Q5).
+**Alternatives considered**: Separate service/database (rejected — spec clarification Q2 mandated embedded module, shared DB).
 
 ---
 
-## 4. QR Code Generation
+## 3. Certificate Generation — PDF + PNG
 
-**Decision**: `qrcode` npm package (`node-qrcode`), server-side only within the certificate generation service.
+**Decision**: Use `@react-pdf/renderer` (already installed) for PDF generation via a Server Action. Generate PNG by rendering the certificate template to a React tree, then using `html-to-image` or a Canvas-based approach for the 1200×630 share image.
 
-**Rationale**: Lightweight, zero native dependencies, runs in Node.js runtime, generates both Data URLs (base64 PNG) and SVG strings. Used server-side during certificate generation; the QR code data URL is embedded directly into the `@react-pdf/renderer` certificate template. TypeScript types available via `@types/qrcode`.
+**Rationale**: `@react-pdf/renderer` is already in `package.json`. It produces pixel-perfect A4 PDFs server-side. For PNG, `html-to-image` (to be added) converts a React component tree to a PNG without a headless browser, keeping the stack lightweight.
 
-**Usage**: `QRCode.toDataURL(verificationUrl, { width: 150, margin: 1 })` → base64 PNG embedded in PDF template.
-
-**Alternatives considered**:
-- Client-side QR generation: rejected — certificate assets are generated server-side; client-side QR adds no value and would require additional render round-trips.
+**Alternatives considered**: Puppeteer (rejected — too heavy for a shared deployment; requires headless Chrome binary; spec constrains to embedded module without extra infra). Vercel OG image API (considered for PNG only — viable but harder to customize with brand assets).
 
 ---
 
-## 5. Architecture — Full-Stack Next.js (Not NestJS)
+## 4. Certificate Signing (Cryptographic Integrity)
 
-**Key finding**: The project is a **pure Next.js 16 App Router** application with **Drizzle ORM + PostgreSQL**. There is **no NestJS backend**. The `src/domain/courses/` follows a clean DDD pattern (contracts → application services → infrastructure repositories) entirely within Next.js. The Certification Module will follow the **identical pattern**:
+**Decision**: Use Node.js built-in `crypto` module (available in Next.js server context). Sign a canonical JSON payload with HMAC-SHA256 using a server-side secret (`CERTIFICATE_SIGNING_SECRET` env var). Store the hex digest as `signatureFingerprint`.
 
-```
-src/domain/certificates/
-├── contracts/          # TypeScript interfaces (gateway + DTO contracts)
-├── application/        # Service classes (CertificateIssuanceService, etc.)
-├── infrastructure/
-│   ├── db/             # Drizzle schema + repository
-│   └── http/           # Next.js route handlers
-└── index.ts            # Public barrel export
-```
+**Rationale**: The project is a Next.js monolith without AWS KMS. HMAC-SHA256 with a strong server secret provides tamper-detection for V2 scope. The signing secret is kept in environment variables (already a project convention per `.env.example`). Key rotation can be addressed in a future milestone.
 
-The "internal event" integration with the Courses domain means the `CertificateIssuanceService` is called directly from within the Courses enrollment service (or a shared event bus pattern using a simple observer/callback registered at app startup) — no HTTP call, no separate service, no queue for single-cert path.
+**Alternatives considered**: RSA-2048 / AWS KMS (rejected — too complex for V2 embedded module; no AWS infra confirmed).
+
+---
+
+## 5. File Storage — PDF/PNG Assets
+
+**Decision**: Upload generated PDFs and PNGs to AWS S3 using `@aws-sdk/client-s3` and `@aws-sdk/s3-request-presigner` (already installed). Serve downloads via 15-minute presigned URLs. Public verification page embeds the PNG via presigned URL for OG image.
+
+**Rationale**: Both `@aws-sdk/client-s3` and `@aws-sdk/s3-request-presigner` are already in `package.json`. S3 bucket and credentials (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_BUCKET_NAME`, `AWS_REGION`) will be added to `.env.example`.
+
+**Alternatives considered**: Vercel Blob / Cloudflare R2 (viable, but S3 SDK is already installed).
 
 ---
 
 ## 6. Email Delivery
 
-**Decision**: `nodemailer` (already in `package.json`). Configuration via env vars (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`). Branded HTML email templates as TypeScript template-literal strings.
+**Decision**: Use `nodemailer` (already installed) with an SMTP transactional provider (Resend SMTP or SendGrid SMTP). Email templates are React components rendered to HTML strings via `@react-email/render` (to be added as a lightweight dependency).
 
-**Rationale**: `nodemailer` is already a declared dependency. No new package required. For production, configure against Resend's SMTP relay or any transactional SMTP provider. The email service is abstracted behind an `IEmailService` interface following the existing project pattern.
+**Rationale**: `nodemailer` is already in `package.json`. React Email provides typed, preview-able email templates consistent with the project's React-first approach.
 
----
-
-## 7. File Storage (PDF/PNG Assets)
-
-**Decision**: Cloudflare R2 (preferred, given `open-next.config.ts.disabled` and `.wrangler` directory present — evidence of existing Cloudflare infrastructure interest) or AWS S3. Files stored with UUID-keyed paths: `certificates/{certificateId}/cert.pdf` and `certificates/{certificateId}/cert.png`. Accessed via pre-signed URLs with 15-minute TTL.
-
-**New package required**: `@aws-sdk/client-s3` (for S3-compatible API, works with both S3 and R2 via endpoint override) + `@aws-sdk/s3-request-presigner`.
+**Alternatives considered**: Resend REST API (simpler but adds a new HTTP client dependency; SMTP keeps nodemailer as the single email adapter).
 
 ---
 
-## 8. Deployment Context
+## 7. Celebration Modal — In-App Completion UX
 
-The project currently supports **Vercel** (`vercel.json` present) and **Cloudflare** (`open-next.config.ts.disabled` present, disabled). Certificate generation (PDF, HMAC signing, QR embedding) runs in **Node.js runtime** (not Edge Runtime). All certificate API routes and Server Actions must declare `export const runtime = 'nodejs'` to avoid Edge Runtime limitations with `crypto` and `@react-pdf/renderer`.
+**Decision**: Add a `useCertificateCompletion` hook that subscribes to the `onCompleted` callback from `useLessonProgress`. When fired, it:
+1. Sets a local state flag to show a `CelebrationModal` component over the video player.
+2. Calls the `POST /api/certificates` Server Action to trigger synchronous certificate issuance.
+3. Displays the certificate URL in the modal once the action resolves.
+
+**Implementation note**: The modal uses `framer-motion` + `canvas-confetti` (both already installed) for the celebration animation. It renders as a portal over the lesson layout.
+
+---
+
+## 8. Bulk Issuance — DB-Backed Job Pattern
+
+**Decision**: Create a `bulk_issuance_jobs` table. The admin triggers bulk issue → API route creates a job record → a Next.js Route Handler processes certificates one-by-one in a `while` loop using `setInterval` polling on the client for progress. No Redis/BullMQ required.
+
+**Rationale**: Spec clarification mandated no external queue. The database-backed job pattern (insert job → process in background → poll for status) is sufficient for the scale of a ScholarX season (typically 50–500 participants).
+
+---
+
+## 9. Public Routes — Verification & Portfolio Pages
+
+**Decision**: 
+- `/verify/[id]` — already scaffolded in `src/app/verify/[id]/page.tsx`. Upgrade to a full Server Component with proper data fetching, OG meta tags, and cryptographic verification logic.  
+- `/u/[username]/certificates` — already scaffolded in `src/app/u/`. Implement as a fully public Server Component with `noindex` control.
+- `/certificates/claim/[token]` — already scaffolded under `src/app/certificates/claim/`. Complete the claim flow.
+
+**Rationale**: The route scaffolding already exists from previous work; this is a completion task.
+
+---
+
+## 10. API Routes — Existing vs. New
+
+**Decision**: The `src/app/api/certificates/` directory already exists with subdirectories: `bulk/`, `claim/`, `jobs/`, `portfolio/`, `verify/`, and `route.ts`. These are already scaffolded. The plan will fill in the implementation of each route handler.
+
+---
+
+## 11. Testing Strategy
+
+**Decision**: Use Node's built-in test runner (`node --import tsx --test`) already configured in `package.json`. Write unit tests for:
+- Certificate signing/verification logic (pure functions, easy to test)
+- `useLessonProgress` completion threshold logic
+- Server Actions (integration tests using in-memory test DB)
+
+**Rationale**: The project already uses `tsx` + Node test runner. No additional test framework to install.
+
+---
+
+## Summary of New Dependencies to Install
+
+| Package | Purpose | Action |
+|---------|---------|--------|
+| `html-to-image` | PNG generation from React component | `pnpm add html-to-image` |
+| `@react-email/render` | Email template rendering | `pnpm add @react-email/render` |
+
+All other dependencies are already present in `package.json`.

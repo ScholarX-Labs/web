@@ -1,252 +1,298 @@
 # Data Model: Certification Module
-**Branch**: `003-certification-module` | **Date**: 2026-04-28
 
-Drizzle ORM schema for a new `certificates` PostgreSQL schema. All tables live in `src/domain/certificates/infrastructure/db/certificates-db.schema.ts` and are registered in `drizzle.config.ts`.
-
----
-
-## Schema Overview
-
-```
-certificates schema
-├── certificates          — Core credential record
-├── certificate_events    — Immutable audit log
-├── certificate_jobs      — Bulk issuance async jobs
-└── completion_criteria   — Per-course completion thresholds
-```
+**Branch**: `003-certification-module` | **Date**: 2026-04-28 | **Phase**: 1  
+**Source**: spec.md § Key Entities + Assumptions + Functional Requirements
 
 ---
 
-## Entity Definitions
+## Entity Relationship Overview
 
-### 1. `certificates.certificates`
+```
+User ──────────────────────────────────────────────────────┐
+ │ (portfolioUsername, portfolioEnabled on existing table)  │
+ │                                                          │
+ ├──< certificates (userId FK)                              │
+ │         │                                                │
+ │         ├──< certificate_events (certificateId FK)       │
+ │         └── [one] completion_criteria (per courseSlug)   │
+ │                                                          │
+ └──< bulk_issuance_jobs (triggeredBy FK)                   │
+                                                            │
+Course (external, no DB table owned here —                  │
+        read-only via courseSlug string reference) ─────────┘
+```
 
-One record per issued credential. Uniqueness constraint on `(userId, courseId, seasonNumber)` prevents duplicate issuance.
+---
 
-```typescript
-export const dbCertificates = certificatesSchema.table(
-  "certificates",
-  {
-    // Identity
-    id: uuid("id").primaryKey().defaultRandom(),
-    shortId: varchar("short_id", { length: 20 }).notNull().unique(),
-    // e.g. "SX-2026-00142" — generated on insert via sequence
+## 1. `completion_criteria` Table
 
-    // Recipient
-    userId: text("user_id").references(() => dbUsers.id, { onDelete: "set null" }),
-    recipientName: varchar("recipient_name", { length: 255 }).notNull(),
-    recipientEmail: varchar("recipient_email", { length: 255 }).notNull(),
+**File**: `src/db/schema/certification-schema.ts`
 
-    // Program context
-    courseId: uuid("course_id").references(() => dbCourses.id).notNull(),
-    programName: varchar("program_name", { length: 255 }).notNull(),
-    seasonNumber: integer("season_number").notNull(),
-    role: varchar("role", { length: 20 }).notNull(), // "mentee" | "mentor"
-    completionDate: timestamp("completion_date").notNull(),
+```ts
+export const completionCriteria = pgTable("completion_criteria", {
+  id:               uuid("id").defaultRandom().primaryKey(),
+  courseSlug:       text("course_slug").notNull().unique(),
+  minWatchPct:      integer("min_watch_pct").notNull().default(90),
+  quizzesRequired:  boolean("quizzes_required").notNull().default(false),
+  minQuizScore:     integer("min_quiz_score"),          // null when quizzesRequired = false
+  createdAt:        timestamp("created_at").defaultNow().notNull(),
+  updatedAt:        timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull(),
+});
+```
 
-    // Lifecycle
-    status: varchar("status", { length: 20 }).notNull().default("PENDING"),
-    // Allowed: "PENDING" | "CLAIMED" | "REVOKED" | "FAILED"
-    issuedAt: timestamp("issued_at").notNull().defaultNow(),
-    claimedAt: timestamp("claimed_at"),
-    revokedAt: timestamp("revoked_at"),
-    revokedReason: text("revoked_reason"),
+**Constraints**:
+- `courseSlug` is UNIQUE — one criteria record per course.
+- `minWatchPct` in range [0, 100]; validated at the application layer (Zod).
+- `minQuizScore` is nullable; must be non-null when `quizzesRequired = true` (Zod refinement).
 
-    // Cryptographic integrity
-    signatureHex: varchar("signature_hex", { length: 64 }).notNull(),
-    // HMAC-SHA256 hex string over canonical payload
+**Index**: `courseSlug` (for fast lookup when evaluating completion events).
 
-    // Asset storage
-    pdfStorageKey: varchar("pdf_storage_key", { length: 500 }),
-    // e.g. "certificates/{id}/cert.pdf"
-    pngStorageKey: varchar("png_storage_key", { length: 500 }),
-    // e.g. "certificates/{id}/cert.png"
+---
 
-    // Claim token
-    claimToken: varchar("claim_token", { length: 64 }).unique(),
-    claimTokenExpiresAt: timestamp("claim_token_expires_at"),
+## 2. `certificates` Table
 
-    // Portfolio visibility
-    isPublic: boolean("is_public").notNull().default(false),
+**File**: `src/db/schema/certification-schema.ts`
 
-    // Metadata
-    createdAt: timestamp("created_at").notNull().defaultNow(),
-    updatedAt: timestamp("updated_at").notNull().defaultNow(),
-  },
-  (table) => ({
-    // Idempotency: one certificate per (user, course, season)
-    uniqueIssuance: uniqueIndex("uq_cert_user_course_season").on(
-      table.userId,
-      table.courseId,
-      table.seasonNumber,
-    ),
-  }),
+```ts
+export const certificateStatusEnum = pgEnum("certificate_status", [
+  "PENDING",
+  "CLAIMED",
+  "REVOKED",
+  "FAILED",
+]);
+
+export const certificates = pgTable("certificates", {
+  id:                   uuid("id").defaultRandom().primaryKey(),
+  shortId:              text("short_id").notNull().unique(),         // e.g. "SX-2026-00142"
+  courseSlug:           text("course_slug").notNull(),
+  courseTitle:          text("course_title").notNull(),
+  userId:               text("user_id").notNull()
+                          .references(() => user.id, { onDelete: "restrict" }),
+  recipientName:        text("recipient_name").notNull(),
+  recipientEmail:       text("recipient_email").notNull(),
+  role:                 text("role").notNull(),                      // "mentee" | "mentor"
+  status:               certificateStatusEnum("status").notNull().default("PENDING"),
+  claimToken:           text("claim_token").unique(),
+  claimTokenExpiry:     timestamp("claim_token_expiry"),
+  claimedAt:            timestamp("claimed_at"),
+  pdfUrl:               text("pdf_url"),                             // S3 key
+  pngUrl:               text("png_url"),                             // S3 key (1200x630)
+  signatureFingerprint: text("signature_fingerprint").notNull(),
+  isPublic:             boolean("is_public").notNull().default(false),
+  revokedAt:            timestamp("revoked_at"),
+  revokedReason:        text("revoked_reason"),
+  metadata:             jsonb("metadata"),
+  createdAt:            timestamp("created_at").defaultNow().notNull(),
+  updatedAt:            timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull(),
+});
+```
+
+**Constraints**:
+- UNIQUE on `(courseSlug, userId)` — prevents duplicate certificates per participant per course.
+- `shortId` generated as `SX-{YEAR}-{5-digit-seq}` at the service layer.
+- `recipientEmail` anonymized to `deleted@scholarx.lk` on GDPR erasure; `recipientName` to `[Redacted]`.
+- `claimToken` is set to null after first successful claim (single-use enforcement).
+
+**Indexes**:
+- `(courseSlug)` — for bulk issuance queries.
+- `(userId)` — for wallet queries.
+- `(status)` — for admin dashboard filters.
+- `(claimToken)` — for claim-link lookups.
+
+**Lifecycle / Status Transitions**:
+```
+[issuance] → PENDING
+PENDING    → CLAIMED   (on successful claim)
+PENDING    → FAILED    (on generation failure after 3 retries)
+PENDING    → REVOKED   (admin revoke)
+CLAIMED    → REVOKED   (admin revoke)
+REVOKED    → CLAIMED   (un-revoke — admin restores)
+FAILED     → PENDING   (admin manual retry)
+```
+
+---
+
+## 3. `certificate_events` Table
+
+**File**: `src/db/schema/certification-schema.ts`
+
+```ts
+export const certificateEventTypeEnum = pgEnum("certificate_event_type", [
+  "ISSUED",
+  "CLAIMED",
+  "VIEWED",
+  "VERIFIED",
+  "SHARED",
+  "DOWNLOADED",
+  "REVOKED",
+  "EMAIL_SENT",
+  "EMAIL_RESENT",
+  "FAILED",
+]);
+
+export const certificateEvents = pgTable("certificate_events", {
+  id:            uuid("id").defaultRandom().primaryKey(),
+  certificateId: uuid("certificate_id").notNull()
+                   .references(() => certificates.id, { onDelete: "cascade" }),
+  eventType:     certificateEventTypeEnum("event_type").notNull(),
+  actorId:       text("actor_id"),                // null for public/anonymous events
+  ipRegion:      text("ip_region"),               // anonymized (country/region only, no IP)
+  userAgent:     text("user_agent"),
+  metadata:      jsonb("metadata"),
+  createdAt:     timestamp("created_at").defaultNow().notNull(),
+});
+```
+
+**Design notes**:
+- Append-only. No `updatedAt`. Events are never modified or deleted.
+- `actorId` is nullable — verification events by anonymous verifiers have no actor.
+- `ipRegion` stores country + region only (GDPR-safe), not the raw IP.
+
+**Index**: `(certificateId)` — for event history queries.
+
+---
+
+## 4. `bulk_issuance_jobs` Table
+
+**File**: `src/db/schema/certification-schema.ts`
+
+```ts
+export const bulkJobStatusEnum = pgEnum("bulk_job_status", [
+  "QUEUED",
+  "RUNNING",
+  "COMPLETED",
+  "PARTIAL",   // completed with some failures
+  "FAILED",
+]);
+
+export const bulkIssuanceJobs = pgTable("bulk_issuance_jobs", {
+  id:              uuid("id").defaultRandom().primaryKey(),
+  courseSlug:      text("course_slug").notNull(),
+  triggeredBy:     text("triggered_by").notNull()
+                     .references(() => user.id, { onDelete: "restrict" }),
+  totalCount:      integer("total_count").notNull().default(0),
+  processedCount:  integer("processed_count").notNull().default(0),
+  failedCount:     integer("failed_count").notNull().default(0),
+  status:          bulkJobStatusEnum("status").notNull().default("QUEUED"),
+  errorLog:        jsonb("error_log"),            // array of { userId, reason } failure records
+  createdAt:       timestamp("created_at").defaultNow().notNull(),
+  updatedAt:       timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull(),
+});
+```
+
+**Index**: `(courseSlug, status)` — for admin dashboard job listing.
+
+---
+
+## 5. User Table Extensions (Already Applied)
+
+The following columns were already added to the `auth.user` table in `auth-schema.ts`:
+
+```ts
+portfolioUsername: text("portfolio_username").unique(),
+portfolioEnabled:  boolean("portfolio_enabled").notNull().default(false),
+```
+
+No further changes to the `user` table are required.
+
+---
+
+## 6. Zod Validation Schemas (Application Layer)
+
+**File**: `src/domain/certificates/schemas.ts`
+
+```ts
+// CompletionCriteria input
+export const CompletionCriteriaSchema = z.object({
+  courseSlug:      z.string().min(1),
+  minWatchPct:     z.number().int().min(0).max(100),
+  quizzesRequired: z.boolean(),
+  minQuizScore:    z.number().int().min(0).max(100).nullable(),
+}).refine(
+  (d) => !d.quizzesRequired || d.minQuizScore !== null,
+  { message: "minQuizScore is required when quizzesRequired is true" }
 );
-```
 
-**State Machine**:
-```
-[PENDING] → [CLAIMED]  (recipient claims via token)
-[PENDING] → [FAILED]   (generation failed after 3 retries)
-[PENDING] → [REVOKED]  (admin revokes before claim)
-[CLAIMED] → [REVOKED]  (admin revokes after claim)
-[FAILED]  → [PENDING]  (admin manual retry)
-```
+// Manual issuance
+export const IssueCertificateSchema = z.object({
+  courseSlug:     z.string().min(1),
+  userId:         z.string().min(1),
+  recipientName:  z.string().min(1).max(200),
+  recipientEmail: z.string().email(),
+  role:           z.enum(["mentee", "mentor"]),
+});
 
----
+// Revoke
+export const RevokeCertificateSchema = z.object({
+  id:     z.string().uuid(),
+  reason: z.string().min(1).max(500),
+});
 
-### 2. `certificates.certificate_events`
-
-Immutable append-only audit log. Never updated or deleted.
-
-```typescript
-export const dbCertificateEvents = certificatesSchema.table(
-  "certificate_events",
-  {
-    id: uuid("id").primaryKey().defaultRandom(),
-    certificateId: uuid("certificate_id")
-      .notNull()
-      .references(() => dbCertificates.id),
-    eventType: varchar("event_type", { length: 50 }).notNull(),
-    // Allowed: "issued" | "claimed" | "viewed" | "verified" | "shared"
-    //          | "downloaded" | "revoked" | "email_sent" | "email_resent"
-    //          | "generation_failed" | "generation_retried"
-    actorId: text("actor_id"),            // userId if authenticated, null for public
-    actorRole: varchar("actor_role", { length: 20 }), // "recipient" | "admin" | "public"
-    ipRegion: varchar("ip_region", { length: 100 }), // anonymized, e.g. "LK" country code
-    userAgentHash: varchar("user_agent_hash", { length: 64 }), // SHA256 of UA string
-    metadata: jsonb("metadata").$type<Record<string, unknown>>(),
-    occurredAt: timestamp("occurred_at").notNull().defaultNow(),
-  },
-);
+// Portfolio username
+export const SetPortfolioUsernameSchema = z.object({
+  username: z.string()
+    .min(3).max(30)
+    .regex(/^[a-zA-Z0-9-]+$/, "Only alphanumeric characters and hyphens allowed"),
+});
 ```
 
 ---
 
-### 3. `certificates.certificate_jobs`
+## 7. TypeScript Domain Types
 
-Tracks bulk season issuance jobs. Enables async processing and real-time progress polling.
+**File**: `src/domain/certificates/types.ts`
 
-```typescript
-export const dbCertificateJobs = certificatesSchema.table(
-  "certificate_jobs",
-  {
-    id: uuid("id").primaryKey().defaultRandom(),
-    courseId: uuid("course_id").references(() => dbCourses.id).notNull(),
-    seasonNumber: integer("season_number").notNull(),
-    triggeredBy: text("triggered_by").notNull(), // admin userId
-    status: varchar("status", { length: 20 }).notNull().default("PENDING"),
-    // Allowed: "PENDING" | "PROCESSING" | "COMPLETED" | "PARTIAL" | "FAILED"
-    totalCount: integer("total_count").notNull().default(0),
-    processedCount: integer("processed_count").notNull().default(0),
-    failedCount: integer("failed_count").notNull().default(0),
-    errorSummary: jsonb("error_summary").$type<Array<{ userId: string; error: string }>>(),
-    startedAt: timestamp("started_at"),
-    completedAt: timestamp("completed_at"),
-    createdAt: timestamp("created_at").notNull().defaultNow(),
-  },
-);
-```
+```ts
+export type CertificateStatus = "PENDING" | "CLAIMED" | "REVOKED" | "FAILED";
+export type CertificateRole   = "mentee" | "mentor";
+export type CertificateEventType =
+  | "ISSUED" | "CLAIMED" | "VIEWED" | "VERIFIED"
+  | "SHARED" | "DOWNLOADED" | "REVOKED" | "EMAIL_SENT" | "EMAIL_RESENT" | "FAILED";
 
----
+export interface Certificate {
+  id:                   string;
+  shortId:              string;
+  courseSlug:           string;
+  courseTitle:          string;
+  userId:               string;
+  recipientName:        string;
+  recipientEmail:       string;
+  role:                 CertificateRole;
+  status:               CertificateStatus;
+  claimToken:           string | null;
+  claimTokenExpiry:     Date | null;
+  claimedAt:            Date | null;
+  pdfUrl:               string | null;  // S3 key
+  pngUrl:               string | null;  // S3 key
+  signatureFingerprint: string;
+  isPublic:             boolean;
+  revokedAt:            Date | null;
+  revokedReason:        string | null;
+  metadata:             Record<string, unknown> | null;
+  createdAt:            Date;
+  updatedAt:            Date;
+}
 
-### 4. `certificates.completion_criteria`
+export interface CompletionCriteria {
+  id:              string;
+  courseSlug:      string;
+  minWatchPct:     number;
+  quizzesRequired: boolean;
+  minQuizScore:    number | null;
+}
 
-One record per course. Admin-configurable. Must exist before automatic issuance can trigger.
-
-```typescript
-export const dbCompletionCriteria = certificatesSchema.table(
-  "completion_criteria",
-  {
-    id: uuid("id").primaryKey().defaultRandom(),
-    courseId: uuid("course_id")
-      .notNull()
-      .unique()
-      .references(() => dbCourses.id),
-    minWatchPercentage: integer("min_watch_percentage").notNull().default(90),
-    // Range: 0–100. Certificate issued when enrolled user reaches this %.
-    quizzesRequired: boolean("quizzes_required").notNull().default(false),
-    minQuizScore: integer("min_quiz_score").default(70),
-    // Range: 0–100. Null/ignored when quizzesRequired = false.
-    createdAt: timestamp("created_at").notNull().defaultNow(),
-    updatedAt: timestamp("updated_at").notNull().defaultNow(),
-  },
-);
-```
-
----
-
-### 5. User Entity Extensions (existing `auth.user` table)
-
-The existing `auth.user` table (managed by `better-auth`) needs two new columns for the public portfolio feature. These are added via a Drizzle migration on the `auth` schema:
-
-```typescript
-// New columns added to existing auth.user table
-portfolioUsername: varchar("portfolio_username", { length: 30 }).unique(),
-// Null = no public portfolio configured. Unique across all users.
-portfolioEnabled: boolean("portfolio_enabled").notNull().default(false),
-// True only when username is set AND user has opted in.
-```
-
-> **Note**: These columns are added via a Drizzle migration. The `better-auth` schema file is regenerated and the `auth-schema.ts` in `/src/db/schema/` is updated.
-
----
-
-## Relationships Diagram
-
-```
-auth.user (existing)
-  ├─< certificates.certificates (userId FK, nullable — GDPR erasure sets null)
-  │     └─< certificates.certificate_events (certificateId FK)
-  └── portfolio_username, portfolio_enabled (new columns)
-
-courses.courses (existing)
-  ├─< certificates.certificates (courseId FK)
-  ├─< certificates.certificate_jobs (courseId FK)
-  └──  certificates.completion_criteria (courseId FK, unique — 1:1)
-```
-
----
-
-## Validation Rules
-
-| Field | Rule |
-|---|---|
-| `certificates.status` | Must be one of: `PENDING`, `CLAIMED`, `REVOKED`, `FAILED` |
-| `certificates.role` | Must be one of: `mentee`, `mentor` |
-| `certificates.shortId` | Format: `SX-{YYYY}-{5-digit-zero-padded-seq}`, e.g. `SX-2026-00142` |
-| `certificates.signatureHex` | 64-character lowercase hex string |
-| `certificates.claimToken` | 64-character cryptographically random hex (generated via `crypto.randomBytes(32).toString('hex')`) |
-| `completion_criteria.minWatchPercentage` | Integer 0–100 inclusive |
-| `completion_criteria.minQuizScore` | Integer 0–100 inclusive, only validated when `quizzesRequired = true` |
-| `auth.user.portfolioUsername` | Regex: `/^[a-z0-9-]{3,30}$/` (lowercase alphanumeric + hyphens, 3–30 chars) |
-
----
-
-## Index Strategy
-
-| Table | Index | Purpose |
-|---|---|---|
-| `certificates` | `(userId, courseId, seasonNumber)` UNIQUE | Idempotency enforcement |
-| `certificates` | `(status)` | Admin dashboard filtering |
-| `certificates` | `(claimToken)` UNIQUE | Fast claim token lookup |
-| `certificates` | `(courseId, seasonNumber)` | Season-level filtering |
-| `certificate_events` | `(certificateId, occurredAt)` | Audit log chronological queries |
-| `certificate_jobs` | `(courseId, seasonNumber)` | Bulk job lookup |
-| `completion_criteria` | `(courseId)` UNIQUE | Already enforced by FK unique constraint |
-| `auth.user` | `(portfolioUsername)` UNIQUE | Fast `/u/:username` resolution |
-
----
-
-## Drizzle Config Update
-
-Add to `drizzle.config.ts`:
-```typescript
-schema: [
-  "./src/db/schema/auth-schema.ts",
-  "./src/db/schema/contact-us-schema.ts",
-  "./src/domain/courses/infrastructure/db/courses-db.schema.ts",
-  "./src/domain/certificates/infrastructure/db/certificates-db.schema.ts", // NEW
-],
-schemaFilter: ["auth", "public", "courses", "certificates"], // add "certificates"
+export interface CertificateVerificationResult {
+  status:               CertificateStatus | "INVALID";
+  certificateId:        string;
+  shortId:              string;
+  recipientName:        string;
+  courseTitle:          string;
+  courseSlug:           string;
+  role:                 CertificateRole;
+  issuedAt:             Date;
+  claimedAt:            Date | null;
+  signatureFingerprint: string;
+  signatureValid:       boolean;
+  pngUrl:               string | null;  // for OG image (presigned)
+}
 ```

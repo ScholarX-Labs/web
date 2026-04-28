@@ -1,224 +1,137 @@
 # Quickstart: Certification Module
+
 **Branch**: `003-certification-module` | **Date**: 2026-04-28
 
-Developer guide for implementing the Certification Module from scratch.
+This guide covers the local dev setup for the Certification Module.
 
 ---
 
 ## Prerequisites
 
-Ensure these are in place before starting implementation:
+- Node.js 20+, pnpm installed
+- PostgreSQL database running (local or Neon/Supabase)
+- AWS S3 bucket (or LocalStack for local dev)
+- SMTP credentials (Resend SMTP recommended)
+
+---
+
+## 1. Environment Variables
+
+Add the following to your `.env.local` (see `.env.example` for the full template):
 
 ```bash
-# New dependencies to install
-pnpm add @react-pdf/renderer qrcode @aws-sdk/client-s3 @aws-sdk/s3-request-presigner
+# Certification Module — Signing
+CERTIFICATE_SIGNING_SECRET="<random-256-bit-hex-string>"
 
-# Dev/type dependencies
-pnpm add -D @types/qrcode @types/react-pdf
-```
+# Certification Module — Storage (S3)
+AWS_ACCESS_KEY_ID="<your-key>"
+AWS_SECRET_ACCESS_KEY="<your-secret>"
+AWS_REGION="us-east-1"
+AWS_BUCKET_NAME="scholarx-certificates"
 
-Add to `.env.local`:
-```env
-# Certification Module
-CERT_SIGNING_SECRET=<64-char random hex>       # HMAC signing secret
-CERT_STORAGE_BUCKET=scholarx-certificates       # S3/R2 bucket name
-CERT_STORAGE_ENDPOINT=https://...              # Cloudflare R2 endpoint (omit for AWS S3)
-CERT_STORAGE_ACCESS_KEY_ID=...
-CERT_STORAGE_SECRET_ACCESS_KEY=...
-CERT_BASE_URL=https://scholarx.lk              # Base URL for verify/claim links
-```
+# Certification Module — Email (Nodemailer SMTP)
+SMTP_HOST="smtp.resend.com"
+SMTP_PORT="465"
+SMTP_USER="resend"
+SMTP_PASS="<resend-api-key>"
+SMTP_FROM="ScholarX <no-reply@scholarx.lk>"
 
----
-
-## Folder Structure (create this)
-
-```text
-src/domain/certificates/
-├── contracts/
-│   ├── certificate.contract.ts     # (copy from specs/003-certification-module/contracts/)
-│   └── index.ts                    # barrel export
-├── application/
-│   ├── certificate-issuance.service.ts
-│   ├── certificate-verification.service.ts
-│   ├── certificate-claim.service.ts
-│   ├── certificate-admin.service.ts
-│   ├── certificate-portfolio.service.ts
-│   ├── certificate-email.service.ts
-│   ├── certificate-signing.service.ts    # HMAC logic
-│   ├── certificate-storage.service.ts    # S3/R2 logic
-│   ├── certificate-pdf.service.ts        # @react-pdf/renderer
-│   ├── certificate.errors.ts
-│   └── index.ts
-├── infrastructure/
-│   ├── db/
-│   │   ├── certificates-db.schema.ts     # Drizzle schema (from data-model.md)
-│   │   ├── certificates.repository.ts    # DB access layer
-│   │   └── completion-criteria.repository.ts
-│   └── http/
-│       ├── certificates-admin.handler.ts # Admin API route handlers
-│       └── certificates-public.handler.ts
-└── index.ts                              # Public barrel export
+# App public URL (for claim links and verification URLs)
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
 ```
 
 ---
 
-## Implementation Order
+## 2. Run Database Migration
 
-Follow this strict sequence to avoid blocked dependencies:
+After adding the new `certification-schema.ts`:
 
-### Step 1 — DB Schema & Migration
-1. Create `certificates-db.schema.ts` from `data-model.md`
-2. Add to `drizzle.config.ts` schema array and `schemaFilter`
-3. Run `pnpm db:generate && pnpm db:migrate`
-4. Add `portfolioUsername` and `portfolioEnabled` columns to `auth.user` via Drizzle migration
-
-### Step 2 — Domain Contracts
-1. Copy `specs/003-certification-module/contracts/certificate.contract.ts` → `src/domain/certificates/contracts/`
-2. Create `index.ts` barrel export
-
-### Step 3 — Infrastructure Layer
-1. Implement `CertificatesRepository` (CRUD for all certificate tables)
-2. Implement `CompletionCriteriaRepository` (CRUD for completion_criteria)
-
-### Step 4 — Core Application Services (in this order)
-1. `CertificateSigningService` — HMAC-SHA256 sign + verify (pure crypto, no DB)
-2. `CertificatePdfService` — `@react-pdf/renderer` PDF + PNG generation
-3. `CertificateStorageService` — S3/R2 upload + pre-signed URL generation
-4. `CertificateEmailService` — nodemailer claim + reminder email
-5. `CertificateIssuanceService` — orchestrates signing → PDF → storage → email → DB (single-cert, sync)
-6. `CertificateVerificationService` — verify signature, log event, return `VerifyCertificateResult`
-7. `CertificateClaimService` — validate token → mark claimed → optionally link to wallet
-8. `CertificateAdminService` — list, revoke, resend, bulk trigger, export CSV
-9. `CertificatePortfolioService` — set username, toggle visibility, get public portfolio
-
-### Step 5 — Courses Integration
-In `NextCourseEnrollmentService`, after a successful enrollment/progress update that crosses the completion threshold:
-```typescript
-// Emit completion event to certificates domain
-if (completionCriteriaMet) {
-  await certificateIssuanceService.issue({
-    userId,
-    courseId,
-    ...
-  });
-}
-```
-
-### Step 6 — Next.js Route Handlers
-Create under `src/app/api/`:
-```text
-src/app/api/
-└── certificates/
-    ├── route.ts                        # POST /api/certificates (admin manual issue)
-    ├── [id]/
-    │   ├── route.ts                    # GET /api/certificates/:id
-    │   └── revoke/route.ts             # POST /api/certificates/:id/revoke
-    ├── bulk/route.ts                   # POST /api/certificates/bulk
-    ├── jobs/[jobId]/route.ts           # GET /api/certificates/jobs/:jobId (progress)
-    ├── claim/route.ts                  # POST /api/certificates/claim
-    ├── verify/[id]/route.ts            # GET /api/certificates/verify/:id
-    └── portfolio/
-        ├── route.ts                    # PUT /api/certificates/portfolio (set username)
-        └── [username]/route.ts         # GET /api/certificates/portfolio/:username
-```
-
-Create under `src/app/`:
-```text
-src/app/
-├── verify/
-│   └── [id]/page.tsx                  # Public: /verify/:id
-├── certificates/
-│   └── claim/[token]/page.tsx         # Public: /certificates/claim/:token
-└── u/
-    └── [username]/
-        └── certificates/page.tsx      # Public: /u/:username/certificates
-```
-
-### Step 7 — Admin Dashboard UI
-Add to the existing admin area:
-```text
-src/app/(admin)/
-└── admin/certificates/
-    ├── page.tsx                       # Certificate list + filters
-    ├── [id]/page.tsx                  # Certificate detail + actions
-    └── bulk/page.tsx                  # Bulk issuance trigger + progress
-```
-
-### Step 8 — Wallet UI
-```text
-src/app/(authenticated)/
-└── my/certificates/
-    ├── page.tsx                       # Wallet — all claimed certs
-    └── settings/page.tsx             # Portfolio username + visibility toggles
+```bash
+pnpm db:generate    # generates migration files
+pnpm db:migrate     # applies migration to your PostgreSQL DB
 ```
 
 ---
 
-## Key Implementation Notes
+## 3. Install New Dependencies
 
-### HMAC Signing
-```typescript
-// certificate-signing.service.ts
-import { createHmac, timingSafeEqual, randomBytes } from "crypto";
-
-function sign(payload: CanonicalPayload): string {
-  const data = JSON.stringify(payload, Object.keys(payload).sort());
-  return createHmac("sha256", process.env.CERT_SIGNING_SECRET!)
-    .update(data)
-    .digest("hex");
-}
-
-function verify(payload: CanonicalPayload, signature: string): boolean {
-  const expected = Buffer.from(sign(payload), "hex");
-  const received = Buffer.from(signature, "hex");
-  if (expected.length !== received.length) return false;
-  return timingSafeEqual(expected, received);
-}
-```
-
-### Short ID Generation
-```typescript
-// Use a PostgreSQL sequence: CREATE SEQUENCE IF NOT EXISTS cert_seq START 1;
-// On insert: shortId = `SX-${new Date().getFullYear()}-${seq.toString().padStart(5, "0")}`
-```
-
-### Node.js Runtime Declaration
-All API routes that use `crypto`, `@react-pdf/renderer`, or `nodemailer` MUST declare:
-```typescript
-export const runtime = "nodejs";
-```
-
-### Completion Criteria Guard
-```typescript
-// Before issuing, always check criteria exist:
-const criteria = await criteriaRepo.findByCourseId(courseId);
-if (!criteria) throw new CertificateError("CRITERIA_NOT_CONFIGURED", 422, ...);
-
-const meetsWatch = watchPercentage >= criteria.minWatchPercentage;
-const meetsQuiz = !criteria.quizzesRequired || quizScore >= (criteria.minQuizScore ?? 0);
-if (!meetsWatch || !meetsQuiz) return { code: "completion_criteria_not_met", ... };
+```bash
+pnpm add html-to-image @react-email/render
 ```
 
 ---
 
-## Testing Strategy
+## 4. Configure Completion Criteria (Admin)
 
-| Layer | Tool | What to test |
-|---|---|---|
-| Signing service | `node --test` (built-in) | Sign → verify roundtrip; tamper detection; timing-safe comparison |
-| Issuance service | `node --test` + DB mock | Idempotency (duplicate issue returns `already_exists`); criteria guard |
-| Verification service | `node --test` | VALID / REVOKED / INVALID paths |
-| Claim service | `node --test` | Token expiry; double-claim prevention; atomic consumption |
-| API route handlers | `test:api` script | HTTP status codes; auth guard (admin routes); public route accessibility |
+Use the admin dashboard or directly insert a `completion_criteria` row for your test course:
 
-Run with: `pnpm test:api` (existing script) for API-level tests.
+```sql
+INSERT INTO completion_criteria (course_slug, min_watch_pct, quizzes_required, min_quiz_score)
+VALUES ('my-test-course', 90, false, null);
+```
 
 ---
 
-## Constitution Compliance Checklist
+## 5. Test the Completion Flow (Local)
 
-- [x] **Principle I** — Domain follows SRP: each service has one responsibility. Observer pattern for Courses → Certificates event. DI via constructor injection.
-- [x] **Principle II** — All contracts and services are strictly typed TypeScript. No `any`. Explicit return types everywhere.
-- [x] **Principle III** — Unit tests for signing, issuance, and verification services. Integration tests for API routes.
-- [x] **Principle IV** — Verify page, claim page, portfolio page, and wallet UI follow the design system (glassmorphism, Framer Motion, Tailwind).
-- [x] **Principle V** — Verify page targets <1.5s LCP (static-rendered with `generateStaticParams`). PDF generation <5s p95. No unnecessary re-renders.
+1. Start the dev server: `pnpm dev`
+2. Navigate to a lesson: `http://localhost:3000/courses/my-test-course/lessons/1`
+3. Seek the video to 90%+ of its duration.
+4. The `useLessonProgress` hook fires `onCompleted` → the celebration modal appears.
+5. Check your email (or Nodemailer preview) for the claim email.
+6. Click the claim link → `http://localhost:3000/certificates/claim/<token>`
+7. Verify the certificate → `http://localhost:3000/verify/<certificate-id>`
+
+---
+
+## 6. Test Bulk Issuance (Admin)
+
+```bash
+# POST to bulk issue endpoint (replace token with your admin session token)
+curl -X POST http://localhost:3000/api/certificates/bulk \
+  -H "Content-Type: application/json" \
+  -H "Cookie: better-auth.session_token=<your-session>" \
+  -d '{"courseSlug": "my-test-course"}'
+```
+
+Poll the job status:
+```bash
+curl http://localhost:3000/api/certificates/jobs/<jobId> \
+  -H "Cookie: better-auth.session_token=<your-session>"
+```
+
+---
+
+## 7. Key Source Locations
+
+| Area | Path |
+|------|------|
+| DB schema | `src/db/schema/certification-schema.ts` |
+| Domain types & Zod schemas | `src/domain/certificates/` |
+| Certificate service | `src/domain/certificates/certificate.service.ts` |
+| Signing utility | `src/lib/certificate-signing.ts` |
+| PDF generator | `src/lib/certificate-pdf.tsx` |
+| PNG generator | `src/lib/certificate-png.tsx` |
+| Email templates | `src/lib/emails/` |
+| S3 helpers | `src/lib/storage.ts` (existing, shared) |
+| API routes | `src/app/api/certificates/` |
+| Lesson progress hook | `src/hooks/use-lesson-progress.ts` |
+| Celebration modal | `src/components/certificates/CelebrationModal.tsx` |
+| Verification page | `src/app/verify/[id]/page.tsx` |
+| Claim page | `src/app/certificates/claim/[token]/page.tsx` |
+| Wallet page | `src/app/my/certificates/page.tsx` |
+| Public portfolio page | `src/app/u/[username]/certificates/page.tsx` |
+| Admin dashboard | `src/app/api/certificates/route.ts` + admin UI |
+
+---
+
+## 8. Running Tests
+
+```bash
+# All tests
+pnpm test
+
+# Certification module tests only
+node --import tsx --test src/domain/certificates/**/*.test.ts
+node --import tsx --test src/lib/certificate-signing.test.ts
+```
