@@ -8,7 +8,7 @@ interface CourseCurriculumProps {
   course: Course;
 }
 
-export function CourseCurriculum({ course }: CourseCurriculumProps) {
+export function CourseCurriculum({ course: _course }: CourseCurriculumProps) {
   // In a real application, the course curriculum might come from course.lessons
   // For this UI mockup, we will provide a stylized static what-you-learn list
   // since the course type doesn't have deep curriculum data yet.
