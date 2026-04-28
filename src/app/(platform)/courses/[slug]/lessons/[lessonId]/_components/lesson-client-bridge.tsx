@@ -2,6 +2,8 @@
 
 import React, { useRef, useState } from "react";
 import { useLessonProgress } from "@/hooks/use-lesson-progress";
+import { useCertificateCompletion } from "@/hooks/use-certificate-completion";
+import { CelebrationModal } from "@/components/certificates/CelebrationModal";
 import { VideoPlayer } from "./video-player";
 import { LessonMeta } from "./lesson-meta";
 import { LessonSidebar } from "./lesson-sidebar";
@@ -20,7 +22,12 @@ interface LessonClientBridgeProps {
   totalLessons: number;
   prevLesson?: { id: string; title: string };
   nextLesson?: { id: string; title: string };
-  lessons: LessonSummary[]; // The full curriculum array
+  lessons: LessonSummary[];
+  /** Optional — enables automatic certificate issuance on completion */
+  courseId?: string;
+  programName?: string;
+  seasonNumber?: number;
+  participantRole?: "mentee" | "mentor";
 }
 
 /**
@@ -39,6 +46,10 @@ export function LessonClientBridge({
   prevLesson,
   nextLesson,
   lessons,
+  courseId,
+  programName,
+  seasonNumber = 1,
+  participantRole = "mentee",
 }: LessonClientBridgeProps) {
   const playerRef = useRef<MediaPlayerInstance>(null);
   const { isFocusMode } = useUILayoutStore();
@@ -57,6 +68,15 @@ export function LessonClientBridge({
     lessonId,
     courseSlug,
     videoDuration: 0, // Will be updated via setVideoDuration
+  });
+
+  // 2. Certificate Completion — fires celebration modal + Server Action
+  const { showModal, isIssuing, result, dismiss } = useCertificateCompletion({
+    courseId: courseId ?? courseSlug, // fallback to slug if no real ID
+    programName: programName ?? lessonTitle,
+    seasonNumber,
+    role: participantRole,
+    isCompleted: !!progress?.completedAt,
   });
 
   // 2. Resume Handler
@@ -97,6 +117,17 @@ export function LessonClientBridge({
           : "w-full max-w-[1800px] p-4 lg:p-6 xl:p-8 gap-6"
       )}
     >
+      {/* ── CELEBRATION MODAL ───────────────────────────── */}
+      <CelebrationModal
+        open={showModal}
+        isIssuing={isIssuing}
+        certificateId={result?.certificateId}
+        shortId={result?.shortId}
+        verificationUrl={result?.verificationUrl}
+        programName={programName ?? lessonTitle}
+        onDismiss={dismiss}
+      />
+
       {/* ── LEFT: VIDEO + META ───────────────────────────── */}
       <motion.div
         layout
