@@ -5,6 +5,8 @@ import {
 } from "@/domain/courses/contracts";
 import { NextCoursesRepository } from "@/domain/courses/infrastructure/db/next-courses.repository";
 import { NextCourseError } from "@/domain/courses/application/next-course.errors";
+import type { CourseCompletionEvaluatedEvent } from "@/domain/certificates/contracts";
+import { CertificateIssuanceService } from "@/domain/certificates/application/certificate-issuance.service";
 
 interface EnrollmentContext {
   requestId?: string;
@@ -207,4 +209,42 @@ export class NextCourseEnrollmentService {
       },
     };
   }
+
+  /**
+   * evaluateCompletion
+   *
+   * Called by the lesson-progress telemetry layer (e.g. a Server Action
+   * triggered when watchedPercentage crosses the configured threshold).
+   *
+   * Emits a CourseCompletionEvaluatedEvent in-process to the
+   * CertificateIssuanceService. No network call required.
+   *
+   * Design: Observer pattern — Courses domain emits an event; the
+   * Certificate domain consumes it. Dependency Inversion: this method
+   * accepts the event shape defined in the Certificates contracts,
+   * but does NOT import anything from the certificate domain directly
+   * (import above is the only coupling, kept minimal).
+   */
+  async evaluateCompletion(
+    event: CourseCompletionEvaluatedEvent,
+  ): Promise<void> {
+    try {
+      const issuanceService = new CertificateIssuanceService();
+      await issuanceService.issue({
+        userId: event.userId,
+        recipientName: event.recipientName,
+        recipientEmail: event.recipientEmail,
+        courseId: event.courseId,
+        programName: event.programName,
+        seasonNumber: event.seasonNumber,
+        role: event.role,
+        completionDate: event.completionDate,
+      });
+    } catch (err) {
+      // Non-blocking: log failure but do not surface to the caller.
+      // The admin dashboard will surface FAILED certificate records.
+      console.error("[NextCourseEnrollmentService.evaluateCompletion]", err);
+    }
+  }
 }
+

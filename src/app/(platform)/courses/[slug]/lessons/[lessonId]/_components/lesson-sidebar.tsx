@@ -32,7 +32,7 @@ const SidebarInner = React.memo(function SidebarInner({
   const totalDuration = "1h 45m";
 
   return (
-    <div className="flex h-full flex-col gap-6 text-white">
+    <div className="flex flex-col flex-1 min-h-0 gap-6 text-white w-full h-full">
       {/* Header Section */}
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
@@ -67,8 +67,8 @@ const SidebarInner = React.memo(function SidebarInner({
       </div>
 
       {/* Lessons List */}
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center gap-2 group cursor-default">
+      <div className="flex flex-col gap-4 flex-1 min-h-0">
+        <div className="flex items-center gap-2 group cursor-default shrink-0">
           <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/20 group-hover:text-blue-400/40 transition-colors">
             Section 1: Fundamentals
           </span>
@@ -79,7 +79,7 @@ const SidebarInner = React.memo(function SidebarInner({
           variants={staggerContainer}
           initial="hidden"
           animate="visible"
-          className="flex flex-col gap-3 overflow-y-auto max-h-[50vh] xl:max-h-[60vh] pr-1.5 -mr-1.5 custom-scrollbar"
+          className="flex flex-col gap-3 overflow-y-auto flex-1 pr-1.5 -mr-1.5 custom-scrollbar pb-6"
         >
           {lessons.map((lesson, index) => {
             const isCurrent = lesson.id === currentLessonId;
@@ -92,7 +92,7 @@ const SidebarInner = React.memo(function SidebarInner({
                 variants={staggerItem}
                 whileHover={!lesson.isLocked ? { scale: 1.01, x: 2 } : {}}
                 whileTap={!lesson.isLocked ? { scale: 0.98 } : {}}
-                className="relative rounded-2xl overflow-hidden group"
+                className="relative rounded-2xl overflow-hidden group shrink-0"
               >
                 <Link
                   href={lesson.isLocked ? "#" : `/courses/${courseSlug}/lessons/${lesson.id}`}
@@ -201,13 +201,13 @@ export const LessonSidebar = React.memo(function LessonSidebar({
         initial="visible"
         animate={isFocusMode ? "hidden" : "visible"}
         className={cn(
-          "flex-shrink-0 lg:block overflow-hidden",
+          "flex-shrink-0 sticky top-28 h-[calc(100vh-140px)] flex flex-col min-h-0",
           className
         )}
         style={{ "--sidebar-width": "380px" } as any}
       >
         <FloatingPanel
-          className={cn("flex flex-col p-6 h-fit self-start", className)}
+          className="flex flex-col flex-1 min-h-0 p-6 w-full"
           style={{ borderRadius: "1.5rem" }}
         >
           <SidebarInner
