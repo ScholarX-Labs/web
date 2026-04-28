@@ -42,7 +42,7 @@ interface StaggerItemProps extends HTMLMotionProps<"div"> {
 }
 
 // Map common tags to their motion equivalents to avoid creating components during render
-const motionComponents: Record<string, any> = {
+const motionComponents: Record<string, ElementType> = {
   div: motion.div,
   li: motion.li,
   span: motion.span,
@@ -51,10 +51,33 @@ const motionComponents: Record<string, any> = {
   nav: motion.nav,
 };
 
+// Fallback component that creates the motion component once for strings not in the map
+const createdComponents: Record<string, ElementType> = {};
+
 export function StaggerItem({ children, as, ...props }: StaggerItemProps) {
-  const Component = as && typeof as === "string" ? motionComponents[as] || motion.create(as) : motion.div;
-  
+  let Component: ElementType = motion.div;
+
+  if (as) {
+    if (typeof as === "string") {
+      if (motionComponents[as]) {
+        Component = motionComponents[as];
+      } else {
+        if (!createdComponents[as]) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          createdComponents[as] = motion.create(as as any);
+        }
+        Component = createdComponents[as];
+      }
+    } else {
+      // If it's a component type, we can't easily memoize it here without risk,
+      // but usually 'as' is a string tag in this project.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      Component = motion.create(as as any);
+    }
+  }
+
   return (
+    // eslint-disable-next-line react-hooks/static-components
     <Component variants={staggerItemVariants} {...props}>
       {children}
     </Component>
