@@ -1,4 +1,4 @@
-import { AiChatMessage } from "./types";
+import { AiChatMessage, Opportunity } from "./types";
 
 export const INITIAL_MESSAGES: AiChatMessage[] = [
   {
@@ -11,7 +11,7 @@ export const INITIAL_MESSAGES: AiChatMessage[] = [
 export const MOCK_OPPORTUNITIES = [
   {
     id: "opp-1",
-    type: "scholarship",
+    type: "scholarship" as const,
     title: "Global Excellence Scholarship",
     subtitle: "London, UK",
     description: "Fully funded scholarship for international students pursuing postgraduate studies in Engineering or Data Science.",
@@ -23,7 +23,7 @@ export const MOCK_OPPORTUNITIES = [
   },
   {
     id: "opp-2",
-    type: "internship",
+    type: "internship" as const,
     title: "Software Engineering Intern",
     subtitle: "Remote / San Francisco",
     description: "12-week summer internship program at a leading tech company focusing on distributed systems.",
@@ -34,4 +34,4 @@ export const MOCK_OPPORTUNITIES = [
     remote: true,
     matchScore: 88,
   },
-];
+] satisfies Opportunity[];
