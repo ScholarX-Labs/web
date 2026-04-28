@@ -4,7 +4,6 @@ import {
   createContext,
   useContext,
   useState,
-  useEffect,
   ReactNode,
 } from "react";
 import { useSearchParams } from "next/navigation";
@@ -42,8 +41,10 @@ export function OpportunitiesSearchProvider({
     return initialFilters;
   });
 
-  useEffect(() => {
-    // Sync local state if searchParams change (e.g. from Back button or external nav)
+  const [prevParams, setPrevParams] = useState(searchParams);
+
+  if (searchParams !== prevParams) {
+    setPrevParams(searchParams);
     const newQuery = searchParams.get("q") || "";
     const nextFilters: Record<string, string[]> = {};
     searchParams.forEach((value, key) => {
@@ -51,14 +52,9 @@ export function OpportunitiesSearchProvider({
         nextFilters[key] = value ? value.split(",") : [];
       }
     });
-
-    // Only update if actually different to avoid cycles
-    setSearchQuery((prev) => (prev !== newQuery ? newQuery : prev));
-    setFilters((prev) => {
-      const isDifferent = JSON.stringify(prev) !== JSON.stringify(nextFilters);
-      return isDifferent ? nextFilters : prev;
-    });
-  }, [searchParams]);
+    setSearchQuery(newQuery);
+    setFilters(nextFilters);
+  }
 
   const updateFilter = (key: string, values: string[]) => {
     setFilters((prev) => ({ ...prev, [key]: values }));
