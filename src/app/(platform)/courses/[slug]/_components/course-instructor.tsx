@@ -59,7 +59,7 @@ export function CourseInstructor({ instructor }: CourseInstructorProps) {
           
           <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-balance">
             Passionate educator with over 15 years of industry experience. 
-            I've helped thousands of students transition into tech careers through clear, concise, and practical teaching methods.
+            I&apos;ve helped thousands of students transition into tech careers through clear, concise, and practical teaching methods.
             My courses focus on real-world applications and building portfolios that get you hired.
           </p>
         </div>
