@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import { useLessonProgress } from "@/hooks/use-lesson-progress";
 import { VideoPlayer } from "./video-player";
 import { LessonMeta } from "./lesson-meta";
@@ -68,8 +68,8 @@ export function LessonClientBridge({
     // Await resolution before seeking to avoid seek-during-load races.
     try {
       const maybePromise = player.play?.();
-      if (maybePromise && typeof (maybePromise as any).then === "function") {
-        (maybePromise as Promise<void>)
+      if (maybePromise instanceof Promise) {
+        maybePromise
           .then(() => {
             // Ensure player still exists before seeking
             if (playerRef.current) playerRef.current.currentTime = position;
