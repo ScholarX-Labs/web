@@ -3,8 +3,8 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  ChevronLeft, ChevronRight, BookOpen, Clock, CheckCircle2,
-  Share2, Bookmark, MoreHorizontal, Check, Link2,
+  ChevronLeft, ChevronRight, BookOpen, Clock,
+  Bookmark, MoreHorizontal, Check, Link2,
   Flag, NotebookPen, Gauge, Plus
 } from "lucide-react";
 import Link from "next/link";
@@ -161,6 +161,7 @@ export function LessonMeta({
   // Ensure the resume prompt appears if resumePoint is loaded after mount.
   useEffect(() => {
     if (resumePoint != null && !showResumePrompt) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setShowResumePrompt(true);
     }
   }, [resumePoint, showResumePrompt]);
@@ -169,24 +170,29 @@ export function LessonMeta({
     const url = window.location.href;
     // Prefer the Web Share API when available; fall back to clipboard.
     try {
-      const canShareFn = typeof navigator !== "undefined" && typeof (navigator as any).canShare === "function";
-      const shareFn = typeof navigator !== "undefined" && typeof (navigator as any).share === "function";
+      const nav = navigator as Navigator & {
+        share?: (data: ShareData) => Promise<void>;
+        canShare?: (data: ShareData) => boolean;
+      };
 
-      if (shareFn) {
+      const hasShare = typeof nav !== "undefined" && typeof nav.share === "function";
+      const hasCanShare = typeof nav !== "undefined" && typeof nav.canShare === "function";
+
+      if (hasShare) {
         try {
           // If canShare is available, check before calling share.
-          if (canShareFn) {
-            const can = (navigator as any).canShare({ title: `Lesson: ${title}`, url });
+          if (hasCanShare && nav.canShare) {
+            const can = nav.canShare({ title: `Lesson: ${title}`, url });
             if (can) {
-              await (navigator as any).share({ title: `Lesson: ${title}`, url });
+              await nav.share!({ title: `Lesson: ${title}`, url });
               return;
             }
           } else {
             // If canShare is not available, still try share and fall back on failure.
-            await (navigator as any).share({ title: `Lesson: ${title}`, url });
+            await nav.share!({ title: `Lesson: ${title}`, url });
             return;
           }
-        } catch (err) {
+        } catch {
           // Sharing failed or was cancelled — fall back to clipboard below.
         }
       }
