@@ -57,7 +57,7 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
   const { data: session } = useSession();
 
   // Extract the saved list from the user's session safely
-  const savedList: string[] = (session?.user as any)?.savedOpportunities || [];
+  const savedList: string[] = (session?.user as { savedOpportunities?: string[] })?.savedOpportunities || [];
   const isCurrentlySaved = savedList.includes(opportunity.id);
 
   // Optimistic UI state for instant feedback
