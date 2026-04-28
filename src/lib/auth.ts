@@ -10,6 +10,7 @@ import { parsePhoneNumberWithError } from "libphonenumber-js";
 import { z } from "zod";
 import { sendEmail } from "./email";
 import { randomUUID } from "node:crypto";
+import { PgTransaction } from "drizzle-orm/pg-core";
 
 const EMAIL_OTP_RATE_LIMIT_IDENTIFIER = "email-otp-rate-limit";
 const EMAIL_OTP_HOURLY_LIMIT = 4;
@@ -62,7 +63,7 @@ async function assertEmailOtpSendLimit(email: string): Promise<void> {
 async function countOtpSendsSince(
   email: string,
   since: Date,
-  tx: { select: any } = db as any,
+  tx: PgTransaction<any, any, any> | typeof db = db,
 ): Promise<number> {
   const escapedEmail = escapeLikePattern(email);
   const identifierPrefix = `${EMAIL_OTP_RATE_LIMIT_IDENTIFIER}:${escapedEmail}:%`;
@@ -79,7 +80,10 @@ async function countOtpSendsSince(
   return Number(result?.count ?? 0);
 }
 
-async function recordEmailOtpSend(email: string, tx: any = db): Promise<void> {
+async function recordEmailOtpSend(
+  email: string,
+  tx: PgTransaction<any, any, any> | typeof db = db,
+): Promise<void> {
   const normalizedEmail = normalizeEmailAddress(email);
   const uniqueId = randomUUID();
 
@@ -90,6 +94,7 @@ async function recordEmailOtpSend(email: string, tx: any = db): Promise<void> {
     expiresAt: new Date(Date.now() + ONE_DAY_IN_MS + ONE_HOUR_IN_MS),
   });
 }
+
 
 function getOtpEmailContent(
   type: string,
