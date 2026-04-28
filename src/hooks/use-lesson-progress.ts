@@ -85,7 +85,7 @@ function _cancelPendingForKey(key: string) {
   const prev = _pendingHandle.get(key);
   if (!prev) return;
   try {
-    if (prev.type === "idle" && typeof (globalThis as any).cancelIdleCallback === "function") {
+    if (prev.type === "idle" && "cancelIdleCallback" in globalThis) {
       (globalThis as any).cancelIdleCallback(prev.id);
     } else {
       clearTimeout(prev.id);
@@ -104,7 +104,7 @@ function scheduleWriteProgress(progress: LessonProgress, delay = 0) {
 
   const scheduleIdleWrite = () => {
     const writeNow = () => _flushWriteForKey(key);
-    if (typeof (globalThis as any).requestIdleCallback === "function") {
+    if ("requestIdleCallback" in globalThis) {
       const id = (globalThis as any).requestIdleCallback(writeNow, { timeout: 1000 });
       _pendingHandle.set(key, { id, type: "idle" });
     } else {
@@ -124,10 +124,6 @@ function scheduleWriteProgress(progress: LessonProgress, delay = 0) {
   }
 }
 
-// Backwards-compatible writer that schedules via scheduleWriteProgress
-function writeProgress(progress: LessonProgress): void {
-  scheduleWriteProgress(progress, 0);
-}
  
 
 // ─── Heatmap Computation (Pure) ───────────────────────────────────────────────
