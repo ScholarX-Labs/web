@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ChevronLeft, Share2, Tv2, Check, Eye, EyeOff } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -21,20 +21,46 @@ interface LessonHeaderProps {
 export function LessonHeader({ slug, lessonTitle }: LessonHeaderProps) {
   const [copied, setCopied] = useState(false);
   const { isFocusMode, toggleFocusMode } = useUILayoutStore();
+  const router = useRouter();
 
   const handleShare = useCallback(async () => {
     const url = window.location.href;
     const shareData = { title: `Lesson: ${lessonTitle}`, url };
     try {
-      if (navigator.share && navigator.canShare(shareData)) {
-        await navigator.share(shareData);
-      } else {
-        await navigator.clipboard.writeText(url);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+      const hasShare = typeof navigator !== "undefined" && typeof (navigator as any).share === "function";
+      const hasCanShare = typeof navigator !== "undefined" && typeof (navigator as any).canShare === "function";
+
+      if (hasShare) {
+        try {
+          // If canShare exists, ask it first; otherwise assume share is available
+          if (hasCanShare) {
+            const can = (navigator as any).canShare(shareData);
+            if (can) {
+              await (navigator as any).share(shareData);
+              return;
+            }
+          } else {
+            await (navigator as any).share(shareData);
+            return;
+          }
+        } catch (err) {
+          // Sharing failed or was cancelled — fall back to clipboard below.
+        }
+      }
+
+      // Fallback: use Clipboard API if available.
+      if (typeof navigator?.clipboard?.writeText === "function") {
+        try {
+          await navigator.clipboard.writeText(url);
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+          return;
+        } catch {
+          // Clipboard write failed — swallow to preserve UX
+        }
       }
     } catch {
-      // User cancelled
+      // User cancelled or an unexpected error occurred
     }
   }, [lessonTitle]);
 
@@ -59,14 +85,9 @@ export function LessonHeader({ slug, lessonTitle }: LessonHeaderProps) {
           <AnimatedButton
             aria-label="Back to course"
             className="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center"
-            onClick={() => {}}
+            onClick={() => router.push(`/courses/${slug}`)}
           >
-            <Link
-              href={`/courses/${slug}`}
-              className="flex items-center justify-center w-full h-full"
-            >
-              <ChevronLeft className="w-4 h-4 text-white" />
-            </Link>
+            <ChevronLeft className="w-4 h-4 text-white" />
           </AnimatedButton>
         </ContextTooltip>
 

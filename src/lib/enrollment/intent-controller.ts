@@ -11,6 +11,9 @@ import {
 } from "@/lib/enrollment/types";
 import { emitEnrollmentEvent } from "@/lib/telemetry/enrollment-events";
 import { agentLog } from "@/lib/debug/agent-log";
+import { useSession } from "@/lib/auth-client";
+import { useRouter, usePathname } from "next/navigation";
+import { ROUTES } from "@/lib/routes";
 
 interface OpenFromCtaInput {
   course: Course;
@@ -34,6 +37,10 @@ const createCorrelationId = () => {
 
 export function useEnrollIntentController() {
   const prefersReducedMotion = useReducedMotion();
+  const { data: session, isPending: isSessionPending } = useSession();
+  const router = useRouter();
+  const pathname = usePathname();
+
   const markPrecheck = useEnrollmentStore((state) => state.markPrecheck);
   const openModal = useEnrollmentStore((state) => state.openModal);
   const setIntent = useCourseSheetStore((state) => state.setIntent);
@@ -64,8 +71,31 @@ export function useEnrollIntentController() {
     [prefersReducedMotion],
   );
 
+  const checkAuth = (course?: Course) => {
+    if (isSessionPending) return false;
+    if (!session) {
+      // If we have a course, we want to land on the course detail page with the intent
+      // Otherwise, we land back where we were
+      let targetPath = pathname || "/";
+      
+      if (course) {
+        targetPath = ROUTES.COURSE_DETAIL(course.slug || course.id);
+      }
+      
+      const separator = targetPath.includes("?") ? "&" : "?";
+      targetPath = `${targetPath}${separator}intent=enroll`;
+      
+      const redirectUrl = `${ROUTES.SIGNIN}?callbackUrl=${encodeURIComponent(targetPath)}`;
+      router.push(redirectUrl);
+      return false;
+    }
+    return true;
+  };
+
   return {
     openFromCta: ({ course, source }: OpenFromCtaInput) => {
+      if (!checkAuth(course)) return;
+
       const context = makeContext(course, source);
       emitEnrollmentEvent({
         event: "enroll_click",
@@ -79,6 +109,8 @@ export function useEnrollIntentController() {
     },
 
     openFromCard: ({ course, source, originRect }: OpenFromCardInput) => {
+      if (!checkAuth(course)) return;
+
       const context = makeContext(course, source);
       emitEnrollmentEvent({
         event: "enroll_click",

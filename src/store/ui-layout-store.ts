@@ -37,8 +37,28 @@ export const useUILayoutStore = create<UILayoutState>((set) => ({
   // ── Actions ───────────────────────────────────────────────────────────────
   setActiveLayoutId:    (id)     => set({ activeLayoutId: id }),
   setDrawerOpen:        (isOpen) => set({ isDrawerOpen: isOpen }),
-  toggleFocusMode:      ()       => set((s) => ({ isFocusMode: !s.isFocusMode })),
-  setFocusMode:         (active) => set({ isFocusMode: active }),
-  setNotesOverlayOpen:  (open)   => set({ isNotesOverlayOpen: open }),
-  setResourcesSheetOpen:(open)   => set({ isResourcesSheetOpen: open }),
+  toggleFocusMode:      ()       => set((s) => {
+    const next = !s.isFocusMode;
+    // If enabling focus mode, close competing overlays/sheets
+    if (next) {
+      return {
+        isFocusMode: next,
+        isNotesOverlayOpen: false,
+        isResourcesSheetOpen: false,
+      };
+    }
+    return { isFocusMode: next };
+  }),
+  setFocusMode:         (active) => set((s) => ({
+    isFocusMode: active,
+    ...(active ? { isNotesOverlayOpen: false, isResourcesSheetOpen: false } : {}),
+  })),
+  setNotesOverlayOpen:  (open)   => set((s) => ({
+    isNotesOverlayOpen: open,
+    ...(open ? { isFocusMode: false, isResourcesSheetOpen: false } : {}),
+  })),
+  setResourcesSheetOpen:(open)   => set((s) => ({
+    isResourcesSheetOpen: open,
+    ...(open ? { isFocusMode: false, isNotesOverlayOpen: false } : {}),
+  })),
 }));

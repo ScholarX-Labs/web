@@ -5,36 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1773328975916,
-      "tag": "0000_base_db_config",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1773329026816,
-      "tag": "0001_patch_array_text_columns_default",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1773329066987,
-      "tag": "0002_patch_gpa_to_numeric",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1773583951780,
-      "tag": "0003_boring_ogun",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1775823604871,
-      "tag": "0004_aspiring_reptil",
+      "when": 1776722156985,
+      "tag": "0000_round_william_stryker",
       "breakpoints": true
     }
   ]

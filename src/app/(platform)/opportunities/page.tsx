@@ -5,6 +5,7 @@ import Link from "next/link";
 import OpprtunitySection from "@/components/opportunities/OpprtunitySection";
 import { OpportunitiesSearchProvider } from "@/providers/opportunities-search-provider";
 import OpportunitiesSearchInput from "@/components/opportunities/OpportunitiesSearchInput";
+import { ROUTES } from "@/lib/routes";
 
 async function opportunities() {
   await requireSession();
@@ -37,7 +38,7 @@ async function opportunities() {
 
             <div className="flex flex-row w-1/5 sm:w-2/3 lg:w-1/2 xl:w-2/5 max-w-95 min-w-80 justify-between my-3 items-center">
               <Link
-                href="/ai-search"
+                href={ROUTES.AI_SEARCH}
                 className="flex flex-row text-white bg-ring/20 p-2 border-border border-2 cursor-pointer rounded-3xl text-sm text-nowrap gap-2"
               >
                 <Zap color="#FFFFFF" /> <span>AI search</span>

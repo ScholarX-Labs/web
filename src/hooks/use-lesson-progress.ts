@@ -63,25 +63,72 @@ function readProgress(courseSlug: string, lessonId: string): LessonProgress | nu
   }
 }
 
-function writeProgress(progress: LessonProgress): void {
-  const write = () => {
-    try {
-      localStorage.setItem(
-        storageKey(progress.courseSlug, progress.lessonId),
-        JSON.stringify(progress)
-      );
-    } catch {
-      // Storage quota exceeded or private browsing — silently ignore
+// Module-scoped pending maps keyed by storageKey
+const _pendingProgress = new Map<string, LessonProgress>();
+const _pendingHandle = new Map<string, { id: number; type: "idle" | "timeout" }>();
+
+function _flushWriteForKey(key: string) {
+  const p = _pendingProgress.get(key);
+  if (!p) return;
+  try {
+    // Synchronous localStorage write as the primary flush mechanism.
+    localStorage.setItem(key, JSON.stringify(p));
+  } catch {
+    // ignore
+  }
+  _pendingProgress.delete(key);
+  const prev = _pendingHandle.get(key);
+  if (prev) _pendingHandle.delete(key);
+}
+
+function _cancelPendingForKey(key: string) {
+  const prev = _pendingHandle.get(key);
+  if (!prev) return;
+  try {
+    if (prev.type === "idle" && typeof (globalThis as any).cancelIdleCallback === "function") {
+      (globalThis as any).cancelIdleCallback(prev.id);
+    } else {
+      clearTimeout(prev.id);
+    }
+  } catch {}
+  _pendingHandle.delete(key);
+}
+
+function scheduleWriteProgress(progress: LessonProgress, delay = 0) {
+  const key = storageKey(progress.courseSlug, progress.lessonId);
+  // Store latest progress immediately so it's available for synchronous flush.
+  _pendingProgress.set(key, progress);
+
+  // Cancel any previously scheduled handle for this key.
+  _cancelPendingForKey(key);
+
+  const scheduleIdleWrite = () => {
+    const writeNow = () => _flushWriteForKey(key);
+    if (typeof (globalThis as any).requestIdleCallback === "function") {
+      const id = (globalThis as any).requestIdleCallback(writeNow, { timeout: 1000 });
+      _pendingHandle.set(key, { id, type: "idle" });
+    } else {
+      const id = setTimeout(writeNow, 0) as unknown as number;
+      _pendingHandle.set(key, { id, type: "timeout" });
     }
   };
 
-  // Prefer requestIdleCallback for non-blocking writes; fall back to setTimeout
-  if (typeof requestIdleCallback !== "undefined") {
-    requestIdleCallback(write, { timeout: 1000 });
+  if (delay > 0) {
+    const timerId = setTimeout(() => {
+      // After debounce delay, schedule idle write
+      scheduleIdleWrite();
+    }, delay) as unknown as number;
+    _pendingHandle.set(key, { id: timerId, type: "timeout" });
   } else {
-    setTimeout(write, 0);
+    scheduleIdleWrite();
   }
 }
+
+// Backwards-compatible writer that schedules via scheduleWriteProgress
+function writeProgress(progress: LessonProgress): void {
+  scheduleWriteProgress(progress, 0);
+}
+ 
 
 // ─── Heatmap Computation (Pure) ───────────────────────────────────────────────
 
@@ -132,44 +179,60 @@ export function useLessonProgress({
   courseSlug,
   videoDuration: initialDuration,
 }: UseLessonProgressOptions): UseLessonProgressReturn {
-  const [progress, setProgress] = useState<LessonProgress | null>(null);
-  const [videoDuration, setVideoDuration] = useState(initialDuration);
-  const [resumePoint, setResumePoint] = useState<number | null>(null);
+  // Lazily initialize progress and resumePoint from persisted storage to
+  // avoid calling setState during mount effects. Read once and derive
+  // initial values for `progress` and `resumePoint`.
+  const _initialStored = typeof window !== 'undefined' ? readProgress(courseSlug, lessonId) : null;
+  const [progress, setProgress] = useState<LessonProgress | null>(() => {
+    // Only reuse persisted progress when it represents an active, eligible
+    // resume state. If the stored progress is completed or below the
+    // resume eligibility threshold, initialize a fresh default object.
+    if (
+      _initialStored &&
+      !_initialStored.completedAt &&
+      _initialStored.watchedPercentage >= 5
+    )
+      return _initialStored;
+    return {
+      lessonId,
+      courseSlug,
+      lastPosition:           0,
+      watchedPercentage:      0,
+      pauseEvents:            [],
+      seekEvents:             [],
+      highEngagementSegments: [],
+      sessionStartedAt:       Date.now(),
+      completedAt:            null,
+    };
+  });
 
-  // Debounce ref for onTimeUpdate
-  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [videoDuration, setVideoDuration] = useState<number>(() => (initialDuration > 0 ? initialDuration : 0));
+
+  const [resumePoint, setResumePoint] = useState<number | null>(() => {
+    if (
+      _initialStored &&
+      !_initialStored.completedAt &&
+      _initialStored.watchedPercentage >= 5 &&
+      _initialStored.lastPosition > 10
+    ) {
+      return _initialStored.lastPosition;
+    }
+    return null;
+  });
+
+  // Debounce ref for onTimeUpdate (no longer used for scheduling writes)
   // Track whether this is a fresh page load (to show resume prompt)
   const isFirstLoad = useRef(true);
 
-  // ── Mount: read persisted progress ────────────────────────────────────────
+  // ── Mount: mark first load complete. Progress/videoDuration/resumePoint
+  // are initialized lazily above to avoid setting state during mount effects.
   useEffect(() => {
-    const stored = readProgress(courseSlug, lessonId);
-    if (stored) {
-      setProgress(stored);
-      // Show resume prompt if user previously watched >= 5%
-      if (stored.watchedPercentage >= 5 && stored.lastPosition > 10) {
-        setResumePoint(stored.lastPosition);
-      }
-    } else {
-      setProgress({
-        lessonId,
-        courseSlug,
-        lastPosition:           0,
-        watchedPercentage:      0,
-        pauseEvents:            [],
-        seekEvents:             [],
-        highEngagementSegments: [],
-        sessionStartedAt:       Date.now(),
-        completedAt:            null,
-      });
-    }
     isFirstLoad.current = false;
   }, [lessonId, courseSlug]);
 
-  // ── Update videoDuration when prop changes ────────────────────────────────
-  useEffect(() => {
-    if (initialDuration > 0) setVideoDuration(initialDuration);
-  }, [initialDuration]);
+  // Note: `videoDuration` is initialized from `initialDuration` via
+  // the state initializer above. If the caller updates `initialDuration`,
+  // callers should call `setVideoDuration` returned from this hook.
 
   // ── Heatmap (memoized — only recalculate when pauseEvents changes) ────────
   const heatmapBuckets = useMemo(
@@ -183,13 +246,8 @@ export function useLessonProgress({
       setProgress((prev) => {
         if (!prev) return prev;
         const next = updater(prev);
-        if (immediate) {
-          writeProgress(next);
-        } else {
-          // Debounced write
-          if (debounceTimer.current) clearTimeout(debounceTimer.current);
-          debounceTimer.current = setTimeout(() => writeProgress(next), DEBOUNCE_MS);
-        }
+        // Schedule write: immediate writes as soon as possible, otherwise debounce
+        scheduleWriteProgress(next, immediate ? 0 : DEBOUNCE_MS);
         return next;
       });
     },
@@ -259,12 +317,31 @@ export function useLessonProgress({
     }
   }, [progress?.watchedPercentage, updateProgress]);
 
-  // ── Cleanup debounce timer on unmount ─────────────────────────────────────
+  // ── Cleanup: flush any pending progress for this lesson on unmount/pagehide/visibilitychange
   useEffect(() => {
-    return () => {
-      if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    const key = storageKey(courseSlug, lessonId);
+    const handleVisibility = () => {
+      if (document.visibilityState === "hidden") {
+        _flushWriteForKey(key);
+        _cancelPendingForKey(key);
+      }
     };
-  }, []);
+    const handlePageHide = () => {
+      _flushWriteForKey(key);
+      _cancelPendingForKey(key);
+    };
+
+    window.addEventListener("visibilitychange", handleVisibility);
+    window.addEventListener("pagehide", handlePageHide);
+
+    return () => {
+      // Ensure latest pending progress is persisted synchronously before unmount
+      _flushWriteForKey(key);
+      _cancelPendingForKey(key);
+      window.removeEventListener("visibilitychange", handleVisibility);
+      window.removeEventListener("pagehide", handlePageHide);
+    };
+  }, [courseSlug, lessonId]);
 
   return {
     progress,

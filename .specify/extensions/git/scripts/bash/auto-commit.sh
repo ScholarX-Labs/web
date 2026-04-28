@@ -46,6 +46,8 @@ fi
 _config_file="$REPO_ROOT/.specify/extensions/git/git-config.yml"
 _enabled=false
 _commit_msg=""
+# Optional explicit paths to stage (inline YAML array supported: paths: ["specs/", ".specify/feature.json"])
+declare -a _paths_spec=()
 
 if [ -f "$_config_file" ]; then
     # Parse the auto_commit section for this event.
@@ -96,6 +98,20 @@ if [ -f "$_config_file" ]; then
                 if echo "$_line" | grep -Eq '[[:space:]]+message:'; then
                     _commit_msg=$(echo "$_line" | sed 's/^[^:]*:[[:space:]]*//' | sed 's/^["'\'']//' | sed 's/["'\'']*$//')
                 fi
+                if echo "$_line" | grep -Eq '[[:space:]]+paths:'; then
+                    # Support inline array: paths: ["specs/", ".specify/feature.json"] or simple comma-separated
+                    _paths_raw=$(echo "$_line" | sed 's/^[^:]*:[[:space:]]*//')
+                    # strip surrounding [ ] if present
+                    _paths_raw=$(echo "$_paths_raw" | sed 's/^\[//' | sed 's/\]$//')
+                    IFS=',' read -ra _parts <<< "$_paths_raw"
+                    for _p in "${_parts[@]}"; do
+                        # trim whitespace and surrounding quotes
+                        _p=$(echo "$_p" | sed 's/^ *["'\'']*//; s/["'\''] *$//')
+                        if [ -n "$_p" ]; then
+                            _paths_spec+=("$_p")
+                        fi
+                    done
+                fi
             fi
         fi
     done < "$_config_file"
@@ -133,8 +149,42 @@ if [ -z "$_commit_msg" ]; then
     _commit_msg="[Spec Kit] Auto-commit ${_phase} ${_command_name}"
 fi
 
-# Stage and commit
-_git_out=$(git add . 2>&1) || { echo "[specify] Error: git add failed: $_git_out" >&2; exit 1; }
-_git_out=$(git commit -q -m "$_commit_msg" 2>&1) || { echo "[specify] Error: git commit failed: $_git_out" >&2; exit 1; }
+# Prepare staging: show summary and require confirmation before staging all changes
+_porcelain=$(git status --porcelain 2>/dev/null)
+if [ -n "$_porcelain" ]; then
+    echo "[specify] Uncommitted changes detected:"
+    git status --porcelain
+    # Only prompt in interactive shells
+    # If explicit paths configured, stage only those (supports non-interactive)
+    if [ ${#_paths_spec[@]} -gt 0 ]; then
+        echo "[specify] Staging configured paths: ${_paths_spec[*]}"
+        _git_out=$(git add -- "${_paths_spec[@]}" 2>&1) || { echo "[specify] Error: git add failed: $_git_out" >&2; exit 1; }
+        if [ -z "$(git diff --name-only --cached -- "${_paths_spec[@]}")" ]; then
+            exit 0
+        fi
+        _git_out=$(git commit -q -m "$_commit_msg" -- "${_paths_spec[@]}" 2>&1) || { echo "[specify] Error: git commit failed: $_git_out" >&2; exit 1; }
+        echo "[OK] Changes committed ${_phase} ${_command_name}" >&2
+        exit 0
+    fi
 
-echo "[OK] Changes committed ${_phase} ${_command_name}" >&2
+    if [ -t 0 ]; then
+        read -r -p "Stage all changes and commit? [y/N] " _answer
+        case "$_answer" in
+            [Yy]*)
+                _git_out=$(git add . 2>&1) || { echo "[specify] Error: git add failed: $_git_out" >&2; exit 1; }
+                _git_out=$(git commit -q -m "$_commit_msg" 2>&1) || { echo "[specify] Error: git commit failed: $_git_out" >&2; exit 1; }
+                echo "[OK] Changes committed ${_phase} ${_command_name}" >&2
+                ;;
+            *)
+                echo "[specify] Skipped auto-commit per user choice" >&2
+                exit 0
+                ;;
+        esac
+    else
+        echo "[specify] Non-interactive session: auto-commit requires confirmation. Skipped auto-commit. To enable non-interactive auto-commit, configure explicit pathspecs under auto_commit in .specify/extensions/git/git-config.yml." >&2
+        exit 0
+    fi
+else
+    echo "[specify] No changes to commit after $EVENT_NAME" >&2
+    exit 0
+fi

@@ -66,13 +66,16 @@ export function ContextTooltip({
   children,
   side = "top",
   delayDuration = 400,
+  className,
 }: ContextTooltipProps) {
+  // NOTE: TooltipProvider was intentionally removed from this per-instance wrapper.
+  // Wrap your application root (e.g., in `app/layout.tsx`) with a single
+  // `TooltipProvider` to configure global options like `delayDuration` or
+  // `skipDelayDuration`. This avoids creating a provider per tooltip instance.
   return (
-    <TooltipProvider delayDuration={delayDuration}>
-      <TooltipRoot>
-        <TooltipTrigger asChild>{children}</TooltipTrigger>
-        <TooltipContent side={side}>{content}</TooltipContent>
-      </TooltipRoot>
-    </TooltipProvider>
+    <TooltipRoot>
+      <TooltipTrigger asChild>{children}</TooltipTrigger>
+      <TooltipContent side={side} className={className}>{content}</TooltipContent>
+    </TooltipRoot>
   );
 }

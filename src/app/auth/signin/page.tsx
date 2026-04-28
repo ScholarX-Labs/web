@@ -102,6 +102,15 @@ export default function Page() {
           error={errors.password?.message}
         />
 
+        <div className="flex justify-end">
+          <Link
+            href={ROUTES.FORGOT_PASSWORD}
+            className="text-sm text-orange-500/70 motion-safe:transition-colors duration-200 ease-in-out hover:opacity-80 after:content-[''] after:absolute after:-bottom-0.5 after:left-0 after:h-0.5 after:w-full after:origin-bottom-right after:scale-x-0 after:bg-current after:transition-transform after:duration-300 after:ease-in-out hover:after:scale-x-100 hover:after:origin-bottom-left relative"
+          >
+            Forgot password?
+          </Link>
+        </div>
+
         <Button
           type="submit"
           disabled={isAnySubmitting}

@@ -1,4 +1,3 @@
-import { requireSession } from "@/lib/dal";
 import React from "react";
 
 /**
@@ -12,9 +11,9 @@ export default function PlatformLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="flex flex-1 flex-col bg-background">
       {/* <NavBar /> */}
-      <main className="flex-1 w-full">{children}</main>
+      <div className="flex-1 w-full">{children}</div>
       {/* <Footer /> */}
     </div>
   );

@@ -10,20 +10,12 @@ import { useUILayoutStore } from "@/store/ui-layout-store";
 import { motion } from "framer-motion";
 import { staggerContainer, staggerItem, sidebarFocusVariants } from "@/lib/motion-variants";
 import React from "react";
-
-interface LessonContent {
-  id: string;
-  title: string;
-  duration: string;
-  isCompleted?: boolean;
-  isCurrent?: boolean;
-  isLocked?: boolean;
-}
+import type { LessonSummary } from "@/types/course.types";
 
 interface LessonSidebarProps {
   courseSlug: string;
   currentLessonId: string;
-  lessons: LessonContent[];
+  lessons: LessonSummary[];
   className?: string;
   /** Optional per-lesson watch percentage map: lessonId → 0-100 */
   progress?: Record<string, number>;

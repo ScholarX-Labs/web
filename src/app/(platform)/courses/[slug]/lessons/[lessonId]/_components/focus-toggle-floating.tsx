@@ -52,7 +52,7 @@ export function FocusToggleFloating({ variant = "floating" }: FocusToggleFloatin
 
   const content = (
     <motion.div
-      layoutId="focus-toggle"
+      layoutId={`focus-toggle-${variant}`}
       initial="hidden"
       animate={isVisible ? "visible" : { opacity: 0, y: 20, scale: 0.95, pointerEvents: "none" }}
       exit="exit"

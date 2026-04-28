@@ -23,6 +23,7 @@ import { Monitor, PenTool, Database, Cpu, Tag } from "lucide-react";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useCourseSheetStore } from "@/stores/course-sheet.store";
 import { useEnrollIntentController } from "@/lib/enrollment/intent-controller";
+import { useSession } from "@/lib/auth-client";
 
 const CATEGORY_STYLES: Record<
   string,
@@ -69,6 +70,7 @@ interface CourseCardProps {
 export function CourseCard({ course, className }: CourseCardProps) {
   const isDesktop = useMediaQuery("(min-width: 1024px)");
   const router = useRouter();
+  const { data: session, isPending: isSessionPending } = useSession();
   const openCourseSheet = useCourseSheetStore((state) => state.openCourseSheet);
   const { openFromCard } = useEnrollIntentController();
   const courseDetailHref = ROUTES.COURSE_DETAIL(course.slug ?? course.id);
@@ -113,6 +115,15 @@ export function CourseCard({ course, className }: CourseCardProps) {
 
     if (course.isSubscribed) {
       router.push(courseDetailHref);
+      return;
+    }
+
+    if (isSessionPending) return;
+
+    if (!session) {
+      const targetPath = `${courseDetailHref}${courseDetailHref.includes("?") ? "&" : "?"}intent=enroll`;
+      const redirectUrl = `${ROUTES.SIGNIN}?callbackUrl=${encodeURIComponent(targetPath)}`;
+      router.push(redirectUrl);
       return;
     }
 
