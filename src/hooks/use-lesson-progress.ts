@@ -204,7 +204,7 @@ export function useLessonProgress({
 
   const [videoDuration, setVideoDuration] = useState<number>(() => (initialDuration > 0 ? initialDuration : 0));
 
-  const [resumePoint, setResumePoint] = useState<number | null>(() => {
+  const [resumePoint] = useState<number | null>(() => {
     if (
       _initialStored &&
       !_initialStored.completedAt &&
