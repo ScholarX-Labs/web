@@ -187,13 +187,17 @@ const parseApiErrorMessage = (error: unknown, fallback: string): string => {
   if (
     typeof error === "object" &&
     error !== null &&
-    "error" in error &&
-    typeof (error as any).error === "object" &&
-    (error as any).error !== null &&
-    "message" in (error as any).error &&
-    typeof (error as any).error.message === "string"
+    "error" in error
   ) {
-    return (error as any).error.message;
+    const errObj = (error as { error: unknown }).error;
+    if (
+      typeof errObj === "object" &&
+      errObj !== null &&
+      "message" in errObj &&
+      typeof (errObj as { message: unknown }).message === "string"
+    ) {
+      return (errObj as { message: string }).message;
+    }
   }
   if (error instanceof Error && error.message) {
     return error.message;
