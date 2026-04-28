@@ -109,7 +109,8 @@ export function LessonClientBridge({
         {(() => {
           const currentLesson = lessons.find((l) => l.id === lessonId);
           const mediaSrc = currentLesson?.media?.src;
-          const thumbnails = currentLesson?.media?.thumbnails;
+          const rawThumbnails = currentLesson?.media?.thumbnails;
+          const thumbnails = Array.isArray(rawThumbnails) ? rawThumbnails[0] : rawThumbnails;
           const poster = currentLesson?.media?.poster;
 
           if (!mediaSrc) {
