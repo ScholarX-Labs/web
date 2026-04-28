@@ -41,45 +41,51 @@ interface StaggerItemProps extends HTMLMotionProps<"div"> {
   as?: ElementType;
 }
 
-// Map common tags to their motion equivalents to avoid creating components during render
-const motionComponents: Record<string, ElementType> = {
-  div: motion.div,
-  li: motion.li,
-  span: motion.span,
-  article: motion.article,
-  section: motion.section,
-  nav: motion.nav,
-};
-
-// Fallback component that creates the motion component once for strings not in the map
-const createdComponents: Record<string, ElementType> = {};
+// Pre-define motion components for common tags to avoid static-components error
+const MotionLi = motion.li;
+const MotionDiv = motion.div;
+const MotionSpan = motion.span;
+const MotionArticle = motion.article;
+const MotionSection = motion.section;
 
 export function StaggerItem({ children, as, ...props }: StaggerItemProps) {
-  let Component: ElementType = motion.div;
-
-  if (as) {
-    if (typeof as === "string") {
-      if (motionComponents[as]) {
-        Component = motionComponents[as];
-      } else {
-        if (!createdComponents[as]) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          createdComponents[as] = motion.create(as as any);
-        }
-        Component = createdComponents[as];
-      }
-    } else {
-      // If it's a component type, we can't easily memoize it here without risk,
-      // but usually 'as' is a string tag in this project.
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      Component = motion.create(as as any);
-    }
+  // Use pre-defined components for common tags
+  if (as === "li") {
+    return (
+      <MotionLi variants={staggerItemVariants} {...(props as any)}>
+        {children}
+      </MotionLi>
+    );
+  }
+  
+  if (as === "span") {
+    return (
+      <MotionSpan variants={staggerItemVariants} {...(props as any)}>
+        {children}
+      </MotionSpan>
+    );
   }
 
+  if (as === "article") {
+    return (
+      <MotionArticle variants={staggerItemVariants} {...(props as any)}>
+        {children}
+      </MotionArticle>
+    );
+  }
+
+  if (as === "section") {
+    return (
+      <MotionSection variants={staggerItemVariants} {...(props as any)}>
+        {children}
+      </MotionSection>
+    );
+  }
+
+  // Default to div
   return (
-    // eslint-disable-next-line react-hooks/static-components
-    <Component variants={staggerItemVariants} {...props}>
+    <MotionDiv variants={staggerItemVariants} {...(props as any)}>
       {children}
-    </Component>
+    </MotionDiv>
   );
 }
