@@ -8,7 +8,7 @@ import { User } from "lucide-react";
 import MobileMenu from "@/components/MobileMenu";
 import { ROUTES } from "@/lib/routes";
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 
 interface HeaderProps {
   isLoggedIn: boolean;
@@ -22,7 +22,9 @@ function Header({ isLoggedIn }: HeaderProps) {
   const [headerHeightPx, setHeaderHeightPx] = useState<number>(0);
 
   // Read the CSS custom property --header-height and convert to pixels.
-  useEffect(() => {
+  // Use layout effect so measurement happens before paint to preserve
+  // the spring animation when the header hides/shows.
+  useLayoutEffect(() => {
     function updateHeaderHeight() {
       const root = document.documentElement;
       const raw =
@@ -58,6 +60,7 @@ function Header({ isLoggedIn }: HeaderProps) {
   return (
     <motion.header
       initial={false}
+      aria-hidden={isHidden}
       animate={{
         y: isHidden ? -(headerHeightPx || 0) : 0,
         opacity: isHidden ? 0 : 1,

@@ -8,6 +8,7 @@ import { isDevAuthBypassEnabled } from "@/config/dev-auth-bypass";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { GlobalShellExclusions } from "@/components/global-shell-exclusions";
+import { RootMain } from "@/components/root-main";
 import SignoutButton from "./auth/_components/SignoutButton";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -53,12 +54,7 @@ export default async function RootLayout({
                   bypassed.
                 </div>
               ) : null}
-              <main
-                className="flex-1 flex flex-col"
-                style={{ paddingTop: "var(--header-height)" }}
-              >
-                {children}
-              </main>
+              <RootMain>{children}</RootMain>
             </TooltipProvider>
           </AppProviders>
           <GlobalShellExclusions>

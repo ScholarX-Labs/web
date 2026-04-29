@@ -2,10 +2,18 @@
 
 import { usePathname } from "next/navigation";
 
-export function GlobalShellExclusions({ children }: { children: React.ReactNode }) {
+export function isHeaderExcluded(pathname?: string | null) {
+  return pathname?.includes("/lessons/") ?? false;
+}
+
+export function GlobalShellExclusions({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const pathname = usePathname();
-  const isLessonPage = pathname?.includes("/lessons/");
-  
+  const isLessonPage = isHeaderExcluded(pathname);
+
   if (isLessonPage) {
     return <>{null}</>;
   }
