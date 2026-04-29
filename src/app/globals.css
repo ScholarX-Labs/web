@@ -55,8 +55,8 @@
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
 
-  --shadow-elevated: 0 30px 90px -15px rgba(0, 0, 0, 0.7),
-    0 10px 30px -5px rgba(0, 0, 0, 0.4);
+  --shadow-elevated:
+    0 30px 90px -15px rgba(0, 0, 0, 0.7), 0 10px 30px -5px rgba(0, 0, 0, 0.4);
 }
 
 :root {
@@ -102,6 +102,18 @@
   --shiny-color: rgba(0, 0, 0, 0.6); /* Dark shine over text */
 }
 
+/* Header sizing: kept in a CSS custom property so server and client
+   layouts can use the same value responsively. Matches Tailwind's
+   pt-16 / md:pt-20 (4rem / 5rem). */
+:root {
+  --header-height: 4rem;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --header-height: 5rem;
+  }
+}
 .dark {
   --background: oklch(0.141 0.005 285.823);
   --foreground: oklch(0.985 0 0);
@@ -225,7 +237,11 @@
     border-radius: 20px;
     border: 1px solid rgba(255, 255, 255, 0.22);
     background:
-      radial-gradient(circle at 18% 22%, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0) 42%),
+      radial-gradient(
+        circle at 18% 22%,
+        rgba(255, 255, 255, 0.34),
+        rgba(255, 255, 255, 0) 42%
+      ),
       linear-gradient(142deg, #58a9ff 0%, #2f85f5 46%, #006ef0 100%);
     box-shadow:
       0 12px 26px rgba(0, 98, 224, 0.26),
@@ -233,9 +249,11 @@
       0 -10px 22px rgba(0, 63, 145, 0.2) inset;
     padding: 10px 16px;
     isolation: isolate;
-    transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    transition:
+      transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
       box-shadow 220ms ease;
-    animation: user-bubble-settle 620ms cubic-bezier(0.12, 0.94, 0.28, 1.08) 80ms both;
+    animation: user-bubble-settle 620ms cubic-bezier(0.12, 0.94, 0.28, 1.08)
+      80ms both;
   }
 
   .ai-chat-user-message-bubble::before,
@@ -296,7 +314,9 @@
     margin: 4px 2px;
     background: transparent;
     opacity: 0;
-    transition: opacity 300ms ease, width 300ms ease;
+    transition:
+      opacity 300ms ease,
+      width 300ms ease;
   }
 
   .premium-scrollbar:hover [data-slot="scroll-area-scrollbar"] {
@@ -430,7 +450,6 @@
   }
 }
 
-
 .footer .navbar {
   flex-shrink: 0;
   padding: 1rem;
@@ -438,64 +457,126 @@
 
 /* ── Legacy Home Page Animations ───────────────────────────── */
 @keyframes float {
-  0%, 100% { transform: translate(0, 0); }
-  50% { transform: translate(-30px, 30px); }
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-30px, 30px);
+  }
 }
 
 @keyframes floatRotate1 {
-  0%, 100% { transform: translate(-50%, -50%) rotate(-5deg); }
-  50% { transform: translate(-50%, -50%) rotate(15deg); }
+  0%,
+  100% {
+    transform: translate(-50%, -50%) rotate(-5deg);
+  }
+  50% {
+    transform: translate(-50%, -50%) rotate(15deg);
+  }
 }
 
 @keyframes floatRotate2 {
-  0%, 100% { transform: translate(-50%, -50%) rotate(5deg); }
-  50% { transform: translate(-50%, -50%) rotate(-15deg); }
+  0%,
+  100% {
+    transform: translate(-50%, -50%) rotate(5deg);
+  }
+  50% {
+    transform: translate(-50%, -50%) rotate(-15deg);
+  }
 }
 
 @keyframes floatRotate3 {
-  0%, 100% { transform: translate(-50%, -50%) rotate(10deg); }
-  50% { transform: translate(-50%, -50%) rotate(-10deg); }
+  0%,
+  100% {
+    transform: translate(-50%, -50%) rotate(10deg);
+  }
+  50% {
+    transform: translate(-50%, -50%) rotate(-10deg);
+  }
 }
 
 @keyframes morph {
-  0%, 100% { border-radius: 63% 37% 54% 46% / 55% 48% 52% 45%; }
-  25% { border-radius: 48% 52% 65% 35% / 65% 40% 60% 35%; }
-  50% { border-radius: 40% 60% 50% 50% / 45% 65% 35% 55%; }
-  75% { border-radius: 58% 42% 45% 55% / 38% 62% 38% 62%; }
+  0%,
+  100% {
+    border-radius: 63% 37% 54% 46% / 55% 48% 52% 45%;
+  }
+  25% {
+    border-radius: 48% 52% 65% 35% / 65% 40% 60% 35%;
+  }
+  50% {
+    border-radius: 40% 60% 50% 50% / 45% 65% 35% 55%;
+  }
+  75% {
+    border-radius: 58% 42% 45% 55% / 38% 62% 38% 62%;
+  }
 }
 
 @keyframes pulse-shadow {
-  0%, 100% {
-    box-shadow: 0 10px 30px rgba(51, 153, 204, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  0%,
+  100% {
+    box-shadow:
+      0 10px 30px rgba(51, 153, 204, 0.4),
+      0 0 0 1px rgba(255, 255, 255, 0.1);
   }
   50% {
-    box-shadow: 0 15px 40px rgba(51, 153, 204, 0.6), 0 0 0 2px rgba(255, 255, 255, 0.2);
+    box-shadow:
+      0 15px 40px rgba(51, 153, 204, 0.6),
+      0 0 0 2px rgba(255, 255, 255, 0.2);
   }
 }
 
 @keyframes fadeInLeft {
-  from { opacity: 0; transform: translateX(-50px); }
-  to { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @keyframes fadeInRight {
-  from { opacity: 0; transform: translateX(50px); }
-  to { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes slideInWidth {
-  from { width: 0%; }
-  to { width: 100%; }
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
 }
 
 @keyframes fadeInScale {
-  from { opacity: 0; transform: scale(0); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @keyframes slideInRight {
@@ -535,7 +616,8 @@
 }
 
 @keyframes rotateFloat {
-  0%, 100% {
+  0%,
+  100% {
     transform: rotate(0deg) translateY(0);
   }
   25% {
@@ -557,4 +639,3 @@
     width: 100%;
   }
 }
-

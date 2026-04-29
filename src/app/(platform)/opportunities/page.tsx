@@ -8,8 +8,6 @@ import OpportunitiesSearchInput from "@/components/opportunities/OpportunitiesSe
 import { ROUTES } from "@/lib/routes";
 
 async function opportunities() {
-  await requireSession();
-
   return (
     <OpportunitiesSearchProvider>
       <div className="flex flex-col  min-h-screen">

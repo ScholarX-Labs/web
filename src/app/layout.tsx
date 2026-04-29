@@ -34,6 +34,7 @@ export default async function RootLayout({
 }>) {
   const currentUser = await getSession();
   const IsDevShowSignOutButton = false; // Set to true to show sign-out button in dev when bypass is enabled
+  const isLoggedIn = !!currentUser?.session?.id;
 
   return (
     <html lang="en" className={inter.variable}>
@@ -42,7 +43,7 @@ export default async function RootLayout({
       >
         <div vaul-drawer-wrapper="" className="min-h-screen flex flex-col">
           <GlobalShellExclusions>
-            <Header />
+            <Header isLoggedIn={isLoggedIn} />
           </GlobalShellExclusions>
           <AppProviders>
             <TooltipProvider>
@@ -52,7 +53,12 @@ export default async function RootLayout({
                   bypassed.
                 </div>
               ) : null}
-              <main className="flex-1 flex flex-col">{children}</main>
+              <main
+                className="flex-1 flex flex-col"
+                style={{ paddingTop: "var(--header-height)" }}
+              >
+                {children}
+              </main>
             </TooltipProvider>
           </AppProviders>
           <GlobalShellExclusions>
