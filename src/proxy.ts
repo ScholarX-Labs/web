@@ -6,7 +6,13 @@ import { ROUTES } from "./lib/routes";
 const SESSION_COOKIE_NAME = "better-auth.session_token";
 const SECURE_SESSION_COOKIE_NAME = `__Secure-${SESSION_COOKIE_NAME}`;
 
-const OPEN_ROUTES = new Set<string>(["/", "/about", "/contact", "/courses"]);
+const OPEN_ROUTES = new Set<string>([
+  "/",
+  "/about",
+  "/contact",
+  "/courses",
+  "/opportunities",
+]);
 const ALLOWED_AUTH_ROUTES_FOR_AUTHENTICATED = new Set<string>([
   ROUTES.PHONE_COLLECTION,
   ROUTES.VERIFY_EMAIL,
@@ -19,14 +25,21 @@ function hasSessionCookie(request: NextRequest) {
   );
 }
 
-export function middleware(request: NextRequest) {
+function normalizePath(pathname: string): string {
+  return pathname.endsWith("/") && pathname !== "/"
+    ? pathname.slice(0, -1)
+    : pathname;
+}
+
+export function proxy(request: NextRequest) {
   if (isDevAuthBypassEnabled && process.env.NODE_ENV !== "production") {
     return NextResponse.next();
   }
   const isAuthenticated = hasSessionCookie(request);
-  const { pathname } = request.nextUrl;
+  const pathname = normalizePath(request.nextUrl.pathname);
   const isAuthRoute = pathname.startsWith("/auth");
-  const isPublicRoute = OPEN_ROUTES.has(pathname) || pathname.startsWith("/courses/");
+  const isPublicRoute =
+    OPEN_ROUTES.has(pathname) || pathname.startsWith("/courses/");
 
   if (
     isAuthRoute &&

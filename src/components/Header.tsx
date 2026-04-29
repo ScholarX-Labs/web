@@ -1,17 +1,77 @@
+"use client";
+
 import Link from "next/link";
 import Scholarx_horizontal_logo from "../../public/ScholarX-Logo-horizontal-Blue-Solid-Small_ScholarX.png";
 import Image from "next/image";
-import { getSession } from "@/lib/dal";
 import SignoutButton from "@/app/auth/_components/SignoutButton";
 import { User } from "lucide-react";
 import MobileMenu from "@/components/MobileMenu";
 import { ROUTES } from "@/lib/routes";
+import { motion, useMotionValueEvent, useScroll } from "framer-motion";
+import { useLayoutEffect, useState } from "react";
 
-async function Header() {
-  const session = await getSession();
-  const isLoggedIn = !!session?.session?.id;
+interface HeaderProps {
+  isLoggedIn: boolean;
+}
+
+const SCROLL_THRESHOLD = 80;
+
+function Header({ isLoggedIn }: HeaderProps) {
+  const [isHidden, setIsHidden] = useState(false);
+  const { scrollY } = useScroll();
+  const [headerHeightPx, setHeaderHeightPx] = useState<number>(0);
+
+  // Read the CSS custom property --header-height and convert to pixels.
+  // Use layout effect so measurement happens before paint to preserve
+  // the spring animation when the header hides/shows.
+  useLayoutEffect(() => {
+    function updateHeaderHeight() {
+      const root = document.documentElement;
+      const raw =
+        getComputedStyle(root).getPropertyValue("--header-height") || "4rem";
+      const el = document.createElement("div");
+      el.style.position = "absolute";
+      el.style.visibility = "hidden";
+      el.style.height = raw.trim();
+      document.body.appendChild(el);
+      const px = el.offsetHeight || 0;
+      document.body.removeChild(el);
+      setHeaderHeightPx(px);
+    }
+
+    updateHeaderHeight();
+    const mq = window.matchMedia("(min-width: 768px)");
+    mq.addEventListener("change", updateHeaderHeight);
+    window.addEventListener("resize", updateHeaderHeight);
+    return () => {
+      mq.removeEventListener("change", updateHeaderHeight);
+      window.removeEventListener("resize", updateHeaderHeight);
+    };
+  }, []);
+
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    const previous = scrollY.getPrevious() ?? 0;
+    const isScrollingDown = latest > previous;
+    const nextHidden = isScrollingDown && latest > SCROLL_THRESHOLD;
+
+    setIsHidden((current) => (current === nextHidden ? current : nextHidden));
+  });
+
   return (
-    <header className="sticky top-0 z-50 w-full flex flex-row items-center justify-between px-4 lg:justify-around bg-background border-b lg:border-none">
+    <motion.header
+      initial={false}
+      aria-hidden={isHidden}
+      animate={{
+        y: isHidden ? -(headerHeightPx || 0) : 0,
+        opacity: isHidden ? 0 : 1,
+      }}
+      transition={{ type: "spring", stiffness: 260, damping: 30 }}
+      className="fixed inset-x-0 top-0 z-50 w-full flex flex-row items-center justify-between px-4 lg:justify-around bg-background/95 backdrop-blur-md border-b lg:border-none will-change-transform"
+      style={{
+        height: "var(--header-height)",
+        pointerEvents: isHidden ? "none" : "auto",
+      }}
+    >
       <section className="flex-1 flex justify-center lg:justify-start">
         <Link
           href={ROUTES.HOME}
@@ -93,7 +153,7 @@ async function Header() {
           <MobileMenu isLoggedIn={isLoggedIn} />
         </div>
       </section>
-    </header>
+    </motion.header>
   );
 }
 
