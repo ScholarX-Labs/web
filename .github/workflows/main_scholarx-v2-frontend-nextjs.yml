@@ -23,21 +23,16 @@ jobs:
         with:
           node-version: '22.x'
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 9
-
       - name: Install Doppler CLI
         uses: dopplerhq/cli-action@v1
 
-      - name: pnpm install, build, and test
+      - name: npm install, build, and test
         env:
           DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
         run: |
-          pnpm install
-          doppler run -- pnpm run --if-present build
-          pnpm run --if-present test
+          npm install
+          doppler run -- npm run --if-present build
+          npm run --if-present test
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
