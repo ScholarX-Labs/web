@@ -8,6 +8,7 @@ import {
   timestamp,
   numeric,
   jsonb,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { user as dbUsers } from "@/db/schema/auth-schema";
 
@@ -54,4 +55,30 @@ export const dbSubscriptions = coursesSchema.table("subscriptions", {
   paymentId: varchar("payment_id", { length: 255 }),
   enrolledAt: timestamp("enrolled_at"),
 });
+
+export const dbCourseCompletions = coursesSchema.table(
+  "course_completions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => dbUsers.id, { onDelete: "cascade" }),
+    courseId: uuid("course_id")
+      .notNull()
+      .references(() => dbCourses.id, { onDelete: "cascade" }),
+    completedAt: timestamp("completed_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    certificateId: varchar("certificate_id", { length: 60 }).notNull().unique(),
+    completionPercentage: integer("completion_percentage").notNull().default(0),
+    completedLessons: integer("completed_lessons").notNull().default(0),
+  },
+  (table) => [
+    uniqueIndex("course_completions_user_course_uidx").on(
+      table.userId,
+      table.courseId,
+    ),
+  ],
+);
+
 export { dbUsers };

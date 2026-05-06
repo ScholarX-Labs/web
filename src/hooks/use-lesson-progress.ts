@@ -19,8 +19,11 @@ export interface LessonProgress {
 export interface UseLessonProgressOptions {
   lessonId:    string;
   courseSlug:  string;
+  courseId?:   string; // Added to support completion actions
   /** Total video duration in seconds. Pass 0 until VidStack fires onDurationChange. */
   videoDuration: number;
+  /** Optional callback when the entire course is considered complete */
+  onCourseCompleted?: (courseId: string) => void;
 }
 
 export interface UseLessonProgressReturn {
@@ -45,7 +48,7 @@ export interface UseLessonProgressReturn {
 
 const HEATMAP_BUCKETS = 20;
 const DEBOUNCE_MS     = 500;
-const COMPLETE_AT_PCT = 90;
+const COMPLETE_AT_PCT = 94; // Lowered slightly to ensure animation fires before end
 
 // ─── Storage Helpers ──────────────────────────────────────────────────────────
 
@@ -173,16 +176,13 @@ function computeHeatmapBuckets(
 export function useLessonProgress({
   lessonId,
   courseSlug,
+  courseId,
   videoDuration: initialDuration,
+  onCourseCompleted,
 }: UseLessonProgressOptions): UseLessonProgressReturn {
-  // Lazily initialize progress and resumePoint from persisted storage to
-  // avoid calling setState during mount effects. Read once and derive
-  // initial values for `progress` and `resumePoint`.
+  // ... rest of state initialization ...
   const _initialStored = typeof window !== 'undefined' ? readProgress(courseSlug, lessonId) : null;
   const [progress, setProgress] = useState<LessonProgress | null>(() => {
-    // Only reuse persisted progress when it represents an active, eligible
-    // resume state. If the stored progress is completed or below the
-    // resume eligibility threshold, initialize a fresh default object.
     if (
       _initialStored &&
       !_initialStored.completedAt &&
@@ -216,41 +216,28 @@ export function useLessonProgress({
     return null;
   });
 
-  // Debounce ref for onTimeUpdate (no longer used for scheduling writes)
-  // Track whether this is a fresh page load (to show resume prompt)
   const isFirstLoad = useRef(true);
 
-  // ── Mount: mark first load complete. Progress/videoDuration/resumePoint
-  // are initialized lazily above to avoid setting state during mount effects.
   useEffect(() => {
     isFirstLoad.current = false;
   }, [lessonId, courseSlug]);
 
-  // Note: `videoDuration` is initialized from `initialDuration` via
-  // the state initializer above. If the caller updates `initialDuration`,
-  // callers should call `setVideoDuration` returned from this hook.
-
-  // ── Heatmap (memoized — only recalculate when pauseEvents changes) ────────
   const heatmapBuckets = useMemo(
     () => computeHeatmapBuckets(progress?.pauseEvents ?? [], videoDuration),
     [progress?.pauseEvents, videoDuration]
   );
 
-  // ── Internal updater ──────────────────────────────────────────────────────
   const updateProgress = useCallback(
     (updater: (prev: LessonProgress) => LessonProgress, immediate = false) => {
       setProgress((prev) => {
         if (!prev) return prev;
         const next = updater(prev);
-        // Schedule write: immediate writes as soon as possible, otherwise debounce
         scheduleWriteProgress(next, immediate ? 0 : DEBOUNCE_MS);
         return next;
       });
     },
     []
   );
-
-  // ── Event Handlers ────────────────────────────────────────────────────────
 
   const onTimeUpdate = useCallback(
     (currentTime: number) => {
@@ -299,22 +286,22 @@ export function useLessonProgress({
     }), /* immediate */ true);
   }, [updateProgress]);
 
-  // ── Also mark completed when watchedPercentage >= threshold ──────────────
-  useEffect(() => {
-    if (
-      progress &&
-      progress.watchedPercentage >= COMPLETE_AT_PCT &&
-      !progress.completedAt
-    ) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      updateProgress((prev) => ({
-        ...prev,
-        completedAt: Date.now(),
-      }), /* immediate */ true);
-    }
-  }, [progress, updateProgress]);
+  // Ref to prevent multiple completion triggers
+  const hasTriggeredCompletion = useRef(false);
 
-  // ── Cleanup: flush any pending progress for this lesson on unmount/pagehide/visibilitychange
+  // Handle completion trigger
+  useEffect(() => {
+    if (!progress || !courseId || !onCourseCompleted) return;
+
+    const isComplete = progress.completedAt || progress.watchedPercentage >= COMPLETE_AT_PCT;
+    
+    if (isComplete && !hasTriggeredCompletion.current) {
+      console.log(`[PROGRESS] Lesson ${lessonId} reached completion threshold. Triggering course completion.`);
+      hasTriggeredCompletion.current = true;
+      onCourseCompleted(courseId);
+    }
+  }, [progress, courseId, onCourseCompleted, lessonId]);
+
   useEffect(() => {
     const key = storageKey(courseSlug, lessonId);
     const handleVisibility = () => {
