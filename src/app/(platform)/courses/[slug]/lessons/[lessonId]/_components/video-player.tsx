@@ -48,12 +48,16 @@ export const VideoPlayer = React.forwardRef<MediaPlayerInstance, VideoPlayerProp
     onEnded,
     onDurationChange,
   }, ref) => {
+    const internalPlayerRef = useRef<MediaPlayerInstance>(null);
     const seekFromRef = useRef<number>(0);
     const { isFocusMode } = useUILayoutStore();
 
+    // Merge the forwarded ref with our internal ref
+    React.useImperativeHandle(ref, () => internalPlayerRef.current!);
+
     return (
       <div className="group relative w-full">
-        {/* Atmospheric Ambilight (Breathing Glow) */}
+        {/* ... atmospheric elements ... */}
         <div className={cn(
           "pointer-events-none absolute -inset-6 z-0 hidden lg:block transition-opacity duration-1000",
           isFocusMode ? "opacity-100" : "opacity-60"
@@ -62,8 +66,8 @@ export const VideoPlayer = React.forwardRef<MediaPlayerInstance, VideoPlayerProp
           <div className="absolute inset-x-20 inset-y-10 rounded-[3rem] bg-violet-600/15 blur-[100px] animate-pulse duration-[15000ms] delay-1000" />
         </div>
 
-        {/* Floor Reflection Shadow */}
         <div className="pointer-events-none absolute -bottom-10 inset-x-8 h-20 bg-blue-500/10 blur-[40px] rounded-[50%] z-0" />
+        
         <motion.div
           animate={{
             scale: 1,
@@ -89,11 +93,10 @@ export const VideoPlayer = React.forwardRef<MediaPlayerInstance, VideoPlayerProp
             boxShadow: "0 40px 100px -20px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05)",
           }}
         >
-          {/* Inner glass light reflection (Apple-style top edge highlight) */}
           <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent z-20" />
 
         <MediaPlayer
-          ref={ref}
+          ref={internalPlayerRef}
           title={title}
           src={src}
           autoPlay
@@ -101,30 +104,30 @@ export const VideoPlayer = React.forwardRef<MediaPlayerInstance, VideoPlayerProp
           className="w-full aspect-video"
           crossOrigin
           poster={poster}
-          onTimeUpdate={(event) => {
-            // VidStack events provide an object with currentTime
-            const time = typeof event === 'number' ? event : event?.currentTime;
+          onTimeUpdate={() => {
+            const time = internalPlayerRef.current?.currentTime;
             if (typeof time === "number") onTimeUpdate?.(time);
           }}
-          onPause={(event) => {
-            const time = typeof event === 'number' ? event : event?.currentTime;
+          onPause={() => {
+            const time = internalPlayerRef.current?.currentTime;
             if (typeof time === "number") onPause?.(time);
           }}
-          onSeeked={(event) => {
-            const time = typeof event === 'number' ? event : event?.currentTime;
+          onSeeked={() => {
+            const time = internalPlayerRef.current?.currentTime;
             if (typeof time === "number") {
               onSeeked?.(seekFromRef.current, time);
             }
           }}
           onSeeking={(event) => {
-            const time = typeof event === 'number' ? event : event?.currentTime;
+            // seeking event usually has the time in the detail
+            const time = (event as any)?.currentTime ?? internalPlayerRef.current?.currentTime;
             if (typeof time === "number") {
               seekFromRef.current = time;
             }
           }}
           onEnd={() => onEnded?.()}
-          onDurationChange={(event) => {
-            const duration = typeof event === 'number' ? event : event?.duration;
+          onDurationChange={() => {
+            const duration = internalPlayerRef.current?.duration;
             if (typeof duration === "number") onDurationChange?.(duration);
           }}
         >
