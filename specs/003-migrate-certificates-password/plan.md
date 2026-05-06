@@ -64,7 +64,10 @@ src/
 │   ├── application/
 │   │   ├── certificate.errors.ts                 [NEW] NextCertificateError class
 │   │   ├── certificate.service.ts                [NEW] Business logic, Drizzle-native, no Mongoose
-│   │   └── completion-writer.service.ts          [NEW] Write path — upsertCourseCompletion()
+│   │   ├── certificate.mappers.ts                [NEW] DB row → DTO mapping helpers
+│   │   └── completion-writer.service.ts          [NEW] Idempotent command — upsertCourseCompletion()
+│   ├── factory/
+│   │   └── next-certificate-domain.factory.ts    [NEW] Composition root for repository + services
 │   └── infrastructure/
 │       └── db/
 │           └── next-certificates.repository.ts   [NEW] Drizzle queries against dbCourseCompletions
@@ -101,6 +104,117 @@ src/
 ```
 
 > **Architectural Rule**: The `domain/` layer has zero Next.js imports. It is pure TypeScript — no `headers()`, no `"use server"`, no `next/*`. That boundary is enforced strictly. Server Actions in `src/actions/` are the only bridge.
+
+---
+
+## Design Patterns & Maintainability Rules
+
+This feature should be implemented as a small bounded context, not as page-local database code. The goal is to make certificate issuance, verification, PDF generation, and password changes easy to evolve independently.
+
+| Pattern | Where Applied | Rule |
+|---|---|---|
+| **Clean / Hexagonal Architecture** | `domain/certificates/*` | Pages, Server Actions, and route handlers are adapters. Domain services own business rules. Repository owns persistence. |
+| **Repository Pattern** | `NextCertificatesRepository` | All Drizzle SQL lives in repository methods. No SQL in pages, Server Actions, route handlers, or React components. |
+| **Application Service Pattern** | `NextCertificateService`, `CompletionWriterService` | Use-case methods coordinate repository calls and enforce invariants. Services return DTOs or primitives, not React or `Response`. |
+| **Composition Root / Factory** | `createNextCertificateDomain()` | Construct repositories and services in one factory, mirroring `createNextCourseDomain()`. Adapters import the factory instead of `new`ing dependencies repeatedly. |
+| **DTO + Mapper Pattern** | `contracts/index.ts`, `certificate.mappers.ts` | Convert DB rows to serializable DTOs once. Dates cross RSC/action boundaries as ISO strings only. |
+| **Result Object Pattern** | `CertificateVerificationResult` | Public verification returns a typed result instead of throwing for expected invalid/not-found states. |
+| **Idempotent Command Pattern** | `upsertCourseCompletion()` | Completion issuance is a command with exactly-once semantics per `(userId, courseId)`. Replays must not mint a second certificate. |
+| **Immutable Identifier Pattern** | `certificateId` | Once issued, a certificate ID is never updated. Corrections should update display metadata, not the certificate identity. |
+| **Thin Adapter Pattern** | Server Actions and route handlers | Adapters only parse framework inputs, enforce auth, call domain services, and shape HTTP/RSC output. |
+| **Client Island Pattern** | Certificate modal and change-password form | Keep certificate listing and verification as RSC. Use client components only for local UI state or browser-only APIs. |
+| **Policy Boundary** | Password validation, certificate ID validation | Validation rules live close to the use case and are testable without rendering pages. |
+
+### Dependency Direction
+
+```text
+app/*, actions/*, api/*, components/*
+        ↓
+domain/certificates/application
+        ↓
+domain/certificates/infrastructure/db
+        ↓
+db/schema
+```
+
+Rules:
+- Dependencies point inward from adapters to domain use cases. Domain code never imports `next/*`, `react`, `headers()`, `cookies()`, or UI components.
+- `application/` may depend on `contracts/` and repository interfaces/classes, but not on page paths or route handlers.
+- `infrastructure/db/` may import Drizzle schema and `db`; it should not return DTOs shaped for UI.
+- `components/` consume DTOs only. They do not know Drizzle table names, SQL column names, or auth session shape.
+
+### Domain Factory
+
+Add a factory so actions and route handlers use one stable composition API:
+
+```typescript
+// src/domain/certificates/factory/next-certificate-domain.factory.ts
+import { NextCertificateService } from "@/domain/certificates/application/certificate.service";
+import { CompletionWriterService } from "@/domain/certificates/application/completion-writer.service";
+import { NextCertificatesRepository } from "@/domain/certificates/infrastructure/db/next-certificates.repository";
+
+export interface NextCertificateDomainServices {
+  certificates: NextCertificateService;
+  completions: CompletionWriterService;
+}
+
+export const createNextCertificateDomain = (): NextCertificateDomainServices => {
+  const repository = new NextCertificatesRepository();
+
+  return {
+    certificates: new NextCertificateService(repository),
+    completions: new CompletionWriterService(repository),
+  };
+};
+```
+
+### Mapper Boundary
+
+Add explicit mappers instead of inline mapping inside services when row shape starts to grow:
+
+```typescript
+// src/domain/certificates/application/certificate.mappers.ts
+import type { UserCertificateDto, CertificateVerificationResult } from "../contracts";
+import type {
+  CertificateUserRow,
+  CertificateVerificationRow,
+} from "../infrastructure/db/next-certificates.repository";
+
+export function toUserCertificateDto(row: CertificateUserRow): UserCertificateDto {
+  return {
+    completionId: row.completion.id,
+    courseId: row.completion.courseId,
+    courseTitle: row.courseTitle,
+    courseImageUrl: row.courseImageUrl,
+    completedAt: row.completion.completedAt.toISOString(),
+    completedLessons: row.completion.completedLessons,
+    completionPercentage: row.completion.completionPercentage,
+    certificateId: row.completion.certificateId!,
+  };
+}
+
+export function toValidVerificationResult(row: CertificateVerificationRow): CertificateVerificationResult {
+  return {
+    valid: true,
+    certificateId: row.completion.certificateId!,
+    studentName: row.studentName,
+    courseName: row.courseTitle,
+    completedAt: row.completion.completedAt.toISOString(),
+    completionPercentage: row.completion.completionPercentage,
+  };
+}
+```
+
+Define `CertificateUserRow` and `CertificateVerificationRow` as exported repository return types so mapper signatures stay precise.
+
+### Scalability Rules
+
+- Add new certificate read models through repository methods and DTO mappers, not by widening page-specific query code.
+- Add new delivery formats, such as PNG preview or share image, as separate application services. Do not grow `buildPdf()` into a multi-format renderer.
+- Keep certificate issuance synchronous only while it is cheap. If PDF generation, email delivery, or LinkedIn sharing becomes part of issuance, emit/store the completion first and move side effects behind a queue/job boundary.
+- Use database uniqueness as the final correctness guard. Service-level checks improve UX, but `(user_id, course_id)` and `certificate_id` constraints enforce integrity under race conditions.
+- Keep public verification cacheable only after product/legal approval. Until then, prefer `dynamic = "force-dynamic"` or conservative cache headers because certificate revocation may be added later.
+- Treat `certificateId` as public but unguessable. Never expose internal completion IDs in public verification URLs.
 
 ---
 
@@ -149,30 +263,41 @@ const isPublicRoute =
 
 ```typescript
 // ADD after the dbSubscriptions export — same file, same pgSchema("courses")
+// Also add `uniqueIndex` to the pg-core import list.
 
-export const dbCourseCompletions = coursesSchema.table("course_completions", {
-  id: uuid("id").primaryKey().defaultRandom(),
+export const dbCourseCompletions = coursesSchema.table(
+  "course_completions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
 
-  userId: text("user_id")
-    .notNull()
-    .references(() => dbUsers.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => dbUsers.id, { onDelete: "cascade" }),
 
-  courseId: uuid("course_id")
-    .notNull()
-    .references(() => dbCourses.id, { onDelete: "cascade" }),
+    courseId: uuid("course_id")
+      .notNull()
+      .references(() => dbCourses.id, { onDelete: "cascade" }),
 
-  // ISO timestamp — set once when course is marked 100% complete
-  completedAt: timestamp("completed_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
+    // ISO timestamp — set once when course is marked 100% complete
+    completedAt: timestamp("completed_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
 
-  // Format: CERT-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx (UUID v4 with CERT- prefix)
-  // UNIQUE constraint prevents duplicate certificates for the same completion
-  certificateId: varchar("certificate_id", { length: 60 }).unique(),
+    // Format: CERT-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx (UUID v4 with CERT- prefix)
+    // Unique globally because verification uses this as the public lookup key.
+    certificateId: varchar("certificate_id", { length: 60 }).notNull().unique(),
 
-  completionPercentage: integer("completion_percentage").notNull().default(0),
-  completedLessons: integer("completed_lessons").notNull().default(0),
-});
+    completionPercentage: integer("completion_percentage").notNull().default(0),
+    completedLessons: integer("completed_lessons").notNull().default(0),
+  },
+  (table) => [
+    // Final correctness guard for migration reruns and race conditions.
+    uniqueIndex("course_completions_user_course_uidx").on(
+      table.userId,
+      table.courseId,
+    ),
+  ],
+);
 ```
 
 **After editing the schema file, run:**
@@ -268,6 +393,14 @@ import {
   dbUsers,
 } from "@/domain/courses/infrastructure/db/courses-db.schema";
 
+export type CertificateUserRow = Awaited<
+  ReturnType<NextCertificatesRepository["findByUser"]>
+>[number];
+
+export type CertificateVerificationRow = NonNullable<
+  Awaited<ReturnType<NextCertificatesRepository["findByCertificateId"]>>
+>;
+
 export class NextCertificatesRepository {
   /**
    * All completions for a user, newest first.
@@ -349,12 +482,15 @@ import { readFileSync } from "fs";
 import { randomUUID } from "crypto";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { NextCertificatesRepository } from "../infrastructure/db/next-certificates.repository";
-import { NextCertificateError } from "./certificate.errors";
 import {
   UserCertificateDto,
   CertificateVerificationResult,
   CertificatePdfData,
 } from "../contracts";
+import {
+  toUserCertificateDto,
+  toValidVerificationResult,
+} from "./certificate.mappers";
 
 // Certificate ID regex — V2 format only: CERT-<UUID v4>
 // Legacy format (CERT-XXXXX-XXXXX) is NOT supported here.
@@ -392,16 +528,7 @@ export class NextCertificateService {
     const rows = await this.repo.findByUser(userId);
     return rows
       .filter((r) => r.completion.certificateId !== null)
-      .map((r) => ({
-        completionId: r.completion.id,
-        courseId: r.completion.courseId,
-        courseTitle: r.courseTitle,
-        courseImageUrl: r.courseImageUrl,
-        completedAt: r.completion.completedAt.toISOString(),
-        completedLessons: r.completion.completedLessons,
-        completionPercentage: r.completion.completionPercentage,
-        certificateId: r.completion.certificateId!,
-      }));
+      .map(toUserCertificateDto);
   }
 
   /** Public certificate verification — three distinct result states */
@@ -420,14 +547,7 @@ export class NextCertificateService {
     }
 
     // 3. Valid
-    return {
-      valid: true,
-      certificateId: row.completion.certificateId!,
-      studentName: row.studentName,
-      courseName: row.courseTitle,
-      completedAt: row.completion.completedAt.toISOString(),
-      completionPercentage: row.completion.completionPercentage,
-    };
+    return toValidVerificationResult(row);
   }
 
   /**
@@ -512,12 +632,7 @@ export class NextCertificateService {
 
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
-import { NextCertificateService } from "@/domain/certificates/application/certificate.service";
-import { NextCertificatesRepository } from "@/domain/certificates/infrastructure/db/next-certificates.repository";
-
-function makeService() {
-  return new NextCertificateService(new NextCertificatesRepository());
-}
+import { createNextCertificateDomain } from "@/domain/certificates/factory/next-certificate-domain.factory";
 
 /**
  * Returns all certificates for the currently authenticated user.
@@ -526,7 +641,9 @@ function makeService() {
 export async function getUserCertificates() {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user?.id) return [];
-  return makeService().getUserCertificates(session.user.id);
+  return createNextCertificateDomain().certificates.getUserCertificates(
+    session.user.id,
+  );
 }
 
 /**
@@ -534,7 +651,9 @@ export async function getUserCertificates() {
  * Returns a structured result with valid/invalid state and certificate details.
  */
 export async function verifyCertificate(certificateId: string) {
-  return makeService().verifyCertificate(certificateId);
+  return createNextCertificateDomain().certificates.verifyCertificate(
+    certificateId,
+  );
 }
 ```
 
@@ -618,11 +737,14 @@ async upsertCompletion(data: {
 
 ```typescript
 // e.g. inside an existing lesson-progress server action or API route
-const writer = new CompletionWriterService(new NextCertificatesRepository());
-await writer.upsertCourseCompletion(userId, courseId, {
-  completedLessons: totalCompleted,
-  completionPercentage: 100,
-});
+await createNextCertificateDomain().completions.upsertCourseCompletion(
+  userId,
+  courseId,
+  {
+    completedLessons: totalCompleted,
+    completionPercentage: 100,
+  },
+);
 ```
 
 > **Schema change required**: Add a compound unique constraint `(user_id, course_id)` to `dbCourseCompletions`. See Step 1 — the schema must include `.unique()` on the pair, not just on `certificateId`.
@@ -639,8 +761,7 @@ await writer.upsertCourseCompletion(userId, courseId, {
 ```typescript
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
-import { NextCertificateService } from "@/domain/certificates/application/certificate.service";
-import { NextCertificatesRepository } from "@/domain/certificates/infrastructure/db/next-certificates.repository";
+import { createNextCertificateDomain } from "@/domain/certificates/factory/next-certificate-domain.factory";
 
 // Next 16: params is a Promise
 export async function GET(
@@ -654,8 +775,10 @@ export async function GET(
   }
 
   // 2. Generate PDF (service validates ownership via userId+courseId pair)
-  const service = new NextCertificateService(new NextCertificatesRepository());
-  const pdfBuffer = await service.generatePdf(session.user.id, params.courseId);
+  const { courseId } = await params;
+  const pdfBuffer = await createNextCertificateDomain()
+    .certificates
+    .generatePdf(session.user.id, courseId);
 
   if (!pdfBuffer) {
     return new Response("Certificate not found", { status: 404 });
@@ -666,7 +789,7 @@ export async function GET(
     status: 200,
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="certificate-${params.courseId}.pdf"`,
+      "Content-Disposition": `attachment; filename="certificate-${courseId}.pdf"`,
       "Cache-Control": "private, no-store",
     },
   });
@@ -690,7 +813,7 @@ export async function GET(
 
 ## Step 7 — My Certificates Page (Protected RSC)
 
-**File**: `src/app/(protected)/certificates/page.tsx` [NEW]
+**File**: `src/app/(platform)/certificates/page.tsx` [NEW]
 
 > Pure Server Component. No `useEffect`, no client-side fetching. `CertificateModal` is the only Client island.
 
@@ -846,7 +969,7 @@ function InvalidResult({ certificateId }: { certificateId: string }) {
 
 ## Step 9 — Change Password Page
 
-**File**: `src/app/(protected)/settings/change-password/page.tsx` [NEW]
+**File**: `src/app/(platform)/settings/change-password/page.tsx` [NEW]
 
 > `"use client"` — this is a form with controlled inputs and async submission. Uses `better-auth`'s `authClient.changePassword()` directly. No custom API endpoint needed.
 
@@ -1004,6 +1127,15 @@ export default function ChangePasswordPage() {
 - [ ] `npx drizzle-kit push` applies successfully to local dev DB
 - [ ] SQL query confirms all columns exist with correct types and constraints
 - [ ] `UNIQUE` constraint on `certificate_id` is present
+- [ ] Compound unique index on `(user_id, course_id)` is present
+
+### Architecture / Design Patterns
+- [ ] No `next/*`, React, `headers()`, or `"use server"` imports exist under `src/domain/certificates/`
+- [ ] Server Actions and route handlers use `createNextCertificateDomain()` instead of constructing repositories directly
+- [ ] All Drizzle queries for certificates live in `NextCertificatesRepository`
+- [ ] DB rows are converted to public DTOs through mapper helpers, not inside pages/components
+- [ ] Re-running completion issuance for the same `(userId, courseId)` returns the existing certificate ID
+- [ ] Public verification invalid/not-found states return `CertificateVerificationResult` objects and do not throw expected-control-flow errors
 
 ### PDF Generation
 - [ ] `certificate-template.pdf` copied to `public/assets/` and committed
@@ -1039,4 +1171,4 @@ npx tsc --noEmit   # Must produce zero errors
 
 ---
 
-*Plan authored by Principal Full-Stack Engineer. Implementation order: Steps 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9. Each step is independently reviewable via PR diff.*
+*Plan authored by Principal Full-Stack Engineer. Implementation order: Steps 0 → 1 → 2 → 3 → 4 → 5 → 5a → 6 → 7 → 8 → 9. Each step is independently reviewable via PR diff.*
