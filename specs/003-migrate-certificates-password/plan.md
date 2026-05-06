@@ -15,23 +15,25 @@ Migrate three legacy features from the Express/React (MongoDB) stack to the Next
 2. **Certificate Verification** — public, SSR-rendered page for third-party authenticity checks.
 3. **Change Password** — authenticated settings page using `better-auth`'s secure `changePassword` API.
 
-No data migration from MongoDB is in scope. All new data lives in PostgreSQL via Drizzle ORM.
+**Data migration from MongoDB → PostgreSQL is in scope** and must run before this feature ships to production. All historical `CourseCompletion` documents will be migrated into `courses.course_completions`. After migration, the V2 system is the single source of truth — no dual-lookup, no MongoDB dependency.
 
 ---
 
 ## Technical Context
 
-| Dimension | Decision |
-|---|---|
-| Language | TypeScript 5.x — strict mode, no `any` |
-| Runtime | Next.js 14 App Router (Node.js runtime for route handlers) |
-| Database | PostgreSQL via Drizzle ORM — existing `pgSchema("courses")` |
-| Auth | `better-auth` — `auth.api.getSession({ headers })` pattern |
-| PDF | `pdf-lib` — buffer-based, no Node `Writable` streams |
-| ID format | UUIDs throughout — no MongoDB ObjectIds |
-| Styling | Tailwind CSS v4 + shadcn/ui components |
-| Server Actions | `"use server"` files in `src/actions/` (framework-agnostic domain layer) |
-| Template asset | `public/assets/certificate-template.pdf` — read via `process.cwd()` |
+| Dimension | Decision | Rationale |
+|---|---|---|
+| Language | TypeScript 5.x — strict mode, no `any` | Type safety at every layer |
+| Runtime | Next.js 14 App Router (Node.js runtime for route handlers) | Required for `fs`, `pdf-lib` |
+| Database | PostgreSQL via Drizzle ORM — existing `pgSchema("courses")` | Single source of truth post-migration |
+| Auth | `better-auth` — `auth.api.getSession({ headers })` pattern | Matches all existing protected routes |
+| PDF | `pdf-lib` — buffer-based, returns `Buffer` only | No `Writable` streams; works in App Router |
+| Certificate ID | `CERT-${randomUUID().toUpperCase()}` — Node built-in `crypto` | No external dep; UUID v4 collision-proof |
+| Legacy cert IDs | **Dropped** — only `CERT-<UUID>` format supported | Post-migration, legacy format does not exist |
+| Data fetching | **Server Actions only** — no TanStack Query, no SWR | All cert data needed at SSR time; zero client bundle cost |
+| Post-password-change | Inline success state → `router.push("/settings")` after 2s | Clear confirmation before navigation |
+| Styling | Tailwind CSS v4 + shadcn/ui components | Matches V2 design system |
+| Template asset | `public/assets/certificate-template.pdf` — read via `process.cwd()` | Reliable path in App Router |
 
 ---
 
@@ -312,7 +314,10 @@ import {
   CertificatePdfData,
 } from "../contracts";
 
-// Certificate ID regex — matches CERT-<UUID> format
+// Certificate ID regex — V2 format only: CERT-<UUID v4>
+// Legacy format (CERT-XXXXX-XXXXX) is NOT supported here.
+// All historical MongoDB certificates must be migrated to this format first
+// via the data-migration script (see specs/003-migrate-certificates-password/migration.md).
 const CERT_ID_REGEX =
   /^CERT-[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}$/i;
 
