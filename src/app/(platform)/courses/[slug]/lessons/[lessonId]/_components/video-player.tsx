@@ -101,25 +101,31 @@ export const VideoPlayer = React.forwardRef<MediaPlayerInstance, VideoPlayerProp
           className="w-full aspect-video"
           crossOrigin
           poster={poster}
-          onTimeUpdate={(detail) => {
-            if (typeof detail === "number") onTimeUpdate?.(detail);
+          onTimeUpdate={(event) => {
+            // VidStack events provide an object with currentTime
+            const time = typeof event === 'number' ? event : event?.currentTime;
+            if (typeof time === "number") onTimeUpdate?.(time);
           }}
-          onPause={(detail) => {
-            if (typeof detail === "number") onPause?.(detail);
+          onPause={(event) => {
+            const time = typeof event === 'number' ? event : event?.currentTime;
+            if (typeof time === "number") onPause?.(time);
           }}
-          onSeeked={(detail) => {
-            if (typeof detail === "number") {
-              onSeeked?.(seekFromRef.current, detail);
+          onSeeked={(event) => {
+            const time = typeof event === 'number' ? event : event?.currentTime;
+            if (typeof time === "number") {
+              onSeeked?.(seekFromRef.current, time);
             }
           }}
-          onSeeking={(detail) => {
-            if (typeof detail === "number") {
-              seekFromRef.current = detail;
+          onSeeking={(event) => {
+            const time = typeof event === 'number' ? event : event?.currentTime;
+            if (typeof time === "number") {
+              seekFromRef.current = time;
             }
           }}
           onEnd={() => onEnded?.()}
-          onDurationChange={(detail) => {
-            if (typeof detail === "number") onDurationChange?.(detail);
+          onDurationChange={(event) => {
+            const duration = typeof event === 'number' ? event : event?.duration;
+            if (typeof duration === "number") onDurationChange?.(duration);
           }}
         >
           <MediaProvider />

@@ -7,9 +7,9 @@ import { DrawerContent } from "@/components/ui/drawer-sheet";
 import { FloatingPanel } from "@/components/ui/glass-panel";
 import { ProgressRing } from "@/components/ui/progress-ring";
 import { useUILayoutStore } from "@/store/ui-layout-store";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { staggerContainer, staggerItem, sidebarFocusVariants } from "@/lib/motion-variants";
-import React from "react";
+import React, { useMemo } from "react";
 import type { LessonSummary } from "@/types/course.types";
 
 interface LessonSidebarProps {
@@ -25,10 +25,32 @@ const SidebarInner = React.memo(function SidebarInner({
   courseSlug,
   currentLessonId,
   lessons,
-  progress,
+  progress: currentProgress,
 }: Omit<LessonSidebarProps, "className">) {
   const { setDrawerOpen } = useUILayoutStore();
-  const completedCount = lessons.filter((l) => l.isCompleted).length;
+  
+  // Dynamically determine completion state for all lessons from localStorage
+  const lessonsWithStatus = useMemo(() => {
+    return lessons.map(lesson => {
+      if (typeof window === 'undefined') return lesson;
+      
+      const stored = localStorage.getItem(`progress:${courseSlug}:${lesson.id}`);
+      if (!stored) return lesson;
+      
+      try {
+        const data = JSON.parse(stored);
+        return {
+          ...lesson,
+          // Mark as completed if it has a completedAt timestamp or 100% progress
+          isCompleted: !!data.completedAt || (data.watchedPercentage >= 95)
+        };
+      } catch {
+        return lesson;
+      }
+    });
+  }, [lessons, courseSlug, currentProgress]);
+
+  const completedCount = lessonsWithStatus.filter((l) => l.isCompleted).length;
   const totalDuration = "1h 45m";
 
   return (
@@ -81,9 +103,9 @@ const SidebarInner = React.memo(function SidebarInner({
           animate="visible"
           className="flex flex-col gap-3 overflow-y-auto max-h-[50vh] xl:max-h-[60vh] pr-1.5 -mr-1.5 custom-scrollbar"
         >
-          {lessons.map((lesson, index) => {
+          {lessonsWithStatus.map((lesson, index) => {
             const isCurrent = lesson.id === currentLessonId;
-            const lessonProgress = progress?.[lesson.id] ?? 0;
+            const lessonProgress = currentProgress?.[lesson.id] ?? 0;
             const isInProgress = !lesson.isCompleted && !lesson.isLocked && lessonProgress > 0 && lessonProgress < 100;
 
             return (
@@ -95,7 +117,7 @@ const SidebarInner = React.memo(function SidebarInner({
                 className="relative rounded-2xl overflow-hidden group"
               >
                 <Link
-                  href={lesson.isLocked ? "#" : `/courses/${courseSlug}/lessons/${lesson.id}`}
+                  href={lesson.isLocked ? "#" : `/courses/${courseSlug}/lessons/${index + 1}`}
                   onClick={() => !lesson.isLocked && setDrawerOpen(false)}
                   className={cn(
                     "relative flex items-center gap-4 p-4 transition-all duration-500",
@@ -119,7 +141,7 @@ const SidebarInner = React.memo(function SidebarInner({
                   <div className="relative z-10 flex items-center gap-4 w-full">
                     {/* Status Indicator */}
                     <div className={cn(
-                      "relative w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all duration-700",
+                      "relative w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all duration-700 overflow-hidden",
                       isCurrent
                         ? "bg-blue-600 text-white shadow-[0_0_25px_rgba(37,99,235,0.5)]"
                         : lesson.isCompleted
@@ -135,15 +157,38 @@ const SidebarInner = React.memo(function SidebarInner({
                         />
                       )}
 
-                      {lesson.isLocked ? (
-                        <Lock className="w-4 h-4 opacity-50" />
-                      ) : lesson.isCompleted ? (
-                        <CheckCircle2 className="w-4 h-4" />
-                      ) : (
-                        <span className="text-[11px] font-black tracking-tighter tabular-nums">
-                          {(index + 1).toString().padStart(2, "0")}
-                        </span>
-                      )}
+                      <AnimatePresence mode="wait">
+                        {lesson.isLocked ? (
+                          <motion.div
+                            key="locked"
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.8 }}
+                          >
+                            <Lock className="w-4 h-4 opacity-50" />
+                          </motion.div>
+                        ) : lesson.isCompleted ? (
+                          <motion.div
+                            key="completed"
+                            initial={{ opacity: 0, scale: 0.5, rotate: -45 }}
+                            animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                            exit={{ opacity: 0, scale: 0.5 }}
+                            transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                          >
+                            <CheckCircle2 className="w-4 h-4" />
+                          </motion.div>
+                        ) : (
+                          <motion.span
+                            key="number"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            className="text-[11px] font-black tracking-tighter tabular-nums"
+                          >
+                            {(index + 1).toString().padStart(2, "0")}
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
                     </div>
 
                     {/* Text Content */}
