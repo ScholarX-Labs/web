@@ -3,7 +3,7 @@
 **Branch**: `003-migrate-certificates-password`  
 **Date**: 2026-05-06  
 **Author**: Principal Full-Stack Engineer  
-**Stack**: Next.js 14 App Router · Drizzle ORM · PostgreSQL · better-auth · pdf-lib · TypeScript 5.x
+**Stack**: Next.js **16.1.6** App Router · React 19.2.3 · Drizzle ORM · PostgreSQL · better-auth · pdf-lib · TypeScript 5.x
 
 ---
 
@@ -14,6 +14,7 @@ Migrate three legacy features from the Express/React (MongoDB) stack to the Next
 1. **My Certificates** — authenticated page listing completed courses with downloadable PDF certificates.
 2. **Certificate Verification** — public, SSR-rendered page for third-party authenticity checks.
 3. **Change Password** — authenticated settings page using `better-auth`'s secure `changePassword` API.
+4. **Completion Write Path** — service method + integration point that creates a `course_completions` row when a learner reaches 100%, so new certificates are generated continuously after launch.
 
 **Data migration from MongoDB → PostgreSQL is in scope** and must run before this feature ships to production. All historical `CourseCompletion` documents will be migrated into `courses.course_completions`. After migration, the V2 system is the single source of truth — no dual-lookup, no MongoDB dependency.
 
@@ -24,16 +25,17 @@ Migrate three legacy features from the Express/React (MongoDB) stack to the Next
 | Dimension | Decision | Rationale |
 |---|---|---|
 | Language | TypeScript 5.x — strict mode, no `any` | Type safety at every layer |
-| Runtime | Next.js 14 App Router (Node.js runtime for route handlers) | Required for `fs`, `pdf-lib` |
+| Runtime | Next.js **16.1.6** App Router (Node.js runtime for route handlers) | Actual installed version — React 19.2.3 |
 | Database | PostgreSQL via Drizzle ORM — existing `pgSchema("courses")` | Single source of truth post-migration |
 | Auth | `better-auth` — `auth.api.getSession({ headers })` pattern | Matches all existing protected routes |
-| PDF | `pdf-lib` — buffer-based, returns `Buffer` only | No `Writable` streams; works in App Router |
+| PDF | `pdf-lib` — buffer-based, returns `Buffer` only | Must `npm install pdf-lib` — not yet in package.json |
+| Template asset | **`public/certificate-template.svg`** — convert to PDF at build or use `pdf-lib` + SVG-to-PDF lib | `certificate-template.svg` already exists; no PDF present |
 | Certificate ID | `CERT-${randomUUID().toUpperCase()}` — Node built-in `crypto` | No external dep; UUID v4 collision-proof |
 | Legacy cert IDs | **Dropped** — only `CERT-<UUID>` format supported | Post-migration, legacy format does not exist |
 | Data fetching | **Server Actions only** — no TanStack Query, no SWR | All cert data needed at SSR time; zero client bundle cost |
 | Post-password-change | Inline success state → `router.push("/settings")` after 2s | Clear confirmation before navigation |
-| Styling | Tailwind CSS v4 + shadcn/ui components | Matches V2 design system |
-| Template asset | `public/assets/certificate-template.pdf` — read via `process.cwd()` | Reliable path in App Router |
+| Styling | Tailwind CSS v4 + shadcn/ui + sonner (already installed) | Matches V2 design system |
+| params type | **`Promise<{ ... }>`** + `await params` — Next 16 convention | See `src/app/(platform)/courses/[slug]/page.tsx` pattern |
 
 ---
 
@@ -61,7 +63,8 @@ src/
 │   │   └── index.ts                              [NEW] DTOs: UserCertificateDto, CertificateVerificationResult, CertificatePdfData
 │   ├── application/
 │   │   ├── certificate.errors.ts                 [NEW] NextCertificateError class
-│   │   └── certificate.service.ts                [NEW] Business logic, Drizzle-native, no Mongoose
+│   │   ├── certificate.service.ts                [NEW] Business logic, Drizzle-native, no Mongoose
+│   │   └── completion-writer.service.ts          [NEW] Write path — upsertCourseCompletion()
 │   └── infrastructure/
 │       └── db/
 │           └── next-certificates.repository.ts   [NEW] Drizzle queries against dbCourseCompletions
@@ -76,13 +79,13 @@ src/
 │   ├── api/certificates/[courseId]/download/
 │   │   └── route.ts                              [NEW] GET — streams PDF, auth-protected
 │   │
-│   ├── (protected)/
+│   ├── (platform)/                               ← CORRECT group — mirrors existing (platform)/courses
 │   │   ├── certificates/
 │   │   │   └── page.tsx                          [NEW] My Certificates RSC + Client modal island
 │   │   └── settings/change-password/
 │   │       └── page.tsx                          [NEW] Change Password Client Component form
 │   │
-│   └── certificates/verify/[certificateId]/
+│   └── certificates/verify/[certificateId]/      ← PUBLIC — outside (platform); must also be in proxy OPEN_ROUTES
 │       └── page.tsx                              [NEW] Public verify — pure RSC + generateMetadata
 │
 ├── components/certificates/
@@ -90,11 +93,50 @@ src/
 │   ├── certificate-modal.tsx                     [NEW] PDF preview modal (Client Component)
 │   └── certificate-verify-result.tsx             [NEW] Verification result UI (pure TSX, no hooks)
 │
-└── public/assets/
-    └── certificate-template.pdf                  [ADD] Copy from legacy /assets/templates/
+├── proxy.ts                                      [MODIFY] Add /certificates/verify/ to OPEN_ROUTES prefix check
+│
+└── public/
+    ├── certificate-template.svg                  [EXISTS] SVG source — convert to PDF via pdf-lib at build
+    └── assets/certificate-template.pdf           [GENERATE] Output of svg→pdf conversion (or place manually)
 ```
 
 > **Architectural Rule**: The `domain/` layer has zero Next.js imports. It is pure TypeScript — no `headers()`, no `"use server"`, no `next/*`. That boundary is enforced strictly. Server Actions in `src/actions/` are the only bridge.
+
+---
+
+## Step 0 — Prerequisites (Do First)
+
+### 0a. Install `pdf-lib`
+
+`pdf-lib` is **not in `package.json`**. Install it before any other step:
+
+```bash
+npm install pdf-lib
+```
+
+Verify the template asset is in place — `public/certificate-template.svg` exists. The service will rasterize it via `pdf-lib` or you can export a static PDF to `public/assets/certificate-template.pdf` first. The simplest approach:
+
+> **Decision**: Export `certificate-template.svg` → `certificate-template.pdf` using Inkscape, Figma, or Adobe. Place the result at `public/assets/certificate-template.pdf`. The service reads this PDF at runtime via `process.cwd()`.  
+> If the file is missing at startup, the `getTemplateBytes()` call throws — that is intentional and fails clearly.
+
+### 0b. Fix `proxy.ts` — Make Verify Route Public
+
+**File**: `src/proxy.ts`  
+**Action**: Add `/certificates/verify/` to the prefix check in `isPublicRoute`.
+
+```typescript
+// BEFORE (line 41-42):
+const isPublicRoute =
+  OPEN_ROUTES.has(pathname) || pathname.startsWith("/courses/");
+
+// AFTER:
+const isPublicRoute =
+  OPEN_ROUTES.has(pathname) ||
+  pathname.startsWith("/courses/") ||
+  pathname.startsWith("/certificates/verify/"); // ← P0 FIX: verify is public
+```
+
+> **Why this matters**: Without this, unauthenticated users (employers, LinkedIn visitors clicking a shared cert link) get redirected to `/auth/sign-in`. This would make the verification page completely useless for its primary use case.
 
 ---
 
@@ -498,6 +540,95 @@ export async function verifyCertificate(certificateId: string) {
 
 ---
 
+## Step 5a — Completion Write Path (New V2 Completions)
+
+**File**: `src/domain/certificates/application/completion-writer.service.ts` [NEW]
+
+> Solves F3: Without this, certificates stagnate after migration. Every time a learner finishes a course in V2, this service must be called to create the `course_completions` row — exactly once per (userId, courseId) pair.
+
+```typescript
+import { randomUUID }               from "crypto";
+import { NextCertificatesRepository } from "../infrastructure/db/next-certificates.repository";
+
+export class CompletionWriterService {
+  constructor(private readonly repo: NextCertificatesRepository) {}
+
+  /**
+   * Called by the lesson progress system when a learner hits 100%.
+   * Idempotent: a second call for the same (userId, courseId) is a no-op.
+   *
+   * @returns The certificateId (new or existing)
+   */
+  async upsertCourseCompletion(
+    userId: string,
+    courseId: string,
+    stats: { completedLessons: number; completionPercentage: number },
+  ): Promise<string> {
+    // Check for existing completion — do not overwrite a certificate already issued
+    const existing = await this.repo.findByUserAndCourse(userId, courseId);
+    if (existing?.completion.certificateId) {
+      return existing.completion.certificateId;
+    }
+
+    // Generate cert ID once — immutable after this point
+    const certificateId = `CERT-${randomUUID().toUpperCase()}`;
+
+    await this.repo.upsertCompletion({
+      userId,
+      courseId,
+      certificateId,
+      completedLessons: stats.completedLessons,
+      completionPercentage: stats.completionPercentage,
+    });
+
+    return certificateId;
+  }
+}
+```
+
+**Repository method to add** (`next-certificates.repository.ts`):
+
+```typescript
+async upsertCompletion(data: {
+  userId: string;
+  courseId: string;
+  certificateId: string;
+  completedLessons: number;
+  completionPercentage: number;
+}) {
+  await db
+    .insert(dbCourseCompletions)
+    .values({
+      ...data,
+      completedAt: new Date(),
+    })
+    .onConflictDoUpdate({
+      // Unique constraint: one completion per (userId, courseId)
+      target: [dbCourseCompletions.userId, dbCourseCompletions.courseId],
+      set: {
+        completedLessons: data.completedLessons,
+        completionPercentage: data.completionPercentage,
+        // certificateId is NOT updated — once issued, it never changes
+      },
+    });
+}
+```
+
+**Integration point** — wherever the lesson progress system marks a course as 100% complete, call:
+
+```typescript
+// e.g. inside an existing lesson-progress server action or API route
+const writer = new CompletionWriterService(new NextCertificatesRepository());
+await writer.upsertCourseCompletion(userId, courseId, {
+  completedLessons: totalCompleted,
+  completionPercentage: 100,
+});
+```
+
+> **Schema change required**: Add a compound unique constraint `(user_id, course_id)` to `dbCourseCompletions`. See Step 1 — the schema must include `.unique()` on the pair, not just on `certificateId`.
+
+---
+
 ## Step 6 — PDF Download Route Handler
 
 **File**: `src/app/api/certificates/[courseId]/download/route.ts` [NEW]
@@ -511,9 +642,10 @@ import { auth } from "@/lib/auth";
 import { NextCertificateService } from "@/domain/certificates/application/certificate.service";
 import { NextCertificatesRepository } from "@/domain/certificates/infrastructure/db/next-certificates.repository";
 
+// Next 16: params is a Promise
 export async function GET(
   req: Request,
-  { params }: { params: { courseId: string } },
+  { params }: { params: Promise<{ courseId: string }> },
 ) {
   // 1. Auth gate — protect from unauthenticated access
   const session = await auth.api.getSession({ headers: await headers() });
@@ -627,12 +759,14 @@ function EmptyState() {
 import type { Metadata } from "next";
 import { verifyCertificate } from "@/actions/certificates.actions";
 
+// Next 16 — params is a Promise; must await before use
 interface Props {
-  params: { certificateId: string };
+  params: Promise<{ certificateId: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const result = await verifyCertificate(params.certificateId);
+  const { certificateId } = await params;
+  const result = await verifyCertificate(certificateId);
   if (result.valid) {
     return {
       title: `Verified Certificate — ${result.studentName} | ScholarX`,
@@ -646,12 +780,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function CertificateVerifyPage({ params }: Props) {
-  const result = await verifyCertificate(params.certificateId);
+  const { certificateId } = await params; // ← Next 16 pattern
+  const result = await verifyCertificate(certificateId);
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-muted/30 px-4">
       <div className="w-full max-w-lg rounded-2xl bg-white p-8 shadow-lg">
-        {result.valid ? <ValidResult result={result} /> : <InvalidResult certificateId={params.certificateId} />}
+        {result.valid ? <ValidResult result={result} /> : <InvalidResult certificateId={certificateId} />}
         <footer className="mt-8 flex justify-center gap-6 text-sm text-muted-foreground">
           <a href="/">Visit ScholarX</a>
           <a href="/courses">Browse Courses</a>
