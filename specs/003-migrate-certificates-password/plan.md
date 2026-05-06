@@ -25,10 +25,11 @@ Migrate three legacy features from the Express/React (MongoDB) stack to the Next
 | Dimension | Decision | Rationale |
 |---|---|---|
 | Language | TypeScript 5.x — strict mode, no `any` | Type safety at every layer |
+| Package Manager | **pnpm** | Existing project standard (`pnpm-lock.yaml`) |
 | Runtime | Next.js **16.1.6** App Router (Node.js runtime for route handlers) | Actual installed version — React 19.2.3 |
 | Database | PostgreSQL via Drizzle ORM — existing `pgSchema("courses")` | Single source of truth post-migration |
 | Auth | `better-auth` — `auth.api.getSession({ headers })` pattern | Matches all existing protected routes |
-| PDF | `pdf-lib` — buffer-based, returns `Buffer` only | Must `npm install pdf-lib` — not yet in package.json |
+| PDF | `pdf-lib` — buffer-based, returns `Buffer` only | Must `pnpm add pdf-lib` — not yet in package.json |
 | Template asset | **`public/certificate-template.svg`** — convert to PDF at build or use `pdf-lib` + SVG-to-PDF lib | `certificate-template.svg` already exists; no PDF present |
 | Certificate ID | `CERT-${randomUUID().toUpperCase()}` — Node built-in `crypto` | No external dep; UUID v4 collision-proof |
 | Legacy cert IDs | **Dropped** — only `CERT-<UUID>` format supported | Post-migration, legacy format does not exist |
@@ -225,7 +226,7 @@ Define `CertificateUserRow` and `CertificateVerificationRow` as exported reposit
 `pdf-lib` is **not in `package.json`**. Install it before any other step:
 
 ```bash
-npm install pdf-lib
+pnpm add pdf-lib
 ```
 
 Verify the template asset is in place — `public/certificate-template.svg` exists. The service will rasterize it via `pdf-lib` or you can export a static PDF to `public/assets/certificate-template.pdf` first. The simplest approach:
