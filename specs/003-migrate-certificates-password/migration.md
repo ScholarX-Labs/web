@@ -15,6 +15,63 @@ The script is **not** a Next.js API route. It is a standalone Node.js TypeScript
 
 ---
 
+## P0 Fix: True Idempotency via Compound Unique Constraint
+
+> **Bug identified in review**: The original plan claimed idempotency by checking for existing `certificateId` values. However, when a MongoDB record has a `null` or legacy-format `certificateId`, the script **generates a new UUID each run**, bypassing the existing-cert check entirely. This allows duplicate `(userId, courseId)` rows to accumulate on re-runs.
+
+**Two-layer fix — both are required:**
+
+### Fix 1: Compound Unique Constraint on Schema
+
+Add to `dbCourseCompletions` in `courses-db.schema.ts`:
+
+```typescript
+export const dbCourseCompletions = coursesSchema.table(
+  "course_completions",
+  {
+    // ... all columns as defined in plan.md Step 1 ...
+  },
+  (table) => [
+    // Compound unique: one completion per (user, course) — this is the idempotency guarantee
+    unique("uq_completion_user_course").on(table.userId, table.courseId),
+  ],
+);
+```
+
+This means even if the script runs twice and generates two different `certificateId` values for the same user+course, the second `INSERT` hits a unique violation and is rejected via `.onConflictDoNothing()`.
+
+### Fix 2: `mongo_completion_id` Audit Column
+
+Add a `mongo_completion_id` column that stores the original MongoDB `_id`. This provides:
+- A second idempotency key that survives `null` `certificateId` cases
+- A permanent audit trail linking every Postgres row back to its MongoDB source
+
+```typescript
+// Add to dbCourseCompletions columns:
+mongoCompletionId: varchar("mongo_completion_id", { length: 24 }).unique(),
+// MongoDB ObjectId is always exactly 24 hex chars
+```
+
+The migration script then checks this column first:
+
+```typescript
+// In buildExistingCertIds() — also build a set of migrated mongo IDs
+async function buildExistingMongoIds(): Promise<Set<string>> {
+  const rows = await db
+    .select({ mongoId: dbCourseCompletions.mongoCompletionId })
+    .from(dbCourseCompletions);
+  return new Set(rows.map((r) => r.mongoId).filter(Boolean) as string[]);
+}
+
+// In the main loop — skip if mongo _id already exists in Postgres
+if (existingMongoIds.has(doc._id.toString())) {
+  stats.skipped++;
+  continue; // ← true idempotency — independent of certificateId format
+}
+```
+
+---
+
 ## The Core ID Mapping Problem
 
 This is the most critical part of the migration. MongoDB and PostgreSQL use completely different ID systems:
@@ -43,7 +100,7 @@ Before running the migration, verify:
 
 - [ ] MongoDB is accessible (connection string available)
 - [ ] PostgreSQL V2 DB is accessible (connection string available)
-- [ ] `courses.course_completions` table exists (`npx drizzle-kit push` has been run)
+- [ ] `courses.course_completions` table exists with **compound unique constraint** `(user_id, course_id)` and `mongo_completion_id` column (`npx drizzle-kit push` has been run after schema updates)
 - [ ] All users who had completions in MongoDB have re-registered in the V2 system (verified by email)
 - [ ] All courses from MongoDB exist in the PostgreSQL `courses.courses` table (verified by title)
 - [ ] A full MongoDB dump backup exists before running the script
