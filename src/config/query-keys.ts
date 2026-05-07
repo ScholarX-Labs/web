@@ -38,4 +38,57 @@ export const queryKeys = {
     status: (courseId: string) =>
       [...queryKeys.sales.all, "status", courseId] as const,
   },
+  admin: {
+    all: ["admin"] as const,
+    courses: {
+      all: () => [...queryKeys.admin.all, "courses"] as const,
+      lists: () => [...queryKeys.admin.courses.all(), "list"] as const,
+      list: (query: Record<string, unknown>) =>
+        [...queryKeys.admin.courses.lists(), query] as const,
+      details: () => [...queryKeys.admin.courses.all(), "detail"] as const,
+      detail: (id: string) =>
+        [...queryKeys.admin.courses.details(), id] as const,
+    },
+    lessons: {
+      all: (courseId: string) =>
+        [...queryKeys.admin.courses.detail(courseId), "lessons"] as const,
+      detail: (courseId: string, lessonId: string) =>
+        [...queryKeys.admin.lessons.all(courseId), lessonId] as const,
+    },
+    users: {
+      all: () => [...queryKeys.admin.all, "users"] as const,
+      lists: () => [...queryKeys.admin.users.all(), "list"] as const,
+      list: (query: Record<string, unknown>) =>
+        [...queryKeys.admin.users.lists(), query] as const,
+      detail: (id: string) =>
+        [...queryKeys.admin.users.all(), "detail", id] as const,
+    },
+    subscriptions: {
+      all: () => [...queryKeys.admin.all, "subscriptions"] as const,
+      list: (query: Record<string, unknown>) =>
+        [...queryKeys.admin.subscriptions.all(), "list", query] as const,
+      detail: (id: string) =>
+        [...queryKeys.admin.subscriptions.all(), "detail", id] as const,
+    },
+    inquiries: {
+      all: () => [...queryKeys.admin.all, "inquiries"] as const,
+      list: (query: Record<string, unknown>) =>
+        [...queryKeys.admin.inquiries.all(), "list", query] as const,
+      detail: (id: string) =>
+        [...queryKeys.admin.inquiries.all(), "detail", id] as const,
+    },
+    stats: {
+      all: () => [...queryKeys.admin.all, "stats"] as const,
+      overview: () => [...queryKeys.admin.stats.all(), "overview"] as const,
+    },
+    reports: {
+      all: () => [...queryKeys.admin.all, "reports"] as const,
+      revenue: (range: Record<string, unknown>) =>
+        [...queryKeys.admin.reports.all(), "revenue", range] as const,
+      users: (range: Record<string, unknown>) =>
+        [...queryKeys.admin.reports.all(), "users", range] as const,
+      courses: (range: Record<string, unknown>) =>
+        [...queryKeys.admin.reports.all(), "courses", range] as const,
+    },
+  },
 } as const;

@@ -39,6 +39,10 @@ export const dbCourses = coursesSchema.table("courses", {
   tags: jsonb("tags").$type<string[] | null>(),
   requiresForm: boolean("requires_form"),
   salesInquiry: boolean("sales_inquiry"),
+  isArchived: boolean("is_archived").default(false),
+  seoDescription: text("seo_description"),
+  seoKeywords: varchar("seo_keywords", { length: 500 }),
+  updatedBy: text("updated_by").references(() => dbUsers.id),
   createdAt: timestamp("created_at"),
   updatedAt: timestamp("updated_at"),
 });
