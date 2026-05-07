@@ -14,7 +14,6 @@ const course = {
   currentPrice: 0,
   isPublished: true,
   isSubscribed: false,
-  requiresForm: false,
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
 } satisfies Course;

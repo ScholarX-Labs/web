@@ -57,7 +57,7 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
   const { data: session } = useSession();
 
   // Extract the saved list from the user's session safely
-  const savedList: string[] = (session?.user as { savedOpportunities?: string[] })?.savedOpportunities || [];
+  const savedList: string[] = (session?.user as any)?.savedOpportunities || [];
   const isCurrentlySaved = savedList.includes(opportunity.id);
 
   // Optimistic UI state for instant feedback
@@ -85,7 +85,7 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
         if (!result.success) {
           toast.error(result.error || "Failed to update saved status. Please try again.");
         }
-      } catch {
+      } catch (error) {
         toast.error("An unexpected error occurred. Please try again.");
       }
     });

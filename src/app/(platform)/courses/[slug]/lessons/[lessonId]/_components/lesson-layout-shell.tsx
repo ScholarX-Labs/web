@@ -23,7 +23,6 @@ export function LessonLayoutShell({ children, lessonKey }: LessonLayoutShellProp
 
   // Prevent hydration errors
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 

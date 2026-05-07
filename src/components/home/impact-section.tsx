@@ -26,7 +26,7 @@ const StatCard = memo(function StatCard({
   suffix = "",
   animationDuration = 2000,
   delay = 0,
-}: Omit<StatItem, "id"> & { delay?: number }) {
+}: StatItem & { delay?: number }) {
   const [count, setCount] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);

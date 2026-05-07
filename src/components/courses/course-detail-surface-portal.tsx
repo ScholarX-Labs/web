@@ -24,7 +24,6 @@ export function CourseDetailSurfacePortal() {
   );
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
@@ -41,28 +40,24 @@ export function CourseDetailSurfacePortal() {
     };
   }, [isOpen, mounted]);
 
-  useEffect(() => {
-    if (!mounted || !course || !isOpen) return;
-
-    // #region agent log
-    agentLog({
-      runId: "pre",
-      hypothesisId: "H1",
-      location: "src/components/courses/course-detail-surface-portal.tsx:useEffect",
-      message: "CourseDetailSurfacePortal render gate",
-      data: {
-        isOpen,
-        hasCourse: Boolean(course),
-        intent,
-        isEnrollmentModalOpen,
-        hasOriginRect: Boolean(originRect),
-      },
-      timestamp: Date.now(),
-    });
-    // #endregion agent log
-  }, [mounted, course, isOpen, intent, isEnrollmentModalOpen, originRect]);
-
   if (!mounted || !course || !isOpen) return null;
+
+  // #region agent log
+  agentLog({
+    runId: "pre",
+    hypothesisId: "H1",
+    location: "src/components/courses/course-detail-surface-portal.tsx:render",
+    message: "CourseDetailSurfacePortal render gate",
+    data: {
+      isOpen,
+      hasCourse: Boolean(course),
+      intent,
+      isEnrollmentModalOpen,
+      hasOriginRect: Boolean(originRect),
+    },
+    timestamp: Date.now(),
+  });
+  // #endregion agent log
 
   return createPortal(
     <>

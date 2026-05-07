@@ -16,7 +16,7 @@ import {
   X,
 } from "lucide-react";
 import Image from "next/image";
-import { motion, type Variants } from "framer-motion";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useUiStore } from "@/stores/ui.store";
 import {
@@ -45,7 +45,7 @@ const COURSE_CATEGORIES = [
   { label: "Systems", icon: Cpu, colorClass: "text-purple-500", hoverBg: "hover:bg-purple-500 focus:bg-purple-500 dark:hover:bg-purple-500 dark:focus:bg-purple-500" },
 ] as const;
 
-const containerVariants: Variants = {
+const containerVariants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
@@ -53,7 +53,7 @@ const containerVariants: Variants = {
   },
 };
 
-const itemVariants: Variants = {
+const itemVariants = {
   hidden: { opacity: 0, y: 20 },
   show: {
     opacity: 1,
