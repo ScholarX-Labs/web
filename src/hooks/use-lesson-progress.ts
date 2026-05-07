@@ -289,6 +289,11 @@ export function useLessonProgress({
   // Ref to prevent multiple completion triggers
   const hasTriggeredCompletion = useRef(false);
 
+  // Reset completion trigger when lesson changes
+  useEffect(() => {
+    hasTriggeredCompletion.current = false;
+  }, [lessonId]);
+
   // Handle completion trigger
   useEffect(() => {
     if (!progress || !courseId || !onCourseCompleted) return;

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { memo, useRef } from "react";
-import { MediaPlayer, MediaProvider, type MediaPlayerInstance } from "@vidstack/react";
+import { MediaPlayer, MediaProvider, type MediaPlayerInstance, type MediaSeekingEvent } from "@vidstack/react";
 import {
   defaultLayoutIcons,
   DefaultVideoLayout,
@@ -118,9 +118,9 @@ export const VideoPlayer = React.forwardRef<MediaPlayerInstance, VideoPlayerProp
               onSeeked?.(seekFromRef.current, time);
             }
           }}
-          onSeeking={(event) => {
-            // seeking event usually has the time in the detail
-            const time = (event as any)?.currentTime ?? internalPlayerRef.current?.currentTime;
+          onSeeking={(event: MediaSeekingEvent) => {
+            // seeking event usually has the time in the detail.currentTime
+            const time = event.detail.currentTime ?? internalPlayerRef.current?.currentTime;
             if (typeof time === "number") {
               seekFromRef.current = time;
             }
