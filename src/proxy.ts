@@ -39,7 +39,9 @@ export function proxy(request: NextRequest) {
   const pathname = normalizePath(request.nextUrl.pathname);
   const isAuthRoute = pathname.startsWith("/auth");
   const isPublicRoute =
-    OPEN_ROUTES.has(pathname) || pathname.startsWith("/courses/");
+    OPEN_ROUTES.has(pathname) ||
+    /^\/courses\/[^/]+$/.test(pathname) ||
+    pathname.startsWith("/certificates/verify/");
 
   if (
     isAuthRoute &&
