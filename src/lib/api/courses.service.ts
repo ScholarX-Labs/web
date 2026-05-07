@@ -35,6 +35,7 @@ interface CourseItemResponse {
   urgencyText: string | null;
   tags: string[] | null;
   requiresForm: boolean | null;
+  salesInquiry: boolean | null;
   createdAt: string | null;
   updatedAt: string | null;
   instructor?: InstructorSummary;
@@ -97,6 +98,20 @@ interface ApplicationEnrollmentInitResponse {
     applicationUrl: string;
     nextAction: "application";
   };
+}
+
+interface InquirySubmitResponse {
+  inquiryId: string;
+  message: string;
+}
+
+interface InquiryRequestBody {
+  name: string;
+  email: string;
+  phone?: string;
+  message?: string;
+  sourceSurface?: EnrollmentSourceSurface;
+  idempotencyKey?: string;
 }
 
 interface EnrollmentRequestBody {
@@ -169,6 +184,7 @@ const mapCourse = (course: CourseItemResponse): Course => {
         }
       : undefined,
     requiresForm: course.requiresForm ?? false,
+    salesInquiry: course.salesInquiry ?? false,
     isPublished: course.isPublished,
     isSubscribed: course.isSubscribed ?? false,
     createdAt: course.createdAt ?? new Date().toISOString(),
@@ -706,6 +722,25 @@ export const coursesService = {
         error,
         "Failed to initialize application enrollment",
       );
+    }
+  },
+
+  submitInquiry: async (
+    courseId: string,
+    body?: InquiryRequestBody,
+    token?: string,
+  ): Promise<InquirySubmitResponse> => {
+    try {
+      return await postJson<InquirySubmitResponse>(
+        `/courses/${courseId}/inquiry`,
+        {
+          token,
+          body,
+        },
+        "Failed to submit inquiry",
+      );
+    } catch (error) {
+      return throwApiError(error, "Failed to submit inquiry");
     }
   },
 };

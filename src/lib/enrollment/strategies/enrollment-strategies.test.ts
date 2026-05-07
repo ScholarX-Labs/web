@@ -4,7 +4,9 @@ import { executeFreeEnroll } from "@/lib/enrollment/strategies/free-enroll.strat
 import { executePaidCheckoutInit } from "@/lib/enrollment/strategies/paid-checkout.strategy";
 import { executeFormApplicationInit } from "@/lib/enrollment/strategies/form-application.strategy";
 import { EnrollmentContext } from "@/lib/enrollment/types";
-import { ApiRequestError } from "@/lib/api/courses.service";
+import { ApiRequestError, coursesService } from "@/lib/api/courses.service";
+
+type ApiClient = typeof coursesService;
 
 const baseContext: EnrollmentContext = {
   command: {
@@ -20,17 +22,42 @@ const baseContext: EnrollmentContext = {
     slug: "course-1",
     title: "Course",
     requiresForm: false,
+    salesInquiry: false,
     price: 0,
   },
 };
 
+const createFakeApi = (overrides: Partial<ApiClient> = {}): ApiClient => ({
+  list: async () => ({ items: [], pagination: { currentPage: 1, totalPages: 1, totalCourses: 0, hasNextPage: false, hasPreviousPage: false } }),
+  getAll: async () => [],
+  getFeatured: async () => ({ items: [], pagination: { currentPage: 1, totalPages: 1, totalCourses: 0, hasNextPage: false, hasPreviousPage: false } }),
+  getScholarX: async () => ({ items: [], pagination: { currentPage: 1, totalPages: 1, totalCourses: 0, hasNextPage: false, hasPreviousPage: false } }),
+  search: async () => ({ items: [], pagination: { currentPage: 1, totalPages: 1, totalCourses: 0, hasNextPage: false, hasPreviousPage: false } }),
+  getById: async () => { throw new Error("not implemented"); },
+  getBySlug: async () => { throw new Error("not implemented"); },
+  getEnrollmentStatus: async () => null,
+  enrollFree: async () => { throw new Error("not implemented"); },
+  enrollPaid: async () => ({ clientSecret: "" }),
+  initPaidEnrollment: async () => { throw new Error("not implemented"); },
+  initApplicationEnrollment: async () => { throw new Error("not implemented"); },
+  submitInquiry: async () => ({ inquiryId: "test", message: "ok" }),
+  ...overrides,
+});
+
 test("executeFreeEnroll returns success payload", async () => {
-  const fakeApi = {
+  const fakeApi = createFakeApi({
     enrollFree: async () => ({
+      requestId: "mock",
+      success: true,
+      code: "OK",
       message: "ok",
-      data: { nextAction: "resume_learning" },
+      data: {
+        course: { id: "course-1", studentsCount: 0 },
+        userId: "user-1",
+        nextAction: "resume_learning",
+      },
     }),
-  };
+  });
 
   const result = await executeFreeEnroll(baseContext, fakeApi);
 
@@ -42,11 +69,11 @@ test("executeFreeEnroll returns success payload", async () => {
 });
 
 test("executePaidCheckoutInit maps API failure", async () => {
-  const fakeApi = {
+  const fakeApi = createFakeApi({
     initPaidEnrollment: async () => {
       throw new ApiRequestError("payment missing", 400, "payment_unavailable");
     },
-  };
+  });
 
   const result = await executePaidCheckoutInit(
     { ...baseContext, course: { ...baseContext.course, price: 10 } },
@@ -61,12 +88,19 @@ test("executePaidCheckoutInit maps API failure", async () => {
 });
 
 test("executeFormApplicationInit returns application redirect", async () => {
-  const fakeApi = {
+  const fakeApi = createFakeApi({
     initApplicationEnrollment: async () => ({
+      requestId: "mock",
+      success: true,
+      code: "OK",
       message: "application init",
-      data: { applicationUrl: "/apply/course-1" },
+      data: {
+        courseId: "course-1",
+        applicationUrl: "/apply/course-1",
+        nextAction: "application",
+      },
     }),
-  };
+  });
 
   const result = await executeFormApplicationInit(
     {

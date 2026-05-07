@@ -36,6 +36,7 @@ export interface Course {
 
   // Access and Status
   requiresForm: boolean;
+  salesInquiry?: boolean;
   isPublished: boolean;
 
   // Details

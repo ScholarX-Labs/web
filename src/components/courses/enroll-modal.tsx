@@ -9,10 +9,11 @@ import { Dialog } from "@/components/ui/dialog";
 import { useReducedMotion } from "framer-motion";
 import { useRouter, usePathname } from "next/navigation";
 import { ROUTES } from "@/lib/routes";
-import { executeEnrollment } from "@/lib/enrollment/enrollment-executor";
-import { EnrollmentContext } from "@/lib/enrollment/types";
+import { executeEnrollment, deriveEnrollmentMode } from "@/lib/enrollment/enrollment-executor";
+import { EnrollmentContext, EnrollmentMode } from "@/lib/enrollment/types";
 import { emitEnrollmentEvent } from "@/lib/telemetry/enrollment-events";
 import { EnrollModalContent } from "./enroll-modal-content";
+import { SalesInquiryForm } from "./sales-inquiry-form";
 import { agentLog } from "@/lib/debug/agent-log";
 
 interface EnrollModalProps {
@@ -47,6 +48,7 @@ export const buildEnrollmentExecutionContext = (
       slug: course.slug,
       title: course.title,
       requiresForm: course.requiresForm,
+      salesInquiry: course.salesInquiry,
       price: course.price,
     },
   };
@@ -72,9 +74,22 @@ export function EnrollModal({
   const [processingStep, setProcessingStep] = useState(0);
   const [showPriorityWindow, setShowPriorityWindow] = useState(false);
   const [isAnimatingOut, setIsAnimatingOut] = useState(false);
+  const [isInquirySubmitted, setIsInquirySubmitted] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
   const shouldReduceMotion = useReducedMotion();
+
+  const executionContext = useMemo(
+    () => buildEnrollmentExecutionContext(course, context),
+    [course, context],
+  );
+
+  const enrollmentMode: EnrollmentMode = useMemo(
+    () => deriveEnrollmentMode(executionContext),
+    [executionContext],
+  );
+
+  const isInquiry = enrollmentMode === "inquiry" && !isInquirySubmitted;
 
   const processingSteps = useMemo(
     () => [
@@ -212,6 +227,17 @@ export function EnrollModal({
     return () => window.clearInterval(timer);
   }, [isEnrolling, processingSteps]);
 
+  const handleInquirySuccess = () => {
+    setIsInquirySubmitted(true);
+    setLifecycle("success");
+    toast.success("Your inquiry has been submitted. Our team will contact you shortly.");
+  };
+
+  const handleInquiryError = (message: string) => {
+    setError();
+    toast.error(message);
+  };
+
   const handleEnrollFree = async () => {
     console.log("[ENROLL] handleEnrollFree clicked - courseId:", course.id);
     if (course.isSubscribed) {
@@ -223,7 +249,6 @@ export function EnrollModal({
       "[ANIMATION-DEBUG] Starting enrollment - will trigger exit animation",
     );
     const hadContext = Boolean(context);
-    const executionContext = buildEnrollmentExecutionContext(course, context);
     const enrollmentStartedAt = Date.now();
 
     if (!hadContext) {
@@ -273,6 +298,11 @@ export function EnrollModal({
         return;
       }
 
+      if (result.nextAction === "inquiry") {
+        toast.success("Please fill in your contact details below.");
+        return;
+      }
+
       // Keep processing visible long enough for a premium two-step transition
       const minProcessingDuration = shouldReduceMotion
         ? 220
@@ -299,7 +329,6 @@ export function EnrollModal({
       setError();
       toast.error("An unexpected error occurred. Please try again later.");
     } finally {
-      // Only reset to modal_open if we aren't in a success or terminal error state
       const currentLifecycle = useEnrollmentStore.getState().lifecycle;
       if (
         !isSuccessful &&
@@ -319,28 +348,48 @@ export function EnrollModal({
           <Dialog
             open={!isAnimatingOut && !showPriorityWindow}
             onOpenChange={(open) => {
-              if (!open && !isEnrolling) {
+              if (!open && !isEnrolling && !isInquiry) {
                 closeModal();
                 onDismiss?.();
               }
             }}
           >
-            <EnrollModalContent
-              course={course}
-              isEnrolling={isEnrolling}
-              isSuccess={isSuccess}
-              isPaid={isPaid}
-              shouldReduceMotion={Boolean(shouldReduceMotion)}
-              visualPhase={visualPhase}
-              keynoteTransition={keynoteTransition}
-              processingStep={processingStep}
-              processingSteps={processingSteps}
-              handleEnrollFree={handleEnrollFree}
-              closeModal={closeModal}
-              onDismiss={onDismiss}
-              setLifecycle={setLifecycle}
-              overlayClassName={overlayClassName}
-            />
+            {isInquiry && !isInquirySubmitted ? (
+              <div className="z-90 sm:max-w-md p-0 overflow-hidden rounded-3xl border border-slate-200/90 bg-white/95 shadow-[0_32px_95px_rgba(2,6,23,0.28)] ring-1 ring-slate-100/80 backdrop-blur-xl gap-0 dark:border-slate-800 dark:bg-card/95 dark:ring-slate-800/80">
+                <div className="p-6 pb-2">
+                  <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+                    Interested in {course.title}?
+                  </h2>
+                  <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+                    Share your details and our team will reach out to you.
+                  </p>
+                </div>
+                <SalesInquiryForm
+                  course={course}
+                  context={context}
+                  shouldReduceMotion={Boolean(shouldReduceMotion)}
+                  onSuccess={handleInquirySuccess}
+                  onError={handleInquiryError}
+                />
+              </div>
+            ) : (
+              <EnrollModalContent
+                course={course}
+                isEnrolling={isEnrolling}
+                isSuccess={isSuccess}
+                isPaid={isPaid}
+                shouldReduceMotion={Boolean(shouldReduceMotion)}
+                visualPhase={visualPhase}
+                keynoteTransition={keynoteTransition}
+                processingStep={processingStep}
+                processingSteps={processingSteps}
+                handleEnrollFree={handleEnrollFree}
+                closeModal={closeModal}
+                onDismiss={onDismiss}
+                setLifecycle={setLifecycle}
+                overlayClassName={overlayClassName}
+              />
+            )}
           </Dialog>
         </div>
       )}
@@ -352,7 +401,6 @@ export function EnrollModal({
         processingStep={processingStep}
         processingSteps={processingSteps}
         onClose={() => {
-          // Don't close while processing
           if (!isEnrolling) {
             setShowPriorityWindow(false);
             closeModal();

@@ -207,4 +207,43 @@ export class NextCourseEnrollmentService {
       },
     };
   }
+
+  async submitInquiry(
+    courseId: string,
+    userId: string,
+    params: {
+      name: string;
+      email: string;
+      phone?: string;
+      message?: string;
+      sourceSurface?: string;
+      idempotencyKey?: string;
+    },
+  ) {
+    const course = await this.repository.findByIdActive(courseId);
+
+    if (!course) {
+      throw new NextCourseError(
+        "COURSE_NOT_FOUND",
+        404,
+        `Course (ID: ${courseId}) not found for inquiry submission.`,
+        1001,
+      );
+    }
+
+    await this.assertUserActive(userId);
+
+    const result = await this.repository.createInquiry({
+      courseId,
+      userId,
+      name: params.name,
+      email: params.email,
+      phone: params.phone,
+      message: params.message,
+      sourceSurface: params.sourceSurface,
+      idempotencyKey: params.idempotencyKey,
+    });
+
+    return result;
+  }
 }
