@@ -24,7 +24,9 @@ export default async function CertificatesPage() {
 
       {certificates.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-3xl border-2 border-dashed bg-muted/30 py-24 text-center">
-          <div className="text-6xl mb-6">🏆</div>
+          <div aria-hidden="true" className="mb-6 text-6xl">
+            🏆
+          </div>
           <h2 className="text-2xl font-bold">No Certificates Yet</h2>
           <p className="mt-2 max-w-xs text-muted-foreground">
             Once you complete a course with 100% progress, your certificate will appear here.
