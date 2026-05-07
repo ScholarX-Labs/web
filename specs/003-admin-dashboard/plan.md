@@ -932,51 +932,99 @@ src/
 
 ### Phase 1: Foundation (Days 1-2)
 
-1. **Database migrations**: Add `lessons` table, `admin_audit_log` table, new columns to `courses`
-2. **Domain layer**: Add `src/domain/admin/` with contracts, Zod schemas, repository implementation
-3. **Audit logger**: Write-only service for admin audit trail
-4. **API handler**: `src/app/api/admin/[[...path]]/route.ts` with auth gate and route dispatching
-5. **Admin API client**: Typed fetch wrapper `src/lib/admin/admin-api-client.ts`
+1. **Database migrations**: Add `lessons` table, `admin_audit_log` table, new columns to `courses` (`isArchived`, `seoDescription`, `seoKeywords`, `updatedBy`)
+2. **Domain layer**: Add `src/domain/admin/` with:
+   - Contracts (`AdminRepository` interface, types)
+   - Zod validation schemas (all input types)
+   - Repository implementation (Drizzle ORM, paginated, transactional)
+   - Audit logger (append-only, JSON snapshots, PII-safe)
+3. **API handler**: `src/app/api/admin/[[...path]]/route.ts` with:
+   - Dependency-injected route factory (matching existing pattern)
+   - Role gate middleware
+   - Route dispatch to domain services
+   - Image upload endpoint via `handleImageUpload`
+4. **Admin API client**: Typed fetch wrapper `src/lib/admin/admin-api-client.ts`
+5. **Query key factory**: Extend `src/config/query-keys.ts` with admin namespace
+6. **Middleware update**: `src/middleware.ts` — guard `/admin/*` routes
 
-**Deliverable**: All admin read/write endpoints working via curl/API client. No UI yet.
+**Deliverable**: Full API surface working via curl. All endpoints authenticated and audited. No UI.
 
-### Phase 2: Core UI (Days 3-5)
+### Phase 2: Course & Lesson Management UI (Days 3-5)
 
-1. **Admin layout**: Sidebar, breadcrumbs, session guard
-2. **Data table**: Generic TanStack Table component with search, sort, pagination
-3. **Courses CRUD pages**: List, create, edit with `react-hook-form` + Zod
-4. **Lessons CRUD pages**: List with drag-and-drop reorder, create, edit
-5. **Toast feedback**: Success/error on every mutation
+1. **Admin layout**: Sidebar nav, breadcrumbs, header with admin identity + logout
+2. **Course list page**: TanStack DataTable with:
+   - Debounced search
+   - Column sorting/filtering
+   - Pagination
+   - Row actions dropdown (Edit, Add Lesson, Manage Lessons, Enroll User, Archive)
+   - Status badge (active/inactive/archived)
+3. **Tab-based course editor**:
+   - 6 tabs: Basic Info, Content, Pricing, Media, Audience, Settings
+   - Progress indicator in sidebar
+   - Live course card preview panel
+   - Image upload with drag-and-drop
+   - Markdown editor for description
+   - Optimistic concurrency (pass `expectedVersion`)
+4. **Lesson management**:
+   - Lesson list per course with drag-and-drop reorder
+   - Status/visibility badge
+   - Create/edit lesson forms
+   - Public/private toggle
 
-**Deliverable**: Admin can manage courses and lessons end-to-end.
+**Deliverable**: Admin can create, edit, archive courses and lessons with rich editor UX.
 
-### Phase 3: User & Inquiry Management (Days 6-7)
+### Phase 3: User & Subscription Management (Days 6-7)
 
-1. **User list + detail page**: Search, filter by role, view enrollment history
-2. **Role management**: Change user role with audit trail
-3. **Inquiry inbox**: Table with status filters, mark as contacted/resolved
-4. **Dashboard stats**: Overview card with key metrics
+1. **User list page**: DataTable with:
+   - Search by name/email
+   - Filter by role, block status
+   - Row actions: Edit, Block, Change Role, Suspend
+2. **User detail page**:
+   - Profile view with all fields
+   - Enrollment history table
+   - Subscription history
+   - Block/unblock with reason dialog
+   - Role change with audit note
+3. **Subscription list page**: DataTable with:
+   - Filter by status (active/cancelled/expired/refunded)
+   - Filter by course
+   - Subscription detail view
+   - Status update (cancel/refund)
+
+**Deliverable**: Admin can manage users, roles, blocks, and view subscriptions.
+
+### Phase 4: Inquiries, Reports & Dashboard (Days 8-9)
+
+1. **Dashboard page**: Stats grid (total users, courses, revenue, subscriptions) + recent activity feed + quick actions
+2. **Inquiry inbox**: DataTable with status filters, assignee view, detail page with response thread
+3. **Reports section**:
+   - Revenue report: monthly bar chart + date range picker
+   - User report: signup trends over time
+   - Course report: enrollment distribution, completion rates
+4. **Enrollment management dialogs**:
+   - Enroll user by email
+   - Revoke user from course with confirmation
 
 **Deliverable**: Full admin dashboard feature-complete.
 
-### Phase 4: Hardening (Days 8-9)
+### Phase 5: Hardening (Days 10-11)
 
-1. **Rate limiting**: Apply to mutation endpoints
-2. **Concurrency handling**: Optimistic locking via `updatedAt`
-3. **Error boundaries**: React error boundaries per section
-4. **Loading skeletons**: Skeleton states for every table and form
-5. **Empty states**: Graceful empty/zero states throughout
+1. **Rate limiting**: Token-bucket on all mutation endpoints (30 req/min/admin)
+2. **Concurrency handling**: All PATCH/PUT endpoints verify `expectedVersion` against DB `updatedAt`
+3. **Error boundaries**: Per-section React error boundaries with retry
+4. **Loading skeletons**: Table rows, stat cards, form sections
+5. **Empty states**: Every list view shows appropriate empty state with CTA
+6. **Accessibility audit**: Keyboard nav, ARIA labels, focus management, screen reader testing
 
 **Deliverable**: Production-ready admin dashboard.
 
-### Phase 5: Polish & Test (Day 10)
+### Phase 6: Test & Polish (Day 12)
 
-1. **Test suite**: Write domain service tests, API handler tests
-2. **Accessibility audit**: Keyboard navigation, screen reader labels, focus management
-3. **Performance**: Verify pagination works at scale (10K+ courses/users), add virtual scrolling if needed
-4. **Documentation**: README for admin module, API reference
-
-**Deliverable**: Shippable admin dashboard.
+1. **Domain service tests**: All 7 application services with mocked repository
+2. **API handler tests**: Request/response contract, auth gates, validation
+3. **E2E critical path**: Login as admin → create course → add lesson → verify public visibility
+4. **Performance**: Verify 10K+ rows in tables, add virtual scrolling if needed
+5. **Documentation**: API reference, component storybook, README
 
 ---
 
@@ -985,10 +1033,16 @@ src/
 - [ ] Admin session expires after 15 minutes of inactivity (reduced from default)
 - [ ] All admin API responses exclude `password`, `token`, and other sensitive fields
 - [ ] Role checks at middleware, layout, API handler, and domain layers
+- [ ] Admin cannot demote themselves from admin role
 - [ ] CORS restricted to production origin on admin endpoints
 - [ ] Audit log is append-only — no delete or update operations
-- [ ] Rate limiting on all mutation endpoints
+- [ ] Rate limiting on all mutation endpoints (30 req/min/admin)
 - [ ] Input validation at API boundary (Zod) prevents injection
+- [ ] Concurrency conflict detection prevents lost updates
 - [ ] Soft-delete for all resources — no hard deletes through UI
 - [ ] Idempotency keys on all create operations to prevent duplicates
 - [ ] XSS prevention: all rich text content sanitized before render
+- [ ] Image upload validates file type, size (max 5MB), and scans for malware
+- [ ] All PII redacted from audit log snapshots (password, token, phone optional)
+- [ ] Rate limiter uses Redis in production (in-memory fallback for dev)
+- [ ] SQL injection prevented via parameterized queries (Drizzle ORM)
