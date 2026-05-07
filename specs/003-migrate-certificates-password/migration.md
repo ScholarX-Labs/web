@@ -408,19 +408,28 @@ async function main() {
 
 async function flushBatch(
   batch: typeof dbCourseCompletions.$inferInsert[],
-  stats: { inserted: number },
+  stats: { inserted: number; skipped: number },
 ) {
   if (DRY_RUN) {
     console.log(`[DRY] Would insert ${batch.length} rows`);
     stats.inserted += batch.length;
     return;
   }
-  await db
+  const result = await db
     .insert(dbCourseCompletions)
     .values(batch)
-    .onConflictDoNothing(); // idempotent — skip if certificateId already exists
-  stats.inserted += batch.length;
-  console.log(`[INSERT] Inserted batch of ${batch.length} rows`);
+    .onConflictDoNothing()
+    .returning({ id: dbCourseCompletions.id });
+
+  const insertedCount = result.length;
+  const skippedCount  = batch.length - insertedCount;
+
+  stats.inserted += insertedCount;
+  stats.skipped  += skippedCount;
+
+  if (insertedCount > 0) {
+    console.log(`[INSERT] Inserted ${insertedCount} rows (skipped ${skippedCount} duplicates)`);
+  }
 }
 
 main().catch((err) => {
