@@ -4,7 +4,6 @@ import {
   createContext,
   useContext,
   useState,
-  useEffect,
   ReactNode,
 } from "react";
 import { useSearchParams } from "next/navigation";
@@ -29,22 +28,33 @@ export function OpportunitiesSearchProvider({
 }) {
   const searchParams = useSearchParams();
 
-  const [searchQuery, setSearchQuery] = useState<string>("");
-  const [filters, setFilters] = useState<Record<string, string[]>>({});
+  const [searchQuery, setSearchQuery] = useState<string>(
+    () => searchParams.get("q") || "",
+  );
+  const [filters, setFilters] = useState<Record<string, string[]>>(() => {
+    const initialFilters: Record<string, string[]> = {};
+    searchParams.forEach((value, key) => {
+      if (key !== "q" && key !== "page") {
+        initialFilters[key] = value ? value.split(",") : [];
+      }
+    });
+    return initialFilters;
+  });
 
-  useEffect(() => {
-    // Sync local state if searchParams change (e.g. from Back button or initial load)
+  const [prevParams, setPrevParams] = useState(searchParams);
+
+  if (searchParams !== prevParams) {
+    setPrevParams(searchParams);
     const newQuery = searchParams.get("q") || "";
-    setSearchQuery(newQuery);
-
     const nextFilters: Record<string, string[]> = {};
     searchParams.forEach((value, key) => {
       if (key !== "q" && key !== "page") {
         nextFilters[key] = value ? value.split(",") : [];
       }
     });
+    setSearchQuery(newQuery);
     setFilters(nextFilters);
-  }, [searchParams]);
+  }
 
   const updateFilter = (key: string, values: string[]) => {
     setFilters((prev) => ({ ...prev, [key]: values }));

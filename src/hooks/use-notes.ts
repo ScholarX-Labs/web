@@ -50,6 +50,7 @@ export function useNotes({ lessonId, courseSlug }: UseNotesOptions): UseNotesRet
   useEffect(() => {
     try {
       const stored = localStorage.getItem(storageKey);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (stored) setNotes(JSON.parse(stored));
     } catch { /* ignore */ }
   }, [storageKey]);

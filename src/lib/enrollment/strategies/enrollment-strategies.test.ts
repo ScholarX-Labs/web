@@ -27,8 +27,15 @@ const baseContext: EnrollmentContext = {
 test("executeFreeEnroll returns success payload", async () => {
   const fakeApi = {
     enrollFree: async () => ({
+      requestId: "req-free",
+      success: true,
+      code: "ok",
       message: "ok",
-      data: { nextAction: "resume_learning" },
+      data: {
+        nextAction: "resume_learning",
+        course: { id: "course-1", studentsCount: 100 },
+        userId: "user-1",
+      },
     }),
   };
 
@@ -63,8 +70,15 @@ test("executePaidCheckoutInit maps API failure", async () => {
 test("executeFormApplicationInit returns application redirect", async () => {
   const fakeApi = {
     initApplicationEnrollment: async () => ({
+      requestId: "req-app",
+      success: true,
+      code: "ok",
       message: "application init",
-      data: { applicationUrl: "/apply/course-1" },
+      data: {
+        applicationUrl: "/apply/course-1",
+        courseId: "course-1",
+        nextAction: "application" as const,
+      },
     }),
   };
 

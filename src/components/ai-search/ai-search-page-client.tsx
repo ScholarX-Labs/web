@@ -10,13 +10,30 @@ import {
   StreamingMessageSkeleton,
 } from "@/components/ai-search/chat-message";
 import { ChatInput } from "@/components/ai-search/chat-input";
-import { MOCK_OPPORTUNITIES } from "@/components/ai-search/mock-data";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAiChatStore } from "@/stores/ai-chat.store";
 
 function createId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+interface ApiResult {
+  id: string;
+  score: number;
+  opportunity: {
+    id?: string;
+    type?: { subtype?: string[] };
+    title?: string;
+    location?: string;
+    target_segment?: string[];
+    description?: string;
+    country?: string[];
+    deadline?: string;
+    fund_type?: string[];
+    is_remote?: boolean;
+    application_link?: string;
+  };
 }
 
 export function AiSearchPageClient() {
@@ -74,7 +91,7 @@ export function AiSearchPageClient() {
 
       const data = await response.json();
 
-      const mappedOpportunities = (data.results || []).map((result: any) => {
+      const mappedOpportunities = (data.results || []).map((result: ApiResult) => {
         const opp = result.opportunity;
         return {
           id: opp.id || result.id,
