@@ -16,6 +16,7 @@ Usage:
 import csv
 import json
 import os
+import re
 from datetime import datetime
 from pathlib import Path
 from core import search, DATA_DIR
@@ -460,7 +461,7 @@ def format_markdown(design_system: dict) -> str:
 
 # ============ MAIN ENTRY POINT ============
 def generate_design_system(query: str, project_name: str = None, output_format: str = "ascii", 
-                           persist: bool = False, page: str = None, output_dir: str = None) -> str:
+                           persist: bool = False, page: str = None, output_dir: str = None) -> tuple:
     """
     Main entry point for design system generation.
 
@@ -473,18 +474,42 @@ def generate_design_system(query: str, project_name: str = None, output_format: 
         output_dir: Optional output directory (defaults to current working directory)
 
     Returns:
-        Formatted design system string
+        Tuple of (formatted_output_string, persistence_info_dict_or_None)
     """
     generator = DesignSystemGenerator()
+    
+    # If project_name is missing, use sanitized query as fallback
+    if not project_name:
+        project_name = query.title()
+        
     design_system = generator.generate(query, project_name)
     
+    persistence_info = None
     # Persist to files if requested
     if persist:
-        persist_design_system(design_system, page, output_dir, query)
+        persistence_info = persist_design_system(design_system, page, output_dir, query)
 
+    output = ""
     if output_format == "markdown":
-        return format_markdown(design_system)
-    return format_ascii_box(design_system)
+        output = format_markdown(design_system)
+    else:
+        output = format_ascii_box(design_system)
+        
+    return output, persistence_info
+
+
+def sanitize_slug(text: str) -> str:
+    """Normalize and whitelist characters for safe path components."""
+    if not text:
+        return "default"
+    # Lowercase, replace spaces/separators with dashes
+    s = text.lower().strip()
+    s = re.sub(r'[\\/\s]+', '-', s)
+    # Remove any characters not in [a-z0-9_-]
+    s = re.sub(r'[^a-z0-9_-]', '', s)
+    # Strip leading/trailing dashes and dots
+    s = s.strip('-.')
+    return s or "default"
 
 
 # ============ PERSISTENCE FUNCTIONS ============
@@ -504,8 +529,8 @@ def persist_design_system(design_system: dict, page: str = None, output_dir: str
     base_dir = Path(output_dir) if output_dir else Path.cwd()
     
     # Use project name for project-specific folder
-    project_name = design_system.get("project_name", "default")
-    project_slug = project_name.lower().replace(' ', '-')
+    project_name = design_system.get("project_name")
+    project_slug = sanitize_slug(project_name)
     
     design_system_dir = base_dir / "design-system" / project_slug
     pages_dir = design_system_dir / "pages"
@@ -526,7 +551,8 @@ def persist_design_system(design_system: dict, page: str = None, output_dir: str
     
     # If page is specified, create page override file with intelligent content
     if page:
-        page_file = pages_dir / f"{page.lower().replace(' ', '-')}.md"
+        page_slug = sanitize_slug(page)
+        page_file = pages_dir / f"{page_slug}.md"
         page_content = format_page_override_md(design_system, page, page_query)
         with open(page_file, 'w', encoding='utf-8') as f:
             f.write(page_content)
@@ -534,6 +560,8 @@ def persist_design_system(design_system: dict, page: str = None, output_dir: str
     
     return {
         "status": "success",
+        "project_slug": project_slug,
+        "page_slug": sanitize_slug(page) if page else None,
         "design_system_dir": str(design_system_dir),
         "created_files": created_files
     }
@@ -1063,5 +1091,5 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    result = generate_design_system(args.query, args.project_name, args.format)
+    result, _ = generate_design_system(args.query, args.project_name, args.format)
     print(result)

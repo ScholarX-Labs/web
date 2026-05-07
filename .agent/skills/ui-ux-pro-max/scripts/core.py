@@ -91,6 +91,9 @@ _STACK_COLS = {
 
 AVAILABLE_STACKS = list(STACK_CONFIG.keys())
 
+# Whitelist for short domain-specific tokens that would otherwise be filtered out
+SHORT_WHITELIST = {"ui", "ux"}
+
 
 # ============ BM25 IMPLEMENTATION ============
 class BM25:
@@ -109,7 +112,7 @@ class BM25:
     def tokenize(self, text):
         """Lowercase, split, remove punctuation, filter short words"""
         text = re.sub(r'[^\w\s]', ' ', str(text).lower())
-        return [w for w in text.split() if len(w) > 2]
+        return [w for w in text.split() if len(w) > 2 or w in SHORT_WHITELIST]
 
     def fit(self, documents):
         """Build BM25 index from documents"""
