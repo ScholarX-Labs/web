@@ -4,7 +4,9 @@ import { executeFreeEnroll } from "@/lib/enrollment/strategies/free-enroll.strat
 import { executePaidCheckoutInit } from "@/lib/enrollment/strategies/paid-checkout.strategy";
 import { executeFormApplicationInit } from "@/lib/enrollment/strategies/form-application.strategy";
 import { EnrollmentContext } from "@/lib/enrollment/types";
-import { ApiRequestError } from "@/lib/api/courses.service";
+import { ApiRequestError, coursesService } from "@/lib/api/courses.service";
+
+type ApiClient = typeof coursesService;
 
 const baseContext: EnrollmentContext = {
   command: {
@@ -20,11 +22,12 @@ const baseContext: EnrollmentContext = {
     slug: "course-1",
     title: "Course",
     requiresForm: false,
+    salesInquiry: false,
     price: 0,
   },
 };
 
-const createFakeApi = (overrides: Record<string, unknown> = {}) => ({
+const createFakeApi = (overrides: Partial<ApiClient> = {}): ApiClient => ({
   list: async () => ({ items: [], pagination: { currentPage: 1, totalPages: 1, totalCourses: 0, hasNextPage: false, hasPreviousPage: false } }),
   getAll: async () => [],
   getFeatured: async () => ({ items: [], pagination: { currentPage: 1, totalPages: 1, totalCourses: 0, hasNextPage: false, hasPreviousPage: false } }),
@@ -44,8 +47,15 @@ const createFakeApi = (overrides: Record<string, unknown> = {}) => ({
 test("executeFreeEnroll returns success payload", async () => {
   const fakeApi = createFakeApi({
     enrollFree: async () => ({
+      requestId: "mock",
+      success: true,
+      code: "OK",
       message: "ok",
-      data: { nextAction: "resume_learning" },
+      data: {
+        course: { id: "course-1", studentsCount: 0 },
+        userId: "user-1",
+        nextAction: "resume_learning",
+      },
     }),
   });
 
@@ -80,8 +90,15 @@ test("executePaidCheckoutInit maps API failure", async () => {
 test("executeFormApplicationInit returns application redirect", async () => {
   const fakeApi = createFakeApi({
     initApplicationEnrollment: async () => ({
+      requestId: "mock",
+      success: true,
+      code: "OK",
       message: "application init",
-      data: { applicationUrl: "/apply/course-1" },
+      data: {
+        courseId: "course-1",
+        applicationUrl: "/apply/course-1",
+        nextAction: "application",
+      },
     }),
   });
 
