@@ -8,6 +8,8 @@ import {
   timestamp,
   numeric,
   jsonb,
+  index,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { user as dbUsers } from "@/db/schema/auth-schema";
 
@@ -56,22 +58,40 @@ export const dbSubscriptions = coursesSchema.table("subscriptions", {
   enrolledAt: timestamp("enrolled_at"),
 });
 
-export const dbInquiries = coursesSchema.table("inquiries", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  courseId: uuid("course_id")
-    .notNull()
-    .references(() => dbCourses.id),
-  userId: text("user_id")
-    .notNull()
-    .references(() => dbUsers.id, { onDelete: "cascade" }),
-  name: varchar("name", { length: 255 }).notNull(),
-  email: varchar("email", { length: 255 }).notNull(),
-  phone: varchar("phone", { length: 50 }),
-  message: text("message"),
-  status: varchar("status", { length: 50 }).default("pending"),
-  sourceSurface: varchar("source_surface", { length: 50 }),
-  idempotencyKey: varchar("idempotency_key", { length: 255 }),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
+export const dbInquiries = coursesSchema.table(
+  "inquiries",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    courseId: uuid("course_id")
+      .notNull()
+      .references(() => dbCourses.id),
+    userId: text("user_id")
+      .notNull()
+      .references(() => dbUsers.id, { onDelete: "cascade" }),
+    name: varchar("name", { length: 255 }).notNull(),
+    email: varchar("email", { length: 255 }).notNull(),
+    phone: varchar("phone", { length: 50 }),
+    message: text("message"),
+    status: varchar("status", { length: 50 }).default("pending").notNull(),
+    sourceSurface: varchar("source_surface", { length: 50 }),
+    idempotencyKey: varchar("idempotency_key", { length: 255 }),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+  },
+  (inquiries) => ({
+    inquiryUq: uniqueIndex("inquiries_course_user_idempotency_uq").on(
+      inquiries.courseId,
+      inquiries.userId,
+      inquiries.idempotencyKey,
+    ),
+    inquiryLookupIdx: index("inquiries_course_user_status_idx").on(
+      inquiries.courseId,
+      inquiries.userId,
+      inquiries.status,
+    ),
+    inquiryCreatedAtIdx: index("inquiries_created_at_idx").on(
+      inquiries.createdAt,
+    ),
+  }),
+);
 export { dbUsers };
