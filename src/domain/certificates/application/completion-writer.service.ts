@@ -1,4 +1,3 @@
-import { randomUUID } from "crypto";
 import { NextCertificatesRepository } from "../infrastructure/db/next-certificates.repository";
 
 export class CompletionWriterService {
@@ -21,17 +20,11 @@ export class CompletionWriterService {
       return existing.completion.certificateId;
     }
 
-    // Generate cert ID once — immutable after this point
-    const certificateId = `CERT-${randomUUID().toUpperCase()}`;
-
-    await this.repo.upsertCompletion({
+    return this.repo.upsertCompletion({
       userId,
       courseId,
-      certificateId,
       completedLessons: stats.completedLessons,
       completionPercentage: stats.completionPercentage,
     });
-
-    return certificateId;
   }
 }

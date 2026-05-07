@@ -1,4 +1,4 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
 import {
   dbCourseCompletions,
@@ -82,14 +82,14 @@ export class NextCertificatesRepository {
   async upsertCompletion(data: {
     userId: string;
     courseId: string;
-    certificateId: string;
     completedLessons: number;
     completionPercentage: number;
-  }) {
-    await db
+  }): Promise<string> {
+    const rows = await db
       .insert(dbCourseCompletions)
       .values({
         ...data,
+        certificateId: sql<string>`'CERT-' || upper(gen_random_uuid()::text)`,
         completedAt: new Date(),
       })
       .onConflictDoUpdate({
@@ -100,6 +100,14 @@ export class NextCertificatesRepository {
           completionPercentage: data.completionPercentage,
           // certificateId is NOT updated — once issued, it never changes
         },
-      });
+      })
+      .returning({ certificateId: dbCourseCompletions.certificateId });
+
+    const certificateId = rows[0]?.certificateId;
+    if (!certificateId) {
+      throw new Error("Failed to persist course completion certificate ID");
+    }
+
+    return certificateId;
   }
 }

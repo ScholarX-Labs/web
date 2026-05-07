@@ -9,7 +9,9 @@ import {
   numeric,
   jsonb,
   uniqueIndex,
+  check,
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 import { user as dbUsers } from "@/db/schema/auth-schema";
 
 export const coursesSchema = pgSchema("courses");
@@ -77,6 +79,14 @@ export const dbCourseCompletions = coursesSchema.table(
     uniqueIndex("course_completions_user_course_uidx").on(
       table.userId,
       table.courseId,
+    ),
+    check(
+      "completion_percentage_range",
+      sql`${table.completionPercentage} >= 0 AND ${table.completionPercentage} <= 100`,
+    ),
+    check(
+      "completed_lessons_non_negative",
+      sql`${table.completedLessons} >= 0`,
     ),
   ],
 );
