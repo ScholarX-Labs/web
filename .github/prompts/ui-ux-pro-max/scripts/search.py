@@ -73,7 +73,7 @@ if __name__ == "__main__":
 
     # Design system takes priority
     if args.design_system:
-        result, persistence_info = generate_design_system(
+        result = generate_design_system(
             args.query, 
             args.project_name, 
             args.format,
@@ -84,15 +84,14 @@ if __name__ == "__main__":
         print(result)
         
         # Print persistence confirmation
-        if args.persist and persistence_info:
-            project_slug = persistence_info.get("project_slug", "default")
-            page_slug = persistence_info.get("page_slug")
-            
+        if args.persist:
+            project_slug = args.project_name.lower().replace(' ', '-') if args.project_name else "default"
             print("\n" + "=" * 60)
             print(f"✅ Design system persisted to design-system/{project_slug}/")
             print(f"   📄 design-system/{project_slug}/MASTER.md (Global Source of Truth)")
-            if page_slug:
-                print(f"   📄 design-system/{project_slug}/pages/{page_slug}.md (Page Overrides)")
+            if args.page:
+                page_filename = args.page.lower().replace(' ', '-')
+                print(f"   📄 design-system/{project_slug}/pages/{page_filename}.md (Page Overrides)")
             print("")
             print(f"📖 Usage: When building a page, check design-system/{project_slug}/pages/[page].md first.")
             print(f"   If exists, its rules override MASTER.md. Otherwise, use MASTER.md.")

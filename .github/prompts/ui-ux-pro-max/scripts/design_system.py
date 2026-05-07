@@ -16,7 +16,6 @@ Usage:
 import csv
 import json
 import os
-import re
 from datetime import datetime
 from pathlib import Path
 from core import search, DATA_DIR
@@ -461,7 +460,7 @@ def format_markdown(design_system: dict) -> str:
 
 # ============ MAIN ENTRY POINT ============
 def generate_design_system(query: str, project_name: str = None, output_format: str = "ascii", 
-                           persist: bool = False, page: str = None, output_dir: str = None) -> tuple:
+                           persist: bool = False, page: str = None, output_dir: str = None) -> str:
     """
     Main entry point for design system generation.
 
@@ -474,42 +473,18 @@ def generate_design_system(query: str, project_name: str = None, output_format: 
         output_dir: Optional output directory (defaults to current working directory)
 
     Returns:
-        Tuple of (formatted_output_string, persistence_info_dict_or_None)
+        Formatted design system string
     """
     generator = DesignSystemGenerator()
-    
-    # If project_name is missing, use sanitized query as fallback
-    if not project_name:
-        project_name = query.title()
-        
     design_system = generator.generate(query, project_name)
     
-    persistence_info = None
     # Persist to files if requested
     if persist:
-        persistence_info = persist_design_system(design_system, page, output_dir, query)
+        persist_design_system(design_system, page, output_dir, query)
 
-    output = ""
     if output_format == "markdown":
-        output = format_markdown(design_system)
-    else:
-        output = format_ascii_box(design_system)
-        
-    return output, persistence_info
-
-
-def sanitize_slug(text: str) -> str:
-    """Normalize and whitelist characters for safe path components."""
-    if not text:
-        return "default"
-    # Lowercase, replace spaces/separators with dashes
-    s = text.lower().strip()
-    s = re.sub(r'[\\/\s]+', '-', s)
-    # Remove any characters not in [a-z0-9_-]
-    s = re.sub(r'[^a-z0-9_-]', '', s)
-    # Strip leading/trailing dashes and dots
-    s = s.strip('-.')
-    return s or "default"
+        return format_markdown(design_system)
+    return format_ascii_box(design_system)
 
 
 # ============ PERSISTENCE FUNCTIONS ============
@@ -529,8 +504,8 @@ def persist_design_system(design_system: dict, page: str = None, output_dir: str
     base_dir = Path(output_dir) if output_dir else Path.cwd()
     
     # Use project name for project-specific folder
-    project_name = design_system.get("project_name")
-    project_slug = sanitize_slug(project_name)
+    project_name = design_system.get("project_name", "default")
+    project_slug = project_name.lower().replace(' ', '-')
     
     design_system_dir = base_dir / "design-system" / project_slug
     pages_dir = design_system_dir / "pages"
@@ -544,30 +519,27 @@ def persist_design_system(design_system: dict, page: str = None, output_dir: str
     master_file = design_system_dir / "MASTER.md"
     
     # Generate and write MASTER.md
-    master_content = format_master_md(design_system, project_slug)
+    master_content = format_master_md(design_system)
     with open(master_file, 'w', encoding='utf-8') as f:
         f.write(master_content)
     created_files.append(str(master_file))
     
     # If page is specified, create page override file with intelligent content
     if page:
-        page_slug = sanitize_slug(page)
-        page_file = pages_dir / f"{page_slug}.md"
-        page_content = format_page_override_md(design_system, page, project_slug, page_query)
+        page_file = pages_dir / f"{page.lower().replace(' ', '-')}.md"
+        page_content = format_page_override_md(design_system, page, page_query)
         with open(page_file, 'w', encoding='utf-8') as f:
             f.write(page_content)
         created_files.append(str(page_file))
     
     return {
         "status": "success",
-        "project_slug": project_slug,
-        "page_slug": sanitize_slug(page) if page else None,
         "design_system_dir": str(design_system_dir),
         "created_files": created_files
     }
 
 
-def format_master_md(design_system: dict, project_slug: str = "default") -> str:
+def format_master_md(design_system: dict) -> str:
     """Format design system as MASTER.md with hierarchical override logic."""
     project = design_system.get("project_name", "PROJECT")
     pattern = design_system.get("pattern", {})
@@ -584,7 +556,7 @@ def format_master_md(design_system: dict, project_slug: str = "default") -> str:
     # Logic header
     lines.append("# Design System Master File")
     lines.append("")
-    lines.append(f"> **LOGIC:** When building a specific page, first check `design-system/{project_slug}/pages/[page-name].md`.")
+    lines.append("> **LOGIC:** When building a specific page, first check `design-system/pages/[page-name].md`.")
     lines.append("> If that file exists, its rules **override** this Master file.")
     lines.append("> If not, strictly follow the rules below.")
     lines.append("")
@@ -830,7 +802,7 @@ def format_master_md(design_system: dict, project_slug: str = "default") -> str:
     return "\n".join(lines)
 
 
-def format_page_override_md(design_system: dict, page_name: str, project_slug: str = "default", page_query: str = None) -> str:
+def format_page_override_md(design_system: dict, page_name: str, page_query: str = None) -> str:
     """Format a page-specific override file with intelligent AI-generated content."""
     project = design_system.get("project_name", "PROJECT")
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -847,7 +819,7 @@ def format_page_override_md(design_system: dict, page_name: str, project_slug: s
     lines.append(f"> **Generated:** {timestamp}")
     lines.append(f"> **Page Type:** {page_overrides.get('page_type', 'General')}")
     lines.append("")
-    lines.append(f"> ⚠️ **IMPORTANT:** Rules in this file **override** the Master file (`design-system/{project_slug}/MASTER.md`).")
+    lines.append("> ⚠️ **IMPORTANT:** Rules in this file **override** the Master file (`design-system/MASTER.md`).")
     lines.append("> Only deviations from the Master are documented here. For all other rules, refer to the Master.")
     lines.append("")
     lines.append("---")
@@ -1091,5 +1063,5 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    result, _ = generate_design_system(args.query, args.project_name, args.format)
+    result = generate_design_system(args.query, args.project_name, args.format)
     print(result)

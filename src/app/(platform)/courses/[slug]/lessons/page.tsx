@@ -13,7 +13,7 @@ interface LessonsRootPageProps {
 export default async function LessonsRootPage({ params }: LessonsRootPageProps) {
   const { slug } = await params;
   
-  // Always redirect to the first lesson (1)
+  // Always redirect to the first lesson (lesson-1)
   // In a more complex app, this could check the user's last watched lesson
-  redirect(ROUTES.LESSON(slug, "1"));
+  redirect(ROUTES.LESSON(slug, "lesson-1"));
 }

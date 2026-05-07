@@ -8,7 +8,6 @@ import { isDevAuthBypassEnabled } from "@/config/dev-auth-bypass";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { GlobalShellExclusions } from "@/components/global-shell-exclusions";
-import { RootMain } from "@/components/root-main";
 import SignoutButton from "./auth/_components/SignoutButton";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -35,7 +34,6 @@ export default async function RootLayout({
 }>) {
   const currentUser = await getSession();
   const IsDevShowSignOutButton = false; // Set to true to show sign-out button in dev when bypass is enabled
-  const isLoggedIn = !!currentUser?.session?.id;
 
   return (
     <html lang="en" className={inter.variable}>
@@ -44,7 +42,7 @@ export default async function RootLayout({
       >
         <div vaul-drawer-wrapper="" className="min-h-screen flex flex-col">
           <GlobalShellExclusions>
-            <Header isLoggedIn={isLoggedIn} />
+            <Header />
           </GlobalShellExclusions>
           <AppProviders>
             <TooltipProvider>
@@ -54,7 +52,7 @@ export default async function RootLayout({
                   bypassed.
                 </div>
               ) : null}
-              <RootMain>{children}</RootMain>
+              <main className="flex-1 flex flex-col">{children}</main>
             </TooltipProvider>
           </AppProviders>
           <GlobalShellExclusions>

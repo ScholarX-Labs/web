@@ -152,7 +152,7 @@ export function CourseHero({ course }: CourseHeroProps) {
             {/* Note: In a real app we'd attach a ref here to track intersection for sticky bar */}
             {isEnrolled ? (
               <Link
-                href={ROUTES.LESSON(course.slug, "1")}
+                href={ROUTES.LESSON(course.slug, "lesson-1")}
                 className="group relative flex items-center justify-center gap-2 bg-linear-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white text-base font-bold rounded-full py-4 px-8 shadow-xl shadow-emerald-500/20 transition-all active:scale-[0.98] w-fit overflow-hidden"
               >
                 <span className="absolute inset-0 w-full h-full bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />

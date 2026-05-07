@@ -4,9 +4,9 @@ import { Suspense } from "react";
 import { LessonLayoutShell } from "./_components/lesson-layout-shell";
 import { LessonHeader } from "./_components/lesson-header";
 import { LessonClientBridge } from "./_components/lesson-client-bridge";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { LessonSummary } from "@/types/course.types";
 import { requireSession } from "@/lib/dal";
-import { createNextCourseDomain } from "@/domain/courses";
 
 interface LessonPageProps {
   params: Promise<{ slug: string; lessonId: string }>;
@@ -28,6 +28,7 @@ const MOCK_LESSONS: LessonSummary[] = [
     id: "lesson-1",
     title: "Introduction to the Core Concepts",
     duration: "5:23",
+    isCompleted: true,
     media: {
       // Public sample video for local/dev preview
       src: "https://youtu.be/55NvZjUZIO8",
@@ -39,6 +40,7 @@ const MOCK_LESSONS: LessonSummary[] = [
     id: "lesson-2",
     title: "Setting up your Environment",
     duration: "12:45",
+    isCompleted: true,
     media: {
       src: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
       poster: "https://placehold.co/1280x720/png?text=Lesson+2",
@@ -57,7 +59,7 @@ const MOCK_LESSONS: LessonSummary[] = [
     id: "lesson-4",
     title: "Advanced Component Patterns",
     duration: "25:30",
-    isLocked: false,
+    isLocked: true,
     media: {
       src: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
       poster: "https://placehold.co/1280x720/png?text=Lesson+4",
@@ -67,7 +69,7 @@ const MOCK_LESSONS: LessonSummary[] = [
     id: "lesson-5",
     title: "Performance Optimization Tricks",
     duration: "14:15",
-    isLocked: false,
+    isLocked: true,
     media: {
       src: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
       poster: "https://placehold.co/1280x720/png?text=Lesson+5",
@@ -78,8 +80,7 @@ const MOCK_LESSONS: LessonSummary[] = [
 export default async function LessonPage({ params }: LessonPageProps) {
   const { slug, lessonId } = await params;
 
-  // Fix: Assign the result of requireSession to session
-  const session = await requireSession();
+  await requireSession();
 
   // Robust lookup: allow routes that use numeric lesson ids (e.g. /lessons/1)
   // as well as full ids like "lesson-1". Prefer exact match first, then
@@ -98,17 +99,6 @@ export default async function LessonPage({ params }: LessonPageProps) {
 
   // If the lesson doesn't exist or is locked, return a 404.
   if (!currentLesson || currentLesson.isLocked) {
-    notFound();
-  }
-
-  // Fetch real course data to get the course ID
-  let course;
-  try {
-    const courseDomain = createNextCourseDomain();
-    // Use session.user.id correctly
-    course = await courseDomain.catalog.getBySlug(slug, session?.user?.id);
-  } catch {
-    // If the course doesn't exist, we can't really show lessons
     notFound();
   }
 
@@ -167,7 +157,6 @@ export default async function LessonPage({ params }: LessonPageProps) {
           <LessonClientBridge
             lessonId={currentLesson.id}
             courseSlug={slug}
-            courseId={course.id} // Pass real courseId here
             lessonTitle={currentLesson.title}
             lessonIndex={lessonIndex + 1}
             totalLessons={MOCK_LESSONS.length}
