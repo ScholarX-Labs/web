@@ -4,7 +4,7 @@ import { buildEnrollmentExecutionContext } from "@/components/courses/enroll-mod
 import { Course } from "@/types/course.types";
 import { EnrollmentContext } from "@/lib/enrollment/types";
 
-const course = {
+const course: Course = {
   id: "course-1",
   slug: "course-1",
   title: "Course 1",
@@ -14,9 +14,10 @@ const course = {
   currentPrice: 0,
   isPublished: true,
   isSubscribed: false,
+  requiresForm: false,
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
-} satisfies Course;
+};
 
 test("buildEnrollmentExecutionContext reuses provided context", () => {
   const existing: EnrollmentContext = {

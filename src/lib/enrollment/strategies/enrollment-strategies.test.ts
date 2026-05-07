@@ -24,13 +24,30 @@ const baseContext: EnrollmentContext = {
   },
 };
 
+const createFakeApi = (overrides: Record<string, unknown> = {}) => ({
+  list: async () => ({ items: [], pagination: { currentPage: 1, totalPages: 1, totalCourses: 0, hasNextPage: false, hasPreviousPage: false } }),
+  getAll: async () => [],
+  getFeatured: async () => ({ items: [], pagination: { currentPage: 1, totalPages: 1, totalCourses: 0, hasNextPage: false, hasPreviousPage: false } }),
+  getScholarX: async () => ({ items: [], pagination: { currentPage: 1, totalPages: 1, totalCourses: 0, hasNextPage: false, hasPreviousPage: false } }),
+  search: async () => ({ items: [], pagination: { currentPage: 1, totalPages: 1, totalCourses: 0, hasNextPage: false, hasPreviousPage: false } }),
+  getById: async () => { throw new Error("not implemented"); },
+  getBySlug: async () => { throw new Error("not implemented"); },
+  getEnrollmentStatus: async () => null,
+  enrollFree: async () => { throw new Error("not implemented"); },
+  enrollPaid: async () => ({ clientSecret: "" }),
+  initPaidEnrollment: async () => { throw new Error("not implemented"); },
+  initApplicationEnrollment: async () => { throw new Error("not implemented"); },
+  submitInquiry: async () => ({ inquiryId: "test", message: "ok" }),
+  ...overrides,
+});
+
 test("executeFreeEnroll returns success payload", async () => {
-  const fakeApi = {
+  const fakeApi = createFakeApi({
     enrollFree: async () => ({
       message: "ok",
       data: { nextAction: "resume_learning" },
     }),
-  };
+  });
 
   const result = await executeFreeEnroll(baseContext, fakeApi);
 
@@ -42,11 +59,11 @@ test("executeFreeEnroll returns success payload", async () => {
 });
 
 test("executePaidCheckoutInit maps API failure", async () => {
-  const fakeApi = {
+  const fakeApi = createFakeApi({
     initPaidEnrollment: async () => {
       throw new ApiRequestError("payment missing", 400, "payment_unavailable");
     },
-  };
+  });
 
   const result = await executePaidCheckoutInit(
     { ...baseContext, course: { ...baseContext.course, price: 10 } },
@@ -61,12 +78,12 @@ test("executePaidCheckoutInit maps API failure", async () => {
 });
 
 test("executeFormApplicationInit returns application redirect", async () => {
-  const fakeApi = {
+  const fakeApi = createFakeApi({
     initApplicationEnrollment: async () => ({
       message: "application init",
       data: { applicationUrl: "/apply/course-1" },
     }),
-  };
+  });
 
   const result = await executeFormApplicationInit(
     {

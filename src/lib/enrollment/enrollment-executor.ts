@@ -4,7 +4,6 @@ import {
   EnrollmentMode,
 } from "@/lib/enrollment/types";
 import { executeFreeEnroll } from "@/lib/enrollment/strategies/free-enroll.strategy";
-import { executePaidCheckoutInit } from "@/lib/enrollment/strategies/paid-checkout.strategy";
 import { executeFormApplicationInit } from "@/lib/enrollment/strategies/form-application.strategy";
 import { emitEnrollmentEvent } from "@/lib/telemetry/enrollment-events";
 
@@ -12,7 +11,7 @@ export const deriveEnrollmentMode = (
   context: EnrollmentContext,
 ): EnrollmentMode => {
   if (context.course.requiresForm) return "application";
-  if ((context.course.price ?? 0) > 0) return "paid";
+  if ((context.course.price ?? 0) > 0) return "inquiry";
   return "free";
 };
 
@@ -35,9 +34,14 @@ export const executeEnrollment = async (
   if (mode === "free") {
     console.log("[EXECUTOR] executing free enroll strategy");
     result = await executeFreeEnroll(context);
-  } else if (mode === "paid") {
-    console.log("[EXECUTOR] executing paid checkout strategy");
-    result = await executePaidCheckoutInit(context);
+  } else if (mode === "inquiry") {
+    console.log("[EXECUTOR] inquiry mode — deferring to UI for form data");
+    result = {
+      ok: true,
+      mode: "inquiry",
+      nextAction: "inquiry",
+      message: "Please fill in your contact details",
+    };
   } else {
     console.log("[EXECUTOR] executing form application strategy");
     result = await executeFormApplicationInit(context);

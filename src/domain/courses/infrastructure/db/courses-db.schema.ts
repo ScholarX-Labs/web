@@ -36,6 +36,7 @@ export const dbCourses = coursesSchema.table("courses", {
   urgencyText: varchar("urgency_text", { length: 255 }),
   tags: jsonb("tags").$type<string[] | null>(),
   requiresForm: boolean("requires_form"),
+  salesInquiry: boolean("sales_inquiry"),
   createdAt: timestamp("created_at"),
   updatedAt: timestamp("updated_at"),
 });
@@ -53,5 +54,24 @@ export const dbSubscriptions = coursesSchema.table("subscriptions", {
   isActive: boolean("is_active"),
   paymentId: varchar("payment_id", { length: 255 }),
   enrolledAt: timestamp("enrolled_at"),
+});
+
+export const dbInquiries = coursesSchema.table("inquiries", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  courseId: uuid("course_id")
+    .notNull()
+    .references(() => dbCourses.id),
+  userId: text("user_id")
+    .notNull()
+    .references(() => dbUsers.id, { onDelete: "cascade" }),
+  name: varchar("name", { length: 255 }).notNull(),
+  email: varchar("email", { length: 255 }).notNull(),
+  phone: varchar("phone", { length: 50 }),
+  message: text("message"),
+  status: varchar("status", { length: 50 }).default("pending"),
+  sourceSurface: varchar("source_surface", { length: 50 }),
+  idempotencyKey: varchar("idempotency_key", { length: 255 }),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 export { dbUsers };

@@ -2,6 +2,7 @@ import { and, asc, count, eq, ilike, inArray, sql } from "drizzle-orm";
 import { db } from "@/db";
 import {
   dbCourses,
+  dbInquiries,
   dbSubscriptions,
   dbUsers,
 } from "@/domain/courses/infrastructure/db/courses-db.schema";
@@ -35,6 +36,7 @@ export interface FlatCourseRecord {
   urgencyText: string | null;
   tags: string[] | null;
   requiresForm: boolean | null;
+  salesInquiry: boolean | null;
   createdAt: string | null;
   updatedAt: string | null;
   instructor: {
@@ -84,6 +86,7 @@ const mapCourseRecord = (row: {
   urgencyText: row.course.urgencyText,
   tags: row.course.tags,
   requiresForm: row.course.requiresForm,
+  salesInquiry: row.course.salesInquiry,
   createdAt: row.course.createdAt ? row.course.createdAt.toISOString() : null,
   updatedAt: row.course.updatedAt ? row.course.updatedAt.toISOString() : null,
   instructor: row.instructor
@@ -211,6 +214,34 @@ export class NextCoursesRepository {
       isActive: true,
       paymentId: params.idempotencyKey ?? "free-enrollment",
     });
+  }
+
+  async createInquiry(params: {
+    courseId: string;
+    userId: string;
+    name: string;
+    email: string;
+    phone?: string;
+    message?: string;
+    sourceSurface?: string;
+    idempotencyKey?: string;
+  }) {
+    const [row] = await db
+      .insert(dbInquiries)
+      .values({
+        courseId: params.courseId,
+        userId: params.userId,
+        name: params.name,
+        email: params.email,
+        phone: params.phone ?? null,
+        message: params.message ?? null,
+        sourceSurface: params.sourceSurface ?? null,
+        idempotencyKey: params.idempotencyKey ?? null,
+        status: "pending",
+      })
+      .returning({ id: dbInquiries.id });
+
+    return row;
   }
 
   async findUserById(userId: string) {
