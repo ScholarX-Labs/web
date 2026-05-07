@@ -4,6 +4,7 @@ import {
   EnrollmentExecutionResult,
 } from "@/lib/enrollment/types";
 import { mapEnrollmentError } from "@/lib/enrollment/error-mapper";
+import { emitEnrollmentEvent } from "@/lib/telemetry/enrollment-events";
 
 export interface InquiryFormData {
   name: string;
@@ -25,6 +26,14 @@ export const executeSalesInquiry = async (
       message: formData.message,
       sourceSurface: context.command.source,
       idempotencyKey: context.command.correlationId,
+    });
+
+    emitEnrollmentEvent({
+      event: "enroll_submission_succeeded",
+      timestamp: Date.now(),
+      courseId: context.course.id,
+      sourceSurface: context.command.source,
+      correlationId: context.command.correlationId,
     });
 
     return {
