@@ -15,6 +15,13 @@
       "when": 1778100520012,
       "tag": "0001_thick_typhoid_mary",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1778145571149,
+      "tag": "0002_special_molten_man",
+      "breakpoints": true
     }
   ]
 }
