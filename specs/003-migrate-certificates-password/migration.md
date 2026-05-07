@@ -258,6 +258,20 @@ async function buildExistingCertIds(): Promise<Set<string>> {
   return set;
 }
 
+async function buildExistingMongoIds(): Promise<Set<string>> {
+  // Load all mongoCompletionIds already in Postgres to skip duplicates (idempotency)
+  const rows = await db
+    .select({ mongoId: dbCourseCompletions.mongoCompletionId })
+    .from(dbCourseCompletions);
+
+  const set = new Set<string>();
+  for (const row of rows) {
+    if (row.mongoId) set.add(row.mongoId);
+  }
+  console.log(`[MAP] Found ${set.size} existing MongoDB completions in PostgreSQL (will skip)`);
+  return set;
+}
+
 // ─── Step 2: Fetch all completions from MongoDB ──────────────────────────────
 interface MongoCompletion {
   _id: ObjectId;
@@ -289,9 +303,10 @@ async function main() {
   const mongoDb = mongo.db();
 
   // Build lookup maps
-  const pgUserMap    = await buildPgUserMap();
-  const pgCourseMap  = await buildPgCourseMap();
-  const existingCerts = await buildExistingCertIds();
+  const pgUserMap       = await buildPgUserMap();
+  const pgCourseMap     = await buildPgCourseMap();
+  const existingCerts   = await buildExistingCertIds();
+  const existingMongoIds = await buildExistingMongoIds();
 
   // Fetch all Mongo data in memory (collection is small — < 10k docs expected)
   const mongoUsers   = await mongoDb.collection<MongoUser>("users").find({}, { projection: { _id: 1, email: 1 } }).toArray();
@@ -314,6 +329,14 @@ async function main() {
   for (const doc of completions) {
     stats.total++;
 
+    const mongoId = doc._id.toString();
+
+    // Skip if already migrated by mongoId (idempotency)
+    if (existingMongoIds.has(mongoId)) {
+      stats.skipped++;
+      continue;
+    }
+
     // Resolve user email → PG userId
     const email   = mongoUserEmailMap.get(doc.user.toString());
     const pgUserId = email ? pgUserMap.get(email) : undefined;
@@ -335,7 +358,7 @@ async function main() {
     // Normalize cert ID
     const certId = normalizeCertId(doc.certificateId);
 
-    // Skip if already migrated (idempotency)
+    // Skip if already migrated by certificateId (fallback idempotency)
     if (existingCerts.has(certId)) {
       stats.skipped++;
       continue;
@@ -348,6 +371,7 @@ async function main() {
       certificateId: certId,
       completionPercentage: Math.round(doc.completionPercentage ?? 100),
       completedLessons: doc.completedLessons ?? 0,
+      mongoCompletionId: mongoId,
     });
 
     // Flush batch
