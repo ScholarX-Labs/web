@@ -11,7 +11,9 @@ export const deriveEnrollmentMode = (
   context: EnrollmentContext,
 ): EnrollmentMode => {
   if (context.course.requiresForm) return "application";
-  if ((context.course.price ?? 0) > 0) return "inquiry";
+  if (context.course.salesInquiry && (context.course.price ?? 0) > 0)
+    return "inquiry";
+  if ((context.course.price ?? 0) > 0) return "paid";
   return "free";
 };
 
@@ -36,12 +38,20 @@ export const executeEnrollment = async (
     result = await executeFreeEnroll(context);
   } else if (mode === "inquiry") {
     console.log("[EXECUTOR] inquiry mode — deferring to UI for form data");
+    emitEnrollmentEvent({
+      event: "enroll_inquiry_prompted",
+      timestamp: Date.now(),
+      courseId: context.command.courseId,
+      sourceSurface: context.command.source,
+      correlationId: context.command.correlationId,
+    });
     result = {
       ok: true,
       mode: "inquiry",
       nextAction: "inquiry",
       message: "Please fill in your contact details",
     };
+    return result;
   } else {
     console.log("[EXECUTOR] executing form application strategy");
     result = await executeFormApplicationInit(context);
