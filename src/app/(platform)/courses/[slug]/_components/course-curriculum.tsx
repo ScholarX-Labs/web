@@ -8,7 +8,7 @@ interface CourseCurriculumProps {
   course: Course;
 }
 
-export function CourseCurriculum({ course }: CourseCurriculumProps) {
+export function CourseCurriculum(_props: CourseCurriculumProps) {
   // In a real application, the course curriculum might come from course.lessons
   // For this UI mockup, we will provide a stylized static what-you-learn list
   // since the course type doesn't have deep curriculum data yet.
@@ -16,7 +16,7 @@ export function CourseCurriculum({ course }: CourseCurriculumProps) {
   return (
     <section className="space-y-6">
       <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-        What you'll learn
+        What you&apos;ll learn
       </h2>
 
       <StaggerContainer className="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 md:p-8">

@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { Course } from "@/types/course.types";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   Loader2,
   ShieldCheck,
@@ -37,9 +37,6 @@ export function PriorityEnrollmentWindow({
   }, [isOpen]);
 
   const keynoteEasing: [number, number, number, number] = [0.22, 1, 0.36, 1];
-  const keynoteTransition = shouldReduceMotion
-    ? { duration: 0.15 }
-    : { duration: 0.56, ease: keynoteEasing };
 
   const overlayClassName =
     "z-85 bg-slate-950/60 supports-backdrop-filter:backdrop-blur-lg transition-[opacity,background-color,backdrop-filter] duration-560 ease-[cubic-bezier(0.22,1,0.36,1)]";
@@ -321,7 +318,7 @@ export function PriorityEnrollmentWindow({
               className="space-y-3 rounded-xl border border-slate-100/50 bg-slate-50/50 p-4 dark:border-slate-800/50 dark:bg-slate-900/30"
             >
               <p className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
-                You're getting instant access to
+                You&apos;re getting instant access to
               </p>
               <motion.ul
                 className="space-y-2"

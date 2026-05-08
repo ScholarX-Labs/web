@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import { useLessonProgress } from "@/hooks/use-lesson-progress";
 import { VideoPlayer } from "./video-player";
 import { LessonMeta } from "./lesson-meta";
@@ -68,7 +68,7 @@ export function LessonClientBridge({
     // Await resolution before seeking to avoid seek-during-load races.
     try {
       const maybePromise = player.play?.();
-      if (maybePromise && typeof (maybePromise as any).then === "function") {
+      if (maybePromise && typeof (maybePromise as Promise<void>).then === "function") {
         (maybePromise as Promise<void>)
           .then(() => {
             // Ensure player still exists before seeking
@@ -109,7 +109,9 @@ export function LessonClientBridge({
         {(() => {
           const currentLesson = lessons.find((l) => l.id === lessonId);
           const mediaSrc = currentLesson?.media?.src;
-          const thumbnails = currentLesson?.media?.thumbnails;
+          const thumbnails = Array.isArray(currentLesson?.media?.thumbnails)
+            ? currentLesson.media.thumbnails[0]
+            : currentLesson?.media?.thumbnails;
           const poster = currentLesson?.media?.poster;
 
           if (!mediaSrc) {
@@ -127,7 +129,6 @@ export function LessonClientBridge({
               title={lessonTitle}
               src={mediaSrc}
               thumbnails={thumbnails}
-              poster={poster}
               heatmapBuckets={heatmapBuckets}
               onTimeUpdate={onTimeUpdate}
               onPause={onPause}

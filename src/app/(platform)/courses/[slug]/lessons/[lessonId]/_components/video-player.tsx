@@ -1,6 +1,6 @@
 "use client";
 
-import React, { memo, useRef } from "react";
+import React, { useRef } from "react";
 import { MediaPlayer, MediaProvider, type MediaPlayerInstance } from "@vidstack/react";
 import {
   defaultLayoutIcons,
@@ -13,7 +13,7 @@ import "@vidstack/react/player/styles/default/layouts/video.css";
 import { cn } from "@/lib/utils";
 import { HeatmapTimeline } from "./heatmap-timeline";
 import { motion } from "framer-motion";
-import { fadeSlideIn, focusModeTransition, springApple } from "@/lib/motion-variants";
+import { springApple } from "@/lib/motion-variants";
 
 import { useUILayoutStore } from "@/store/ui-layout-store";
 
@@ -21,9 +21,7 @@ interface VideoPlayerProps {
   title: string;
   src: string;
   thumbnails?: string;
-  poster?: string;
   className?: string;
-  layoutId?: string;
   /** From useLessonProgress */
   heatmapBuckets?: number[];
   onTimeUpdate?: (currentTime: number) => void;
@@ -38,9 +36,7 @@ export const VideoPlayer = React.forwardRef<MediaPlayerInstance, VideoPlayerProp
     title,
     src,
     thumbnails,
-    poster,
     className,
-    layoutId = "video-player",
     heatmapBuckets,
     onTimeUpdate,
     onPause,
@@ -125,7 +121,6 @@ export const VideoPlayer = React.forwardRef<MediaPlayerInstance, VideoPlayerProp
           <DefaultVideoLayout
             thumbnails={thumbnails}
             icons={defaultLayoutIcons}
-            poster={poster}
           />
         </MediaPlayer>
 
