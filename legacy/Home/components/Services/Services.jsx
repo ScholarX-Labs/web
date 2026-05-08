@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import "./Services.css"
 
 export default function Service({
@@ -8,8 +9,6 @@ export default function Service({
       head2,
       head3,
       text1,
-      text2,
-      txt3,
       icon1,
       icon2,
       icon3,

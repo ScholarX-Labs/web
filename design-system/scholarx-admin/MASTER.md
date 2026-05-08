@@ -7,7 +7,7 @@
 ---
 
 **Project:** ScholarX Admin
-**Generated:** 2026-05-08 16:08:46
+**Generated:** 2026-05-08 17:37:12
 **Category:** Analytics Dashboard
 
 ---
@@ -18,13 +18,13 @@
 
 | Role | Hex | CSS Variable |
 |------|-----|--------------|
-| Primary | `#171717` | `--color-primary` |
-| Secondary | `#404040` | `--color-secondary` |
-| CTA/Accent | `#D4AF37` | `--color-cta` |
-| Background | `#FFFFFF` | `--color-background` |
-| Text | `#171717` | `--color-text` |
+| Primary | `#1E40AF` | `--color-primary` |
+| Secondary | `#3B82F6` | `--color-secondary` |
+| CTA/Accent | `#22C55E` | `--color-cta` |
+| Background | `#EFF6FF` | `--color-background` |
+| Text | `#1E3A8A` | `--color-text` |
 
-**Color Notes:** Minimal black + accent gold
+**Color Notes:** Professional blue + join green
 
 ### Typography
 
@@ -68,7 +68,7 @@
 ```css
 /* Primary Button */
 .btn-primary {
-  background: #D4AF37;
+  background: #22C55E;
   color: white;
   padding: 12px 24px;
   border-radius: 8px;
@@ -85,8 +85,8 @@
 /* Secondary Button */
 .btn-secondary {
   background: transparent;
-  color: #171717;
-  border: 2px solid #171717;
+  color: #1E40AF;
+  border: 2px solid #1E40AF;
   padding: 12px 24px;
   border-radius: 8px;
   font-weight: 600;
@@ -99,7 +99,7 @@
 
 ```css
 .card {
-  background: #FFFFFF;
+  background: #EFF6FF;
   border-radius: 12px;
   padding: 24px;
   box-shadow: var(--shadow-md);
@@ -125,9 +125,9 @@
 }
 
 .input:focus {
-  border-color: #171717;
+  border-color: #1E40AF;
   outline: none;
-  box-shadow: 0 0 0 3px #17171720;
+  box-shadow: 0 0 0 3px #1E40AF20;
 }
 ```
 
@@ -163,11 +163,11 @@
 
 ### Page Pattern
 
-**Pattern Name:** Minimal Single Column
+**Pattern Name:** App Store Style Landing
 
-- **Conversion Strategy:** Single CTA focus. Large typography. Lots of whitespace. No nav clutter. Mobile-first.
-- **CTA Placement:** Center, large CTA button
-- **Section Order:** 1. Hero headline, 2. Short description, 3. Benefit bullets (3 max), 4. CTA, 5. Footer
+- **Conversion Strategy:** Show real screenshots. Include ratings (4.5+ stars). QR code for mobile. Platform-specific CTAs.
+- **CTA Placement:** Download buttons prominent (App Store + Play Store) throughout
+- **Section Order:** 1. Hero with device mockup, 2. Screenshots carousel, 3. Features with icons, 4. Reviews/ratings, 5. Download CTAs
 
 ---
 
