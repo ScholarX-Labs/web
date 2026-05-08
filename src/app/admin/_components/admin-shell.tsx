@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { SIDEBAR_NAV } from "@/lib/admin/admin-constants";
 import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 function getTitle(pathname: string): string {
   for (const item of SIDEBAR_NAV) {
@@ -30,31 +31,50 @@ export function AdminShell({
 
   return (
     <SidebarProvider defaultOpen={true}>
-      <div className="flex min-h-screen w-full">
+      <div className="flex min-h-screen w-full bg-[#f8fafc]">
+        {/* Background gradient for depth */}
+        <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-50/50 via-transparent to-transparent pointer-events-none" />
+        
         <AdminSidebar user={user} />
-        <div className="flex flex-1 flex-col min-h-screen">
-          <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b bg-background px-4 lg:px-6">
+        
+        <div className="flex flex-1 flex-col min-h-screen relative">
+          <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b bg-white/70 backdrop-blur-xl px-4 lg:px-8 transition-all duration-300">
             <SidebarTrigger className="lg:hidden" />
-            <nav className="flex items-center gap-1 text-sm text-muted-foreground">
-              {[{ label: "Admin" }, { label: getTitle(pathname) }].map((crumb, i, arr) => (
-                <span key={i} className="flex items-center gap-1">
-                  {i > 0 && <ChevronRight className="size-3" />}
-                  <span className={cn(i === arr.length - 1 && "text-foreground font-medium")}>
-                    {crumb.label}
-                  </span>
-                </span>
-              ))}
+            
+            <nav className="flex items-center gap-2 text-sm text-slate-500 font-medium">
+              <span className="hover:text-slate-900 transition-colors cursor-default">Admin</span>
+              <ChevronRight className="size-3.5 text-slate-300" />
+              <span className="text-slate-900 font-semibold tracking-tight">
+                {getTitle(pathname)}
+              </span>
             </nav>
-            <div className="ml-auto flex items-center gap-3">
-              <div className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground">
-                <div className="size-7 rounded-full bg-primary/10 flex items-center justify-center text-xs font-medium text-primary">
+
+            <div className="ml-auto flex items-center gap-4">
+              <div className="hidden sm:flex items-center gap-3 px-3 py-1.5 rounded-full bg-white/50 border border-slate-100 shadow-sm transition-all hover:shadow-md">
+                <div className="size-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-[10px] font-bold text-white ring-2 ring-white shadow-inner">
                   {user.name?.charAt(0)?.toUpperCase() ?? "A"}
                 </div>
-                <span className="hidden md:inline truncate max-w-[120px]">{user.name ?? "Admin"}</span>
+                <div className="flex flex-col leading-none">
+                  <span className="text-xs font-semibold text-slate-900">{user.name ?? "Admin"}</span>
+                  <span className="text-[10px] text-slate-400 font-medium">Principal Admin</span>
+                </div>
               </div>
             </div>
           </header>
-          <main className="flex-1 p-6 lg:p-8">{children}</main>
+
+          <main className="flex-1 p-6 lg:p-10 relative">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={pathname}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+              >
+                {children}
+              </motion.div>
+            </AnimatePresence>
+          </main>
         </div>
       </div>
     </SidebarProvider>
