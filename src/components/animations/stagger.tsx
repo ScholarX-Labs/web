@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, HTMLMotionProps, Variants } from "framer-motion";
-import { ReactNode, ElementType } from "react";
+import { ReactNode, ElementType, useMemo } from "react";
 
 export const staggerContainerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -42,7 +42,7 @@ interface StaggerItemProps extends HTMLMotionProps<"div"> {
 }
 
 export function StaggerItem({ children, as, ...props }: StaggerItemProps) {
-  const Component = as ? motion.create(as) : motion.div;
+  const Component = useMemo(() => as ? motion.create(as) : motion.div, [as]);
   return (
     <Component variants={staggerItemVariants} {...props}>
       {children}

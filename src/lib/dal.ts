@@ -46,7 +46,7 @@ const getCachedSession = cache(async () => {
     return auth.api.getSession({
       headers: h,
     });
-  } catch (error) {
+  } catch {
     // Return null if headers cannot be accessed (e.g., during static generation)
     return null;
   }

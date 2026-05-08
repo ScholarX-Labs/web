@@ -203,13 +203,17 @@ const parseApiErrorMessage = (error: unknown, fallback: string): string => {
   if (
     typeof error === "object" &&
     error !== null &&
-    "error" in error &&
-    typeof (error as any).error === "object" &&
-    (error as any).error !== null &&
-    "message" in (error as any).error &&
-    typeof (error as any).error.message === "string"
+    "error" in error
   ) {
-    return (error as any).error.message;
+    const err = (error as Record<string, unknown>).error;
+    if (
+      typeof err === "object" &&
+      err !== null &&
+      "message" in err &&
+      typeof (err as Record<string, unknown>).message === "string"
+    ) {
+      return (err as Record<string, unknown>).message as string;
+    }
   }
   if (error instanceof Error && error.message) {
     return error.message;

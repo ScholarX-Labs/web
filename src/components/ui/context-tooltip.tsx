@@ -44,8 +44,6 @@ export interface ContextTooltipProps {
   /** Tooltip side relative to trigger. Default: "top" */
   side?: "top" | "bottom" | "left" | "right";
   className?: string;
-  /** Delay in ms before tooltip shows. Default: 400 */
-  delayDuration?: number;
 }
 
 /**
@@ -65,7 +63,6 @@ export function ContextTooltip({
   content,
   children,
   side = "top",
-  delayDuration = 400,
   className,
 }: ContextTooltipProps) {
   // NOTE: TooltipProvider was intentionally removed from this per-instance wrapper.

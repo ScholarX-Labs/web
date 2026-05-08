@@ -20,7 +20,6 @@ interface SpotlightCardProps {
 export function SpotlightCard({
   children,
   className,
-  spotlightColor,
   tiltEnabled = true,
 }: SpotlightCardProps) {
   const divRef = useRef<HTMLDivElement>(null);

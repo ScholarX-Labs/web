@@ -22,8 +22,12 @@ export default function SimpleDropdown({
   useEffect(() => {
     if (disabled) {
       setOpen(false);
-      return;
     }
+  }, [disabled]);
+
+  useEffect(() => {
+    if (disabled) return;
+
     function onDoc(e: MouseEvent) {
       if (!ref.current) return;
       if (!ref.current.contains(e.target as Node)) setOpen(false);

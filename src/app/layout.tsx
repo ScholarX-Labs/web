@@ -3,12 +3,10 @@ import { Geist, Geist_Mono, Inter } from "next/font/google";
 import { AppProviders } from "@/providers/app-providers";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
-import { getSession } from "@/lib/dal";
 import { isDevAuthBypassEnabled } from "@/config/dev-auth-bypass";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { GlobalShellExclusions } from "@/components/global-shell-exclusions";
-import SignoutButton from "./auth/_components/SignoutButton";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -32,9 +30,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const currentUser = await getSession();
-  const IsDevShowSignOutButton = false; // Set to true to show sign-out button in dev when bypass is enabled
-
   return (
     <html lang="en" className={inter.variable}>
       <body

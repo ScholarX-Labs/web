@@ -7,8 +7,7 @@ import {
   WHY_CHOOSE_SECTION,
   WHO_WE_HELP_SECTION,
 } from "@/lib/home-data";
-import Link from "next/link";
-import { ROUTES } from "@/lib/routes";
+
 
 export const metadata: Metadata = {
   title: "ScholarX — Premium Learning Platform",

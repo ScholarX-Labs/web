@@ -2,7 +2,14 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { HOME_DATA } from "@/lib/home-data";
+const HOME_DATA = {
+  cta: {
+    headline: "Ready to transform your future?",
+    subline: "Join thousands of students who have found their path with ScholarX.",
+    buttonLabel: "Get Started Free",
+    buttonHref: "/auth/signup",
+  },
+};
 import { sectionReveal, tapScale } from "@/lib/motion-variants";
 import Link from "next/link";
 import { GlassPanel } from "@/components/ui/glass-panel";
