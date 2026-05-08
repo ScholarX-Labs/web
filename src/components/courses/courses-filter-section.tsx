@@ -10,9 +10,9 @@ import { CourseDetailSurfacePortal } from "./course-detail-surface-portal";
 // Maps hero filter pill labels to course category/level values
 const FILTER_MAP: Record<string, (course: Course) => boolean> = {
   "Career Preparation": (c) =>
-    ["Engineering", "Backend", "Systems"].includes(c.category ?? ""),
+    ["Engineering", "Backend", "Systems", "Development"].includes(c.category ?? ""),
   "Skill Development": (c) =>
-    ["Design", "Engineering", "Backend", "Systems"].includes(c.category ?? ""),
+    ["Design", "Engineering", "Backend", "Systems", "Development"].includes(c.category ?? ""),
   "Free / Paid": (c) => (c.price ?? 0) === 0,
   "Online / In-Person": () => true, // all are online; included for future use
   "International Opportunities": () => true, // informational tag
@@ -20,6 +20,7 @@ const FILTER_MAP: Record<string, (course: Course) => boolean> = {
   "Design": (c) => (c.category ?? "") === "Design",
   "Backend": (c) => (c.category ?? "") === "Backend",
   "Systems": (c) => (c.category ?? "") === "Systems",
+  "Development": (c) => (c.category ?? "") === "Development",
 };
 
 interface CoursesFilterSectionProps {
