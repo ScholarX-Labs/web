@@ -36,7 +36,6 @@ export interface FlatCourseRecord {
   urgencyText: string | null;
   tags: string[] | null;
   requiresForm: boolean | null;
-  salesInquiry: boolean | null;
   createdAt: string | null;
   updatedAt: string | null;
   instructor: {
@@ -46,6 +45,38 @@ export interface FlatCourseRecord {
     title: string | null;
   } | null;
 }
+
+const courseColumns = {
+  id: dbCourses.id,
+  slug: dbCourses.slug,
+  title: dbCourses.title,
+  description: dbCourses.description,
+  imageUrl: dbCourses.imageUrl,
+  videoPreviewUrl: dbCourses.videoPreviewUrl,
+  category: dbCourses.category,
+  level: dbCourses.level,
+  currentPrice: dbCourses.currentPrice,
+  originalPrice: dbCourses.originalPrice,
+  status: dbCourses.status,
+  rating: dbCourses.rating,
+  totalRatings: dbCourses.totalRatings,
+  duration: dbCourses.duration,
+  lessonsCount: dbCourses.lessonsCount,
+  videosCount: dbCourses.videosCount,
+  studentsCount: dbCourses.studentsCount,
+  isBestseller: dbCourses.isBestseller,
+  urgencyText: dbCourses.urgencyText,
+  tags: dbCourses.tags,
+  requiresForm: dbCourses.requiresForm,
+  createdAt: dbCourses.createdAt,
+  updatedAt: dbCourses.updatedAt,
+};
+
+const instructorColumns = {
+  id: dbUsers.id,
+  name: dbUsers.name,
+  image: dbUsers.image,
+};
 
 const toWhereClause = (filter: CourseListFilter) => {
   const predicates = [eq(dbCourses.status, "active")];
@@ -62,8 +93,8 @@ const toWhereClause = (filter: CourseListFilter) => {
 };
 
 const mapCourseRecord = (row: {
-  course: typeof dbCourses.$inferSelect;
-  instructor: typeof dbUsers.$inferSelect | null;
+  course: Record<string, unknown>;
+  instructor: Record<string, unknown> | null;
 }): FlatCourseRecord => ({
   id: row.course.id,
   slug: row.course.slug,
@@ -86,7 +117,6 @@ const mapCourseRecord = (row: {
   urgencyText: row.course.urgencyText,
   tags: row.course.tags,
   requiresForm: row.course.requiresForm,
-  salesInquiry: row.course.salesInquiry,
   createdAt: row.course.createdAt ? row.course.createdAt.toISOString() : null,
   updatedAt: row.course.updatedAt ? row.course.updatedAt.toISOString() : null,
   instructor: row.instructor
@@ -110,7 +140,7 @@ export class NextCoursesRepository {
       .where(whereClause);
 
     const rows = await db
-      .select({ course: dbCourses, instructor: dbUsers })
+      .select({ course: courseColumns, instructor: instructorColumns })
       .from(dbCourses)
       .leftJoin(dbUsers, eq(sql`${dbCourses.instructorId}::text`, dbUsers.id))
       .where(whereClause)
@@ -126,7 +156,7 @@ export class NextCoursesRepository {
 
   async findByIdActive(id: string): Promise<FlatCourseRecord | null> {
     const rows = await db
-      .select({ course: dbCourses, instructor: dbUsers })
+      .select({ course: courseColumns, instructor: instructorColumns })
       .from(dbCourses)
       .leftJoin(dbUsers, eq(sql`${dbCourses.instructorId}::text`, dbUsers.id))
       .where(and(eq(dbCourses.id, id), eq(dbCourses.status, "active")))
@@ -138,7 +168,7 @@ export class NextCoursesRepository {
 
   async findBySlugActive(slug: string): Promise<FlatCourseRecord | null> {
     const rows = await db
-      .select({ course: dbCourses, instructor: dbUsers })
+      .select({ course: courseColumns, instructor: instructorColumns })
       .from(dbCourses)
       .leftJoin(dbUsers, eq(sql`${dbCourses.instructorId}::text`, dbUsers.id))
       .where(and(eq(dbCourses.slug, slug), eq(dbCourses.status, "active")))
