@@ -1,87 +1,155 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import { useAdminSubscriptions } from "@/hooks/admin/use-admin-subscriptions";
-import { formatDate, statusColor, statusLabel } from "@/lib/admin/admin-utils";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { formatDate, statusLabel } from "@/lib/admin/admin-utils";
+import { DataTable } from "@/components/admin/data-table";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ColumnDef } from "@tanstack/react-table";
+import { SUBSCRIPTION_STATUS_OPTIONS } from "@/lib/admin/admin-constants";
 
+interface Subscription {
+  id: string;
+  userId: string;
+  courseId: string;
+  courseName?: string;
+  status: string;
+  startDate: string;
+  endDate: string;
+}
 
 export default function AdminSubscriptionsPage() {
-  const [status, setStatus] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
   const [page, setPage] = useState(1);
-  const { data, isLoading, error } = useAdminSubscriptions({ page, limit: 20, status: status || undefined });
-  const items = ((data as { items?: unknown[] })?.items ?? []) as Record<string, unknown>[];
-  const pagination = (data as { pagination?: { page: number; pages: number; total: number } })?.pagination ?? { page: 1, pages: 1, total: 0 };
+  const { data, isLoading, error } = useAdminSubscriptions({
+    page,
+    limit: 20,
+    status: statusFilter || undefined,
+  });
+  const items = ((data as { items?: Subscription[] })?.items ?? []) as Subscription[];
+  const pagination =
+    (data as { pagination?: { page: number; pages: number; total: number } })?.pagination ?? {
+      page: 1,
+      pages: 1,
+      total: 0,
+    };
+
+  const columns = useMemo<ColumnDef<Subscription>[]>(
+    () => [
+      {
+        accessorKey: "userId",
+        header: "User",
+        cell: ({ row }) => (
+          <Link
+            href={`/admin/subscriptions/${row.original.id}`}
+            className="font-medium text-foreground hover:text-primary transition-colors"
+          >
+            {row.original.userId.slice(0, 12)}...
+          </Link>
+        ),
+      },
+      {
+        accessorKey: "courseName",
+        header: "Course",
+        cell: ({ row }) => (
+          <span className="text-muted-foreground">
+            {row.original.courseName ?? row.original.courseId.slice(0, 12) + "..."}
+          </span>
+        ),
+      },
+      {
+        accessorKey: "status",
+        header: "Status",
+        cell: ({ row }) => {
+          const s = row.original.status;
+          const variant =
+            s === "active"
+              ? "default"
+              : s === "cancelled" || s === "expired"
+                ? "destructive"
+                : "secondary";
+          return <Badge variant={variant}>{statusLabel(s)}</Badge>;
+        },
+      },
+      {
+        accessorKey: "startDate",
+        header: "Start",
+        cell: ({ row }) => (
+          <span className="text-muted-foreground">{formatDate(row.original.startDate)}</span>
+        ),
+      },
+      {
+        accessorKey: "endDate",
+        header: "End",
+        cell: ({ row }) => (
+          <span className="text-muted-foreground">{formatDate(row.original.endDate)}</span>
+        ),
+      },
+      {
+        id: "actions",
+        header: "",
+        cell: ({ row }) => (
+          <div className="text-right">
+            <Link href={`/admin/subscriptions/${row.original.id}`}>
+              <Button variant="outline" size="sm">
+                View
+              </Button>
+            </Link>
+          </div>
+        ),
+      },
+    ],
+    [],
+  );
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">Subscriptions</h2>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight">Subscriptions</h1>
+        <p className="text-muted-foreground mt-1">Monitor course enrollments and subscriptions</p>
       </div>
 
-      <div className="mb-4 flex gap-4">
-        <select
-          value={status}
-          onChange={(e) => { setStatus(e.target.value); setPage(1); }}
-          className="border border-gray-300 rounded-md px-3 py-2 text-sm"
-        >
-          <option value="">All Statuses</option>
-          <option value="active">Active</option>
-          <option value="cancelled">Cancelled</option>
-          <option value="expired">Expired</option>
-          <option value="refunded">Refunded</option>
-        </select>
-      </div>
-
-      {isLoading && <div className="space-y-3">{Array.from({ length: 5 }).map((_, i) => <div key={i} className="h-16 bg-gray-100 rounded-lg animate-pulse" />)}</div>}
-      {error && <p className="text-red-500">Failed to load subscriptions.</p>}
-      {!isLoading && !error && items.length === 0 && <p className="text-gray-500">No subscriptions found.</p>}
-
-      {items.length > 0 && (
-        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-gray-200 bg-gray-50">
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">User</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">Course</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">Status</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">Start</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">End</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((sub: Record<string, unknown>) => (
-                <tr key={String(sub.id)} className="border-b border-gray-100 hover:bg-gray-50">
-                  <td className="px-4 py-3 text-sm font-medium text-gray-900">
-                    <Link href={`/admin/subscriptions/${sub.id}`} className="hover:text-blue-600">
-                      {String(sub.userId ?? "")}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">{String(sub.courseId ?? sub.courseName ?? "")}</td>
-                  <td className="px-4 py-3">
-                    <Badge variant={(statusColor(String(sub.status ?? "")) === "green" ? "default" : statusColor(String(sub.status ?? "")) === "yellow" ? "secondary" : "destructive") as "default" | "secondary" | "destructive" | "outline"}>
-                      {statusLabel(String(sub.status ?? ""))}
-                    </Badge>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-500">{formatDate(sub.startDate as string)}</td>
-                  <td className="px-4 py-3 text-sm text-gray-500">{formatDate(sub.endDate as string)}</td>
-                </tr>
+      <DataTable
+        columns={columns}
+        data={items}
+        loading={isLoading}
+        error={error ? "Failed to load subscriptions." : null}
+        emptyMessage="No subscriptions found."
+        page={pagination.page}
+        pageCount={pagination.pages}
+        total={pagination.total}
+        onPageChange={setPage}
+        toolbar={
+          <Select
+            value={statusFilter}
+            onValueChange={(v) => {
+              setStatusFilter(v);
+              setPage(1);
+            }}
+          >
+            <SelectTrigger className="w-40">
+              <SelectValue placeholder="All Statuses" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Statuses</SelectItem>
+              {SUBSCRIPTION_STATUS_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
               ))}
-            </tbody>
-          </table>
-
-          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 bg-gray-50">
-            <p className="text-sm text-gray-500">Page {pagination.page} of {pagination.pages} ({pagination.total} total)</p>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage(page - 1)}>Previous</Button>
-              <Button variant="outline" size="sm" disabled={page >= pagination.pages} onClick={() => setPage(page + 1)}>Next</Button>
-            </div>
-          </div>
-        </div>
-      )}
+            </SelectContent>
+          </Select>
+        }
+      />
     </div>
   );
 }
