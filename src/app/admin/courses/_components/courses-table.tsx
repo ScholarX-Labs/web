@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
 import { Plus, Edit2, ExternalLink } from "lucide-react";
 import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
+import { getCategoryStyle } from "@/lib/course-categories";
 
 interface Course {
   id: string;
@@ -64,12 +66,18 @@ export function CoursesTable({
       {
         accessorKey: "category",
         header: "Category",
-        cell: ({ row }) => (
-          <div className="flex items-center gap-2">
-            <div className="size-1.5 rounded-full bg-slate-300" />
-            <span className="font-medium text-slate-500">{row.original.category ?? "Uncategorized"}</span>
-          </div>
-        ),
+        cell: ({ row }) => {
+          const style = getCategoryStyle(row.original.category);
+          const Icon = style.icon;
+          return (
+            <div className="flex items-center gap-2">
+              <Icon className={cn("w-3.5 h-3.5", style.text)} />
+              <span className={cn("font-semibold", style.text)}>
+                {row.original.category ?? "Uncategorized"}
+              </span>
+            </div>
+          );
+        },
       },
       {
         accessorKey: "status",
