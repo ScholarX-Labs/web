@@ -53,7 +53,7 @@ export const createAdminRepository = (): AdminRepository => {
     async listCourses(query: AdminCourseQuery) {
       const page = query.page ?? 1;
       const limit = query.limit ?? 20;
-      const conditions: any[] = [eq(dbCourses.isArchived, false)];
+      const conditions: any[] = [];
 
       if (query.search) {
         conditions.push(
@@ -75,7 +75,22 @@ export const createAdminRepository = (): AdminRepository => {
       return paginate(
         async (l, o) =>
           db
-            .select()
+            .select({
+              id: dbCourses.id,
+              slug: dbCourses.slug,
+              title: dbCourses.title,
+              description: dbCourses.description,
+              imageUrl: dbCourses.imageUrl,
+              category: dbCourses.category,
+              level: dbCourses.level,
+              currentPrice: dbCourses.currentPrice,
+              originalPrice: dbCourses.originalPrice,
+              instructorId: dbCourses.instructorId,
+              status: dbCourses.status,
+              requiresForm: dbCourses.requiresForm,
+              createdAt: dbCourses.createdAt,
+              updatedAt: dbCourses.updatedAt,
+            })
             .from(dbCourses)
             .where(where)
             .orderBy(desc(dbCourses.createdAt))
@@ -89,7 +104,22 @@ export const createAdminRepository = (): AdminRepository => {
 
     async getCourse(id: string) {
       const results = await db
-        .select()
+        .select({
+          id: dbCourses.id,
+          slug: dbCourses.slug,
+          title: dbCourses.title,
+          description: dbCourses.description,
+          imageUrl: dbCourses.imageUrl,
+          category: dbCourses.category,
+          level: dbCourses.level,
+          currentPrice: dbCourses.currentPrice,
+          originalPrice: dbCourses.originalPrice,
+          instructorId: dbCourses.instructorId,
+          status: dbCourses.status,
+          requiresForm: dbCourses.requiresForm,
+          createdAt: dbCourses.createdAt,
+          updatedAt: dbCourses.updatedAt,
+        })
         .from(dbCourses)
         .where(eq(dbCourses.id, id))
         .limit(1);
