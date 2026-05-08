@@ -1,85 +1,127 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import { useAdminCourses } from "@/hooks/admin/use-admin-courses";
-import { formatDate, statusColor, statusLabel, truncate } from "@/lib/admin/admin-utils";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { formatDate, statusLabel } from "@/lib/admin/admin-utils";
+import { DataTable } from "@/components/admin/data-table";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ColumnDef } from "@tanstack/react-table";
+import { Plus } from "lucide-react";
+
+interface Course {
+  id: string;
+  title: string;
+  category: string | null;
+  status: string;
+  currentPrice: number | null;
+  createdAt: string;
+}
 
 export default function AdminCoursesPage() {
-  const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  const { data, isLoading, error } = useAdminCourses({ page, search, limit: 20 });
-  const items = ((data as { items?: unknown[] })?.items ?? []) as Record<string, unknown>[];
+  const { data, isLoading, error } = useAdminCourses({ page, search: "", limit: 20 });
+  const items = ((data as { items?: Course[] })?.items ?? []) as Course[];
   const pagination = (data as { pagination?: { page: number; pages: number; total: number } })?.pagination ?? { page: 1, pages: 1, total: 0 };
 
+  const columns = useMemo<ColumnDef<Course>[]>(
+    () => [
+      {
+        accessorKey: "title",
+        header: "Title",
+        cell: ({ row }) => (
+          <Link
+            href={`/admin/courses/${row.original.id}`}
+            className="font-medium text-foreground hover:text-primary transition-colors"
+          >
+            {row.original.title}
+          </Link>
+        ),
+      },
+      {
+        accessorKey: "category",
+        header: "Category",
+        cell: ({ row }) => (
+          <span className="text-muted-foreground">{row.original.category ?? "—"}</span>
+        ),
+      },
+      {
+        accessorKey: "status",
+        header: "Status",
+        cell: ({ row }) => {
+          const status = row.original.status;
+          const variant =
+            status === "active"
+              ? "default"
+              : status === "draft" || status === "inactive"
+                ? "secondary"
+                : "outline";
+          return <Badge variant={variant}>{statusLabel(status)}</Badge>;
+        },
+      },
+      {
+        accessorKey: "currentPrice",
+        header: "Price",
+        cell: ({ row }) => (
+          <span className="text-muted-foreground">
+            {row.original.currentPrice != null ? `$${Number(row.original.currentPrice).toFixed(2)}` : "—"}
+          </span>
+        ),
+      },
+      {
+        accessorKey: "createdAt",
+        header: "Created",
+        cell: ({ row }) => (
+          <span className="text-muted-foreground">{formatDate(row.original.createdAt)}</span>
+        ),
+      },
+      {
+        id: "actions",
+        header: "",
+        cell: ({ row }) => (
+          <div className="text-right">
+            <Link href={`/admin/courses/${row.original.id}`}>
+              <Button variant="outline" size="sm">
+                Edit
+              </Button>
+            </Link>
+          </div>
+        ),
+      },
+    ],
+    [],
+  );
+
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">Courses</h2>
-        <Link href="/admin/courses/new" className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors">
-          Create Course
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Courses</h1>
+          <p className="text-muted-foreground mt-1">Manage your course catalog</p>
+        </div>
+        <Link href="/admin/courses/new">
+          <Button>
+            <Plus className="size-4 mr-1" />
+            Create Course
+          </Button>
         </Link>
       </div>
 
-      <div className="mb-4">
-        <Input placeholder="Search courses..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} className="max-w-xs" />
-      </div>
-
-      {isLoading && <div className="space-y-3">{Array.from({ length: 5 }).map((_, i) => <div key={i} className="h-16 bg-gray-100 rounded-lg animate-pulse" />)}</div>}
-      {error && <p className="text-red-500">Failed to load courses.</p>}
-      {!isLoading && !error && items.length === 0 && <p className="text-gray-500">No courses found.</p>}
-
-      {items.length > 0 && (
-        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-gray-200 bg-gray-50">
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">Title</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">Category</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">Status</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">Price</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">Created</th>
-                <th className="text-right px-4 py-3 text-sm font-medium text-gray-500">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((course: Record<string, unknown>) => (
-                <tr key={String(course.id)} className="border-b border-gray-100 hover:bg-gray-50">
-                  <td className="px-4 py-3 text-sm font-medium text-gray-900">
-                    <Link href={`/admin/courses/${course.id}`} className="hover:text-blue-600">{truncate(String(course.title ?? ""), 50)}</Link>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">{String(course.category ?? "-")}</td>
-                  <td className="px-4 py-3">
-                    <Badge variant={(statusColor(String(course.status ?? "")) === "green" ? "default" : "secondary") as "default" | "secondary" | "destructive" | "outline"}>
-                      {statusLabel(String(course.status ?? ""))}
-                    </Badge>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">
-                    {course.price ? `$${Number(course.price).toFixed(2)}` : "-"}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-500">{formatDate(course.createdAt as string)}</td>
-                  <td className="px-4 py-3 text-right">
-                    <Link href={`/admin/courses/${course.id}`}>
-                      <Button variant="outline" size="sm">Edit</Button>
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 bg-gray-50">
-            <p className="text-sm text-gray-500">Page {pagination.page} of {pagination.pages} ({pagination.total} total)</p>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage(page - 1)}>Previous</Button>
-              <Button variant="outline" size="sm" disabled={page >= pagination.pages} onClick={() => setPage(page + 1)}>Next</Button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DataTable
+        columns={columns}
+        data={items}
+        loading={isLoading}
+        error={error ? "Failed to load courses." : null}
+        searchable
+        searchPlaceholder="Search courses..."
+        emptyMessage="No courses yet."
+        emptyDescription="Create your first course to get started."
+        page={pagination.page}
+        pageCount={pagination.pages}
+        total={pagination.total}
+        onPageChange={setPage}
+      />
     </div>
   );
 }
