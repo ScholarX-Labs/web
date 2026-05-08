@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { ArrowUp, ChevronDown, ArrowUpDown } from "lucide-react";
+import { useState, useLayoutEffect } from "react";
+import { ArrowUp, ChevronDown } from "lucide-react";
 import { SearchResult } from "@/lib/ai-search/types";
 import { ScholarshipCard } from "./scholarship-card";
 import { ScholarshipModal } from "./scholarship-modal";
@@ -67,7 +67,7 @@ export function SearchResults({
   const [sortBy, setSortBy] = useState<SortOption>("match");
 
   // Reset visible count when results change (new search)
-  useEffect(() => {
+  useLayoutEffect(() => {
     setVisibleCount(PAGE_SIZE);
   }, [results]);
 

@@ -1,10 +1,10 @@
 "use client";
 
-import { use } from "react";
+import { use, useState } from "react";
 import Link from "next/link";
 import { useRevenueReport, useUsersReport, useCoursesReport } from "@/hooks/admin/use-admin-reports";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft, BarChart } from "lucide-react";
 
@@ -14,17 +14,25 @@ export default function AdminReportDetailPage({
   params: Promise<{ reportType: string }>;
 }) {
   const { reportType } = use(params);
-  const today = new Date().toISOString().split("T")[0];
-  const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000).toISOString().split("T")[0];
+  const [today] = useState(() => new Date().toISOString().split("T")[0]);
+  const [thirtyDaysAgo] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 30);
+    return d.toISOString().split("T")[0];
+  });
   const range = { from: thirtyDaysAgo, to: today };
+
+  const revenueQuery = useRevenueReport(range);
+  const usersQuery = useUsersReport(range);
+  const coursesQuery = useCoursesReport(range);
 
   const query =
     reportType === "revenue"
-      ? useRevenueReport(range)
+      ? revenueQuery
       : reportType === "users"
-        ? useUsersReport(range)
+        ? usersQuery
         : reportType === "courses"
-          ? useCoursesReport(range)
+          ? coursesQuery
           : null;
 
   const title = reportType.charAt(0).toUpperCase() + reportType.slice(1) + " Report";

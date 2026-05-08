@@ -21,17 +21,10 @@ function getCategory(result: SearchResult): string | null {
   return null;
 }
 
-function getMatchColor(pct: number): string {
-  if (pct >= 80) return "#16a34a";
-  if (pct >= 60) return "var(--scholar-blue)";
-  return "#f59e0b";
-}
-
 export function ScholarshipCard({
   result,
   onViewDetails,
 }: ScholarshipCardProps) {
-  const matchPct = getMatchPct(result);
   const category = getCategory(result);
 
   return (

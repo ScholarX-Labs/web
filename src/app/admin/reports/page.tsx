@@ -4,15 +4,16 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRevenueReport, useUsersReport, useCoursesReport } from "@/hooks/admin/use-admin-reports";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { BarChart, TrendingUp, Users, BookOpen, DollarSign, ExternalLink } from "lucide-react";
+import { Users, BookOpen, DollarSign, ExternalLink } from "lucide-react";
 
 export default function AdminReportsPage() {
-  const today = new Date().toISOString().split("T")[0];
-  const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000).toISOString().split("T")[0];
-  const [from, setFrom] = useState(thirtyDaysAgo);
-  const [to, setTo] = useState(today);
+  const [from, setFrom] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 30);
+    return d.toISOString().split("T")[0];
+  });
+  const [to, setTo] = useState(() => new Date().toISOString().split("T")[0]);
   const range = { from, to };
 
   const revenue = useRevenueReport(range);

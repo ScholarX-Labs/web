@@ -96,7 +96,7 @@ export const createAdminRouteHandlers = (deps: AdminRouteDeps) => {
   const GET = async (request: NextRequest, context: RouteContext) => {
     try {
       const { path = [] } = await context.params;
-      const admin = await resolveAdmin(deps, request);
+      await resolveAdmin(deps, request);
       const domain = deps.createDomain();
 
       // /api/admin/stats

@@ -145,7 +145,7 @@ export function InquiriesTable({
         },
       },
     ],
-    [],
+    [handleStatusChange, updateStatus.isPending],
   );
 
   return (

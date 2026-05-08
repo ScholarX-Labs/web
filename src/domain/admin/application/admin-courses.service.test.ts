@@ -44,10 +44,10 @@ const makeRepo = (overrides: Partial<AdminRepository> = {}): AdminRepository => 
   listInquiries: async () => ({ items: [], pagination: { page: 1, limit: 20, total: 0, pages: 0 } }),
   getInquiry: async () => null,
   updateInquiryStatus: async (id, status) => ({ id, status }),
-  getOverviewStats: async () => ({ totalCourses: 0, totalUsers: 0, totalRevenue: 0, totalSubscriptions: 0, totalInquiries: 0, recentInquiries: 0 }),
-  getRevenueReport: async () => ({ totalRevenue: 0, periodRevenue: 0, subscriptions: 0, refunds: 0 }),
-  getUsersReport: async () => ({ totalUsers: 0, newUsers: 0, activeUsers: 0 }),
-  getCoursesReport: async () => ({ totalCourses: 0, newCourses: 0, publishedCourses: 0 }),
+  getOverviewStats: async () => ({ totalCourses: 0, totalUsers: 0, totalRevenue: 0, totalSubscriptions: 0, activeSubscriptions: 0, totalInquiries: 0, pendingInquiries: 0, recentInquiries: 0, revenueThisMonth: 0, newUsersThisMonth: 0 }),
+  getRevenueReport: async () => ({ totalRevenue: 0, periodRevenue: 0, subscriptions: 0, refunds: 0, byMonth: [], byCourse: [] }),
+  getUserReport: async () => ({ totalUsers: 0, newUsers: 0, activeUsers: 0, byMonth: [], byRole: [] }),
+  getCourseReport: async () => ({ totalCourses: 0, newCourses: 0, publishedCourses: 0, byCategory: [], topEnrolled: [], averageCompletionRate: 0 }),
   ...overrides,
 });
 

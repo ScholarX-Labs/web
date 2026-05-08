@@ -1,6 +1,6 @@
-import { and, asc, count, desc, eq, gte, like, lte, or, sql, ne } from "drizzle-orm";
+import { and, asc, count, desc, eq, gte, like, lte, or, sql, SQL } from "drizzle-orm";
 import { db } from "@/db";
-import { user as dbUsers, session as dbSessions } from "@/db/schema/auth-schema";
+import { user as dbUsers } from "@/db/schema/auth-schema";
 import { dbCourses, dbSubscriptions, dbInquiries } from "@/domain/courses/infrastructure/db/courses-db.schema";
 import { dbLessons } from "@/domain/admin/infrastructure/db/admin-db.schema";
 import type { AdminRepository } from "@/domain/admin/contracts/admin-repository.contract";
@@ -53,7 +53,7 @@ export const createAdminRepository = (): AdminRepository => {
     async listCourses(query: AdminCourseQuery) {
       const page = query.page ?? 1;
       const limit = query.limit ?? 20;
-      const conditions: any[] = [];
+      const conditions: unknown[] = [];
 
       if (query.search) {
         conditions.push(
@@ -70,7 +70,7 @@ export const createAdminRepository = (): AdminRepository => {
         conditions.push(eq(dbCourses.category, query.category));
       }
 
-      const where = and(...conditions);
+      const where = and(...(conditions as SQL[]));
 
       return paginate(
         async (l, o) =>
@@ -353,7 +353,7 @@ export const createAdminRepository = (): AdminRepository => {
     async listUsers(query: AdminUserQuery) {
       const page = query.page ?? 1;
       const limit = query.limit ?? 20;
-      const conditions: any[] = [];
+      const conditions: unknown[] = [];
 
       if (query.search) {
         conditions.push(
@@ -371,7 +371,7 @@ export const createAdminRepository = (): AdminRepository => {
         conditions.push(eq(dbUsers.banned, query.isBlocked));
       }
 
-      const where = conditions.length > 0 ? and(...conditions) : undefined;
+      const where = conditions.length > 0 ? and(...(conditions as SQL[])) : undefined;
 
       return paginate(
         async (l, o) =>
@@ -471,7 +471,7 @@ export const createAdminRepository = (): AdminRepository => {
     async listSubscriptions(query: AdminSubscriptionQuery) {
       const page = query.page ?? 1;
       const limit = query.limit ?? 20;
-      const conditions: any[] = [];
+      const conditions: unknown[] = [];
 
       if (query.status) {
         conditions.push(eq(dbSubscriptions.status, query.status));
@@ -480,7 +480,7 @@ export const createAdminRepository = (): AdminRepository => {
         conditions.push(eq(dbSubscriptions.courseId, query.courseId));
       }
 
-      const where = conditions.length > 0 ? and(...conditions) : undefined;
+      const where = conditions.length > 0 ? and(...(conditions as SQL[])) : undefined;
 
       return paginate(
         async (l, o) =>
@@ -522,7 +522,7 @@ export const createAdminRepository = (): AdminRepository => {
     async listInquiries(query: AdminInquiryQuery) {
       const page = query.page ?? 1;
       const limit = query.limit ?? 20;
-      const conditions: any[] = [];
+      const conditions: unknown[] = [];
 
       if (query.status) {
         conditions.push(eq(dbInquiries.status, query.status));
@@ -536,7 +536,7 @@ export const createAdminRepository = (): AdminRepository => {
         );
       }
 
-      const where = conditions.length > 0 ? and(...conditions) : undefined;
+      const where = conditions.length > 0 ? and(...(conditions as SQL[])) : undefined;
 
       return paginate(
         async (l, o) =>
@@ -648,8 +648,6 @@ export const createAdminRepository = (): AdminRepository => {
 
       const byMonthMap = new Map<string, { revenue: number; count: number }>();
       const byCourseMap = new Map<string, { courseTitle: string; revenue: number; count: number }>();
-      const courseNames = new Map<string, string>();
-
       for (const sub of subscriptions) {
         const month = sub.enrolledAt
           ? `${sub.enrolledAt.getFullYear()}-${String(sub.enrolledAt.getMonth() + 1).padStart(2, "0")}`

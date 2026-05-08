@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState } from "react";
+import { use } from "react";
 import Link from "next/link";
 import { useAdminInquiry, useUpdateInquiryStatus } from "@/hooks/admin/use-admin-inquiries";
 import { formatDateTime, statusLabel } from "@/lib/admin/admin-utils";
