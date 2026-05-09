@@ -150,6 +150,48 @@ export const auth = betterAuth({
     sendOnSignUp: true,
     sendOnSignIn: false,
   },
+  databaseHooks: {
+    user: {
+      create: {
+        after: async (user) => {
+          try {
+            const firstName = (user as Record<string, unknown>).firstName as string | undefined;
+            const lastName = (user as Record<string, unknown>).lastName as string | undefined;
+
+            if (!firstName || !lastName) {
+              const fallback = `user-${randomUUID().slice(0, 12)}`;
+              await db.update(schema.user).set({ username: fallback }).where(eq(schema.user.id, user.id));
+              return;
+            }
+
+            const base = `${firstName}.${lastName}`
+              .toLowerCase()
+              .replace(/[^a-z0-9._-]/g, "")
+              .replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, "")
+              .slice(0, 26);
+
+            for (let attempt = 0; attempt < 10; attempt++) {
+              const candidate = attempt === 0 ? base : `${base}-${randomUUID().slice(0, 6)}`;
+
+              const result = await db
+                .update(schema.user)
+                .set({ username: candidate })
+                .where(
+                  sql`${schema.user.id} = ${user.id} AND ${schema.user.username} IS NULL`
+                );
+
+              if (result.rowCount !== null && result.rowCount > 0) return;
+            }
+
+            const fallback = `user-${randomUUID().slice(0, 12)}`;
+            await db.update(schema.user).set({ username: fallback }).where(eq(schema.user.id, user.id));
+          } catch (error) {
+            console.error("[auth:afterSignUp] Failed to generate username:", error);
+          }
+        },
+      },
+    },
+  },
   hooks: {
     before: createAuthMiddleware(async (ctx) => {
       if (ctx.path === "/email-otp/send-verification-otp") {
@@ -341,6 +383,13 @@ export const auth = betterAuth({
         defaultValue: [],
         required: false,
       },
+      username: { type: "string", required: false },
+      githubUrl: { type: "string", required: false },
+      facebookUrl: { type: "string", required: false },
+      instagramUrl: { type: "string", required: false },
+      twitterUrl: { type: "string", required: false },
+      linkedinUrl: { type: "string", required: false },
+      isProfilePublic: { type: "boolean", required: false, defaultValue: true },
     },
   },
   plugins: [
