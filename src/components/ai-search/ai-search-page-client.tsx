@@ -73,7 +73,9 @@ export function AiSearchPageClient() {
 
       const data = await response.json();
 
-      const mappedOpportunities = (data.results || []).map((result: Record<string, any>) => {
+      const mappedOpportunities = (data.results || []).map(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (result: Record<string, any>) => {
         const opp = result.opportunity;
         return {
           id: opp.id || result.id,

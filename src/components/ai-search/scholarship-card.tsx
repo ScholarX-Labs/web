@@ -9,12 +9,6 @@ interface ScholarshipCardProps {
   onViewDetails: (result: SearchResult) => void;
 }
 
-function getMatchPct(result: SearchResult): number | null {
-  const raw = result.match_percentage;
-  if (raw == null) return null;
-  return raw > 1 ? Math.round(raw) : Math.round(raw * 100);
-}
-
 function getCategory(result: SearchResult): string | null {
   if (result.category) return result.category;
   if (result.tags && result.tags.length > 0) return result.tags[0];
