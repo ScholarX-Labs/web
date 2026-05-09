@@ -62,6 +62,36 @@ export const dbSubscriptions = coursesSchema.table("subscriptions", {
   enrolledAt: timestamp("enrolled_at"),
 });
 
+export const dbLessonProgress = coursesSchema.table(
+  "lesson_progress",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => dbUsers.id, { onDelete: "cascade" }),
+    lessonId: uuid("lesson_id").notNull(),
+    courseId: uuid("course_id")
+      .notNull()
+      .references(() => dbCourses.id, { onDelete: "cascade" }),
+    completed: boolean("completed").default(false).notNull(),
+    completedAt: timestamp("completed_at"),
+    watchedPercentage: integer("watched_percentage").default(0).notNull(),
+    lastPosition: integer("last_position").default(0).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    progressUserLessonUq: uniqueIndex("progress_user_lesson_uq").on(
+      table.userId,
+      table.lessonId,
+    ),
+    progressCourseUserIdx: index("progress_course_user_idx").on(
+      table.courseId,
+      table.userId,
+    ),
+  }),
+);
+
 export const dbInquiries = coursesSchema.table(
   "inquiries",
   {

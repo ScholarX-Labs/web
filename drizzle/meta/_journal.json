@@ -8,6 +8,13 @@
       "when": 1776722156985,
       "tag": "0000_round_william_stryker",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1778325220654,
+      "tag": "0001_clumsy_wild_pack",
+      "breakpoints": true
     }
   ]
 }
