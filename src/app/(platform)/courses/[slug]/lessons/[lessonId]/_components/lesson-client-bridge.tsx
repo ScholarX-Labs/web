@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useEffect, useCallback } from "react";
 import { useLessonProgress } from "@/hooks/use-lesson-progress";
 import { VideoPlayer } from "./video-player";
 import { LessonMeta } from "./lesson-meta";
@@ -9,12 +9,14 @@ import { motion } from "framer-motion";
 import { useUILayoutStore } from "@/store/ui-layout-store";
 import { cn } from "@/lib/utils";
 import { springApple } from "@/lib/motion-variants";
+import { syncLessonProgress } from "@/actions/course.actions";
 import type { MediaPlayerInstance } from "@vidstack/react";
 import type { LessonSummary } from "@/types/course.types";
 
 interface LessonClientBridgeProps {
   lessonId: string;
   courseSlug: string;
+  courseId: string;
   lessonTitle: string;
   lessonIndex: number;
   totalLessons: number;
@@ -33,6 +35,7 @@ interface LessonClientBridgeProps {
 export function LessonClientBridge({
   lessonId,
   courseSlug,
+  courseId,
   lessonTitle,
   lessonIndex,
   totalLessons,
@@ -59,7 +62,41 @@ export function LessonClientBridge({
     videoDuration: 0, // Will be updated via setVideoDuration
   });
 
-  // 2. Resume Handler
+  // 2. Sync progress to server when completed or on unmount
+  const syncToServer = useCallback(async () => {
+    if (!progress) return;
+    await syncLessonProgress(lessonId, courseId, {
+      completed: progress.completedAt ? true : false,
+      completedAt: progress.completedAt
+        ? new Date(progress.completedAt).toISOString()
+        : null,
+      watchedPercentage: Math.round(progress.watchedPercentage),
+      lastPosition: Math.round(progress.lastPosition),
+    });
+  }, [progress, lessonId, courseId]);
+
+  useEffect(() => {
+    if (!progress?.completedAt) return;
+    const timer = setTimeout(() => {
+      syncToServer();
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [progress?.completedAt, syncToServer]);
+
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === "hidden") {
+        syncToServer();
+      }
+    };
+    window.addEventListener("visibilitychange", handleVisibility);
+    return () => {
+      syncToServer();
+      window.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, [syncToServer]);
+
+  // 3. Resume Handler
   const handleResume = (position: number) => {
     const player = playerRef.current;
     if (!player) return;
@@ -164,9 +201,11 @@ export function LessonClientBridge({
         className="hidden lg:flex shrink-0 w-80 xl:w-96"
         progress={{
           [lessonId]: progress?.watchedPercentage ?? 0,
-          // Mock progress for previous lessons to make UI feel "Wired"
-          ...(lessons[0]?.id && { [lessons[0].id]: 100 }),
-          ...(lessons[1]?.id && { [lessons[1].id]: 100 }),
+          ...Object.fromEntries(
+            lessons
+              .filter((l) => l.isCompleted)
+              .map((l) => [l.id, 100]),
+          ),
         }}
       />
     </motion.main>
