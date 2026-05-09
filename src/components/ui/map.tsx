@@ -2,6 +2,7 @@
 
 import { useRef, useState, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+// @ts-expect-error - dotted-map has no type declarations
 import DottedMap from "dotted-map"
 import Image from "next/image"
 import { useTheme } from "next-themes"
@@ -22,6 +23,7 @@ export function WorldMap({
   dots = [],
   lineColor = "#0ea5e9",
   showLabels = true,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   labelClassName = "text-sm",
   animationDuration = 2,
   loop = true,

@@ -252,6 +252,7 @@ function AlertIcon({ children, className, ...props }: React.HTMLAttributes<HTMLD
   );
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function AlertToolbar({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return <div data-slot="alert-toolbar" className={cn(className)} {...props} />;
 }

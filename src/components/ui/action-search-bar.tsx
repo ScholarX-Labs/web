@@ -85,6 +85,7 @@ const allActions = [
   },
 ];
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function ActionSearchBar({ actions = allActions }: { actions?: Action[] }) {
   const [query, setQuery] = useState("");
   const [result, setResult] = useState<SearchResult | null>(null);
@@ -94,6 +95,7 @@ function ActionSearchBar({ actions = allActions }: { actions?: Action[] }) {
 
   useEffect(() => {
     if (!isFocused) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setResult(null);
       return;
     }

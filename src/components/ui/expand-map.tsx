@@ -102,6 +102,7 @@ export function LocationMap({
                 <motion.div
                   key={i}
                   className="absolute rounded-sm bg-muted-foreground/25 border border-muted-foreground/15"
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                   style={{ top: b.top, left: b.left, right: (b as any).right, width: b.w, height: b.h }}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}

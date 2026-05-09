@@ -123,9 +123,10 @@ const MacOSDock: React.FC<MacOSDockProps> = ({
 
     const scalesNeedUpdate = currentScales.some((scale, index) => Math.abs(scale - targetScales[index]) > 0.002)
     if (scalesNeedUpdate || mouseX !== null) {
+      // eslint-disable-next-line react-hooks/immutability
       animationFrameRef.current = requestAnimationFrame(animateToTarget)
     }
-  }, [mouseX, calculateTargetMagnification, calculatePositions, currentScales, currentPositions])
+  }, [mouseX, calculateTargetMagnification, calculatePositions, currentScales])
 
   useEffect(() => {
     if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current)

@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { useRef, useEffect, useCallback, useState } from "react"
+import { useRef, useEffect, useCallback } from "react"
 
 interface GlobeProps {
   className?: string
@@ -203,6 +203,7 @@ export function Component({
       }
     }
 
+    // eslint-disable-next-line react-hooks/immutability
     animRef.current = requestAnimationFrame(draw)
   }, [dotColor, arcColor, markerColor, autoRotateSpeed, connections, markers])
 
