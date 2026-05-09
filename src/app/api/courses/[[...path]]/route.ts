@@ -178,8 +178,7 @@ export const createCoursesRouteHandlers = (deps: CoursesRouteDeps) => {
         { status: 404 },
       );
     } catch (error) {
-      console.error("[api/courses] GET handler error:", error);
-      if (error instanceof Error && error.stack) console.error(error.stack);
+      console.error("[api/courses] GET handler error:", error instanceof Error ? error.message : "Unknown error");
       return errorResponse(error);
     }
   };
@@ -294,8 +293,7 @@ export const createCoursesRouteHandlers = (deps: CoursesRouteDeps) => {
         { status: 404 },
       );
     } catch (error) {
-      console.error("[api/courses] POST handler error:", error);
-      if (error instanceof Error && error.stack) console.error(error.stack);
+      console.error("[api/courses] POST handler error:", error instanceof Error ? error.message : "Unknown error");
       return errorResponse(error);
     }
   };
