@@ -3,9 +3,11 @@ import { db } from "@/db";
 import {
   dbCourses,
   dbInquiries,
+  dbLessonProgress,
   dbSubscriptions,
   dbUsers,
 } from "@/domain/courses/infrastructure/db/courses-db.schema";
+import { dbLessons } from "@/domain/admin/infrastructure/db/admin-db.schema";
 
 export interface CourseListFilter {
   page: number;
@@ -278,6 +280,20 @@ export class NextCoursesRepository {
     return row;
   }
 
+  async listLessons(courseId: string) {
+    return db
+      .select()
+      .from(dbLessons)
+      .where(
+        and(
+          eq(dbLessons.courseId, courseId),
+          eq(dbLessons.isArchived, false),
+          eq(dbLessons.status, "active"),
+        ),
+      )
+      .orderBy(asc(dbLessons.sortIndex));
+  }
+
   async findUserById(userId: string) {
     const rows = await db
       .select({
@@ -289,5 +305,74 @@ export class NextCoursesRepository {
       .limit(1);
 
     return rows[0] ?? null;
+  }
+
+  async findLessonProgress(userId: string, lessonId: string) {
+    const rows = await db
+      .select()
+      .from(dbLessonProgress)
+      .where(
+        and(
+          eq(dbLessonProgress.userId, userId),
+          eq(dbLessonProgress.lessonId, lessonId),
+        ),
+      )
+      .limit(1);
+
+    return rows[0] ?? null;
+  }
+
+  async upsertLessonProgress(
+    userId: string,
+    lessonId: string,
+    courseId: string,
+    data: {
+      completed?: boolean;
+      completedAt?: Date | null;
+      watchedPercentage?: number;
+      lastPosition?: number;
+    },
+  ) {
+    const existing = await this.findLessonProgress(userId, lessonId);
+
+    if (existing) {
+      const [row] = await db
+        .update(dbLessonProgress)
+        .set({
+          ...data,
+          updatedAt: new Date(),
+        })
+        .where(eq(dbLessonProgress.id, existing.id))
+        .returning();
+
+      return row;
+    }
+
+    const [row] = await db
+      .insert(dbLessonProgress)
+      .values({
+        userId,
+        lessonId,
+        courseId,
+        completed: data.completed ?? false,
+        completedAt: data.completedAt ?? null,
+        watchedPercentage: data.watchedPercentage ?? 0,
+        lastPosition: data.lastPosition ?? 0,
+      })
+      .returning();
+
+    return row;
+  }
+
+  async findProgressByCourse(userId: string, courseId: string) {
+    return db
+      .select()
+      .from(dbLessonProgress)
+      .where(
+        and(
+          eq(dbLessonProgress.userId, userId),
+          eq(dbLessonProgress.courseId, courseId),
+        ),
+      );
   }
 }
