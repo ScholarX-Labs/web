@@ -168,7 +168,7 @@ export default function AdminCourseDetailPage({ params }: { params: Promise<{ co
         <div className="flex items-center gap-6 bg-white/50 backdrop-blur-xl p-2 pl-6 rounded-3xl border border-white shadow-sm">
           <div className="flex flex-col items-end mr-2">
             <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Build Status</span>
-            <span className="text-xs font-bold text-slate-900">{lessons.length} Modules Active</span>
+            <span className="text-xs font-bold text-slate-900">{lessons.length} Lessons Configured</span>
           </div>
           <ProgressIndicator />
         </div>
@@ -328,7 +328,7 @@ function CurriculumTab({ courseId, lessons, onReorder, isLoading, onEditLesson }
     try {
       await createLesson.mutateAsync({ 
         courseId, 
-        data: { title: newLessonTitle, isPublished: false } 
+        data: { title: newLessonTitle, status: "draft" } 
       });
       setNewLessonTitle("");
       toast.success("Lesson added to curriculum");
@@ -344,19 +344,19 @@ function CurriculumTab({ courseId, lessons, onReorder, isLoading, onEditLesson }
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-black text-slate-900 tracking-tight">Curriculum Builder</h2>
-          <p className="text-sm text-slate-400 font-bold mt-1">Structure your course by organizing modules.</p>
+          <p className="text-sm text-slate-400 font-bold mt-1">Directly manage and sequence your course lessons.</p>
         </div>
         
         <MorphingPopover>
           <MorphingPopoverTrigger className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-5 h-10 font-bold shadow-lg shadow-blue-500/20 transition-all flex items-center gap-2">
             <Plus className="size-4" />
-            Add Module
+            Add Lesson
           </MorphingPopoverTrigger>
           <MorphingPopoverContent className="w-80 p-6 shadow-2xl">
-            <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-4">Quick Add Module</h3>
+            <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-4">Quick Add Lesson</h3>
             <div className="space-y-4">
               <Input 
-                placeholder="Enter module title..." 
+                placeholder="Lesson title (e.g. Intro to UI)..." 
                 className="rounded-xl border-slate-200 h-11"
                 value={newLessonTitle}
                 onChange={(e) => setNewLessonTitle(e.target.value)}
@@ -366,7 +366,7 @@ function CurriculumTab({ courseId, lessons, onReorder, isLoading, onEditLesson }
                 onClick={handleAddLesson}
                 disabled={createLesson.isPending}
               >
-                {createLesson.isPending ? "Synchronizing..." : "Confirm Module"}
+                {createLesson.isPending ? "Synchronizing..." : "Confirm Lesson"}
               </Button>
             </div>
           </MorphingPopoverContent>
@@ -375,8 +375,8 @@ function CurriculumTab({ courseId, lessons, onReorder, isLoading, onEditLesson }
 
       <Card className="bg-white/40 backdrop-blur-sm border-slate-100 rounded-3xl overflow-hidden shadow-sm">
         <div className="p-4 bg-slate-50/50 border-b border-slate-100 flex items-center justify-between px-8">
-          <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Curriculum Structure</span>
-          <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{lessons.length} Modules</span>
+          <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Sequence Order</span>
+          <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{lessons.length} Total Lessons</span>
         </div>
         
         <Reorder.Group 
@@ -390,8 +390,8 @@ function CurriculumTab({ courseId, lessons, onReorder, isLoading, onEditLesson }
               <div className="size-16 rounded-2xl bg-slate-50 flex items-center justify-center mb-4">
                 <BookOpen className="size-8 text-slate-200" />
               </div>
-              <p className="text-sm font-bold text-slate-900">Your curriculum is empty</p>
-              <p className="text-xs text-slate-400 font-medium mt-1">Start by adding your first module using the builder above.</p>
+              <p className="text-sm font-bold text-slate-900">Curriculum is empty</p>
+              <p className="text-xs text-slate-400 font-medium mt-1">Start by adding your first lesson using the builder above.</p>
             </div>
           ) : (
             lessons.map((lesson: any, index: number) => (
@@ -414,7 +414,7 @@ function CurriculumTab({ courseId, lessons, onReorder, isLoading, onEditLesson }
                         "text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-md",
                         lesson.status === "active" ? "bg-emerald-50 text-emerald-600" : "bg-slate-100 text-slate-500"
                       )}>
-                        {lesson.status === "active" ? "Active" : "Draft"}
+                        {lesson.status === "active" ? "Published" : "Draft"}
                       </span>
                     </div>
                   </div>
@@ -433,7 +433,7 @@ function CurriculumTab({ courseId, lessons, onReorder, isLoading, onEditLesson }
                       className="h-8 rounded-lg font-bold text-xs hover:bg-blue-50 hover:text-blue-600"
                     >
                       <Edit3 className="size-3.5 mr-2" />
-                      Configure
+                      Edit Lesson
                     </Button>
                   </div>
                 </div>
