@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useId } from "react";
 import Particles, { initParticlesEngine } from "@tsparticles/react";
-import type { Container, SingleOrMultiple } from "@tsparticles/engine";
+import { type Container, MoveDirection } from "@tsparticles/engine";
 import { loadSlim } from "@tsparticles/slim";
 import { cn } from "@/lib/utils";
 import { motion, useAnimation } from "framer-motion";
@@ -32,6 +32,7 @@ export function Sparkles({
   minOpacity?: number | null;
   color?: string;
   background?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   options?: Record<string, any>;
 }) {
   const [isReady, setIsReady] = useState(false)
@@ -159,6 +160,7 @@ export function SparklesCore({
               events: {
                 onClick: { enable: true, mode: "push" },
                 onHover: { enable: false, mode: "repulse" },
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 resize: true as any,
               },
               modes: {
@@ -173,7 +175,7 @@ export function SparklesCore({
               move: {
                 enable: true,
                 speed: { min: 0.1, max: 1 },
-                direction: "none",
+        direction: MoveDirection.none,
                 outModes: { default: "out" },
               },
               number: {

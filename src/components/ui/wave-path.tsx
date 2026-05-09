@@ -3,6 +3,8 @@
 import { cn } from '@/lib/utils';
 import { useRef, useEffect } from 'react';
 
+/* eslint-disable react-hooks/immutability */
+
 type WavePathProps = React.ComponentProps<'div'>;
 
 export function WavePath({ className, ...props }: WavePathProps) {

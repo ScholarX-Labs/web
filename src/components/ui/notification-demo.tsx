@@ -128,6 +128,7 @@ export function NotificationsPopover() {
             className="rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent"
           >
             <div className="relative flex items-start gap-3 pe-3">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 className="size-9 rounded-md"
                 src={notification.image}

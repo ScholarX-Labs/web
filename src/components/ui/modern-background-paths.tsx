@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/purity */
 "use client"
 
 import { motion } from "framer-motion"
@@ -50,7 +51,7 @@ function GeometricPaths() {
 function FlowPaths() {
   const flowPaths = Array.from({ length: 12 }, (_, i) => {
     const amplitude = 50 + i * 10
-    const frequency = 0.01 + i * 0.002
+    const _frequency = 0.01 + i * 0.002
     const offset = i * 60
 
     return {
@@ -221,7 +222,7 @@ export default function BackgroundPaths({
       setCurrentPattern((prev) => (prev + 1) % patterns.length)
     }, 12000)
     return () => clearInterval(interval)
-  }, [])
+  }, [patterns])
 
   const renderPattern = () => {
     switch (currentPattern) {

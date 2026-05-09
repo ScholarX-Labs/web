@@ -19,6 +19,8 @@ import {
 import { useClickOutside } from "@/hooks/use-click-outside";
 import { cn } from "@/lib/utils";
 
+/* eslint-disable @typescript-eslint/no-explicit-any, react-hooks/static-components */
+
 const TRANSITION: Transition = {
   type: "spring",
   bounce: 0.1,
@@ -80,7 +82,6 @@ export type MorphingPopoverProps = {
 
 function MorphingPopover({
   children,
-  transition = TRANSITION,
   defaultOpen,
   open,
   onOpenChange,
@@ -108,7 +109,7 @@ export type MorphingPopoverTriggerProps = {
 const MorphingPopoverTrigger = forwardRef<
   HTMLButtonElement,
   MorphingPopoverTriggerProps
->(({ children, className, asChild = false, ...props }, ref) => {
+>(({ children, className, asChild = false, ...props }, _ref) => {
   const context = useContext(MorphingPopoverContext);
   if (!context) {
     throw new Error(

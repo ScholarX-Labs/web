@@ -146,7 +146,7 @@ const ShaderAnimation = () => {
     
     window.addEventListener('mousemove', handleMouseMove);
 
-    let startTime = Date.now();
+    const startTime = Date.now();
     
     const render = () => {
       const currentTime = (Date.now() - startTime) * 0.001;

@@ -64,6 +64,7 @@ const TestimonialCarousel = React.forwardRef<HTMLDivElement, TestimonialCarousel
                   </div>
                 )}
                 <div className="p-6 flex flex-col items-center gap-4">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={testimonial.avatar} alt={testimonial.name} className="w-16 h-16 rounded-full object-cover" />
                   <h3 className="text-lg font-semibold text-gray-800 dark:text-foreground">{testimonial.name}</h3>
                   <p className="text-center text-sm text-gray-600 dark:text-muted-foreground">{testimonial.description}</p>

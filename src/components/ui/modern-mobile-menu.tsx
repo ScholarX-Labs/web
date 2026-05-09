@@ -36,6 +36,7 @@ const InteractiveMenu: React.FC<InteractiveMenuProps> = ({ items, accentColor })
   const [activeIndex, setActiveIndex] = useState(0)
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (activeIndex >= finalItems.length) setActiveIndex(0)
   }, [finalItems, activeIndex])
 
