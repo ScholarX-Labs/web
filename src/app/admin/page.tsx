@@ -2,7 +2,7 @@
 
 import { useAdminStats } from "@/hooks/admin/use-admin-stats";
 import { Card } from "@/components/ui/card";
-import { BookOpen, Users, CreditCard, MessageSquare, ArrowRight, Zap, TrendingUp, Clock } from "lucide-react";
+import { BookOpen, Users, CreditCard, MessageSquare, ArrowRight, Zap, TrendingUp, Clock, Settings } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
@@ -18,7 +18,7 @@ const container = {
 
 const item = {
   hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.23, 1, 0.32, 1] } }
+  show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.23, 1, 0.32, 1] as const } }
 };
 
 export default function AdminDashboardPage() {

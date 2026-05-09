@@ -226,9 +226,6 @@ export const createAdminRouteHandlers = (deps: AdminRouteDeps) => {
     try {
       const { path = [] } = await context.params;
       const admin = await resolveAdmin(deps, request, path, "POST");
-      const admin = await resolveAdmin(deps, request, path, "PUT");
-      const admin = await resolveAdmin(deps, request, path, "PATCH");
-      const admin = await resolveAdmin(deps, request, path, "DELETE");
       const domain = deps.createDomain();
       const body = await safeJson<Record<string, unknown>>(request);
 
