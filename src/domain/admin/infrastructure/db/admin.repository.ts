@@ -263,11 +263,40 @@ export const createAdminRepository = (): AdminRepository => {
       return results[0] ?? null;
     },
 
+    /*
+     * RACE CONDITION FIX:
+     *
+     * Problem (original code):
+     *   The previous implementation did two separate round-trips — first read
+     *   MAX(sortIndex) from the lessons table, then INSERT with that value + 1.
+     *   Under concurrent calls for the same courseId, both would read the same
+     *   MAX, compute the same sortIndex, and the second INSERT would either
+     *   silently produce a duplicate or (with the existing unique constraint on
+     *   course_id + sort_index) throw an unhandled unique-violation error.
+     *
+     * Solution:
+     *   1. Atomic counter — we added a `last_lesson_index` column to the
+     *      courses table. Inside a single DB transaction we atomically
+     *      increment it via UPDATE ... RETURNING, which acquires a PostgreSQL
+     *      row-level lock on the course row, serialising concurrent callers.
+     *   2. Retry loop — as defence-in-depth, if a unique-violation (23505)
+     *      somehow still occurs (e.g. from a concurrent reorder operation),
+     *      we retry up to 3 times instead of crashing.
+     *
+     * The UPDATE ... RETURNING approach ensures every lesson creation gets a
+     * strictly monotonically increasing, gap-free sortIndex without races.
+     */
     async createLesson(courseId: string, data: CreateLessonInput) {
       const MAX_RETRIES = 3;
       for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
         try {
           return await db.transaction(async (tx) => {
+            /*
+             * Atomically increment the per-course counter.
+             * The UPDATE acquires a row-level lock on the courses row,
+             * so two concurrent transactions will queue — the second sees
+             * the incremented value from the first.
+             */
             const [counter] = await tx
               .update(dbCourses)
               .set({ lastLessonIndex: sql`${dbCourses.lastLessonIndex} + 1` })
@@ -276,6 +305,10 @@ export const createAdminRepository = (): AdminRepository => {
 
             if (!counter) throw new Error(`Course ${courseId} not found`);
 
+            /*
+             * Insert the lesson with the now-unique sortIndex.
+             * The RETURNING clause gives us back the full row in one shot.
+             */
             const [lesson] = await tx
               .insert(dbLessons)
               .values({
@@ -295,6 +328,12 @@ export const createAdminRepository = (): AdminRepository => {
             return lesson;
           });
         } catch (error) {
+          /*
+           * PostgreSQL error code 23505 = unique_violation.
+           * With the atomic counter above this should never fire, but
+           * we keep it as a safety net against truly rare edge cases
+           * (e.g. manual DB edits, concurrent reorder race).
+           */
           if (
             error instanceof Error &&
             "code" in error &&
