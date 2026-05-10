@@ -145,6 +145,7 @@ const MorphingPopoverTrigger = forwardRef<
   return (
     <motion.button
       ref={ref}
+      type="button"
       layoutId={`popover-trigger-${context.uniqueId}`}
       key={`popover-trigger-${context.uniqueId}`}
       onClick={context.open}
@@ -204,6 +205,7 @@ function MorphingPopoverContent({
           <div className="pointer-events-auto relative">
              <motion.div
                 ref={ref}
+                id={`popover-content-${context.uniqueId}`}
                 layoutId={`popover-trigger-${context.uniqueId}`}
                 className={cn(
                 "overflow-hidden bg-white shadow-[0_30px_90px_-15px_rgba(0,0,0,0.3)] border border-slate-200 rounded-3xl",
