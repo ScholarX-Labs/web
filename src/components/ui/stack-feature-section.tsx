@@ -43,8 +43,8 @@ export default function FeatureSection() {
           RUIXEN is a modern and responsive UI kit for React, Next.js, and Tailwind CSS.
         </p>
         <div className="flex items-center gap-3">
-          <Button variant="default">
-            <Link href="https://ruixen.com" target="_blank">Get Started</Link>
+          <Button variant="default" asChild>
+            <Link href="https://ruixen.com" target="_blank" rel="noopener noreferrer">Get Started</Link>
           </Button>
           <Button variant="outline">Learn More</Button>
         </div>
@@ -53,7 +53,7 @@ export default function FeatureSection() {
       <div className="relative w-1/2 h-full flex items-center justify-start overflow-hidden">
         <div className="relative w-[50rem] h-[50rem] translate-x-[50%] flex items-center justify-center">
           <div className="w-24 h-24 rounded-full bg-gray-50 dark:bg-gray-800 shadow-lg flex items-center justify-center">
-            <FaReact className="w-12 h-12 text-blue-400" />
+            <FaReact className="w-12 h-12 text-blue-400" aria-hidden="true" />
           </div>
 
           {[...Array(orbitCount)].map((_, orbitIdx) => {
@@ -88,7 +88,7 @@ export default function FeatureSection() {
                         }}
                       >
                         {cfg.Icon && (
-                          <cfg.Icon className="w-8 h-8" style={{ color: cfg.color }} />
+                          <cfg.Icon className="w-8 h-8" style={{ color: cfg.color }} aria-hidden="true" />
                         )}
                       </div>
                     )
