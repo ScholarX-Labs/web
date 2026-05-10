@@ -9,6 +9,21 @@ export function clearConfigCache(): void {
   cache.clear();
 }
 
+/**
+ * Retrieves a configuration value by key.
+ *
+ * Lookup order: environment variable → in-memory cache → database.
+ *
+ * IMPORTANT: Environment variables (process.env[KEY]) take precedence over DB
+ * values and the in-memory cache. If an env var is set, calls to setConfig()
+ * and clearConfigCache() have no effect for that key — the env override always
+ * wins. This is an intentional emergency-override mechanism (e.g., kill switch
+ * via Azure App Settings).
+ *
+ * If DB-first semantics are desired, reverse the lookup order or ensure callers
+ * (storage-check route, admin config API) clear the env var before relying on
+ * DB writes.
+ */
 export async function getConfig(key: string): Promise<string | null> {
   const envKey = key.toUpperCase();
   const envOverride = process.env[envKey];
@@ -39,6 +54,7 @@ export async function getConfig(key: string): Promise<string | null> {
 
 export async function isAvatarUploadEnabled(): Promise<boolean> {
   const value = await getConfig("avatar_upload_enabled");
+  if (value === null) return false;
   return value !== "false";
 }
 
