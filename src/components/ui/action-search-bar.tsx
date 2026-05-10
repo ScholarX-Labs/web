@@ -179,6 +179,7 @@ function ActionSearchBar({ actions = allActions }: { actions?: Action[] }) {
           </label>
           <div className="relative">
             <Input
+              id="search"
               type="text"
               placeholder="What's up?"
               value={query}
