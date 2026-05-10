@@ -74,6 +74,7 @@ export default function Page() {
   const onSubmit = async (data: SignupForm) => {
     if (isSocialSubmitting) return;
     setServerError(null);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { confirmPassword: _confirmPassword, ...payload } = data;
 
     const { error } = await signUp.email({
