@@ -1,3 +1,5 @@
+"use client"
+
 import { Sparkles } from "@/components/ui/sparkles"
 import { useTheme } from "next-themes"
 
