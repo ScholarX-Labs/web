@@ -15,7 +15,9 @@ export function WavePath({ className, ...props }: WavePathProps) {
   let reqId: number | null = null;
 
   useEffect(() => {
-    setPath(progress);
+    if (path.current) {
+      path.current.setAttributeNS(null, 'd', `M0 100 Q${0} ${100}, ${window.innerWidth * 0.7} 100`);
+    }
   }, []);
 
   const setPath = (progress: number) => {
