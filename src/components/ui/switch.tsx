@@ -16,9 +16,9 @@ export interface SwitchProps {
 }
 
 const sizeMap: Record<SwitchSize, { track: string; thumb: string; translateX: number }> = {
-  sm: { track: "h-5 w-[44px] px-0.5", thumb: "h-3.5 w-3.5", translateX: 22 },
+  sm: { track: "h-5 w-[44px] px-0.5", thumb: "h-3.5 w-3.5", translateX: 26 },
   md: { track: "h-7 px-1 w-[60px]", thumb: "h-5 w-5", translateX: 32 },
-  lg: { track: "h-9 px-1 w-[76px]", thumb: "h-7 w-7", translateX: 42 },
+  lg: { track: "h-9 px-1 w-[76px]", thumb: "h-7 w-7", translateX: 40 },
 };
 
 export function Switch({
