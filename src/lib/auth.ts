@@ -153,6 +153,48 @@ export const auth = betterAuth({
     sendOnSignUp: true,
     sendOnSignIn: false,
   },
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user) => {
+          const firstName = (user as Record<string, unknown>).firstName as string | undefined;
+          const lastName = (user as Record<string, unknown>).lastName as string | undefined;
+
+          if (!firstName || !lastName) {
+            const fallback = `user-${randomUUID().slice(0, 12)}`;
+            return { data: { ...user, username: fallback } };
+          }
+
+          let base = `${firstName}.${lastName}`
+            .toLowerCase()
+            .replace(/[^a-z0-9._-]/g, "")
+            .replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, "")
+            .slice(0, 26);
+
+          if (!base) {
+            base = `user-${randomUUID().slice(0, 6)}`;
+          }
+
+          for (let attempt = 0; attempt < 10; attempt++) {
+            const candidate = attempt === 0 ? base : `${base}-${randomUUID().slice(0, 6)}`;
+
+            const existing = await db
+              .select({ id: schema.user.id })
+              .from(schema.user)
+              .where(eq(schema.user.username, candidate))
+              .limit(1);
+
+            if (existing.length === 0) {
+              return { data: { ...user, username: candidate } };
+            }
+          }
+
+          const fallback = `user-${randomUUID().slice(0, 12)}`;
+          return { data: { ...user, username: fallback } };
+        },
+      },
+    },
+  },
   hooks: {
     before: createAuthMiddleware(async (ctx) => {
       if (ctx.path === "/email-otp/send-verification-otp") {
@@ -344,6 +386,13 @@ export const auth = betterAuth({
         defaultValue: [],
         required: false,
       },
+      username: { type: "string", required: false },
+      githubUrl: { type: "string", required: false },
+      facebookUrl: { type: "string", required: false },
+      instagramUrl: { type: "string", required: false },
+      twitterUrl: { type: "string", required: false },
+      linkedinUrl: { type: "string", required: false },
+      isProfilePublic: { type: "boolean", required: false, defaultValue: true },
     },
   },
   plugins: [
