@@ -26,7 +26,7 @@ const UnsavePopupAction = memo(
   }) => {
     return (
       <Button 
-        onClick={onClick} 
+        onClick={async () => { try { await onClick?.(); } catch (e) { console.error(e); } }} 
         disabled={isLoading} 
         className="rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 shadow-lg shadow-blue-500/20 active:scale-95 transition-all"
       >
