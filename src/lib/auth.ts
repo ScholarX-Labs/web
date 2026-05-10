@@ -153,41 +153,41 @@ export const auth = betterAuth({
   databaseHooks: {
     user: {
       create: {
-        after: async (user) => {
-          try {
-            const firstName = (user as Record<string, unknown>).firstName as string | undefined;
-            const lastName = (user as Record<string, unknown>).lastName as string | undefined;
+        before: async (user) => {
+          const firstName = (user as Record<string, unknown>).firstName as string | undefined;
+          const lastName = (user as Record<string, unknown>).lastName as string | undefined;
 
-            if (!firstName || !lastName) {
-              const fallback = `user-${randomUUID().slice(0, 12)}`;
-              await db.update(schema.user).set({ username: fallback }).where(eq(schema.user.id, user.id));
-              return;
-            }
-
-            const base = `${firstName}.${lastName}`
-              .toLowerCase()
-              .replace(/[^a-z0-9._-]/g, "")
-              .replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, "")
-              .slice(0, 26);
-
-            for (let attempt = 0; attempt < 10; attempt++) {
-              const candidate = attempt === 0 ? base : `${base}-${randomUUID().slice(0, 6)}`;
-
-              const result = await db
-                .update(schema.user)
-                .set({ username: candidate })
-                .where(
-                  sql`${schema.user.id} = ${user.id} AND ${schema.user.username} IS NULL`
-                );
-
-              if (result.rowCount !== null && result.rowCount > 0) return;
-            }
-
+          if (!firstName || !lastName) {
             const fallback = `user-${randomUUID().slice(0, 12)}`;
-            await db.update(schema.user).set({ username: fallback }).where(eq(schema.user.id, user.id));
-          } catch (error) {
-            console.error("[auth:afterSignUp] Failed to generate username:", error);
+            return { data: { ...user, username: fallback } };
           }
+
+          let base = `${firstName}.${lastName}`
+            .toLowerCase()
+            .replace(/[^a-z0-9._-]/g, "")
+            .replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, "")
+            .slice(0, 26);
+
+          if (!base) {
+            base = `user-${randomUUID().slice(0, 6)}`;
+          }
+
+          for (let attempt = 0; attempt < 10; attempt++) {
+            const candidate = attempt === 0 ? base : `${base}-${randomUUID().slice(0, 6)}`;
+
+            const existing = await db
+              .select({ id: schema.user.id })
+              .from(schema.user)
+              .where(eq(schema.user.username, candidate))
+              .limit(1);
+
+            if (existing.length === 0) {
+              return { data: { ...user, username: candidate } };
+            }
+          }
+
+          const fallback = `user-${randomUUID().slice(0, 12)}`;
+          return { data: { ...user, username: fallback } };
         },
       },
     },
