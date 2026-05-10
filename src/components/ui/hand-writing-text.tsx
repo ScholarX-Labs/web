@@ -9,7 +9,7 @@ interface HandWrittenTitleProps {
 
 function HandWrittenTitle({
   title = "Hand Written",
-  subtitle = "Optional subtitle",
+  subtitle,
 }: HandWrittenTitleProps) {
   const draw = {
     hidden: { pathLength: 0, opacity: 0 },
@@ -33,8 +33,9 @@ function HandWrittenTitle({
           initial="hidden"
           animate="visible"
           className="w-full h-full"
+          aria-hidden="true"
+          focusable="false"
         >
-          <title>KokonutUI</title>
           <motion.path
             d="M 950 90 
                C 1250 300, 1050 480, 600 520
