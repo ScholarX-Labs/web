@@ -83,14 +83,14 @@ export function NotificationsPopover() {
   const unreadCount = notifications.filter((n) => n.unread).length;
 
   const handleMarkAllAsRead = () => {
-    setNotifications(
-      notifications.map((n) => ({ ...n, unread: false })),
+    setNotifications((prev) =>
+      prev.map((n) => ({ ...n, unread: false })),
     );
   };
 
   const handleNotificationClick = (id: number) => {
-    setNotifications(
-      notifications.map((n) =>
+    setNotifications((prev) =>
+      prev.map((n) =>
         n.id === id ? { ...n, unread: false } : n,
       ),
     );
