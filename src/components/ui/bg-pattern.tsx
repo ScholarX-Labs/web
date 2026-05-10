@@ -1,4 +1,5 @@
 /** @usage Decorative backgrounds for sections, cards, hero areas, feature panels */
+import { ComponentProps } from 'react';
 import { cn } from '@/lib/utils';
 
 type BGVariantType = 'dots' | 'diagonal-stripes' | 'grid' | 'horizontal-lines' | 'vertical-lines' | 'checkerboard';
@@ -13,7 +14,7 @@ type BGMaskType =
   | 'fade-y'
   | 'none';
 
-interface BGPatternProps extends React.ComponentProps<'div'> {
+interface BGPatternProps extends ComponentProps<'div'> {
   variant?: BGVariantType;
   mask?: BGMaskType;
   size?: number;
