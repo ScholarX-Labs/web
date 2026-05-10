@@ -217,6 +217,7 @@ const MacOSDock: React.FC<MacOSDockProps> = ({
                 zIndex: Math.round(scale * 10),
               }}
             >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={app.icon}
                 alt={app.name}
