@@ -6,7 +6,30 @@ let redis: Redis | null = null;
 let avatarRateLimiters: Ratelimit[] | null = null;
 let profileLimiter: Ratelimit | null = null;
 
+const CIRCUIT_BREAKER_COOLDOWN_MS = 30_000;
+let redisDown = false;
+let redisDownSince = 0;
+
+function isCircuitOpen(): boolean {
+  if (!redisDown) return false;
+  if (Date.now() - redisDownSince >= CIRCUIT_BREAKER_COOLDOWN_MS) {
+    redisDown = false;
+    return false;
+  }
+  return true;
+}
+
+function markRedisDown(): void {
+  redisDown = true;
+  redisDownSince = Date.now();
+  redis = null;
+  avatarRateLimiters = null;
+  profileLimiter = null;
+  console.error("[rate-limiter] Redis unreachable — circuit open for 30s");
+}
+
 function getRedis(): Redis | null {
+  if (isCircuitOpen()) return null;
   if (!env.UPSTASH_REDIS_URL || !env.UPSTASH_REDIS_TOKEN) {
     return null;
   }
@@ -70,16 +93,23 @@ export async function checkAvatarUploadLimit(
 ): Promise<RateLimitResult> {
   const limiters = getAvatarUploadLimiters();
   if (!limiters) {
-    return { allowed: true, remaining: 999, reset: 0 };
+    console.error("[rate-limiter] Avatar upload rate limiter unavailable — blocking upload");
+    return { allowed: false, remaining: 0, reset: Date.now() + 60_000 };
   }
 
-  const results = await Promise.all(limiters.map((l) => l.limit(userId)));
+  try {
+    const results = await Promise.all(limiters.map((l) => l.limit(userId)));
 
-  const allowed = results.every((r) => r.success);
-  const remaining = Math.min(...results.map((r) => r.remaining));
-  const reset = Math.max(...results.map((r) => r.reset));
+    const allowed = results.every((r) => r.success);
+    const remaining = Math.min(...results.map((r) => r.remaining));
+    const reset = Math.max(...results.map((r) => r.reset));
 
-  return { allowed, remaining, reset };
+    return { allowed, remaining, reset };
+  } catch (error) {
+    console.error("[rate-limiter] Redis error during avatar check:", error);
+    markRedisDown();
+    return { allowed: false, remaining: 0, reset: Date.now() + 60_000 };
+  }
 }
 
 export async function checkPublicProfileLimit(
@@ -90,10 +120,16 @@ export async function checkPublicProfileLimit(
     return { allowed: true, remaining: 999, reset: 0 };
   }
 
-  const result = await limiter.limit(ip);
-  return {
-    allowed: result.success,
-    remaining: result.remaining,
-    reset: result.reset,
-  };
+  try {
+    const result = await limiter.limit(ip);
+    return {
+      allowed: result.success,
+      remaining: result.remaining,
+      reset: result.reset,
+    };
+  } catch (error) {
+    console.error("[rate-limiter] Redis error during profile check:", error);
+    markRedisDown();
+    return { allowed: true, remaining: 999, reset: 0 };
+  }
 }
