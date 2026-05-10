@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Course, LessonSummary } from "@/types/course.types";
 import { CourseListQuery, CourseSearchQuery } from "@/domain/courses/contracts";
 import { PaginatedCoursesApiResponse } from "@/lib/api/courses.service";
@@ -184,7 +185,7 @@ export class NextCourseCatalogService {
     ]);
 
     const mapped = toCourse(course, Boolean(sub));
-    mapped.lessons = lessons.map((l: any) => ({
+    mapped.lessons = lessons.map((l) => ({
       id: l.id,
       title: l.title,
       description: l.description ?? undefined,
@@ -261,16 +262,14 @@ export class NextCourseCatalogService {
 
     const lessons = await this.repository.listLessons(course.id);
 
-    // Resolve lessonId: try UUID match first, then numeric index, then lesson-N pattern
+    // Resolve lessonId: try UUID match, then numeric index (raw or lesson-N prefix)
+    const rawId = lessonId.startsWith("lesson-") ? lessonId.slice(7) : lessonId;
     let resolvedLesson = lessons.find((l: any) => l.id === lessonId);
     if (!resolvedLesson) {
-      const numeric = parseInt(lessonId, 10);
+      const numeric = parseInt(rawId, 10);
       if (!isNaN(numeric) && numeric >= 1 && numeric <= lessons.length) {
         resolvedLesson = lessons[numeric - 1];
       }
-    }
-    if (!resolvedLesson) {
-      resolvedLesson = lessons.find((l: any) => l.id === `lesson-${lessonId}`);
     }
     if (!resolvedLesson) {
       throw new NextCourseError(
