@@ -20,6 +20,7 @@ const Component = () => {
             "relative w-24 h-72 rounded-full transition-all duration-500",
             "bg-gradient-to-b from-slate-700 via-slate-600 to-slate-700",
             "shadow-[inset_0_2px_4px_rgba(0,0,0,0.6),inset_0_-2px_4px_rgba(255,255,255,0.1)]",
+            "peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-cyan-400",
           )}
         >
           <div
