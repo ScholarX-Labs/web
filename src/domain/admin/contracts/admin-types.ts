@@ -122,7 +122,7 @@ export interface CreateLessonInput {
   videoUrl?: string;
   duration?: number;
   isPrivate?: boolean;
-  status?: "draft" | "published";
+  status?: "draft" | "staging" | "published" | "archived";
 }
 
 export interface UpdateLessonInput {
@@ -132,7 +132,7 @@ export interface UpdateLessonInput {
   videoUrl?: string;
   duration?: number;
   isPrivate?: boolean;
-  status?: "draft" | "published";
+  status?: "draft" | "staging" | "published" | "archived";
   expectedVersion: string;
 }
 
