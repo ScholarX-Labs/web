@@ -5,7 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
 import { isDevAuthBypassEnabled } from "@/config/dev-auth-bypass";
 import Footer from "@/components/Footer";
-import Header from "@/components/Header";
+import PremiumHeader from "@/components/PremiumHeader";
 import { GlobalShellExclusions } from "@/components/global-shell-exclusions";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -37,7 +37,7 @@ export default async function RootLayout({
       >
         <div vaul-drawer-wrapper="" className="min-h-screen flex flex-col">
           <GlobalShellExclusions>
-            <Header />
+            <PremiumHeader />
           </GlobalShellExclusions>
           <AppProviders>
             <TooltipProvider>
@@ -47,7 +47,7 @@ export default async function RootLayout({
                   bypassed.
                 </div>
               ) : null}
-              <main className="flex-1 flex flex-col">{children}</main>
+              <main className="flex-1 flex flex-col pt-16 lg:pt-[72px]">{children}</main>
             </TooltipProvider>
           </AppProviders>
           <GlobalShellExclusions>
