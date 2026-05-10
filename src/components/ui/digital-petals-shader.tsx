@@ -23,7 +23,7 @@ const DigitalPetalsShader = () => {
     const uniforms = {
       iTime: { value: 0 },
       iResolution: { value: new THREE.Vector2() },
-      iMouse: { value: new THREE.Vector2(window.innerWidth / 2, window.innerHeight / 2) },
+      iMouse: { value: new THREE.Vector2() },
     };
 
     const material = new THREE.ShaderMaterial({ vertexShader, fragmentShader, uniforms });
@@ -39,6 +39,7 @@ const DigitalPetalsShader = () => {
     };
     window.addEventListener('resize', onResize);
     onResize();
+    uniforms.iMouse.value.set(container.clientWidth / 2, container.clientHeight / 2);
 
     const onMouseMove = (e: MouseEvent) => {
       uniforms.iMouse.value.set(e.clientX, container.clientHeight - e.clientY);
