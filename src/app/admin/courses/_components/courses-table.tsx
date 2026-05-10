@@ -15,6 +15,7 @@ import { getCategoryStyle } from "@/lib/course-categories";
 
 interface Course {
   id: string;
+  slug: string | null;
   title: string;
   category: string | null;
   status: string;
@@ -48,32 +49,36 @@ export function CoursesTable({
     () => [
       {
         accessorKey: "title",
-        header: "Course Detail",
+        header: "Entity Identity",
         cell: ({ row }) => (
-          <div className="flex flex-col gap-0.5">
+          <div className="flex flex-col gap-1">
             <Link
               href={`/admin/courses/${row.original.id}`}
-              className="font-bold text-slate-900 hover:text-blue-600 transition-colors"
+              className="font-[900] text-[15px] text-slate-900 hover:text-blue-600 transition-colors tracking-tight"
             >
               {row.original.title}
             </Link>
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1">
-              ID: {row.original.id.slice(0, 8)}...
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] bg-slate-100 px-1.5 py-0.5 rounded-md">
+                CID: {row.original.id.slice(0, 8)}
+              </span>
+            </div>
           </div>
         ),
       },
       {
         accessorKey: "category",
-        header: "Category",
+        header: "Sector",
         cell: ({ row }) => {
           const style = getCategoryStyle(row.original.category);
           const Icon = style.icon;
           return (
-            <div className="flex items-center gap-2">
-              <Icon className={cn("w-3.5 h-3.5", style.text)} />
-              <span className={cn("font-semibold", style.text)}>
-                {row.original.category ?? "Uncategorized"}
+            <div className="flex items-center gap-2.5">
+              <div className={cn("size-8 rounded-xl flex items-center justify-center ring-1 ring-inset", style.bg, "ring-black/5 shadow-sm")}>
+                <Icon className={cn("size-4", style.text)} />
+              </div>
+              <span className={cn("font-bold text-[13px] tracking-tight", style.text)}>
+                {row.original.category ?? "General"}
               </span>
             </div>
           );
@@ -81,19 +86,19 @@ export function CoursesTable({
       },
       {
         accessorKey: "status",
-        header: "Status",
+        header: "Lifecycle",
         cell: ({ row }) => {
           const status = row.original.status;
           const config: Record<string, { variant: "default" | "secondary" | "outline", className: string }> = {
-            active: { variant: "default", className: "bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-100" },
-            draft: { variant: "secondary", className: "bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200" },
-            inactive: { variant: "outline", className: "bg-rose-50 text-rose-700 border-rose-100 hover:bg-rose-100" },
+            active: { variant: "default", className: "bg-emerald-50 text-emerald-700 border-emerald-100/60 shadow-[0_2px_10px_-4px_rgba(16,185,129,0.2)]" },
+            draft: { variant: "secondary", className: "bg-slate-100 text-slate-600 border-slate-200/60" },
+            inactive: { variant: "outline", className: "bg-rose-50 text-rose-700 border-rose-100/60 shadow-[0_2px_10px_-4px_rgba(244,63,94,0.2)]" },
           };
           const style = config[status] || config.draft;
           return (
             <Badge 
               variant={style.variant} 
-              className={`rounded-full px-3 py-0.5 font-bold uppercase tracking-tighter text-[10px] border transition-colors ${style.className}`}
+              className={cn("rounded-full px-4 py-1 font-[900] uppercase tracking-[0.1em] text-[10px] border transition-all active:scale-95 cursor-default", style.className)}
             >
               {statusLabel(status)}
             </Badge>
@@ -102,25 +107,25 @@ export function CoursesTable({
       },
       {
         accessorKey: "currentPrice",
-        header: "Pricing",
+        header: "Valuation",
         cell: ({ row }) => (
-          <div className="flex items-center gap-1">
-            <span className="text-slate-400 font-bold">$</span>
-            <span className="font-bold text-slate-900">
+          <div className="flex items-center gap-1.5">
+            <span className="text-slate-300 font-[900] text-xs">$</span>
+            <span className="font-black text-slate-900 text-[15px] tracking-tight">
               {row.original.currentPrice != null
-                ? Number(row.original.currentPrice).toFixed(2)
-                : "—"}
+                ? Number(row.original.currentPrice).toLocaleString(undefined, { minimumFractionDigits: 2 })
+                : "0.00"}
             </span>
           </div>
         ),
       },
       {
         accessorKey: "createdAt",
-        header: "Created",
+        header: "Synchronized",
         cell: ({ row }) => (
-          <div className="flex flex-col">
-            <span className="text-slate-900 font-medium">{formatDate(row.original.createdAt)}</span>
-            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">Registered Date</span>
+          <div className="flex flex-col gap-0.5">
+            <span className="text-slate-900 font-bold text-[13px] tracking-tight">{formatDate(row.original.createdAt)}</span>
+            <span className="text-[9px] text-slate-400 font-black uppercase tracking-[0.15em]">Registry Date</span>
           </div>
         ),
       },
@@ -128,23 +133,27 @@ export function CoursesTable({
         id: "actions",
         header: "",
         cell: ({ row }) => (
-          <div className="flex items-center justify-end gap-2">
+          <div className="flex items-center justify-end gap-3 px-2">
             <Link href={`/admin/courses/${row.original.id}`}>
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="h-8 w-8 p-0 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all"
+                className="h-10 w-10 p-0 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all active:scale-90 border border-transparent hover:border-blue-100 shadow-sm hover:shadow-md"
               >
-                <Edit2 className="size-3.5" />
+                <Edit2 className="size-4 stroke-[2.5]" />
               </Button>
             </Link>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="h-8 w-8 p-0 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition-all"
-            >
-              <ExternalLink className="size-3.5" />
-            </Button>
+            {row.original.slug && (
+              <Link href={`/courses/${row.original.slug}`} target="_blank">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-10 w-10 p-0 rounded-xl text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition-all active:scale-90 border border-transparent hover:border-emerald-100 shadow-sm hover:shadow-md"
+                >
+                  <ExternalLink className="size-4 stroke-[2.5]" />
+                </Button>
+              </Link>
+            )}
           </div>
         ),
       },
@@ -153,23 +162,27 @@ export function CoursesTable({
   );
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-10">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 px-2">
         <motion.div
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
+          initial={{ opacity: 0, x: -20, filter: "blur(10px)" }}
+          animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+          className="space-y-1.5"
         >
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Courses</h1>
-          <p className="text-slate-500 font-medium mt-1">Manage and organize your platform's curriculum</p>
+          <div className="w-fit px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] mb-2">
+            Asset Registry
+          </div>
+          <h1 className="text-4xl font-[900] tracking-[-0.04em] text-slate-900">Curriculum Nodes</h1>
+          <p className="text-slate-400 font-semibold tracking-tight">Manage and sequence the platform&apos;s architectural knowledge base.</p>
         </motion.div>
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0, scale: 0.9, filter: "blur(10px)" }}
+          animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
         >
           <Link href="/admin/courses/new">
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-5 h-11 font-bold shadow-lg shadow-blue-500/20 transition-all active:scale-95">
-              <Plus className="size-4 mr-2" />
-              Build Course
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-[22px] px-8 h-14 font-black uppercase tracking-[0.2em] text-[11px] shadow-[0_8px_24px_-4px_rgba(37,99,235,0.3)] hover:shadow-[0_12px_32px_-4px_rgba(37,99,235,0.4)] transition-all active:scale-95 border-b-4 border-blue-800">
+              <Plus className="size-4 mr-3 stroke-[3]" />
+              Initialize Node
             </Button>
           </Link>
         </motion.div>
@@ -179,11 +192,11 @@ export function CoursesTable({
         columns={columns}
         data={items}
         loading={isLoading}
-        error={error ? "Failed to synchronize courses." : null}
+        error={error ? "System synchronization failure." : null}
         searchable
-        searchPlaceholder="Filter by course name or category..."
-        emptyMessage="Curriculum is empty"
-        emptyDescription="Your platform hasn't registered any courses yet. Start by creating your first learning path."
+        searchPlaceholder="Filter registry by identity or sector..."
+        emptyMessage="Registry Offline"
+        emptyDescription="Your architectural knowledge base is currently void. Initialize your first curriculum node to begin synchronization."
         page={pagination.page}
         pageCount={pagination.pages}
         total={pagination.total}
