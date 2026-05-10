@@ -1,7 +1,25 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, react-hooks/set-state-in-effect */
 "use client";
 
 import { use, useState, useEffect } from "react";
+
+interface AdminLesson {
+  id: string;
+  title: string;
+  status: string;
+  duration?: number;
+}
+
+interface AdminCourse {
+  id: string;
+  title?: string;
+  description?: string;
+  category?: string;
+  currentPrice?: number;
+  originalPrice?: number;
+  createdAt?: string;
+  slug?: string;
+  status?: string;
+}
 import Link from "next/link";
 import { useAdminCourse, useUpdateCourse, useUpdateCourseStatus } from "@/hooks/admin/use-admin-courses";
 import { useAdminLessons, useCreateLesson, useReorderLessons, useToggleLessonVisibility } from "@/hooks/admin/use-admin-lessons";
@@ -65,26 +83,33 @@ export default function AdminCourseDetailPage({ params }: { params: Promise<{ co
   const reorderLessons = useReorderLessons();
   
   const [activeTab, setActiveTab] = useState("curriculum");
-  const [lessons, setLessons] = useState<any[]>([]);
-  const [selectedLesson, setSelectedLesson] = useState<any>(null);
+  const [lessons, setLessons] = useState<AdminLesson[]>([]);
+  const [selectedLesson, setSelectedLesson] = useState<AdminLesson | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
-  const [pendingData, setPendingData] = useState<Record<string, any> | null>(null);
+  const [pendingData, setPendingData] = useState<Partial<AdminCourse> | null>(null);
+  const [resetKey, setResetKey] = useState(0);
 
   useEffect(() => {
     if (lessonsData) {
-      setLessons(lessonsData as any[]);
+      setLessons(lessonsData as AdminLesson[]);
     }
   }, [lessonsData]);
 
-  const c = course as Record<string, unknown> | undefined;
+  const c = course as AdminCourse | undefined;
 
-  const handleReorder = (newLessons: any[]) => {
+  const handleReorder = async (newLessons: AdminLesson[]) => {
+    const previous = lessons;
     setLessons(newLessons);
-    reorderLessons.mutate({ 
-      courseId, 
-      data: { lessonIds: newLessons.map(l => l.id) } 
-    });
+    try {
+      await reorderLessons.mutateAsync({ 
+        courseId, 
+        data: { lessonIds: newLessons.map(l => l.id) } 
+      });
+    } catch {
+      setLessons(previous);
+      toast.error("Failed to reorder modules");
+    }
   };
 
   const onTabChange = (id: string) => {
@@ -243,25 +268,25 @@ export default function AdminCourseDetailPage({ params }: { params: Promise<{ co
                   lessons={lessons} 
                   onReorder={handleReorder}
                   isLoading={isLessonsLoading}
-                  onEditLesson={(lesson: any) => {
+                    onEditLesson={(lesson: AdminLesson) => {
                     setSelectedLesson(lesson);
                     setIsEditorOpen(true);
                   }}
                 />
               )}
               {activeTab === "basic" && (
-                <BasicTab 
+                <BasicTab key={resetKey}
                   course={c} 
-                  onChanges={(data: any) => {
+                  onChanges={(data: Record<string, unknown>) => {
                     setHasChanges(true);
                     setPendingData({ ...pendingData, ...data });
                   }} 
                 />
               )}
               {activeTab === "pricing" && (
-                <PricingTab 
+                <PricingTab key={resetKey}
                   course={c} 
-                  onChanges={(data: any) => {
+                  onChanges={(data: Record<string, unknown>) => {
                     setHasChanges(true);
                     setPendingData({ ...pendingData, ...data });
                   }} 
@@ -271,7 +296,7 @@ export default function AdminCourseDetailPage({ params }: { params: Promise<{ co
               {activeTab === "settings" && (
                 <SettingsTab 
                   course={c} 
-                  onStatusChange={(status: any) => updateStatus.mutate({ id: courseId, data: { status } })} 
+                  onStatusChange={(status: string) => updateStatus.mutate({ id: courseId, data: { status } })} 
                   isPending={updateStatus.isPending}
                 />
               )}
@@ -326,7 +351,7 @@ export default function AdminCourseDetailPage({ params }: { params: Promise<{ co
               </div>
               <div className="flex justify-between items-center py-3 border-b border-white/5">
                 <span>Synchronized</span>
-                <span className="text-white font-[900] tracking-tight">{new Date(c.createdAt as string).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                <span className="text-white font-[900] tracking-tight">{c.createdAt ? new Date(c.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : "—"}</span>
               </div>
               <div className="flex justify-between items-center py-3 border-b border-white/5">
                 <span>Status</span>
@@ -354,6 +379,7 @@ export default function AdminCourseDetailPage({ params }: { params: Promise<{ co
         onReset={() => {
           setHasChanges(false);
           setPendingData(null);
+          setResetKey(k => k + 1);
         }}
       >
         <span className="font-bold tracking-tight">Registry Node Modification Protocol Active</span>
@@ -362,13 +388,19 @@ export default function AdminCourseDetailPage({ params }: { params: Promise<{ co
   );
 }
 
-function CurriculumTab({ courseId, lessons, onReorder, isLoading, onEditLesson }: any) {
+function CurriculumTab({ courseId, lessons, onReorder, isLoading, onEditLesson }: {
+  courseId: string;
+  lessons: AdminLesson[];
+  onReorder: (lessons: AdminLesson[]) => void;
+  isLoading: boolean;
+  onEditLesson: (lesson: AdminLesson) => void;
+}) {
   const createLesson = useCreateLesson();
   const toggleVisibility = useToggleLessonVisibility();
   const [newLessonTitle, setNewLessonTitle] = useState("");
   const [movingId, setMovingId] = useState<string | null>(null);
 
-  const handleReorderWithHighlight = (newLessons: any[]) => {
+  const handleReorderWithHighlight = (newLessons: AdminLesson[]) => {
     onReorder(newLessons);
     setMovingId(null);
   };
@@ -451,7 +483,7 @@ function CurriculumTab({ courseId, lessons, onReorder, isLoading, onEditLesson }
               </p>
             </div>
           ) : (
-            lessons.map((lesson: any, index: number) => (
+            lessons.map((lesson: AdminLesson, index: number) => (
               <Reorder.Item 
                 key={lesson.id} 
                 value={lesson}
@@ -540,7 +572,7 @@ function CurriculumTab({ courseId, lessons, onReorder, isLoading, onEditLesson }
   );
 }
 
-function BasicTab({ course, onChanges }: any) {
+function BasicTab({ course, onChanges }: { course: AdminCourse; onChanges: (data: Record<string, unknown>) => void }) {
   const [title, setTitle] = useState(String(course.title ?? ""));
   const [description, setDescription] = useState(String(course.description ?? ""));
   const [category, setCategory] = useState(String(course.category ?? ""));
@@ -590,14 +622,14 @@ function BasicTab({ course, onChanges }: any) {
   );
 }
 
-function PricingTab({ course, onChanges }: any) {
-  const [price, setPrice] = useState(String(course.currentPrice ?? ""));
-  const [discountPrice, setDiscountPrice] = useState(String(course.originalPrice ?? ""));
+function PricingTab({ course, onChanges }: { course: AdminCourse; onChanges: (data: Record<string, unknown>) => void }) {
+  const [price, setPrice] = useState(course.currentPrice != null ? String(course.currentPrice / 100) : "");
+  const [discountPrice, setDiscountPrice] = useState(course.originalPrice != null ? String(course.originalPrice / 100) : "");
 
   const handleChange = (field: string, value: string) => {
     if (field === "currentPrice") setPrice(value);
     if (field === "originalPrice") setDiscountPrice(value);
-    onChanges({ [field]: value ? Number(value) : undefined });
+    onChanges({ [field]: value ? Math.round(Number(value) * 100) : undefined });
   };
 
   return (
@@ -687,7 +719,32 @@ function MediaTab() {
   );
 }
 
-function SettingsTab({ course, onStatusChange, isPending }: any) {
+const STATUS_COLORS: Record<string, string> = {
+  slate: "border-slate-500 shadow-2xl shadow-slate-500/20 ring-8 ring-slate-500/5",
+  emerald: "border-emerald-500 shadow-2xl shadow-emerald-500/20 ring-8 ring-emerald-500/5",
+  amber: "border-amber-500 shadow-2xl shadow-amber-500/20 ring-8 ring-amber-500/5",
+  rose: "border-rose-500 shadow-2xl shadow-rose-500/20 ring-8 ring-rose-500/5",
+};
+const STATUS_BG: Record<string, string> = {
+  slate: "bg-slate-500 shadow-slate-500/30",
+  emerald: "bg-emerald-500 shadow-emerald-500/30",
+  amber: "bg-amber-500 shadow-amber-500/30",
+  rose: "bg-rose-500 shadow-rose-500/30",
+};
+const STATUS_BG_SOLID: Record<string, string> = {
+  slate: "bg-slate-500",
+  emerald: "bg-emerald-500",
+  amber: "bg-amber-500",
+  rose: "bg-rose-500",
+};
+const STATUS_BADGE: Record<string, string> = {
+  slate: "bg-slate-500/10 text-slate-500",
+  emerald: "bg-emerald-500/10 text-emerald-500",
+  amber: "bg-amber-500/10 text-amber-500",
+  rose: "bg-rose-500/10 text-rose-500",
+};
+
+function SettingsTab({ course, onStatusChange, isPending }: { course: AdminCourse; onStatusChange: (status: string) => void; isPending: boolean }) {
   return (
     <Card className="p-12 bg-white/70 backdrop-blur-3xl border border-white rounded-[40px] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)] space-y-12 relative overflow-hidden">
       {/* Loading Overlay */}
@@ -791,14 +848,14 @@ function SettingsTab({ course, onStatusChange, isPending }: any) {
                 "relative flex flex-col text-left p-8 rounded-[36px] transition-all duration-500 border-2 overflow-hidden group",
                 isPending ? "cursor-wait opacity-50" : "cursor-pointer",
                 course.status === s.id 
-                  ? `bg-white dark:bg-zinc-900 border-${s.color}-500 shadow-2xl shadow-${s.color}-500/20 ring-8 ring-${s.color}-500/5` 
+                  ? `bg-white dark:bg-zinc-900 ${STATUS_COLORS[s.color] ?? STATUS_COLORS.slate}` 
                   : "bg-slate-50/50 dark:bg-zinc-950/50 border-transparent hover:border-slate-200 dark:hover:border-zinc-800"
               )}
             >
               <div className="flex items-start justify-between mb-6">
                 <div className={cn(
                   "p-4 rounded-[22px] text-white shadow-lg transition-colors duration-500",
-                  course.status === s.id ? `bg-${s.color}-500 shadow-${s.color}-500/30` : "bg-slate-200 dark:bg-zinc-800"
+                  course.status === s.id ? (STATUS_BG[s.color] ?? STATUS_BG.slate) : "bg-slate-200 dark:bg-zinc-800"
                 )}>
                   <s.icon className="size-6 stroke-[2.5]" />
                 </div>
@@ -808,7 +865,7 @@ function SettingsTab({ course, onStatusChange, isPending }: any) {
                     animate={{ scale: 1, rotate: 0 }}
                     className="size-8 rounded-full flex items-center justify-center bg-white shadow-md border border-slate-100"
                   >
-                    <div className={cn("size-3 rounded-full animate-pulse", `bg-${s.color}-500`)} />
+                    <div className={cn("size-3 rounded-full animate-pulse", STATUS_BG_SOLID[s.color] ?? STATUS_BG_SOLID.slate)} />
                   </motion.div>
                 )}
               </div>
@@ -824,7 +881,7 @@ function SettingsTab({ course, onStatusChange, isPending }: any) {
                   <span className={cn(
                     "text-[9px] font-black uppercase tracking-[0.25em] px-2.5 py-1 rounded-full transition-all duration-500",
                     course.status === s.id 
-                      ? `bg-${s.color}-500/10 text-${s.color}-500` 
+                      ? (STATUS_BADGE[s.color] ?? STATUS_BADGE.slate) 
                       : "bg-slate-100 dark:bg-zinc-800 text-slate-400"
                   )}>
                     {s.intel}
@@ -848,7 +905,7 @@ function SettingsTab({ course, onStatusChange, isPending }: any) {
                     exit={{ opacity: 0 }}
                     className={cn(
                       "absolute -right-8 -bottom-8 size-48 blur-3xl rounded-full opacity-20 pointer-events-none transition-colors duration-700",
-                      `bg-${s.color}-500`
+                      STATUS_BG_SOLID[s.color] ?? STATUS_BG_SOLID.slate
                     )}
                   />
                 )}
