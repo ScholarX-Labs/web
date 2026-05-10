@@ -31,9 +31,9 @@ const alertVariants = cva(
         stroke: 'text-foreground',
       },
       size: {
-        lg: 'rounded-lg p-4 gap-3 text-base [&>[data-slot=alert-icon]>svg]:size-6 *:data-slot=alert-icon:mt-0 *:data-slot=alert-close:mt-0.5 *:data-slot=alert-close:-me-0.5',
-        md: 'rounded-lg p-3.5 gap-2.5 text-sm [&>[data-slot=alert-icon]>svg]:size-5 *:data-slot=alert-icon:mt-0 *:data-slot=alert-close:-me-0.5',
-        sm: 'rounded-md px-3 py-2.5 gap-2 text-xs [&>[data-slot=alert-icon]>svg]:size-4 *:data-alert-icon:mt-0.5 *:data-slot=alert-close:-me-0.5 [&>[data-slot=alert-close]>svg]:size-3.5!',
+        lg: 'rounded-lg p-4 gap-3 text-base [&>[data-slot=alert-icon]>svg]:size-6 *:data-slot=alert-icon:mt-0 *:data-alert-close:mt-0.5 *:data-alert-close:-me-0.5',
+        md: 'rounded-lg p-3.5 gap-2.5 text-sm [&>[data-slot=alert-icon]>svg]:size-5 *:data-slot=alert-icon:mt-0 *:data-alert-close:-me-0.5',
+        sm: 'rounded-md px-3 py-2.5 gap-2 text-xs [&>[data-slot=alert-icon]>svg]:size-4 *:data-slot=alert-icon:mt-0.5 *:data-alert-close:-me-0.5 [&>[data-slot=alert-close]>svg]:size-3.5!',
       },
     },
     compoundVariants: [
@@ -210,12 +210,15 @@ const alertVariants = cva(
   },
 );
 
-interface AlertProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof alertVariants> {
-  close?: boolean;
-  onClose?: () => void;
-}
+type AlertProps = ({
+  close?: false;
+  onClose?: never;
+} | {
+  close: true;
+  onClose: () => void;
+}) & React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof alertVariants>;
 
-function Alert({ className, variant, size, icon, appearance, close = false, onClose, children, ...props }: AlertProps) {
+function Alert({ className, variant, size, icon, appearance, close, onClose, children, ...props }: AlertProps) {
   return (
     <div
       data-slot="alert"
@@ -224,7 +227,7 @@ function Alert({ className, variant, size, icon, appearance, close = false, onCl
       {...props}
     >
       {children}
-      {close && (
+      {close && onClose && (
         <Button
           size="icon-xs"
           variant="ghost"
