@@ -95,11 +95,14 @@ export function LessonClientBridge({
         syncToServer();
       }
     };
-    window.addEventListener("visibilitychange", handleVisibility);
+    document.addEventListener("visibilitychange", handleVisibility);
     return () => {
-      syncToServer();
-      window.removeEventListener("visibilitychange", handleVisibility);
+      document.removeEventListener("visibilitychange", handleVisibility);
     };
+  }, [syncToServer]);
+
+  useEffect(() => {
+    return () => { syncToServer(); };
   }, [syncToServer]);
 
   // 3. Resume Handler
