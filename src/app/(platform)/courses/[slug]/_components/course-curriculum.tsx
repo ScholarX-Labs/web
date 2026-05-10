@@ -3,7 +3,6 @@
 import { Course } from "@/types/course.types";
 import { CheckCircle2, PlayCircle, Lock, Clock } from "lucide-react";
 import { StaggerContainer, StaggerItem } from "@/components/animations/stagger";
-import { cn } from "@/lib/utils";
 
 interface CourseCurriculumProps {
   course: Course;
