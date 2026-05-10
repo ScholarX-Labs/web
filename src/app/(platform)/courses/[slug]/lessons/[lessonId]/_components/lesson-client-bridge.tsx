@@ -63,25 +63,31 @@ export function LessonClientBridge({
   });
 
   // 2. Sync progress to server when completed or on unmount
+  const progressRef = useRef(progress);
+  progressRef.current = progress;
+
   const syncToServer = useCallback(async () => {
-    if (!progress) return;
+    const p = progressRef.current;
+    if (!p) return;
     await syncLessonProgress(lessonId, courseId, {
-      completed: progress.completedAt ? true : false,
-      completedAt: progress.completedAt
-        ? new Date(progress.completedAt).toISOString()
+      completed: p.completedAt ? true : false,
+      completedAt: p.completedAt
+        ? new Date(p.completedAt).toISOString()
         : null,
-      watchedPercentage: Math.round(progress.watchedPercentage),
-      lastPosition: Math.round(progress.lastPosition),
+      watchedPercentage: Math.round(p.watchedPercentage),
+      lastPosition: Math.round(p.lastPosition),
     });
-  }, [progress, lessonId, courseId]);
+  }, [lessonId, courseId]);
 
   useEffect(() => {
-    if (!progress?.completedAt) return;
+    if (!progressRef.current?.completedAt) return;
     const timer = setTimeout(() => {
       syncToServer();
     }, 2000);
     return () => clearTimeout(timer);
-  }, [progress?.completedAt, syncToServer]);
+    // Intentionally only fire when completedAt first becomes truthy
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [progress?.completedAt ? "completed" : "not-completed", syncToServer]);
 
   useEffect(() => {
     const handleVisibility = () => {
@@ -149,6 +155,7 @@ export function LessonClientBridge({
           const thumbnails = Array.isArray(currentLesson?.media?.thumbnails)
             ? currentLesson.media.thumbnails[0]
             : currentLesson?.media?.thumbnails;
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const poster = currentLesson?.media?.poster;
 
           if (!mediaSrc) {
