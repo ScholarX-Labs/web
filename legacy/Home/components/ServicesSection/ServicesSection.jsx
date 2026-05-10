@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 /**
  * ServicesSection Component
  * Reusable section for displaying service cards (Why Choose & Who We Help)

@@ -63,6 +63,16 @@ function readProgress(courseSlug: string, lessonId: string): LessonProgress | nu
   }
 }
 
+function _toIdleWindow(w: typeof globalThis): {
+  requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+  cancelIdleCallback?: (id: number) => void;
+} {
+  return w as unknown as typeof w & {
+    requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+    cancelIdleCallback?: (id: number) => void;
+  };
+}
+
 // Module-scoped pending maps keyed by storageKey
 const _pendingProgress = new Map<string, LessonProgress>();
 const _pendingHandle = new Map<string, { id: number; type: "idle" | "timeout" }>();
@@ -85,8 +95,8 @@ function _cancelPendingForKey(key: string) {
   const prev = _pendingHandle.get(key);
   if (!prev) return;
   try {
-    if (prev.type === "idle" && typeof (globalThis as any).cancelIdleCallback === "function") {
-      (globalThis as any).cancelIdleCallback(prev.id);
+    if (prev.type === "idle" && typeof _toIdleWindow(globalThis).cancelIdleCallback === "function") {
+      _toIdleWindow(globalThis).cancelIdleCallback!(prev.id);
     } else {
       clearTimeout(prev.id);
     }
@@ -104,8 +114,9 @@ function scheduleWriteProgress(progress: LessonProgress, delay = 0) {
 
   const scheduleIdleWrite = () => {
     const writeNow = () => _flushWriteForKey(key);
-    if (typeof (globalThis as any).requestIdleCallback === "function") {
-      const id = (globalThis as any).requestIdleCallback(writeNow, { timeout: 1000 });
+    const w = _toIdleWindow(globalThis);
+    if (typeof w.requestIdleCallback === "function") {
+      const id = w.requestIdleCallback(writeNow, { timeout: 1000 });
       _pendingHandle.set(key, { id, type: "idle" });
     } else {
       const id = setTimeout(writeNow, 0) as unknown as number;
@@ -122,11 +133,6 @@ function scheduleWriteProgress(progress: LessonProgress, delay = 0) {
   } else {
     scheduleIdleWrite();
   }
-}
-
-// Backwards-compatible writer that schedules via scheduleWriteProgress
-function writeProgress(progress: LessonProgress): void {
-  scheduleWriteProgress(progress, 0);
 }
  
 
@@ -208,7 +214,7 @@ export function useLessonProgress({
 
   const [videoDuration, setVideoDuration] = useState<number>(() => (initialDuration > 0 ? initialDuration : 0));
 
-  const [resumePoint, setResumePoint] = useState<number | null>(() => {
+  const [resumePoint] = useState<number | null>(() => {
     if (
       _initialStored &&
       !_initialStored.completedAt &&
@@ -268,6 +274,7 @@ export function useLessonProgress({
           ...prev,
           lastPosition:      currentTime,
           watchedPercentage: Math.max(prev.watchedPercentage, pct),
+          completedAt: prev.completedAt ?? (Math.max(prev.watchedPercentage, pct) >= COMPLETE_AT_PCT ? Date.now() : null),
         };
       });
     },
@@ -304,18 +311,7 @@ export function useLessonProgress({
   }, [updateProgress]);
 
   // ── Also mark completed when watchedPercentage >= threshold ──────────────
-  useEffect(() => {
-    if (
-      progress &&
-      progress.watchedPercentage >= COMPLETE_AT_PCT &&
-      !progress.completedAt
-    ) {
-      updateProgress((prev) => ({
-        ...prev,
-        completedAt: Date.now(),
-      }), /* immediate */ true);
-    }
-  }, [progress?.watchedPercentage, updateProgress]);
+  // (moved into onTimeUpdate to avoid set-state-in-effect)
 
   // ── Cleanup: flush any pending progress for this lesson on unmount/pagehide/visibilitychange
   useEffect(() => {

@@ -28,7 +28,12 @@ const SidebarInner = React.memo(function SidebarInner({
   progress,
 }: Omit<LessonSidebarProps, "className">) {
   const { setDrawerOpen } = useUILayoutStore();
-  const completedCount = lessons.filter((l) => l.isCompleted).length;
+  const isClientCompleted = (id: string) => {
+    const pct = progress?.[id] ?? 0;
+    return pct >= 90;
+  };
+  const isEffectivelyCompleted = (l: LessonSummary) => l.isCompleted || isClientCompleted(l.id);
+  const completedCount = lessons.filter((l) => isEffectivelyCompleted(l)).length;
   const totalDuration = "1h 45m";
 
   return (
@@ -84,7 +89,8 @@ const SidebarInner = React.memo(function SidebarInner({
           {lessons.map((lesson, index) => {
             const isCurrent = lesson.id === currentLessonId;
             const lessonProgress = progress?.[lesson.id] ?? 0;
-            const isInProgress = !lesson.isCompleted && !lesson.isLocked && lessonProgress > 0 && lessonProgress < 100;
+            const lessonCompleted = isEffectivelyCompleted(lesson);
+            const isInProgress = !lessonCompleted && !lesson.isLocked && lessonProgress > 0 && lessonProgress < 100;
 
             return (
               <motion.div
@@ -122,7 +128,7 @@ const SidebarInner = React.memo(function SidebarInner({
                       "relative w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all duration-700",
                       isCurrent
                         ? "bg-blue-600 text-white shadow-[0_0_25px_rgba(37,99,235,0.5)]"
-                        : lesson.isCompleted
+                        : lessonCompleted
                         ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/20"
                         : "bg-white/5 text-white/30 border border-white/10"
                     )}>
@@ -137,7 +143,7 @@ const SidebarInner = React.memo(function SidebarInner({
 
                       {lesson.isLocked ? (
                         <Lock className="w-4 h-4 opacity-50" />
-                      ) : lesson.isCompleted ? (
+                      ) : lessonCompleted ? (
                         <CheckCircle2 className="w-4 h-4" />
                       ) : (
                         <span className="text-[11px] font-black tracking-tighter tabular-nums">
@@ -204,7 +210,7 @@ export const LessonSidebar = React.memo(function LessonSidebar({
           "flex-shrink-0 lg:block overflow-hidden",
           className
         )}
-        style={{ "--sidebar-width": "380px" } as any}
+        style={{ "--sidebar-width": "380px" } as React.CSSProperties}
       >
         <FloatingPanel
           className={cn("flex flex-col p-6 h-fit self-start", className)}

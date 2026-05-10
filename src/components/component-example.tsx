@@ -51,7 +51,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -107,6 +107,7 @@ function CardExample() {
     <Example title="Card" className="items-center justify-center">
       <Card className="relative w-full max-w-sm overflow-hidden pt-0">
         <div className="bg-primary absolute inset-0 z-30 aspect-video opacity-50 mix-blend-color" />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="https://images.unsplash.com/photo-1604076850742-4c7221f3101b?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
           alt="Photo by mymind on Unsplash"
@@ -418,70 +419,66 @@ function FormExample() {
           </CardAction>
         </CardHeader>
         <CardContent>
-          <form>
-            <FieldGroup>
-              <div className="grid grid-cols-2 gap-4">
-                <Field>
-                  <FieldLabel htmlFor="small-form-name">Name</FieldLabel>
-                  <Input
-                    id="small-form-name"
-                    placeholder="Enter your name"
-                    required
-                  />
-                </Field>
-                <Field>
-                  <FieldLabel htmlFor="small-form-role">Role</FieldLabel>
-                  <Select defaultValue="">
-                    <SelectTrigger id="small-form-role">
-                      <SelectValue placeholder="Select a role" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectItem value="developer">Developer</SelectItem>
-                        <SelectItem value="designer">Designer</SelectItem>
-                        <SelectItem value="manager">Manager</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </Field>
-              </div>
+          <form className="flex flex-col gap-6">
+            <div className="grid grid-cols-2 gap-4">
               <Field>
-                <FieldLabel htmlFor="small-form-framework">
-                  Framework
-                </FieldLabel>
-                <Combobox items={frameworks}>
-                  <ComboboxInput
-                    id="small-form-framework"
-                    placeholder="Select a framework"
-                    required
-                  />
-                  <ComboboxContent>
-                    <ComboboxEmpty>No frameworks found.</ComboboxEmpty>
-                    <ComboboxList>
-                      {(item) => (
-                        <ComboboxItem key={item} value={item}>
-                          {item}
-                        </ComboboxItem>
-                      )}
-                    </ComboboxList>
-                  </ComboboxContent>
-                </Combobox>
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="small-form-comments">Comments</FieldLabel>
-                <Textarea
-                  id="small-form-comments"
-                  placeholder="Add any additional comments"
+                <FieldLabel>Name</FieldLabel>
+                <Input
+                  id="small-form-name"
+                  placeholder="Enter your name"
+                  required
                 />
               </Field>
-              <Field orientation="horizontal">
-                <Button type="submit">Submit</Button>
-                <Button variant="outline" type="button">
-                  Cancel
-                </Button>
+              <Field>
+                <FieldLabel>Role</FieldLabel>
+                <Select defaultValue="">
+                  <SelectTrigger id="small-form-role">
+                    <SelectValue placeholder="Select a role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="developer">Developer</SelectItem>
+                      <SelectItem value="designer">Designer</SelectItem>
+                      <SelectItem value="manager">Manager</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
               </Field>
-            </FieldGroup>
+            </div>
+            <Field>
+              <FieldLabel>Framework</FieldLabel>
+              <Combobox items={frameworks}>
+                <ComboboxInput
+                  id="small-form-framework"
+                  placeholder="Select a framework"
+                  required
+                />
+                <ComboboxContent>
+                  <ComboboxEmpty>No frameworks found.</ComboboxEmpty>
+                  <ComboboxList>
+                    {(item) => (
+                      <ComboboxItem key={item} value={item}>
+                        {item}
+                      </ComboboxItem>
+                    )}
+                  </ComboboxList>
+                </ComboboxContent>
+              </Combobox>
+            </Field>
+            <Field>
+              <FieldLabel>Comments</FieldLabel>
+              <Textarea
+                id="small-form-comments"
+                placeholder="Add any additional comments"
+              />
+            </Field>
+            <div className="flex flex-row gap-4">
+              <Button type="submit">Submit</Button>
+              <Button variant="outline" type="button">
+                Cancel
+              </Button>
+            </div>
           </form>
         </CardContent>
       </Card>

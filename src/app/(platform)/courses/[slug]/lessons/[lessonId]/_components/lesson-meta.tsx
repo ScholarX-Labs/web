@@ -3,8 +3,8 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  ChevronLeft, ChevronRight, BookOpen, Clock, CheckCircle2,
-  Share2, Bookmark, MoreHorizontal, Check, Link2,
+  ChevronLeft, ChevronRight, BookOpen, Clock,
+  Bookmark, MoreHorizontal, Check, Link2,
   Flag, NotebookPen, Gauge, Plus
 } from "lucide-react";
 import Link from "next/link";
@@ -159,56 +159,14 @@ export function LessonMeta({
   }, []);
 
   // Ensure the resume prompt appears if resumePoint is loaded after mount.
+  const prevResumePoint = useRef(resumePoint);
   useEffect(() => {
-    if (resumePoint != null && !showResumePrompt) {
+    if (resumePoint != null && resumePoint !== prevResumePoint.current && !showResumePrompt) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setShowResumePrompt(true);
+      prevResumePoint.current = resumePoint;
     }
   }, [resumePoint, showResumePrompt]);
-
-  const handleShare = useCallback(async () => {
-    const url = window.location.href;
-    // Prefer the Web Share API when available; fall back to clipboard.
-    try {
-      const canShareFn = typeof navigator !== "undefined" && typeof (navigator as any).canShare === "function";
-      const shareFn = typeof navigator !== "undefined" && typeof (navigator as any).share === "function";
-
-      if (shareFn) {
-        try {
-          // If canShare is available, check before calling share.
-          if (canShareFn) {
-            const can = (navigator as any).canShare({ title: `Lesson: ${title}`, url });
-            if (can) {
-              await (navigator as any).share({ title: `Lesson: ${title}`, url });
-              return;
-            }
-          } else {
-            // If canShare is not available, still try share and fall back on failure.
-            await (navigator as any).share({ title: `Lesson: ${title}`, url });
-            return;
-          }
-        } catch (err) {
-          // Sharing failed or was cancelled — fall back to clipboard below.
-        }
-      }
-
-      // Fallback: use Clipboard API if available.
-      if (typeof navigator?.clipboard?.writeText === "function") {
-        try {
-          await navigator.clipboard.writeText(url);
-          showToast("Link copied to clipboard");
-          return;
-        } catch (err) {
-          showToast("Failed to copy link");
-          return;
-        }
-      }
-
-      // Last resort: inform the user sharing isn't supported.
-      showToast("Sharing not supported on this device");
-    } catch (err) {
-      showToast("Failed to share or copy link");
-    }
-  }, [title, showToast]);
 
   const handleBookmark = useCallback(() => {
     setIsBookmarked((prev) => {
@@ -244,7 +202,7 @@ export function LessonMeta({
           } else {
             showToast("Copy not supported on this device");
           }
-        } catch (err) {
+        } catch {
           showToast("Failed to copy link");
         }
       },

@@ -1,28 +1,19 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, startTransition } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   BookOpen, NotebookPen, FolderOpen, Plus, Trash2,
-  File, Link2, Video, Clock, StickyNote
+  Clock, StickyNote
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNotes } from "@/hooks/use-notes";
 import { useUILayoutStore } from "@/store/ui-layout-store";
-import { fadeSlideUp, staggerContainer, staggerItem } from "@/lib/motion-variants";
-import { AnimatedButton } from "@/components/ui/animated-button";
-import { ContextTooltip } from "@/components/ui/context-tooltip";
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
-
-interface Note {
-  id: string;
-  text: string;
-  timestamp: string;    // Human-readable time, e.g. "22:35"
-  createdAt: number;    // Unix ms
-}
 
 interface Resource {
   id: string;
@@ -45,70 +36,6 @@ interface LessonTabsProps {
 type TabId = "overview" | "notes" | "resources";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Mock Resources
-// ─────────────────────────────────────────────────────────────────────────────
-
-const DEFAULT_RESOURCES: Resource[] = [
-  {
-    id: "r1",
-    type: "pdf",
-    title: "Lesson Slides",
-    description: "Full slide deck for this lesson in PDF format",
-    url: "#",
-    size: "2.4 MB",
-  },
-  {
-    id: "r2",
-    type: "code",
-    title: "Starter Code",
-    description: "GitHub repository with the starter project template",
-    url: "https://github.com",
-    size: "ZIP",
-  },
-  {
-    id: "r3",
-    type: "link",
-    title: "React Documentation",
-    description: "Official React 18 docs referenced in this lesson",
-    url: "https://react.dev",
-  },
-  {
-    id: "r4",
-    type: "video",
-    title: "Supplemental Video",
-    description: "Extended walkthrough of the advanced patterns",
-    url: "#",
-  },
-];
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Resource Icon + color map
-// ─────────────────────────────────────────────────────────────────────────────
-
-const resourceMeta: Record<Resource["type"], { icon: React.ReactNode; color: string; bg: string }> = {
-  pdf: {
-    icon: <File className="w-4 h-4" />,
-    color: "text-red-400",
-    bg: "bg-red-500/10 border-red-500/20",
-  },
-  code: {
-    icon: <File className="w-4 h-4" />,
-    color: "text-emerald-400",
-    bg: "bg-emerald-500/10 border-emerald-500/20",
-  },
-  link: {
-    icon: <Link2 className="w-4 h-4" />,
-    color: "text-blue-400",
-    bg: "bg-blue-500/10 border-blue-500/20",
-  },
-  video: {
-    icon: <Video className="w-4 h-4" />,
-    color: "text-violet-400",
-    bg: "bg-violet-500/10 border-violet-500/20",
-  },
-};
-
-// ─────────────────────────────────────────────────────────────────────────────
 // Tab Bar
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -126,7 +53,6 @@ export function LessonTabs({
   lessonId,
   courseSlug,
   description,
-  resources = DEFAULT_RESOURCES,
   initialTab,
   onTabChange,
 }: LessonTabsProps) {
@@ -150,11 +76,13 @@ export function LessonTabs({
   }, [setResourcesSheetOpen, onTabChange]);
 
   // React to external tab override (run only once when initialTab first arrives)
-  const seenInitialTabRef = useRef(false);
+  const seenInitialTabRef = useRef(initialTab);
   useEffect(() => {
-    if (!seenInitialTabRef.current && initialTab) {
-      seenInitialTabRef.current = true;
-      setActiveTab(initialTab);
+    if (initialTab && initialTab !== seenInitialTabRef.current) {
+      seenInitialTabRef.current = initialTab;
+      startTransition(() => {
+        setActiveTab(initialTab);
+      });
       if (initialTab === "resources") {
         setResourcesSheetOpen(true);
       }

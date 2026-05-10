@@ -1680,17 +1680,34 @@ const redis = new Redis({
 });
 
 // Avatar upload: 3 per hour, 5 per day, 7 per week, 10 per month per user
-export const avatarUploadLimiter = new Ratelimit({
-  redis,
-  prefix: "ratelimit:avatar",
-  analytics: true,
-  limiter: Ratelimit.multi(
-    { window: 60 * 60 * 1000, max: 3 },      // hourly
-    { window: 24 * 60 * 60 * 1000, max: 5 },  // daily
-    { window: 7 * 24 * 60 * 60 * 1000, max: 7 }, // weekly
-    { window: 30 * 24 * 60 * 60 * 1000, max: 10 }, // monthly
-  ),
+const hourlyLimiter = new Ratelimit({
+  redis, prefix: "ratelimit:avatar:hourly", analytics: true,
+  limiter: Ratelimit.slidingWindow(3, "1 h"),
 });
+const dailyLimiter = new Ratelimit({
+  redis, prefix: "ratelimit:avatar:daily", analytics: true,
+  limiter: Ratelimit.slidingWindow(5, "1 d"),
+});
+const weeklyLimiter = new Ratelimit({
+  redis, prefix: "ratelimit:avatar:weekly", analytics: true,
+  limiter: Ratelimit.slidingWindow(7, "1 w"),
+});
+const monthlyLimiter = new Ratelimit({
+  redis, prefix: "ratelimit:avatar:monthly", analytics: true,
+  limiter: Ratelimit.slidingWindow(10, "1 M"),
+});
+
+export async function checkAvatarUploadLimit(identifier: string) {
+  const [hourly, daily, weekly, monthly] = await Promise.all([
+    hourlyLimiter.limit(identifier),
+    dailyLimiter.limit(identifier),
+    weeklyLimiter.limit(identifier),
+    monthlyLimiter.limit(identifier),
+  ]);
+  const remaining = Math.min(hourly.remaining, daily.remaining, weekly.remaining, monthly.remaining);
+  const reset = Math.max(hourly.reset, daily.reset, weekly.reset, monthly.reset);
+  return { denied: hourly.denied || daily.denied || weekly.denied || monthly.denied, remaining, reset };
+}
 
 // Public profile lookups: 60 per minute per IP
 export const publicProfileLimiter = new Ratelimit({
@@ -1781,18 +1798,25 @@ const ACCEPTED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
 const AVATAR_MAX_DIMENSION = 512;
 
-// Magic byte signatures
-const MAGIC_BYTES: Record<string, number[]> = {
-  "image/jpeg": [0xFF, 0xD8, 0xFF],
-  "image/png": [0x89, 0x50, 0x4E, 0x47],
-  "image/webp": [0x52, 0x49, 0x46, 0x46], // RIFF prefix
+// Magic byte signatures — each entry is an array of { bytes, offset } segments
+type MagicSignature = { bytes: number[]; offset: number }[];
+
+const MAGIC_BYTES: Record<string, MagicSignature> = {
+  "image/jpeg": [{ bytes: [0xFF, 0xD8, 0xFF], offset: 0 }],
+  "image/png": [{ bytes: [0x89, 0x50, 0x4E, 0x47], offset: 0 }],
+  "image/webp": [
+    { bytes: [0x52, 0x49, 0x46, 0x46], offset: 0 },  // "RIFF" prefix
+    { bytes: [0x57, 0x45, 0x42, 0x50], offset: 8 },  // "WEBP" chunk header
+  ],
 };
 
 function detectMagicBytes(buffer: Buffer): string | null {
-  for (const [mime, sig] of Object.entries(MAGIC_BYTES)) {
-    if (buffer.length >= sig.length && sig.every((b, i) => buffer[i] === b)) {
-      return mime;
-    }
+  for (const [mime, segments] of Object.entries(MAGIC_BYTES)) {
+    const matches = segments.every(({ bytes, offset }) =>
+      buffer.length >= offset + bytes.length &&
+      bytes.every((b, i) => buffer[offset + i] === b)
+    );
+    if (matches) return mime;
   }
   return null;
 }

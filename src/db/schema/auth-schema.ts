@@ -1,4 +1,5 @@
 // [AUTO-FIXED] Array defaults and other Postgres-specific patches applied by scripts/fix-auth-schema.js
+// [AUTO-FIXED] Array defaults and other Postgres-specific patches applied by scripts/fix-auth-schema.js
 import { relations, sql } from "drizzle-orm";
 import {
   pgSchema,
@@ -6,7 +7,6 @@ import {
   timestamp,
   boolean,
   integer,
-  numeric,
   index,
 } from "drizzle-orm/pg-core";
 

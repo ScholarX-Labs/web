@@ -24,6 +24,7 @@ export default defineConfig({
     "./src/db/schema/auth-schema.ts",
     "./src/db/schema/contact-us-schema.ts",
     "./src/domain/courses/infrastructure/db/courses-db.schema.ts",
+    "./src/domain/admin/infrastructure/db/admin-db.schema.ts",
   ],
   dialect: "postgresql",
   dbCredentials: {

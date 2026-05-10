@@ -46,6 +46,7 @@ export interface Course {
   createdAt: string;
   updatedAt: string;
   isSubscribed?: boolean;
+  lessons?: Lesson[];
 }
 
 export interface Enrollment {

@@ -3,9 +3,11 @@ import { db } from "@/db";
 import {
   dbCourses,
   dbInquiries,
+  dbLessonProgress,
   dbSubscriptions,
   dbUsers,
 } from "@/domain/courses/infrastructure/db/courses-db.schema";
+import { dbLessons } from "@/domain/admin/infrastructure/db/admin-db.schema";
 
 export interface CourseListFilter {
   page: number;
@@ -36,7 +38,6 @@ export interface FlatCourseRecord {
   urgencyText: string | null;
   tags: string[] | null;
   requiresForm: boolean | null;
-  salesInquiry: boolean | null;
   createdAt: string | null;
   updatedAt: string | null;
   instructor: {
@@ -46,6 +47,38 @@ export interface FlatCourseRecord {
     title: string | null;
   } | null;
 }
+
+const courseColumns = {
+  id: dbCourses.id,
+  slug: dbCourses.slug,
+  title: dbCourses.title,
+  description: dbCourses.description,
+  imageUrl: dbCourses.imageUrl,
+  videoPreviewUrl: dbCourses.videoPreviewUrl,
+  category: dbCourses.category,
+  level: dbCourses.level,
+  currentPrice: dbCourses.currentPrice,
+  originalPrice: dbCourses.originalPrice,
+  status: dbCourses.status,
+  rating: dbCourses.rating,
+  totalRatings: dbCourses.totalRatings,
+  duration: dbCourses.duration,
+  lessonsCount: dbCourses.lessonsCount,
+  videosCount: dbCourses.videosCount,
+  studentsCount: dbCourses.studentsCount,
+  isBestseller: dbCourses.isBestseller,
+  urgencyText: dbCourses.urgencyText,
+  tags: dbCourses.tags,
+  requiresForm: dbCourses.requiresForm,
+  createdAt: dbCourses.createdAt,
+  updatedAt: dbCourses.updatedAt,
+};
+
+const instructorColumns = {
+  id: dbUsers.id,
+  name: dbUsers.name,
+  image: dbUsers.image,
+};
 
 const toWhereClause = (filter: CourseListFilter) => {
   const predicates = [eq(dbCourses.status, "active")];
@@ -62,38 +95,41 @@ const toWhereClause = (filter: CourseListFilter) => {
 };
 
 const mapCourseRecord = (row: {
-  course: typeof dbCourses.$inferSelect;
-  instructor: typeof dbUsers.$inferSelect | null;
+  course: Record<string, unknown>;
+  instructor: Record<string, unknown> | null;
 }): FlatCourseRecord => ({
-  id: row.course.id,
-  slug: row.course.slug,
-  title: row.course.title,
-  description: row.course.description,
-  imageUrl: row.course.imageUrl,
-  videoPreviewUrl: row.course.videoPreviewUrl,
-  category: row.course.category,
-  level: row.course.level,
-  currentPrice: row.course.currentPrice,
-  originalPrice: row.course.originalPrice,
-  status: row.course.status,
-  rating: row.course.rating,
-  totalRatings: row.course.totalRatings,
-  duration: row.course.duration,
-  lessonsCount: row.course.lessonsCount,
-  videosCount: row.course.videosCount,
-  studentsCount: row.course.studentsCount,
-  isBestseller: row.course.isBestseller,
-  urgencyText: row.course.urgencyText,
-  tags: row.course.tags,
-  requiresForm: row.course.requiresForm,
-  salesInquiry: row.course.salesInquiry,
-  createdAt: row.course.createdAt ? row.course.createdAt.toISOString() : null,
-  updatedAt: row.course.updatedAt ? row.course.updatedAt.toISOString() : null,
+  id: row.course.id as string,
+  slug: row.course.slug as string | null,
+  title: row.course.title as string,
+  description: row.course.description as string,
+  imageUrl: row.course.imageUrl as string | null,
+  videoPreviewUrl: row.course.videoPreviewUrl as string | null,
+  category: row.course.category as string,
+  level: row.course.level as string | null,
+  currentPrice: row.course.currentPrice as number,
+  originalPrice: row.course.originalPrice as number | null,
+  status: row.course.status as string,
+  rating: row.course.rating as string | number | null,
+  totalRatings: row.course.totalRatings as number | null,
+  duration: row.course.duration as string | null,
+  lessonsCount: row.course.lessonsCount as number | null,
+  videosCount: row.course.videosCount as number | null,
+  studentsCount: row.course.studentsCount as number | null,
+  isBestseller: row.course.isBestseller as boolean | null,
+  urgencyText: row.course.urgencyText as string | null,
+  tags: row.course.tags as string[] | null,
+  requiresForm: row.course.requiresForm as boolean | null,
+  createdAt: row.course.createdAt
+    ? (row.course.createdAt as Date).toISOString()
+    : null,
+  updatedAt: row.course.updatedAt
+    ? (row.course.updatedAt as Date).toISOString()
+    : null,
   instructor: row.instructor
     ? {
-        id: row.instructor.id,
-        name: row.instructor.name,
-        avatar: row.instructor.image,
+        id: row.instructor.id as string,
+        name: row.instructor.name as string,
+        avatar: row.instructor.image as string | null,
         title: null,
       }
     : null,
@@ -110,7 +146,7 @@ export class NextCoursesRepository {
       .where(whereClause);
 
     const rows = await db
-      .select({ course: dbCourses, instructor: dbUsers })
+      .select({ course: courseColumns, instructor: instructorColumns })
       .from(dbCourses)
       .leftJoin(dbUsers, eq(sql`${dbCourses.instructorId}::text`, dbUsers.id))
       .where(whereClause)
@@ -126,7 +162,7 @@ export class NextCoursesRepository {
 
   async findByIdActive(id: string): Promise<FlatCourseRecord | null> {
     const rows = await db
-      .select({ course: dbCourses, instructor: dbUsers })
+      .select({ course: courseColumns, instructor: instructorColumns })
       .from(dbCourses)
       .leftJoin(dbUsers, eq(sql`${dbCourses.instructorId}::text`, dbUsers.id))
       .where(and(eq(dbCourses.id, id), eq(dbCourses.status, "active")))
@@ -138,7 +174,7 @@ export class NextCoursesRepository {
 
   async findBySlugActive(slug: string): Promise<FlatCourseRecord | null> {
     const rows = await db
-      .select({ course: dbCourses, instructor: dbUsers })
+      .select({ course: courseColumns, instructor: instructorColumns })
       .from(dbCourses)
       .leftJoin(dbUsers, eq(sql`${dbCourses.instructorId}::text`, dbUsers.id))
       .where(and(eq(dbCourses.slug, slug), eq(dbCourses.status, "active")))
@@ -244,6 +280,20 @@ export class NextCoursesRepository {
     return row;
   }
 
+  async listLessons(courseId: string) {
+    return db
+      .select()
+      .from(dbLessons)
+      .where(
+        and(
+          eq(dbLessons.courseId, courseId),
+          eq(dbLessons.isArchived, false),
+          eq(dbLessons.status, "active"),
+        ),
+      )
+      .orderBy(asc(dbLessons.sortIndex));
+  }
+
   async findUserById(userId: string) {
     const rows = await db
       .select({
@@ -255,5 +305,74 @@ export class NextCoursesRepository {
       .limit(1);
 
     return rows[0] ?? null;
+  }
+
+  async findLessonProgress(userId: string, lessonId: string) {
+    const rows = await db
+      .select()
+      .from(dbLessonProgress)
+      .where(
+        and(
+          eq(dbLessonProgress.userId, userId),
+          eq(dbLessonProgress.lessonId, lessonId),
+        ),
+      )
+      .limit(1);
+
+    return rows[0] ?? null;
+  }
+
+  async upsertLessonProgress(
+    userId: string,
+    lessonId: string,
+    courseId: string,
+    data: {
+      completed?: boolean;
+      completedAt?: Date | null;
+      watchedPercentage?: number;
+      lastPosition?: number;
+    },
+  ) {
+    const existing = await this.findLessonProgress(userId, lessonId);
+
+    if (existing) {
+      const [row] = await db
+        .update(dbLessonProgress)
+        .set({
+          ...data,
+          updatedAt: new Date(),
+        })
+        .where(eq(dbLessonProgress.id, existing.id))
+        .returning();
+
+      return row;
+    }
+
+    const [row] = await db
+      .insert(dbLessonProgress)
+      .values({
+        userId,
+        lessonId,
+        courseId,
+        completed: data.completed ?? false,
+        completedAt: data.completedAt ?? null,
+        watchedPercentage: data.watchedPercentage ?? 0,
+        lastPosition: data.lastPosition ?? 0,
+      })
+      .returning();
+
+    return row;
+  }
+
+  async findProgressByCourse(userId: string, courseId: string) {
+    return db
+      .select()
+      .from(dbLessonProgress)
+      .where(
+        and(
+          eq(dbLessonProgress.userId, userId),
+          eq(dbLessonProgress.courseId, courseId),
+        ),
+      );
   }
 }

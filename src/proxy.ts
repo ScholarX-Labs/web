@@ -19,7 +19,7 @@ function hasSessionCookie(request: NextRequest) {
   );
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   if (isDevAuthBypassEnabled && process.env.NODE_ENV !== "production") {
     return NextResponse.next();
   }
@@ -27,6 +27,7 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isAuthRoute = pathname.startsWith("/auth");
   const isPublicRoute = OPEN_ROUTES.has(pathname) || pathname.startsWith("/courses/");
+  const isAdminRoute = pathname.startsWith("/admin");
 
   if (
     isAuthRoute &&
@@ -36,7 +37,11 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
-  if (!isPublicRoute && !isAuthenticated && !isAuthRoute) {
+  if (isAdminRoute && !isAuthenticated) {
+    return NextResponse.redirect(new URL(ROUTES.SIGNIN, request.url));
+  }
+
+  if (!isPublicRoute && !isAuthenticated && !isAuthRoute && !isAdminRoute) {
     return NextResponse.redirect(new URL(ROUTES.SIGNIN, request.url));
   }
 

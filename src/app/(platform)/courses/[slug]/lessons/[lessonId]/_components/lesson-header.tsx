@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Share2, Tv2, Check, Eye, EyeOff } from "lucide-react";
+import { ChevronLeft, Share2, Tv2, Check } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { AnimatedButton } from "@/components/ui/animated-button";
@@ -20,47 +20,26 @@ interface LessonHeaderProps {
 
 export function LessonHeader({ slug, lessonTitle }: LessonHeaderProps) {
   const [copied, setCopied] = useState(false);
-  const { isFocusMode, toggleFocusMode } = useUILayoutStore();
+  const { isFocusMode } = useUILayoutStore();
   const router = useRouter();
 
   const handleShare = useCallback(async () => {
     const url = window.location.href;
-    const shareData = { title: `Lesson: ${lessonTitle}`, url };
     try {
-      const hasShare = typeof navigator !== "undefined" && typeof (navigator as any).share === "function";
-      const hasCanShare = typeof navigator !== "undefined" && typeof (navigator as any).canShare === "function";
-
-      if (hasShare) {
-        try {
-          // If canShare exists, ask it first; otherwise assume share is available
-          if (hasCanShare) {
-            const can = (navigator as any).canShare(shareData);
-            if (can) {
-              await (navigator as any).share(shareData);
-              return;
-            }
-          } else {
-            await (navigator as any).share(shareData);
-            return;
-          }
-        } catch (err) {
-          // Sharing failed or was cancelled — fall back to clipboard below.
-        }
-      }
-
-      // Fallback: use Clipboard API if available.
-      if (typeof navigator?.clipboard?.writeText === "function") {
-        try {
-          await navigator.clipboard.writeText(url);
-          setCopied(true);
-          setTimeout(() => setCopied(false), 2000);
-          return;
-        } catch {
-          // Clipboard write failed — swallow to preserve UX
-        }
+      if (typeof navigator.share === "function") {
+        await navigator.share({ title: `Lesson: ${lessonTitle}`, url });
+        return;
       }
     } catch {
-      // User cancelled or an unexpected error occurred
+      // Sharing failed or was cancelled
+    }
+
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard write failed
     }
   }, [lessonTitle]);
 

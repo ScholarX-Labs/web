@@ -35,10 +35,15 @@ export const dbCourses = coursesSchema.table("courses", {
   videosCount: integer("videos_count"),
   studentsCount: integer("students_count"),
   isBestseller: boolean("is_bestseller"),
+  lastLessonIndex: integer("last_lesson_index").notNull().default(0),
   urgencyText: varchar("urgency_text", { length: 255 }),
   tags: jsonb("tags").$type<string[] | null>(),
   requiresForm: boolean("requires_form"),
   salesInquiry: boolean("sales_inquiry"),
+  isArchived: boolean("is_archived").default(false),
+  seoDescription: text("seo_description"),
+  seoKeywords: varchar("seo_keywords", { length: 500 }),
+  updatedBy: text("updated_by").references(() => dbUsers.id),
   createdAt: timestamp("created_at"),
   updatedAt: timestamp("updated_at"),
 });
@@ -57,6 +62,36 @@ export const dbSubscriptions = coursesSchema.table("subscriptions", {
   paymentId: varchar("payment_id", { length: 255 }),
   enrolledAt: timestamp("enrolled_at"),
 });
+
+export const dbLessonProgress = coursesSchema.table(
+  "lesson_progress",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => dbUsers.id, { onDelete: "cascade" }),
+    lessonId: uuid("lesson_id").notNull(),
+    courseId: uuid("course_id")
+      .notNull()
+      .references(() => dbCourses.id, { onDelete: "cascade" }),
+    completed: boolean("completed").default(false).notNull(),
+    completedAt: timestamp("completed_at"),
+    watchedPercentage: integer("watched_percentage").default(0).notNull(),
+    lastPosition: integer("last_position").default(0).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    progressUserLessonUq: uniqueIndex("progress_user_lesson_uq").on(
+      table.userId,
+      table.lessonId,
+    ),
+    progressCourseUserIdx: index("progress_course_user_idx").on(
+      table.courseId,
+      table.userId,
+    ),
+  }),
+);
 
 export const dbInquiries = coursesSchema.table(
   "inquiries",

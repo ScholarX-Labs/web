@@ -32,6 +32,7 @@ const StatCard = memo(function StatCard({
   const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const element = cardRef.current;
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -41,13 +42,13 @@ const StatCard = memo(function StatCard({
       { threshold: 0.3 }
     );
 
-    if (cardRef.current) {
-      observer.observe(cardRef.current);
+    if (element) {
+      observer.observe(element);
     }
 
     return () => {
-      if (cardRef.current) {
-        observer.unobserve(cardRef.current);
+      if (element) {
+        observer.unobserve(element);
       }
     };
   }, []);
@@ -164,6 +165,7 @@ export const ImpactSection = memo(function ImpactSection({
           {IMPACT_STATS.map((stat, index) => (
             <StatCard
               key={stat.id}
+              id={stat.id}
               icon={stat.icon}
               value={stat.value}
               label={stat.label}

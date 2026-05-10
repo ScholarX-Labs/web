@@ -49,15 +49,15 @@ export const useUILayoutStore = create<UILayoutState>((set) => ({
     }
     return { isFocusMode: next };
   }),
-  setFocusMode:         (active) => set((s) => ({
+  setFocusMode:         (active) => set(() => ({
     isFocusMode: active,
     ...(active ? { isNotesOverlayOpen: false, isResourcesSheetOpen: false } : {}),
   })),
-  setNotesOverlayOpen:  (open)   => set((s) => ({
+  setNotesOverlayOpen:  (open)   => set(() => ({
     isNotesOverlayOpen: open,
     ...(open ? { isFocusMode: false, isResourcesSheetOpen: false } : {}),
   })),
-  setResourcesSheetOpen:(open)   => set((s) => ({
+  setResourcesSheetOpen:(open)   => set(() => ({
     isResourcesSheetOpen: open,
     ...(open ? { isFocusMode: false, isNotesOverlayOpen: false } : {}),
   })),

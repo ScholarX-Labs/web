@@ -57,7 +57,7 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
   const { data: session } = useSession();
 
   // Extract the saved list from the user's session safely
-  const savedList: string[] = (session?.user as any)?.savedOpportunities || [];
+  const savedList: string[] = (session?.user as Record<string, unknown>)?.savedOpportunities as string[] || [];
   const isCurrentlySaved = savedList.includes(opportunity.id);
 
   // Optimistic UI state for instant feedback
@@ -66,7 +66,7 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
     (state, newSavedState: boolean) => newSavedState
   );
 
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
 
   const handleToggleSave = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -85,7 +85,7 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
         if (!result.success) {
           toast.error(result.error || "Failed to update saved status. Please try again.");
         }
-      } catch (error) {
+      } catch {
         toast.error("An unexpected error occurred. Please try again.");
       }
     });

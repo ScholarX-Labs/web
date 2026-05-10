@@ -19,48 +19,11 @@ import { CourseRating } from "./course-rating";
 import { CourseMeta } from "./course-meta";
 import { InstructorInfo } from "./instructor-info";
 import { cn } from "@/lib/utils";
-import { Monitor, PenTool, Database, Cpu, Tag } from "lucide-react";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useCourseSheetStore } from "@/stores/course-sheet.store";
 import { useEnrollIntentController } from "@/lib/enrollment/intent-controller";
 import { useSession } from "@/lib/auth-client";
-
-const CATEGORY_STYLES: Record<
-  string,
-  { icon: React.ElementType; gradient: string; shadow: string; ring: string }
-> = {
-  Engineering: {
-    icon: Monitor,
-    gradient: "from-blue-500 to-cyan-400",
-    shadow: "shadow-[0_4px_14px_rgba(59,130,246,0.4)]",
-    ring: "ring-blue-400/30",
-  },
-  Design: {
-    icon: PenTool,
-    gradient: "from-pink-500 to-rose-400",
-    shadow: "shadow-[0_4px_14px_rgba(236,72,153,0.4)]",
-    ring: "ring-pink-400/30",
-  },
-  Backend: {
-    icon: Database,
-    gradient: "from-emerald-500 to-teal-400",
-    shadow: "shadow-[0_4px_14px_rgba(16,185,129,0.4)]",
-    ring: "ring-emerald-400/30",
-  },
-  Systems: {
-    icon: Cpu,
-    gradient: "from-purple-500 to-violet-400",
-    shadow: "shadow-[0_4px_14px_rgba(168,85,247,0.4)]",
-    ring: "ring-purple-400/30",
-  },
-};
-
-const DEFAULT_CATEGORY_STYLE = {
-  icon: Tag,
-  gradient: "from-hero-orange to-[#ff8a6a]",
-  shadow: "shadow-[0_4px_14px_rgba(255,106,58,0.4)]",
-  ring: "ring-white/30",
-};
+import { getCategoryStyle } from "@/lib/course-categories";
 
 interface CourseCardProps {
   course: Course;
@@ -195,8 +158,7 @@ export function CourseCard({ course, className }: CourseCardProps) {
 
             {course.category &&
               (() => {
-                const style =
-                  CATEGORY_STYLES[course.category] || DEFAULT_CATEGORY_STYLE;
+                const style = getCategoryStyle(course.category);
                 const Icon = style.icon;
                 return (
                   <div

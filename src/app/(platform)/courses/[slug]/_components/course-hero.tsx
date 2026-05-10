@@ -2,13 +2,15 @@
 
 import Image from "next/image";
 import { Course } from "@/types/course.types";
-import { Badge } from "@/components/ui/badge";
 import { Play, Star, Users, Clock, MonitorPlay } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { useScroll, useTransform, motion } from "framer-motion";
 import { useEnrollIntentController } from "@/lib/enrollment/intent-controller";
 import { ROUTES } from "@/lib/routes";
 import Link from "next/link";
 import { StaggerContainer, StaggerItem } from "@/components/animations/stagger";
+import { cn } from "@/lib/utils";
+import { getCategoryStyle } from "@/lib/course-categories";
 
 interface CourseHeroProps {
   course: Course;
@@ -86,12 +88,23 @@ export function CourseHero({ course }: CourseHeroProps) {
         {/* Right: Info */}
         <StaggerContainer className="w-full md:w-[55%] flex flex-col gap-5">
           <StaggerItem className="flex flex-wrap items-center gap-2">
-            <Badge
-              variant="secondary"
-              className="bg-white/10 text-white hover:bg-white/20 ring-1 ring-white/20"
-            >
-              {course.category || "General"}
-            </Badge>
+            {(() => {
+              const style = getCategoryStyle(course.category);
+              const Icon = style.icon;
+              return (
+                <span
+                  className={cn(
+                    "inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold tracking-wide rounded-md ring-1 backdrop-blur-md bg-linear-to-r text-white",
+                    style.gradient,
+                    style.shadow,
+                    style.ring,
+                  )}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  {course.category || "General"}
+                </span>
+              );
+            })()}
             {course.level && (
               <Badge variant="outline" className="border-white/20 text-white">
                 {course.level}

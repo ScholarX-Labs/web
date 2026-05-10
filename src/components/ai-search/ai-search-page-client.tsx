@@ -10,7 +10,6 @@ import {
   StreamingMessageSkeleton,
 } from "@/components/ai-search/chat-message";
 import { ChatInput } from "@/components/ai-search/chat-input";
-import { MOCK_OPPORTUNITIES } from "@/components/ai-search/mock-data";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAiChatStore } from "@/stores/ai-chat.store";
@@ -74,7 +73,9 @@ export function AiSearchPageClient() {
 
       const data = await response.json();
 
-      const mappedOpportunities = (data.results || []).map((result: any) => {
+      const mappedOpportunities = (data.results || []).map(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (result: Record<string, any>) => {
         const opp = result.opportunity;
         return {
           id: opp.id || result.id,

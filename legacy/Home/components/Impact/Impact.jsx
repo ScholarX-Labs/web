@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import "./Impact.css"
 import { BsCalendar4Event } from "react-icons/bs";
 import { GrGroup } from "react-icons/gr";
@@ -11,7 +12,7 @@ export default function Impact({waterMark}) {
             <div className="mb-4 mb-md-0">
 
                  <h2>Our <span>Impact</span></h2>   
-                   <p>We're dedicated to making education accessible and providing the resources students need to succeed globally.</p> 
+                   <p>We&apos;re dedicated to making education accessible and providing the resources students need to succeed globally.</p> 
                    </div>
 
                    <div className="boxes">
