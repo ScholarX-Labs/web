@@ -35,6 +35,7 @@ export const dbCourses = coursesSchema.table("courses", {
   videosCount: integer("videos_count"),
   studentsCount: integer("students_count"),
   isBestseller: boolean("is_bestseller"),
+  lastLessonIndex: integer("last_lesson_index").notNull().default(0),
   urgencyText: varchar("urgency_text", { length: 255 }),
   tags: jsonb("tags").$type<string[] | null>(),
   requiresForm: boolean("requires_form"),
