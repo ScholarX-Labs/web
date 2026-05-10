@@ -11,7 +11,7 @@ import {
 export function AlertDemo() {
   return (
     <div className="flex flex-col gap-5 p-10 w-full mx-auto max-w-[600px]">
-      <Alert variant="primary" close>
+      <Alert variant="primary" close onClose={() => {}}>
         <AlertIcon><RiNotificationFill /></AlertIcon>
         <AlertTitle>This is a primary alert</AlertTitle>
         <AlertToolbar>
@@ -20,7 +20,7 @@ export function AlertDemo() {
           </Button>
         </AlertToolbar>
       </Alert>
-      <Alert variant="success" close>
+      <Alert variant="success" close onClose={() => {}}>
         <AlertIcon><RiCheckboxCircleFill /></AlertIcon>
         <AlertTitle>This is a success alert</AlertTitle>
         <AlertToolbar>
@@ -29,7 +29,7 @@ export function AlertDemo() {
           </Button>
         </AlertToolbar>
       </Alert>
-      <Alert variant="destructive" close>
+      <Alert variant="destructive" close onClose={() => {}}>
         <AlertIcon><RiErrorWarningFill /></AlertIcon>
         <AlertTitle>This is a destructive alert</AlertTitle>
         <AlertToolbar>
@@ -38,7 +38,7 @@ export function AlertDemo() {
           </Button>
         </AlertToolbar>
       </Alert>
-      <Alert variant="info" close>
+      <Alert variant="info" close onClose={() => {}}>
         <AlertIcon><RiSpamFill /></AlertIcon>
         <AlertTitle>This is an info alert</AlertTitle>
         <AlertToolbar>
@@ -47,7 +47,7 @@ export function AlertDemo() {
           </Button>
         </AlertToolbar>
       </Alert>
-      <Alert variant="warning" close>
+      <Alert variant="warning" close onClose={() => {}}>
         <AlertIcon><RiSpam3Fill /></AlertIcon>
         <AlertTitle>This is a warning alert</AlertTitle>
         <AlertToolbar>
