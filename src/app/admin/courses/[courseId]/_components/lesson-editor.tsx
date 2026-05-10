@@ -1,7 +1,18 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, react-hooks/set-state-in-effect */
 "use client";
 
 import { useState, useEffect } from "react";
+
+interface LessonData {
+  id: string;
+  title?: string;
+  description?: string;
+  content?: string;
+  videoUrl?: string;
+  duration?: number;
+  isPrivate?: boolean;
+  status?: string;
+  updatedAt?: string;
+}
 import { useUpdateLesson } from "@/hooks/admin/use-admin-lessons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,7 +40,7 @@ import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface LessonEditorProps {
-  lesson: any;
+  lesson: LessonData | null;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -79,12 +90,13 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
         videoUrl: lesson.videoUrl || "",
         duration: lesson.duration || 1,
         isPrivate: lesson.isPrivate ?? true,
-        status: (lesson.status as any) || "draft"
+        status: lesson.status ?? "draft"
       });
     }
   }, [lesson]);
 
   const handleSave = async () => {
+    if (!lesson) return;
     try {
       await updateLesson.mutateAsync({
         id: lesson.id,
@@ -294,7 +306,10 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
                   <input
                     type="number"
                     value={formData.duration}
-                    onChange={(e) => setFormData({ ...formData, duration: Math.max(1, parseInt(e.target.value) || 1) })}
+                    onChange={(e) => {
+                      const parsed = parseInt(e.target.value, 10);
+                      setFormData({ ...formData, duration: Number.isNaN(parsed) ? 1 : Math.max(1, parsed) });
+                    }}
                     className="bg-transparent border-none focus:ring-0 font-black text-lg text-center w-12 text-emerald-600"
                   />
                   <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Min</span>
@@ -459,7 +474,7 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
                       layout
                       whileHover={{ scale: 1.02, y: -4 }}
                       whileTap={{ scale: 0.97 }}
-                      onClick={() => setFormData({ ...formData, status: s.id as any })}
+                      onClick={() => setFormData({ ...formData, status: s.id })}
                       className={cn(
                         "relative flex flex-col text-left p-6 rounded-[32px] transition-all duration-500 border-2 cursor-pointer overflow-hidden group",
                         formData.status === s.id 
