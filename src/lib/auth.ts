@@ -63,6 +63,7 @@ async function assertEmailOtpSendLimit(email: string): Promise<void> {
 async function countOtpSendsSince(
   email: string,
   since: Date,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   tx: PgDatabase<any> = db,
 ): Promise<number> {
   const escapedEmail = escapeLikePattern(email);
@@ -80,6 +81,7 @@ async function countOtpSendsSince(
   return Number(result?.count ?? 0);
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function recordEmailOtpSend(email: string, tx: PgDatabase<any> = db): Promise<void> {
   const normalizedEmail = normalizeEmailAddress(email);
   const uniqueId = randomUUID();
