@@ -8,6 +8,7 @@ import {
   timestamp,
   jsonb,
   index,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { user as dbUsers } from "@/db/schema/auth-schema";
 import { dbCourses } from "@/domain/courses/infrastructure/db/courses-db.schema";
@@ -37,6 +38,10 @@ export const dbLessons = coursesSchema.table(
   (table) => ({
     lessonsCourseIdIdx: index("lessons_course_id_idx").on(table.courseId),
     lessonsSortIdx: index("lessons_sort_idx").on(
+      table.courseId,
+      table.sortIndex,
+    ),
+    lessonsCourseSortUq: uniqueIndex("lessons_course_sort_uq").on(
       table.courseId,
       table.sortIndex,
     ),
