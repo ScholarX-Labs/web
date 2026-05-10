@@ -15,6 +15,20 @@
       "when": 1778325220654,
       "tag": "0001_clumsy_wild_pack",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1779000000000,
+      "tag": "0002_lessons_sort_unique",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1779100000000,
+      "tag": "0003_add_last_lesson_index",
+      "breakpoints": true
     }
   ]
 }
