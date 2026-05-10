@@ -24,7 +24,7 @@ export function GradientDots({
 
   return (
     <motion.div
-      className={`absolute inset-0 ${className}`}
+      className={`absolute inset-0 ${className ?? ""}`}
       style={{
         backgroundColor,
         backgroundImage: [
