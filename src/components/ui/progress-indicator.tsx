@@ -1,5 +1,5 @@
 import React from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { CircleCheck } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -65,27 +65,29 @@ const ProgressIndicator = ({
               justifyContent: isExpanded ? 'stretch' : 'space-between'
             }}
           >
-            {!isExpanded && (
-              <motion.button
-                initial={{ opacity: 0, width: 0, scale: 0.8 }}
-                animate={{ opacity: 1, width: "auto", scale: 1 }}
-                exit={{ opacity: 0, width: 0, scale: 0.8 }}
-                transition={{
-                  type: "spring",
-                  stiffness: 400,
-                  damping: 15,
-                  mass: 0.8,
-                  bounce: 0.25,
-                  duration: 0.6,
-                  opacity: { duration: 0.2 }
-                }}
-                onClick={onBack}
-                type="button"
-                className="px-6 py-3 text-slate-600 flex items-center justify-center bg-slate-100 font-bold rounded-2xl hover:bg-slate-200 transition-all duration-200 flex-1 text-sm shadow-sm"
-              >
-                Back
-              </motion.button>
-            )}
+            <AnimatePresence>
+              {!isExpanded && (
+                <motion.button
+                  initial={{ opacity: 0, width: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, width: "auto", scale: 1 }}
+                  exit={{ opacity: 0, width: 0, scale: 0.8 }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 400,
+                    damping: 15,
+                    mass: 0.8,
+                    bounce: 0.25,
+                    duration: 0.6,
+                    opacity: { duration: 0.2 }
+                  }}
+                  onClick={onBack}
+                  type="button"
+                  className="px-6 py-3 text-slate-600 flex items-center justify-center bg-slate-100 font-bold rounded-2xl hover:bg-slate-200 transition-all duration-200 flex-1 text-sm shadow-sm"
+                >
+                  Back
+                </motion.button>
+              )}
+            </AnimatePresence>
             <motion.button
               onClick={onNext}
               layout
