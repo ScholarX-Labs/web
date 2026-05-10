@@ -168,17 +168,24 @@ export default function AdminDashboardPage() {
             
             <div className="grid sm:grid-cols-2 gap-6">
               {[
-                { title: "New Curriculum", desc: "Initialize learning node", href: "/admin/courses/new", icon: BookOpen, color: "blue" },
-                { title: "Signal Inbox", desc: "Synchronize support data", href: "/admin/inquiries", icon: MessageSquare, color: "emerald" },
-                { title: "Vault Reports", desc: "Audit financial streams", href: "/admin/reports", icon: TrendingUp, color: "violet" },
-                { title: "Core Configuration", desc: "Modify system variables", href: "/admin/settings", icon: Settings, color: "slate" },
-              ].map((action) => (
+                { title: "New Curriculum", desc: "Initialize learning node", href: "/admin/courses/new", icon: BookOpen, color: "blue" as const },
+                { title: "Signal Inbox", desc: "Synchronize support data", href: "/admin/inquiries", icon: MessageSquare, color: "emerald" as const },
+                { title: "Vault Reports", desc: "Audit financial streams", href: "/admin/reports", icon: TrendingUp, color: "violet" as const },
+                { title: "Core Configuration", desc: "Modify system variables", href: "/admin/settings", icon: Settings, color: "slate" as const },
+              ].map((action) => {
+                const colorClasses: Record<string, string> = {
+                  blue: "bg-blue-50 text-blue-600",
+                  emerald: "bg-emerald-50 text-emerald-600",
+                  violet: "bg-violet-50 text-violet-600",
+                  slate: "bg-slate-50 text-slate-600",
+                };
+                return (
                 <button
                   key={action.title}
                   onClick={() => handleAction(action.href)}
                   className="group flex flex-col gap-5 rounded-[32px] border border-slate-100/60 bg-white/50 p-8 text-sm text-left hover:bg-white hover:shadow-[0_20px_40px_-8px_rgba(0,0,0,0.04)] hover:border-white transition-all duration-500"
                 >
-                  <div className={`size-12 rounded-[14px] bg-${action.color}-50 flex items-center justify-center text-${action.color}-600 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-sm`}>
+                  <div className={`size-12 rounded-[14px] ${colorClasses[action.color] ?? "bg-slate-50 text-slate-600"} flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-sm`}>
                     <action.icon className="size-6 stroke-[2.5]" />
                   </div>
                   <div>
@@ -186,7 +193,8 @@ export default function AdminDashboardPage() {
                     <span className="text-slate-400 font-bold text-xs mt-1 block uppercase tracking-wide opacity-80">{action.desc}</span>
                   </div>
                 </button>
-              ))}
+              );
+              })}
             </div>
           </Card>
         </motion.div>
