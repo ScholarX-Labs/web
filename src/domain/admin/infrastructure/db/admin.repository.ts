@@ -153,16 +153,9 @@ export const createAdminRepository = (): AdminRepository => {
     },
 
     async updateCourse(id: string, data: UpdateCourseInput, _expectedVersion: Date) {
-      const current = await db
-        .select({ updatedAt: dbCourses.updatedAt })
-        .from(dbCourses)
-        .where(eq(dbCourses.id, id))
-        .limit(1);
-
-      if (current.length > 0 && current[0].updatedAt && _expectedVersion) {
-        if (current[0].updatedAt.getTime() !== _expectedVersion.getTime()) {
-          throw AdminErrors.conflict("Course was modified by another user. Please refresh and try again.");
-        }
+      const whereConditions = [eq(dbCourses.id, id)];
+      if (_expectedVersion) {
+        whereConditions.push(eq(dbCourses.updatedAt, _expectedVersion));
       }
 
       const results = await db
@@ -186,8 +179,13 @@ export const createAdminRepository = (): AdminRepository => {
           ...(data.seoKeywords !== undefined && { seoKeywords: data.seoKeywords }),
           updatedAt: new Date(),
         })
-        .where(eq(dbCourses.id, id))
+        .where(and(...whereConditions))
         .returning();
+
+      if (results.length === 0) {
+        throw AdminErrors.conflict("Course was modified by another user. Please refresh and try again.");
+      }
+
       return results[0];
     },
 
@@ -266,28 +264,48 @@ export const createAdminRepository = (): AdminRepository => {
     },
 
     async createLesson(courseId: string, data: CreateLessonInput) {
-      const maxSort = await db
-        .select({ max: sql<number>`COALESCE(MAX(${dbLessons.sortIndex}), 0) + 1` })
-        .from(dbLessons)
-        .where(eq(dbLessons.courseId, courseId));
-      const sortIndex = Number(maxSort[0]?.max ?? 1);
+      const MAX_RETRIES = 3;
+      for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+        try {
+          return await db.transaction(async (tx) => {
+            const [counter] = await tx
+              .update(dbCourses)
+              .set({ lastLessonIndex: sql`${dbCourses.lastLessonIndex} + 1` })
+              .where(eq(dbCourses.id, courseId))
+              .returning({ sortIndex: dbCourses.lastLessonIndex });
 
-      const results = await db
-        .insert(dbLessons)
-        .values({
-          id: crypto.randomUUID(),
-          courseId,
-          title: data.title,
-          description: data.description ?? null,
-          content: data.content ?? null,
-          videoUrl: data.videoUrl ?? null,
-          duration: data.duration ?? null,
-          isPrivate: data.isPrivate ?? true,
-          status: data.status ?? "draft",
-          sortIndex,
-        })
-        .returning();
-      return results[0];
+            if (!counter) throw new Error(`Course ${courseId} not found`);
+
+            const [lesson] = await tx
+              .insert(dbLessons)
+              .values({
+                id: crypto.randomUUID(),
+                courseId,
+                title: data.title,
+                description: data.description ?? null,
+                content: data.content ?? null,
+                videoUrl: data.videoUrl ?? null,
+                duration: data.duration ?? null,
+                isPrivate: data.isPrivate ?? true,
+                status: data.status ?? "draft",
+                sortIndex: counter.sortIndex,
+              })
+              .returning();
+
+            return lesson;
+          });
+        } catch (error) {
+          if (
+            error instanceof Error &&
+            "code" in error &&
+            (error as Record<string, unknown>).code === "23505" &&
+            attempt < MAX_RETRIES - 1
+          ) {
+            continue;
+          }
+          throw error;
+        }
+      }
     },
 
     async updateLesson(id: string, data: UpdateLessonInput, _expectedVersion: Date) {
