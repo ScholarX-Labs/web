@@ -3,7 +3,7 @@
 
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 
 function GeometricPaths() {
   const gridSize = 40
@@ -51,7 +51,7 @@ function GeometricPaths() {
 function FlowPaths() {
   const flowPaths = Array.from({ length: 12 }, (_, i) => {
     const amplitude = 50 + i * 10
-    const _frequency = 0.01 + i * 0.002
+    const _frequency = 0.01 + i * 0.002 // eslint-disable-line @typescript-eslint/no-unused-vars
     const offset = i * 60
 
     return {
@@ -214,7 +214,7 @@ export default function BackgroundPaths({
   title?: string
 }) {
   const [currentPattern, setCurrentPattern] = useState(0)
-  const patterns = ['neural', 'flow', 'geometric', 'spiral']
+  const patterns = useMemo(() => ['neural', 'flow', 'geometric', 'spiral'], [])
   const words = title.split(" ")
 
   useEffect(() => {
