@@ -154,12 +154,14 @@ export default function RadialOrbitalTimeline({ timelineData }: RadialOrbitalTim
             }
 
             return (
-              <div
+              <button type="button"
                 key={item.id}
                 ref={(el) => { nodeRefs.current[item.id] = el }}
-                className="absolute transition-all duration-700 cursor-pointer"
+                className="absolute transition-all duration-700 cursor-pointer text-left"
                 style={nodeStyle}
                 onClick={(e) => { e.stopPropagation(); toggleItem(item.id) }}
+                aria-label={item.title}
+                aria-expanded={isExpanded}
               >
                 <div
                   className={`absolute rounded-full -inset-1 ${isPulsing ? "animate-pulse duration-1000" : ""}`}
@@ -243,7 +245,7 @@ export default function RadialOrbitalTimeline({ timelineData }: RadialOrbitalTim
                     </CardContent>
                   </Card>
                 )}
-              </div>
+              </button>
             )
           })}
         </div>
