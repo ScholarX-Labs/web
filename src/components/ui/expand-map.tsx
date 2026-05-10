@@ -1,8 +1,25 @@
 "use client"
 
 import type React from "react"
-import { useState, useRef } from "react"
+import { useState, useRef, useId } from "react"
 import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from "framer-motion"
+
+interface BlockShape {
+  top: string;
+  left?: string;
+  right?: string;
+  w: string;
+  h: string;
+}
+
+const blocks: BlockShape[] = [
+  { top: "40%", left: "10%", w: "15%", h: "20%" },
+  { top: "15%", left: "35%", w: "12%", h: "15%" },
+  { top: "70%", left: "75%", w: "18%", h: "18%" },
+  { top: "20%", right: "10%", w: "10%", h: "25%" },
+  { top: "55%", left: "5%", w: "8%", h: "12%" },
+  { top: "8%", left: "75%", w: "14%", h: "10%" },
+];
 
 interface LocationMapProps {
   location?: string
@@ -43,17 +60,32 @@ export function LocationMap({
     setIsHovered(false)
   }
 
+  const patternId = useId()
+
   const handleClick = () => setIsExpanded(!isExpanded)
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handleClick();
+    }
+  };
 
   return (
     <motion.div
       ref={containerRef}
+      role="button"
+      tabIndex={0}
+      aria-expanded={isExpanded}
       className={`relative cursor-pointer select-none ${className}`}
       style={{ perspective: 1000 }}
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={handleMouseLeave}
       onClick={handleClick}
+      onKeyDown={handleKeyDown}
+      onFocus={() => setIsHovered(true)}
+      onBlur={handleMouseLeave}
     >
       <motion.div
         className="relative overflow-hidden rounded-2xl bg-background border border-border"
@@ -91,22 +123,14 @@ export function LocationMap({
                     initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.5, delay: 0.7 + i * 0.1 }} />
                 ))}
               </svg>
-              {[
-                { top: "40%", left: "10%", w: "15%", h: "20%" },
-                { top: "15%", left: "35%", w: "12%", h: "15%" },
-                { top: "70%", left: "75%", w: "18%", h: "18%" },
-                { top: "20%", right: "10%", w: "10%", h: "25%" },
-                { top: "55%", left: "5%", w: "8%", h: "12%" },
-                { top: "8%", left: "75%", w: "14%", h: "10%" },
-              ].map((b, i) => (
+              {blocks.map((b, i) => (
                 <motion.div
                   key={i}
                   className="absolute rounded-sm bg-muted-foreground/25 border border-muted-foreground/15"
                   style={{
                     top: b.top,
                     left: b.left,
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    right: (b as any).right,
+                    right: b.right,
                     width: b.w,
                     height: b.h,
                   }}
@@ -134,11 +158,11 @@ export function LocationMap({
         <motion.div className="absolute inset-0 opacity-[0.03]" animate={{ opacity: isExpanded ? 0 : 0.03 }} transition={{ duration: 0.3 }}>
           <svg width="100%" height="100%" className="absolute inset-0">
             <defs>
-              <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+              <pattern id={patternId} width="20" height="20" patternUnits="userSpaceOnUse">
                 <path d="M 20 0 L 0 0 0 20" fill="none" className="stroke-foreground" strokeWidth="0.5" />
               </pattern>
             </defs>
-            <rect width="100%" height="100%" fill="url(#grid)" />
+            <rect width="100%" height="100%" fill={`url(#${patternId})`} />
           </svg>
         </motion.div>
 
