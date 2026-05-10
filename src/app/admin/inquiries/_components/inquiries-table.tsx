@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import Link from "next/link";
 import { useAdminInquiries, useUpdateInquiryStatus } from "@/hooks/admin/use-admin-inquiries";
 import { formatDate, statusLabel } from "@/lib/admin/admin-utils";
@@ -51,14 +51,14 @@ export function InquiriesTable({
       total: 0,
     };
 
-  const handleStatusChange = async (inquiryId: string, newStatus: string) => {
+  const handleStatusChange = useCallback(async (inquiryId: string, newStatus: string) => {
     try {
       await updateStatus.mutateAsync({ id: inquiryId, data: { status: newStatus } });
       toast.success(`Inquiry marked as ${statusLabel(newStatus).toLowerCase()}`);
     } catch {
       toast.error("Failed to update status");
     }
-  };
+  }, [updateStatus]);
 
   const columns = useMemo<ColumnDef<Inquiry>[]>(
     () => [
