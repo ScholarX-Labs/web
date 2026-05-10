@@ -66,7 +66,7 @@ export function Sparkles({
         enable: true,
         direction: "none" as const,
         speed: {
-          min: minSpeed || speed / 10,
+          min: minSpeed ?? speed / 10,
           max: speed,
         },
         straight: false,
@@ -76,7 +76,7 @@ export function Sparkles({
       },
       opacity: {
         value: {
-          min: minOpacity || opacity / 10,
+          min: minOpacity ?? opacity / 10,
           max: opacity,
         },
         animation: {
@@ -87,7 +87,7 @@ export function Sparkles({
       },
       size: {
         value: {
-          min: minSize || size / 2.5,
+          min: minSize ?? size / 2.5,
           max: size,
         },
       },
@@ -181,21 +181,21 @@ export function SparklesCore({
               number: {
                 density: { enable: true, width: 400, height: 400 },
                 limit: { mode: "delete", value: 0 },
-                value: particleDensity || 120,
+                value: particleDensity ?? 120,
               },
               opacity: {
                 value: { min: 0.1, max: 1 },
                 animation: {
                   count: 0,
                   enable: true,
-                  speed: speed || 4,
+                  speed: speed ?? 4,
                   sync: false,
                   startValue: "random",
                 },
               },
               shape: { type: "circle" },
               size: {
-                value: { min: minSize || 1, max: maxSize || 3 },
+                value: { min: minSize ?? 1, max: maxSize ?? 3 },
               },
             },
             detectRetina: true,
