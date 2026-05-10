@@ -162,55 +162,11 @@ export function LessonMeta({
   const prevResumePoint = useRef(resumePoint);
   useEffect(() => {
     if (resumePoint != null && resumePoint !== prevResumePoint.current && !showResumePrompt) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setShowResumePrompt(true);
       prevResumePoint.current = resumePoint;
     }
   }, [resumePoint, showResumePrompt]);
-
-  const handleShare = useCallback(async () => {
-    const url = window.location.href;
-    // Prefer the Web Share API when available; fall back to clipboard.
-    try {
-      const canShareFn = typeof navigator !== "undefined" && typeof (navigator as Navigator).canShare === "function";
-      const shareFn = typeof navigator !== "undefined" && typeof (navigator as Navigator).share === "function";
-
-      if (shareFn) {
-        try {
-          // If canShare is available, check before calling share.
-          if (canShareFn) {
-            const can = (navigator as Navigator).canShare({ title: `Lesson: ${title}`, url });
-            if (can) {
-              await (navigator as Navigator).share({ title: `Lesson: ${title}`, url });
-              return;
-            }
-          } else {
-            // If canShare is not available, still try share and fall back on failure.
-            await (navigator as Navigator).share({ title: `Lesson: ${title}`, url });
-            return;
-          }
-        } catch (_err) {
-          // Sharing failed or was cancelled — fall back to clipboard below.
-        }
-      }
-
-      // Fallback: use Clipboard API if available.
-      if (typeof navigator?.clipboard?.writeText === "function") {
-        try {
-          await navigator.clipboard.writeText(url);
-          showToast("Link copied to clipboard");
-          return;
-        } catch (_err) {
-          showToast("Failed to copy link");
-          return;
-        }
-      }
-
-      // Last resort: inform the user sharing isn't supported.
-      showToast("Sharing not supported on this device");
-    } catch (_err) {
-      showToast("Failed to share or copy link");
-    }
-  }, [title, showToast]);
 
   const handleBookmark = useCallback(() => {
     setIsBookmarked((prev) => {
@@ -246,7 +202,7 @@ export function LessonMeta({
           } else {
             showToast("Copy not supported on this device");
           }
-        } catch (_err) {
+        } catch {
           showToast("Failed to copy link");
         }
       },
