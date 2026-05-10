@@ -59,26 +59,26 @@ export function AdminSidebar({ user }: { user: { name?: string | null; email?: s
   };
 
   return (
-    <Sidebar collapsible="icon" variant="inset" className="border-r bg-white/50 backdrop-blur-xl">
-      <SidebarHeader className="pt-6 pb-2">
+    <Sidebar collapsible="icon" variant="inset" className="border-r border-slate-200/60 bg-white/60 backdrop-blur-3xl selection:bg-blue-100 selection:text-blue-900">
+      <SidebarHeader className="pt-8 pb-4 px-4">
         <Link
           href="/admin"
-          className="flex items-center gap-3 px-3 py-1 group-data-[collapsible=icon]:justify-center"
+          className="flex items-center gap-4 px-3 py-2 group-data-[collapsible=icon]:justify-center transition-all active:scale-95"
         >
           <div className="relative">
-            <div className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-lg shadow-blue-500/20 ring-1 ring-white/20">
-              <Sparkles className="size-5 fill-white/20" />
+            <div className="flex size-10 items-center justify-center rounded-[14px] bg-gradient-to-br from-blue-700 to-blue-800 text-white shadow-[0_4px_12px_-2px_rgba(37,99,235,0.3)] ring-1 ring-white/20">
+              <Sparkles className="size-5.5 fill-white/10" />
             </div>
-            <div className="absolute -bottom-1 -right-1 size-3 rounded-full bg-emerald-500 border-2 border-white" />
+            <div className="absolute -bottom-1 -right-1 size-3.5 rounded-full bg-emerald-500 border-[3px] border-white shadow-sm" />
           </div>
           <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-            <span className="text-sm font-bold tracking-tight text-slate-900 leading-tight">ScholarX</span>
-            <span className="text-[10px] font-medium text-slate-400 tracking-wider uppercase">Enterprise</span>
+            <span className="text-[15px] font-[900] tracking-tight text-slate-900 leading-tight">ScholarX</span>
+            <span className="text-[10px] font-black text-slate-400 tracking-[0.1em] uppercase">Enterprise</span>
           </div>
         </Link>
       </SidebarHeader>
 
-      <SidebarContent className="px-3">
+      <SidebarContent className="px-4 py-2">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -86,22 +86,22 @@ export function AdminSidebar({ user }: { user: { name?: string | null; email?: s
                 <SidebarMenuButton
                   asChild
                   isActive={isActive("/admin") && pathname === "/admin"}
-                  tooltip="Dashboard"
+                  tooltip="Control Center"
                   className={cn(
-                    "relative h-11 transition-all duration-200",
+                    "relative h-12 rounded-xl transition-all duration-300 px-4",
                     isActive("/admin") && pathname === "/admin" 
-                      ? "text-blue-600 font-semibold" 
-                      : "text-slate-500 hover:text-slate-900 hover:bg-slate-100/50"
+                      ? "text-blue-700 bg-blue-50/60 shadow-[0_2px_8px_-2px_rgba(37,99,235,0.08)]" 
+                      : "text-slate-500 hover:text-slate-900 hover:bg-slate-100/80"
                   )}
                 >
                   <Link href="/admin">
-                    <LayoutDashboard className="size-4.5" />
-                    <span>Dashboard</span>
+                    <LayoutDashboard className="size-5" />
+                    <span className="font-bold tracking-tight text-[13.5px]">Dashboard</span>
                     {isActive("/admin") && pathname === "/admin" && (
                       <motion.div
-                        layoutId="active-pill"
-                        className="absolute left-[-12px] w-1.5 h-6 bg-blue-600 rounded-r-full shadow-[0_0_12px_rgba(37,99,235,0.5)]"
-                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                        layoutId="sidebar-active"
+                        className="absolute right-[-4px] w-1 h-6 bg-blue-600 rounded-l-full shadow-[0_0_12px_rgba(37,99,235,0.4)]"
+                        transition={{ type: "spring", stiffness: 400, damping: 30 }}
                       />
                     )}
                   </Link>
@@ -111,15 +111,15 @@ export function AdminSidebar({ user }: { user: { name?: string | null; email?: s
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarSeparator className="mx-2 my-2 opacity-50" />
+        <SidebarSeparator className="mx-3 my-4 bg-slate-200/50" />
 
         {sectionGroups.map((group) => (
           <SidebarGroup key={group.label} className="py-2">
-            <SidebarGroupLabel className="px-3 text-[10px] font-bold uppercase tracking-[0.1em] text-slate-400 mb-2">
+            <SidebarGroupLabel className="px-4 text-[10px] font-black uppercase tracking-[0.15em] text-slate-400 mb-3">
               {group.label}
             </SidebarGroupLabel>
             <SidebarGroupContent>
-              <SidebarMenu className="gap-1">
+              <SidebarMenu className="gap-1.5">
                 {SIDEBAR_NAV.filter((item) => group.items.includes(item.label)).map((item) => {
                   const active = isActive(item.href);
                   return (
@@ -129,20 +129,20 @@ export function AdminSidebar({ user }: { user: { name?: string | null; email?: s
                         isActive={active}
                         tooltip={item.label}
                         className={cn(
-                          "relative h-11 transition-all duration-200",
+                          "relative h-12 rounded-xl transition-all duration-300 px-4",
                           active 
-                            ? "text-blue-600 font-semibold bg-blue-50/50" 
-                            : "text-slate-500 hover:text-slate-900 hover:bg-slate-100/50"
+                            ? "text-blue-700 bg-blue-50/60 shadow-[0_2px_8px_-2px_rgba(37,99,235,0.08)]" 
+                            : "text-slate-500 hover:text-slate-900 hover:bg-slate-100/80"
                         )}
                       >
                         <Link href={item.href}>
-                          {iconMap[item.icon] ?? <LayoutDashboard className="size-4.5" />}
-                          <span>{item.label}</span>
+                          {iconMap[item.icon] ?? <LayoutDashboard className="size-5" />}
+                          <span className="font-bold tracking-tight text-[13.5px]">{item.label}</span>
                           {active && (
                             <motion.div
-                              layoutId="active-pill"
-                              className="absolute left-[-12px] w-1.5 h-6 bg-blue-600 rounded-r-full shadow-[0_0_12px_rgba(37,99,235,0.5)]"
-                              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                              layoutId="sidebar-active"
+                              className="absolute right-[-4px] w-1 h-6 bg-blue-600 rounded-l-full shadow-[0_0_12px_rgba(37,99,235,0.4)]"
+                              transition={{ type: "spring", stiffness: 400, damping: 30 }}
                             />
                           )}
                         </Link>
