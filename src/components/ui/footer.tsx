@@ -14,7 +14,7 @@ export function FooterActions() {
   return (
     <div className="flex items-center justify-center">
       <div className="flex items-center rounded-full border border-dotted">
-        <button
+        <button type="button"
           onClick={() => setTheme("light")}
           className="bg-black mr-3 rounded-full p-2 text-white dark:bg-background dark:text-white"
         >
@@ -25,7 +25,7 @@ export function FooterActions() {
           <DIcons.ArrowUp className="h-3 w-3" />
           <span className="sr-only">Scroll to top</span>
         </button>
-        <button
+        <button type="button"
           onClick={() => setTheme("dark")}
           className="dark:bg-black ml-3 rounded-full p-2 text-black dark:text-white"
         >
