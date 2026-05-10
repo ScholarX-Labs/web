@@ -97,7 +97,6 @@ export function GlowingShadow({ children }: GlowingShadowProps) {
           position: relative;
           z-index: 2;
           border-radius: var(--card-radius);
-          cursor: pointer;
         }
 
         .glow-container:before,
@@ -231,7 +230,7 @@ export function GlowingShadow({ children }: GlowingShadowProps) {
           100% { --hue: 360; }
         }
       `}</style>
-      <div className="glow-container" role="button">
+      <div className="glow-container">
         <span className="glow"></span>
         <div className="glow-content">{children}</div>
       </div>
