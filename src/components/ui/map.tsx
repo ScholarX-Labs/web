@@ -148,6 +148,8 @@ export function WorldMap({
                 <motion.g
                   onHoverStart={() => setHoveredLocation(dot.start.label || `Location ${i}`)}
                   onHoverEnd={() => setHoveredLocation(null)}
+                  onClick={() => setHoveredLocation(h => h ? null : (dot.start.label || `Location ${i}`))}
+                  onTouchStart={() => setHoveredLocation(dot.start.label || `Location ${i}`)}
                   className="cursor-pointer"
                   whileHover={{ scale: 1.2 }}
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
@@ -174,6 +176,8 @@ export function WorldMap({
                 <motion.g
                   onHoverStart={() => setHoveredLocation(dot.end.label || `Destination ${i}`)}
                   onHoverEnd={() => setHoveredLocation(null)}
+                  onClick={() => setHoveredLocation(h => h ? null : (dot.end.label || `Destination ${i}`))}
+                  onTouchStart={() => setHoveredLocation(dot.end.label || `Destination ${i}`)}
                   className="cursor-pointer"
                   whileHover={{ scale: 1.2 }}
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
@@ -207,7 +211,7 @@ export function WorldMap({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
-            className="absolute bottom-4 left-4 bg-white/90 dark:bg-black/90 text-black dark:text-white px-3 py-2 rounded-lg text-sm font-medium backdrop-blur-sm sm:hidden border border-gray-200 dark:border-gray-700"
+            className="absolute bottom-4 left-4 bg-white/90 dark:bg-black/90 text-black dark:text-white px-3 py-2 rounded-lg text-sm font-medium backdrop-blur-sm md:hidden border border-gray-200 dark:border-gray-700"
           >
             {hoveredLocation}
           </motion.div>
