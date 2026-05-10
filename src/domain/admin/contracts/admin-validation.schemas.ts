@@ -24,7 +24,7 @@ export const UpdateCourseSchema = CreateCourseSchema.partial().extend({
 });
 
 export const CourseStatusSchema = z.object({
-  status: z.enum(["active", "inactive", "archived"]),
+  status: z.enum(["active", "inactive", "archived", "draft"]),
 });
 
 export const EnrollUserSchema = z.object({
@@ -38,7 +38,7 @@ export const CreateLessonSchema = z.object({
   videoUrl: z.string().url().optional().or(z.literal("")),
   duration: z.coerce.number().int().positive().optional(),
   isPrivate: z.coerce.boolean().optional(),
-  status: z.enum(["draft", "published"]).optional(),
+  status: z.enum(["draft", "staging", "published", "archived"]).optional(),
 });
 
 export const UpdateLessonSchema = CreateLessonSchema.partial().extend({
