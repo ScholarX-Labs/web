@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, startTransition } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   BookOpen, NotebookPen, FolderOpen, Plus, Trash2,
-  File, Link2, Video, Clock, StickyNote
+  Clock, StickyNote
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNotes } from "@/hooks/use-notes";
@@ -36,43 +36,6 @@ interface LessonTabsProps {
 type TabId = "overview" | "notes" | "resources";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Mock Resources
-// ─────────────────────────────────────────────────────────────────────────────
-
-const DEFAULT_RESOURCES: Resource[] = [
-  {
-    id: "r1",
-    type: "pdf",
-    title: "Lesson Slides",
-    description: "Full slide deck for this lesson in PDF format",
-    url: "#",
-    size: "2.4 MB",
-  },
-  {
-    id: "r2",
-    type: "code",
-    title: "Starter Code",
-    description: "GitHub repository with the starter project template",
-    url: "https://github.com",
-    size: "ZIP",
-  },
-  {
-    id: "r3",
-    type: "link",
-    title: "React Documentation",
-    description: "Official React 18 docs referenced in this lesson",
-    url: "https://react.dev",
-  },
-  {
-    id: "r4",
-    type: "video",
-    title: "Supplemental Video",
-    description: "Extended walkthrough of the advanced patterns",
-    url: "#",
-  },
-];
-
-// ─────────────────────────────────────────────────────────────────────────────
 // Tab Bar
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -90,7 +53,6 @@ export function LessonTabs({
   lessonId,
   courseSlug,
   description,
-  resources: _resources,
   initialTab,
   onTabChange,
 }: LessonTabsProps) {
@@ -118,7 +80,9 @@ export function LessonTabs({
   useEffect(() => {
     if (initialTab && initialTab !== seenInitialTabRef.current) {
       seenInitialTabRef.current = initialTab;
-      setActiveTab(initialTab);
+      startTransition(() => {
+        setActiveTab(initialTab);
+      });
       if (initialTab === "resources") {
         setResourcesSheetOpen(true);
       }
