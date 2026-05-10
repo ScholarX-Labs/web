@@ -577,7 +577,7 @@
   50% {
     background-position: 100% 100%;
   }
-  to {
+  100% {
     background-position: 0% 0%;
   }
 }
@@ -587,7 +587,7 @@
   to { transform: rotate(360deg); }
 }
 
-@keyframes gradientShift {
+@keyframes gradient-shift {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
@@ -685,12 +685,12 @@
   margin-top: 0.5rem;
 }
 
-@keyframes moveBackground {
+@keyframes move-background {
   from { background-position: 0% 0%; }
   to { background-position: 0% -1000%; }
 }
 
-@keyframes iconBounce {
+@keyframes icon-bounce {
   0%, 100% { transform: translateY(0); }
   20% { transform: translateY(-0.3em); }
   40% { transform: translateY(0); }
@@ -734,7 +734,7 @@
 }
 
 .menu__item.active .icon {
-  animation: iconBounce 0.5s ease;
+  animation: icon-bounce 0.5s ease;
 }
 
 .menu__text {
