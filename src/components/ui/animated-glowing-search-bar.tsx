@@ -2,7 +2,7 @@
 const SearchComponent = () => {
   return (
     <div className="relative flex items-center justify-center">
-      <div className="absolute z-[-1] w-full h-min-screen"></div>
+      <div className="absolute z-[-1] w-full min-h-screen"></div>
       <div id="poda" className="relative flex items-center justify-center group">
         <div className="absolute z-[-1] overflow-hidden h-full w-full max-h-[70px] max-w-[314px] rounded-xl blur-[3px]
                         before:absolute before:content-[''] before:z-[-2] before:w-[999px] before:h-[999px] before:bg-no-repeat before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:rotate-60
