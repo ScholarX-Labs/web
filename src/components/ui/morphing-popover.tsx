@@ -9,6 +9,7 @@ import {
   useContext,
   isValidElement,
   forwardRef,
+  startTransition,
 } from "react";
 import {
   AnimatePresence,
@@ -16,16 +17,11 @@ import {
   type Transition,
   type Variants,
 } from "framer-motion";
+import { createPortal } from "react-dom";
 import { useClickOutside } from "@/hooks/use-click-outside";
 import { cn } from "@/lib/utils";
 
 /* eslint-disable @typescript-eslint/no-explicit-any, react-hooks/static-components */
-
-const TRANSITION: Transition = {
-  type: "spring",
-  bounce: 0.1,
-  duration: 0.4,
-};
 
 type MorphingPopoverContextValue = {
   isOpen: boolean;
@@ -93,7 +89,14 @@ function MorphingPopover({
 
   return (
     <MorphingPopoverContext.Provider value={{ ...popoverLogic, variants }}>
-      <div className={cn("relative w-fit h-fit", className)} {...props}>
+      <div 
+        className={cn(
+          "relative w-fit h-fit", 
+          popoverLogic.isOpen && "z-50", 
+          className
+        )} 
+        {...props}
+      >
         {children}
       </div>
     </MorphingPopoverContext.Provider>
@@ -109,7 +112,7 @@ export type MorphingPopoverTriggerProps = {
 const MorphingPopoverTrigger = forwardRef<
   HTMLButtonElement,
   MorphingPopoverTriggerProps
->(({ children, className, asChild = false, ...props }, _ref) => {
+>(({ children, className, asChild = false, ...props }, ref) => {
   const context = useContext(MorphingPopoverContext);
   if (!context) {
     throw new Error(
@@ -118,15 +121,17 @@ const MorphingPopoverTrigger = forwardRef<
   }
 
   if (asChild && isValidElement(children)) {
+    const childProps = children.props as Record<string, unknown>;
     const MotionComponent = motion.create(
       children.type as React.ForwardRefExoticComponent<any>
     );
 
     return (
       <MotionComponent
-        {...children.props}
+        ref={ref}
+        {...childProps}
         onClick={(e: any) => {
-          children.props.onClick?.(e);
+          (childProps.onClick as ((e: any) => void) | undefined)?.(e);
           context.open();
         }}
         layoutId={`popover-trigger-${context.uniqueId}`}
@@ -139,13 +144,14 @@ const MorphingPopoverTrigger = forwardRef<
 
   return (
     <motion.button
+      ref={ref}
       layoutId={`popover-trigger-${context.uniqueId}`}
       key={`popover-trigger-${context.uniqueId}`}
       onClick={context.open}
       className={cn(className)}
       aria-expanded={context.isOpen}
       aria-controls={`popover-content-${context.uniqueId}`}
-      {...props}
+      {...(props as Record<string, unknown>)}
     >
       <motion.span layoutId={`popover-label-${context.uniqueId}`}>
         {children}
@@ -172,9 +178,13 @@ function MorphingPopoverContent({
     );
 
   const ref = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
   useClickOutside(ref, () => context.close());
 
   useEffect(() => {
+    startTransition(() => {
+      setMounted(true);
+    });
     if (!context.isOpen) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -183,30 +193,35 @@ function MorphingPopoverContent({
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [context.isOpen, context.close]);
+  }, [context, context.isOpen, context.close]);
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <AnimatePresence>
       {context.isOpen && (
-        <div className="absolute top-0 left-0 z-50">
-          <motion.div
-            ref={ref}
-            layoutId={`popover-trigger-${context.uniqueId}`}
-            className={cn(
-              "overflow-hidden bg-white shadow-2xl border border-slate-200 rounded-2xl",
-              className
-            )}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            variants={context.variants}
-            {...props}
-          >
-            {children}
-          </motion.div>
+        <div className="fixed inset-0 z-[9999] pointer-events-none flex items-center justify-center bg-black/5 backdrop-blur-[2px]">
+          <div className="pointer-events-auto relative">
+             <motion.div
+                ref={ref}
+                layoutId={`popover-trigger-${context.uniqueId}`}
+                className={cn(
+                "overflow-hidden bg-white shadow-[0_30px_90px_-15px_rgba(0,0,0,0.3)] border border-slate-200 rounded-3xl",
+                className
+                )}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                variants={context.variants}
+                {...(props as Record<string, unknown>)}
+            >
+                {children}
+            </motion.div>
+          </div>
         </div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }
 
