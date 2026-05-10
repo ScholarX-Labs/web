@@ -112,9 +112,12 @@ export default function Page() {
 				aria-hidden="true"
 				className={cn(
 					'pointer-events-none absolute -top-1/2 left-1/2 h-[120vmin] w-[120vmin] -translate-x-1/2 rounded-full',
-					'bg-[radial-gradient(ellipse_at_center,--theme(--color-foreground/.1),transparent_50%)]',
 					'blur-[30px]',
 				)}
+				style={{
+					backgroundImage:
+						'radial-gradient(ellipse at center, hsla(var(--foreground) / 0.1), transparent 50%)',
+				}}
 			/>
 			<Default />
 		</main>
