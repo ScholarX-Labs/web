@@ -86,46 +86,46 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  async function loadProfile() {
-    setLoading(true);
-    const result = await getProfile();
-    if (result.success && result.data) {
-      const data = result.data as Record<string, unknown>;
-      setProfile({
-        id: data.id as string,
-        firstName: data.firstName as string,
-        lastName: data.lastName as string,
-        firstNameAr: (data.firstNameAr as string) ?? null,
-        lastNameAr: (data.lastNameAr as string) ?? null,
-        email: data.email as string,
-        image: (data.image as string) ?? null,
-        username: (data.username as string) ?? null,
-        educationLevel: (data.educationLevel as string) ?? null,
-        university: (data.university as string) ?? null,
-        faculty: (data.faculty as string) ?? null,
-        currentInterest: (data.currentInterest as string) ?? null,
-        nationality: (data.nationality as string) ?? null,
-        city: (data.city as string) ?? null,
-        dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth as string).toISOString().split("T")[0] : null,
-        industry: (data.industry as string) ?? null,
-        gpa: (data.gpa as number) ?? null,
-        githubUrl: (data.githubUrl as string) ?? null,
-        facebookUrl: (data.facebookUrl as string) ?? null,
-        instagramUrl: (data.instagramUrl as string) ?? null,
-        twitterUrl: (data.twitterUrl as string) ?? null,
-        linkedinUrl: (data.linkedinUrl as string) ?? null,
-        isProfilePublic: data.isProfilePublic as boolean,
-      });
-    } else {
-      toast.error("Failed to load profile");
-    }
-    setLoading(false);
-  }
-
   useEffect(() => {
-    startTransition(() => {
-      loadProfile();
-    });
+    let cancelled = false;
+    async function load() {
+      startTransition(() => { setLoading(true); });
+      const result = await getProfile();
+      if (cancelled) return;
+      if (result.success && result.data) {
+        const data = result.data as Record<string, unknown>;
+        setProfile({
+          id: data.id as string,
+          firstName: data.firstName as string,
+          lastName: data.lastName as string,
+          firstNameAr: (data.firstNameAr as string) ?? null,
+          lastNameAr: (data.lastNameAr as string) ?? null,
+          email: data.email as string,
+          image: (data.image as string) ?? null,
+          username: (data.username as string) ?? null,
+          educationLevel: (data.educationLevel as string) ?? null,
+          university: (data.university as string) ?? null,
+          faculty: (data.faculty as string) ?? null,
+          currentInterest: (data.currentInterest as string) ?? null,
+          nationality: (data.nationality as string) ?? null,
+          city: (data.city as string) ?? null,
+          dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth as string).toISOString().split("T")[0] : null,
+          industry: (data.industry as string) ?? null,
+          gpa: (data.gpa as number) ?? null,
+          githubUrl: (data.githubUrl as string) ?? null,
+          facebookUrl: (data.facebookUrl as string) ?? null,
+          instagramUrl: (data.instagramUrl as string) ?? null,
+          twitterUrl: (data.twitterUrl as string) ?? null,
+          linkedinUrl: (data.linkedinUrl as string) ?? null,
+          isProfilePublic: data.isProfilePublic as boolean,
+        });
+      } else {
+        toast.error("Failed to load profile");
+      }
+      setLoading(false);
+    }
+    load();
+    return () => { cancelled = true; };
   }, []);
 
   const handleSavePersonal = useCallback(async () => {
