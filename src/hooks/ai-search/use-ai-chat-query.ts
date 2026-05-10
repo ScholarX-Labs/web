@@ -72,10 +72,12 @@ export function useAiChatQuery() {
           aiReason: `Matched based on semantic similarity of ${Math.round(((r.score as number) || 0) * 100)}%.`,
           country: ((opp.country as string[])?.[0]) || "Global",
           degree: ((opp.degree as string[])?.[0]) || "Bachelor",
-          fundingType: ((opp.funding_type as string[])?.[0]) || "Fully Funded",
           deadline: (opp.deadline as string) || "TBA",
-          link: (opp.link as string) || "#",
           isVerified: opp.verified !== false,
+          fundingLabel: ((opp.funding_type as string[])?.[0]) || "Fully Funded",
+          applicationLink: (opp.link as string) || null,
+          remote: (opp.is_remote as boolean) || false,
+          matchScore: Math.round(((r.score as number) || 0) * 100),
         };
       });
 
