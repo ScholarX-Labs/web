@@ -3,8 +3,8 @@ import Scholarx_horizontal_logo from "../../public/ScholarX-Logo-horizontal-Blue
 import Image from "next/image";
 import { getSession } from "@/lib/dal";
 import SignoutButton from "@/app/auth/_components/SignoutButton";
-import { User } from "lucide-react";
 import MobileMenu from "@/components/MobileMenu";
+import { ProfilePopup } from "@/components/profile/profile-popup";
 import { ROUTES } from "@/lib/routes";
 
 async function Header() {
@@ -64,11 +64,18 @@ async function Header() {
         </div>
       </section>
       <section className="flex-1 flex flex-row justify-end lg:justify-center items-center gap-4 lg:gap-8">
-        {isLoggedIn ? (
+        {isLoggedIn && session?.user ? (
           <>
-            <Link href={ROUTES.PROFILE}>
-              <User color="#000000" />
-            </Link>
+            <ProfilePopup
+              user={{
+                id: session.user.id,
+                name: session.user.name,
+                email: session.user.email,
+                image: session.user.image ?? null,
+                firstName: session.user.firstName,
+                lastName: session.user.lastName,
+              }}
+            />
             <div className="hidden lg:block">
               <SignoutButton className="p-2 rounded-sm bg-primary text-white transition-colors duration-300 hover:bg-chart-5" />
             </div>
