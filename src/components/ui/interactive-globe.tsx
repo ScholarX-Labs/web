@@ -225,7 +225,19 @@ export function Component({
     rotXRef.current = Math.max(-1, Math.min(1, dragRef.current.startRotX + dy * 0.005))
   }, [])
 
-  const onPointerUp = useCallback(() => { dragRef.current.active = false }, [])
+  const onPointerUp = useCallback((e: React.PointerEvent) => {
+    dragRef.current.active = false
+    ;(e.target as HTMLElement).releasePointerCapture(e.pointerId)
+  }, [])
+
+  const onPointerCancel = useCallback((e: React.PointerEvent) => {
+    dragRef.current.active = false
+    ;(e.target as HTMLElement).releasePointerCapture(e.pointerId)
+  }, [])
+
+  const onLostPointerCapture = useCallback(() => {
+    dragRef.current.active = false
+  }, [])
 
   return (
     <canvas
@@ -235,6 +247,8 @@ export function Component({
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
+      onPointerCancel={onPointerCancel}
+      onLostPointerCapture={onLostPointerCapture}
     />
   )
 }
