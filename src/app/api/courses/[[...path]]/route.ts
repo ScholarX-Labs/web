@@ -70,6 +70,15 @@ const safeJson = async <T>(request: NextRequest): Promise<T | undefined> => {
   }
 };
 
+interface InquiryBody {
+  name?: string;
+  email?: string;
+  phone?: string;
+  message?: string;
+  sourceSurface?: string;
+  idempotencyKey?: string;
+}
+
 type RouteContext = {
   params: Promise<{ path?: string[] }>;
 };
@@ -235,6 +244,41 @@ export const createCoursesRouteHandlers = (deps: CoursesRouteDeps) => {
           { requestId },
         );
         return NextResponse.json(result, { status: 200 });
+      }
+
+      if (path.length === 2 && path[1] === "inquiry") {
+        const courseId = path[0];
+        const inquiryBody = await safeJson<InquiryBody>(request);
+
+        if (!inquiryBody?.name || !inquiryBody?.email) {
+          throw new NextCourseError(
+            "BAD_REQUEST",
+            400,
+            "Name and email are required",
+            9005,
+          );
+        }
+
+        const result = await domain.enrollment.submitInquiry(
+          courseId,
+          userId,
+          {
+            name: inquiryBody.name,
+            email: inquiryBody.email,
+            phone: inquiryBody.phone,
+            message: inquiryBody.message,
+            sourceSurface: inquiryBody.sourceSurface,
+            idempotencyKey: inquiryBody.idempotencyKey,
+          },
+        );
+
+        return NextResponse.json(
+          {
+            inquiryId: result.id,
+            message: "Your inquiry has been submitted. Our team will contact you shortly.",
+          },
+          { status: 200 },
+        );
       }
 
       return NextResponse.json(

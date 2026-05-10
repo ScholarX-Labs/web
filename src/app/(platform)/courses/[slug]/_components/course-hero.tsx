@@ -2,13 +2,15 @@
 
 import Image from "next/image";
 import { Course } from "@/types/course.types";
-import { Badge } from "@/components/ui/badge";
 import { Play, Star, Users, Clock, MonitorPlay } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { useScroll, useTransform, motion } from "framer-motion";
 import { useEnrollIntentController } from "@/lib/enrollment/intent-controller";
 import { ROUTES } from "@/lib/routes";
 import Link from "next/link";
 import { StaggerContainer, StaggerItem } from "@/components/animations/stagger";
+import { cn } from "@/lib/utils";
+import { getCategoryStyle } from "@/lib/course-categories";
 
 interface CourseHeroProps {
   course: Course;
@@ -86,12 +88,23 @@ export function CourseHero({ course }: CourseHeroProps) {
         {/* Right: Info */}
         <StaggerContainer className="w-full md:w-[55%] flex flex-col gap-5">
           <StaggerItem className="flex flex-wrap items-center gap-2">
-            <Badge
-              variant="secondary"
-              className="bg-white/10 text-white hover:bg-white/20 ring-1 ring-white/20"
-            >
-              {course.category || "General"}
-            </Badge>
+            {(() => {
+              const style = getCategoryStyle(course.category);
+              const Icon = style.icon;
+              return (
+                <span
+                  className={cn(
+                    "inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold tracking-wide rounded-md ring-1 backdrop-blur-md bg-linear-to-r text-white",
+                    style.gradient,
+                    style.shadow,
+                    style.ring,
+                  )}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  {course.category || "General"}
+                </span>
+              );
+            })()}
             {course.level && (
               <Badge variant="outline" className="border-white/20 text-white">
                 {course.level}
@@ -152,7 +165,7 @@ export function CourseHero({ course }: CourseHeroProps) {
             {/* Note: In a real app we'd attach a ref here to track intersection for sticky bar */}
             {isEnrolled ? (
               <Link
-                href={ROUTES.LESSON(course.slug, "1")}
+                href={ROUTES.LESSON(course.slug, "lesson-1")}
                 className="group relative flex items-center justify-center gap-2 bg-linear-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white text-base font-bold rounded-full py-4 px-8 shadow-xl shadow-emerald-500/20 transition-all active:scale-[0.98] w-fit overflow-hidden"
               >
                 <span className="absolute inset-0 w-full h-full bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />

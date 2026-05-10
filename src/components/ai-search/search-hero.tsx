@@ -4,9 +4,6 @@ import { useState, useRef, KeyboardEvent } from "react";
 import {
   ArrowRight,
   Loader2,
-  Globe,
-  FlaskConical,
-  BookOpen,
   Sparkles,
 } from "lucide-react";
 import { Textarea } from "@/components/ai-search/ui/textarea";

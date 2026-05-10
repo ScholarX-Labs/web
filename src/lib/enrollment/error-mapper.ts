@@ -22,8 +22,7 @@ export const mapEnrollmentError = (error: unknown): EnrollmentMappedError => {
     error instanceof ApiRequestError ||
     (typeof error === "object" &&
       error !== null &&
-      "name" in error &&
-      (error as { name: unknown }).name === "ApiRequestError");
+      (error as Record<string, unknown>).name === "ApiRequestError");
 
   if (isApiError) {
     const apiError = error as ApiRequestError;

@@ -1,5 +1,6 @@
 // [AUTO-FIXED] Array defaults and other Postgres-specific patches applied by scripts/fix-auth-schema.js
 // [AUTO-FIXED] Array defaults and other Postgres-specific patches applied by scripts/fix-auth-schema.js
+// [AUTO-FIXED] Array defaults and other Postgres-specific patches applied by scripts/fix-auth-schema.js
 import { relations, sql } from "drizzle-orm";
 import {
   pgSchema,
@@ -7,7 +8,6 @@ import {
   timestamp,
   boolean,
   integer,
-  numeric,
   index,
 } from "drizzle-orm/pg-core";
 
@@ -47,6 +47,14 @@ export const user = authSchema.table("user", {
   currentInterest: text("current_interest"),
   savedOpportunities: text("saved_opportunities").array().default(sql`'{}'::text[]`),
   registeredEvents: text("registered_events").array().default(sql`'{}'::text[]`),
+
+  username: text("username").unique(),
+  githubUrl: text("github_url"),
+  facebookUrl: text("facebook_url"),
+  instagramUrl: text("instagram_url"),
+  twitterUrl: text("twitter_url"),
+  linkedinUrl: text("linkedin_url"),
+  isProfilePublic: boolean("is_profile_public").default(true).notNull(),
 });
 
 export const session = authSchema.table(

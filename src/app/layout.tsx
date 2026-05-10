@@ -3,13 +3,10 @@ import { Geist, Geist_Mono, Inter } from "next/font/google";
 import { AppProviders } from "@/providers/app-providers";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
-import { getSession } from "@/lib/dal";
 import { isDevAuthBypassEnabled } from "@/config/dev-auth-bypass";
 import Footer from "@/components/Footer";
-import Header from "@/components/Header";
+import PremiumHeader from "@/components/PremiumHeader";
 import { GlobalShellExclusions } from "@/components/global-shell-exclusions";
-import { RootMain } from "@/components/root-main";
-import SignoutButton from "./auth/_components/SignoutButton";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -33,10 +30,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const currentUser = await getSession();
-  const IsDevShowSignOutButton = false; // Set to true to show sign-out button in dev when bypass is enabled
-  const isLoggedIn = !!currentUser?.session?.id;
-
   return (
     <html lang="en" className={inter.variable}>
       <body
@@ -44,7 +37,7 @@ export default async function RootLayout({
       >
         <div vaul-drawer-wrapper="" className="min-h-screen flex flex-col">
           <GlobalShellExclusions>
-            <Header isLoggedIn={isLoggedIn} />
+            <PremiumHeader />
           </GlobalShellExclusions>
           <AppProviders>
             <TooltipProvider>
@@ -54,7 +47,7 @@ export default async function RootLayout({
                   bypassed.
                 </div>
               ) : null}
-              <RootMain>{children}</RootMain>
+              <main className="flex-1 flex flex-col pt-16 lg:pt-[72px]">{children}</main>
             </TooltipProvider>
           </AppProviders>
           <GlobalShellExclusions>

@@ -1,25 +1,22 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useEffect, useCallback } from "react";
 import { useLessonProgress } from "@/hooks/use-lesson-progress";
-import { markCourseCompleted } from "@/actions/certificates.actions";
-import { triggerCelebration } from "@/lib/celebrations";
-import { toast } from "sonner";
 import { VideoPlayer } from "./video-player";
 import { LessonMeta } from "./lesson-meta";
 import { LessonSidebar } from "./lesson-sidebar";
-import { LessonCompletionBanner } from "./lesson-completion-banner";
 import { motion } from "framer-motion";
 import { useUILayoutStore } from "@/store/ui-layout-store";
 import { cn } from "@/lib/utils";
 import { springApple } from "@/lib/motion-variants";
+import { syncLessonProgress } from "@/actions/course.actions";
 import type { MediaPlayerInstance } from "@vidstack/react";
 import type { LessonSummary } from "@/types/course.types";
 
 interface LessonClientBridgeProps {
   lessonId: string;
   courseSlug: string;
-  courseId?: string; // Support for completion actions
+  courseId: string;
   lessonTitle: string;
   lessonIndex: number;
   totalLessons: number;
@@ -48,8 +45,6 @@ export function LessonClientBridge({
 }: LessonClientBridgeProps) {
   const playerRef = useRef<MediaPlayerInstance>(null);
   const { isFocusMode } = useUILayoutStore();
-  const [showLessonCelebration, setShowLessonCelebration] = useState(false);
-  const hasCelebratedLesson = useRef(false);
 
   // 1. Initialize Progress Tracking
   const {
@@ -64,53 +59,53 @@ export function LessonClientBridge({
   } = useLessonProgress({
     lessonId,
     courseSlug,
-    courseId,
     videoDuration: 0, // Will be updated via setVideoDuration
-    onCourseCompleted: async (id) => {
-      // Trigger if this is the last lesson (lessonIndex is 1-based)
-      const isLastLesson = lessonIndex === totalLessons;
-      if (isLastLesson) {
-        try {
-          await markCourseCompleted(id, {
-            completedLessons: totalLessons,
-            completionPercentage: 100,
-          });
-          
-          triggerCelebration();
-          toast.success("Congratulations! You've earned a certificate.", {
-            description: "You can view and download it in your dashboard.",
-            action: {
-              label: "View Certificate",
-              onClick: () => window.location.href = "/certificates",
-            },
-            duration: 10000,
-          });
-        } catch (err) {
-          console.error("Failed to mark course as completed:", err);
-        }
-      }
-    },
   });
 
-  // 1a. Listen for current lesson completion to show the banner
-  useEffect(() => {
-    if (progress?.watchedPercentage && progress.watchedPercentage >= 95 && !hasCelebratedLesson.current) {
-      hasCelebratedLesson.current = true;
-      setShowLessonCelebration(true);
-      
-      // Auto-hide banner after 5 seconds
-      const timer = setTimeout(() => setShowLessonCelebration(false), 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [progress?.watchedPercentage]);
+  // 2. Sync progress to server when completed or on unmount
+  const progressRef = useRef(progress);
+  progressRef.current = progress;
 
-  // Reset celebration gate if lesson changes
-  useEffect(() => {
-    hasCelebratedLesson.current = false;
-    setShowLessonCelebration(false);
-  }, [lessonId]);
+  const syncToServer = useCallback(async () => {
+    const p = progressRef.current;
+    if (!p) return;
+    await syncLessonProgress(lessonId, courseId, {
+      completed: p.completedAt ? true : false,
+      completedAt: p.completedAt
+        ? new Date(p.completedAt).toISOString()
+        : null,
+      watchedPercentage: Math.round(p.watchedPercentage),
+      lastPosition: Math.round(p.lastPosition),
+    });
+  }, [lessonId, courseId]);
 
-  // 2. Resume Handler
+  useEffect(() => {
+    if (!progressRef.current?.completedAt) return;
+    const timer = setTimeout(() => {
+      syncToServer();
+    }, 2000);
+    return () => clearTimeout(timer);
+    // Intentionally only fire when completedAt first becomes truthy
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [progress?.completedAt ? "completed" : "not-completed", syncToServer]);
+
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === "hidden") {
+        syncToServer();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, [syncToServer]);
+
+  useEffect(() => {
+    return () => { syncToServer(); };
+  }, [syncToServer]);
+
+  // 3. Resume Handler
   const handleResume = (position: number) => {
     const player = playerRef.current;
     if (!player) return;
@@ -119,8 +114,8 @@ export function LessonClientBridge({
     // Await resolution before seeking to avoid seek-during-load races.
     try {
       const maybePromise = player.play?.();
-      if (maybePromise instanceof Promise) {
-        maybePromise
+      if (maybePromise && typeof (maybePromise as Promise<void>).then === "function") {
+        (maybePromise as Promise<void>)
           .then(() => {
             // Ensure player still exists before seeking
             if (playerRef.current) playerRef.current.currentTime = position;
@@ -142,15 +137,12 @@ export function LessonClientBridge({
       layout
       transition={springApple}
       className={cn(
-        "flex flex-1 flex-col lg:flex-row mx-auto transition-all duration-700 relative",
+        "flex flex-1 flex-col lg:flex-row mx-auto transition-all duration-700",
         isFocusMode 
           ? "w-screen max-w-none p-10 min-h-[100vh] justify-center items-center gap-0" 
           : "w-full max-w-[1800px] p-4 lg:p-6 xl:p-8 gap-6"
       )}
     >
-      {/* Lesson Completion Animation Overlay */}
-      <LessonCompletionBanner isVisible={showLessonCelebration} />
-
       {/* ── LEFT: VIDEO + META ───────────────────────────── */}
       <motion.div
         layout
@@ -163,8 +155,10 @@ export function LessonClientBridge({
         {(() => {
           const currentLesson = lessons.find((l) => l.id === lessonId);
           const mediaSrc = currentLesson?.media?.src;
-          const rawThumbnails = currentLesson?.media?.thumbnails;
-          const thumbnails = Array.isArray(rawThumbnails) ? rawThumbnails[0] : rawThumbnails;
+          const thumbnails = Array.isArray(currentLesson?.media?.thumbnails)
+            ? currentLesson.media.thumbnails[0]
+            : currentLesson?.media?.thumbnails;
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const poster = currentLesson?.media?.poster;
 
           if (!mediaSrc) {
@@ -182,7 +176,6 @@ export function LessonClientBridge({
               title={lessonTitle}
               src={mediaSrc}
               thumbnails={thumbnails}
-              poster={poster}
               heatmapBuckets={heatmapBuckets}
               onTimeUpdate={onTimeUpdate}
               onPause={onPause}
@@ -218,6 +211,11 @@ export function LessonClientBridge({
         className="hidden lg:flex shrink-0 w-80 xl:w-96"
         progress={{
           [lessonId]: progress?.watchedPercentage ?? 0,
+          ...Object.fromEntries(
+            lessons
+              .filter((l) => l.isCompleted)
+              .map((l) => [l.id, 100]),
+          ),
         }}
       />
     </motion.main>

@@ -4,13 +4,13 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
 import { db } from "@/db";
 import { and, eq, gte, like, sql } from "drizzle-orm";
+import type { PgDatabase } from "drizzle-orm/pg-core";
 import * as schema from "@/db/schema/auth-schema";
 import { admin, bearer, emailOTP, phoneNumber } from "better-auth/plugins";
 import { parsePhoneNumberWithError } from "libphonenumber-js";
 import { z } from "zod";
 import { sendEmail } from "./email";
 import { randomUUID } from "node:crypto";
-import { PgTransaction } from "drizzle-orm/pg-core";
 
 const EMAIL_OTP_RATE_LIMIT_IDENTIFIER = "email-otp-rate-limit";
 const EMAIL_OTP_HOURLY_LIMIT = 4;
@@ -64,7 +64,7 @@ async function countOtpSendsSince(
   email: string,
   since: Date,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  tx: PgTransaction<any, any, any> | typeof db = db,
+  tx: PgDatabase<any> = db,
 ): Promise<number> {
   const escapedEmail = escapeLikePattern(email);
   const identifierPrefix = `${EMAIL_OTP_RATE_LIMIT_IDENTIFIER}:${escapedEmail}:%`;
@@ -81,11 +81,8 @@ async function countOtpSendsSince(
   return Number(result?.count ?? 0);
 }
 
-async function recordEmailOtpSend(
-  email: string,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  tx: PgTransaction<any, any, any> | typeof db = db,
-): Promise<void> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function recordEmailOtpSend(email: string, tx: PgDatabase<any> = db): Promise<void> {
   const normalizedEmail = normalizeEmailAddress(email);
   const uniqueId = randomUUID();
 
@@ -96,7 +93,6 @@ async function recordEmailOtpSend(
     expiresAt: new Date(Date.now() + ONE_DAY_IN_MS + ONE_HOUR_IN_MS),
   });
 }
-
 
 function getOtpEmailContent(
   type: string,
@@ -156,6 +152,48 @@ export const auth = betterAuth({
     autoSignInAfterVerification: true,
     sendOnSignUp: true,
     sendOnSignIn: false,
+  },
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user) => {
+          const firstName = (user as Record<string, unknown>).firstName as string | undefined;
+          const lastName = (user as Record<string, unknown>).lastName as string | undefined;
+
+          if (!firstName || !lastName) {
+            const fallback = `user-${randomUUID().slice(0, 12)}`;
+            return { data: { ...user, username: fallback } };
+          }
+
+          let base = `${firstName}.${lastName}`
+            .toLowerCase()
+            .replace(/[^a-z0-9._-]/g, "")
+            .replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, "")
+            .slice(0, 26);
+
+          if (!base) {
+            base = `user-${randomUUID().slice(0, 6)}`;
+          }
+
+          for (let attempt = 0; attempt < 10; attempt++) {
+            const candidate = attempt === 0 ? base : `${base}-${randomUUID().slice(0, 6)}`;
+
+            const existing = await db
+              .select({ id: schema.user.id })
+              .from(schema.user)
+              .where(eq(schema.user.username, candidate))
+              .limit(1);
+
+            if (existing.length === 0) {
+              return { data: { ...user, username: candidate } };
+            }
+          }
+
+          const fallback = `user-${randomUUID().slice(0, 12)}`;
+          return { data: { ...user, username: fallback } };
+        },
+      },
+    },
   },
   hooks: {
     before: createAuthMiddleware(async (ctx) => {
@@ -348,6 +386,13 @@ export const auth = betterAuth({
         defaultValue: [],
         required: false,
       },
+      username: { type: "string", required: false },
+      githubUrl: { type: "string", required: false },
+      facebookUrl: { type: "string", required: false },
+      instagramUrl: { type: "string", required: false },
+      twitterUrl: { type: "string", required: false },
+      linkedinUrl: { type: "string", required: false },
+      isProfilePublic: { type: "boolean", required: false, defaultValue: true },
     },
   },
   plugins: [

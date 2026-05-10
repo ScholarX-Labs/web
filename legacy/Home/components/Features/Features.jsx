@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 /**
  * Features Component
  * Welcome section showcasing ScholarX's value proposition

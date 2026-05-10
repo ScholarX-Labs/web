@@ -14,8 +14,6 @@ import { GoogleIcon } from "../../../components/icons/GoogleIcon";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/lib/routes";
 
-const passwordRequirements = /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])/;
-
 const signupSchema = z
   .object({
     firstName: z.string().min(1, { message: "First name is required" }).max(50),
@@ -76,7 +74,8 @@ export default function Page() {
   const onSubmit = async (data: SignupForm) => {
     if (isSocialSubmitting) return;
     setServerError(null);
-    const { confirmPassword, ...payload } = data;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { confirmPassword: _confirmPassword, ...payload } = data;
 
     const { error } = await signUp.email({
       email: payload.email,

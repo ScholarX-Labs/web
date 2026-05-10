@@ -1,76 +1,271 @@
-import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
-
-import { cn } from "@/lib/utils"
+/** @usage Notification banners, status messages, form feedback with colorful variants */
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { cva, type VariantProps } from 'class-variance-authority';
+import { X } from 'lucide-react';
 
 const alertVariants = cva(
-  "group/alert relative grid w-full gap-0.5 rounded-lg border px-4 py-3 text-left text-sm has-data-[slot=alert-action]:relative has-data-[slot=alert-action]:pr-18 has-[>svg]:grid-cols-[auto_1fr] has-[>svg]:gap-x-2.5 *:[svg]:row-span-2 *:[svg]:translate-y-0.5 *:[svg]:text-current *:[svg:not([class*='size-'])]:size-4",
+  'flex items-stretch w-full gap-2 group-[.toaster]:w-(--width)',
   {
     variants: {
       variant: {
-        default: "bg-card text-card-foreground",
-        destructive:
-          "bg-card text-destructive *:data-[slot=alert-description]:text-destructive/90 *:[svg]:text-current",
+        secondary: '',
+        primary: '',
+        destructive: '',
+        success: '',
+        info: '',
+        mono: '',
+        warning: '',
+      },
+      icon: {
+        primary: '',
+        destructive: '',
+        success: '',
+        info: '',
+        warning: '',
+      },
+      appearance: {
+        solid: '',
+        outline: '',
+        light: '',
+        stroke: 'text-foreground',
+      },
+      size: {
+        lg: 'rounded-lg p-4 gap-3 text-base [&>[data-slot=alert-icon]>svg]:size-6 *:data-slot=alert-icon:mt-0 *:data-alert-close:mt-0.5 *:data-alert-close:-me-0.5',
+        md: 'rounded-lg p-3.5 gap-2.5 text-sm [&>[data-slot=alert-icon]>svg]:size-5 *:data-slot=alert-icon:mt-0 *:data-alert-close:-me-0.5',
+        sm: 'rounded-md px-3 py-2.5 gap-2 text-xs [&>[data-slot=alert-icon]>svg]:size-4 *:data-slot=alert-icon:mt-0.5 *:data-alert-close:-me-0.5 [&>[data-slot=alert-close]>svg]:size-3.5!',
       },
     },
-    defaultVariants: {
-      variant: "default",
-    },
-  }
-)
+    compoundVariants: [
+      {
+        variant: 'secondary',
+        appearance: 'solid',
+        className: 'bg-muted text-foreground *:data-alert-close:text-foreground',
+      },
+      {
+        variant: 'primary',
+        appearance: 'solid',
+        className: 'bg-primary text-primary-foreground *:data-alert-close:text-primary-foreground',
+      },
+      {
+        variant: 'destructive',
+        appearance: 'solid',
+        className: 'bg-destructive text-destructive-foreground *:data-alert-close:text-destructive-foreground',
+      },
+      {
+        variant: 'success',
+        appearance: 'solid',
+        className: 'bg-green-500 text-white *:data-alert-close:text-white',
+      },
+      {
+        variant: 'info',
+        appearance: 'solid',
+        className: 'bg-violet-600 text-white *:data-alert-close:text-white',
+      },
+      {
+        variant: 'warning',
+        appearance: 'solid',
+        className: 'bg-yellow-500 text-white *:data-alert-close:text-white',
+      },
+      {
+        variant: 'mono',
+        appearance: 'solid',
+        className: 'bg-mono text-mono-foreground *:data-alert-close:text-mono-foreground',
+      },
 
-function Alert({
-  className,
-  variant,
-  ...props
-}: React.ComponentProps<"div"> & VariantProps<typeof alertVariants>) {
+      {
+        variant: 'secondary',
+        appearance: 'outline',
+        className: 'border border-border bg-background text-foreground *:data-alert-close:text-foreground',
+      },
+      {
+        variant: 'primary',
+        appearance: 'outline',
+        className: 'border border-border bg-background text-primary *:data-alert-close:text-foreground',
+      },
+      {
+        variant: 'destructive',
+        appearance: 'outline',
+        className: 'border border-border bg-background text-destructive *:data-alert-close:text-foreground',
+      },
+      {
+        variant: 'success',
+        appearance: 'outline',
+        className: 'border border-border bg-background text-green-500 *:data-alert-close:text-foreground',
+      },
+      {
+        variant: 'info',
+        appearance: 'outline',
+        className: 'border border-border bg-background text-violet-600 *:data-alert-close:text-foreground',
+      },
+      {
+        variant: 'warning',
+        appearance: 'outline',
+        className: 'border border-border bg-background text-yellow-500 *:data-alert-close:text-foreground',
+      },
+      {
+        variant: 'mono',
+        appearance: 'outline',
+        className: 'border border-border bg-background text-mono *:data-alert-close:text-foreground',
+      },
+
+      {
+        variant: 'secondary',
+        appearance: 'stroke',
+        className: 'border border-border bg-background [&>div:first-of-type>svg]:text-foreground',
+      },
+      {
+        variant: 'primary',
+        appearance: 'stroke',
+        className: 'border border-border bg-background [&>div:first-of-type>svg]:text-primary',
+      },
+      {
+        variant: 'destructive',
+        appearance: 'stroke',
+        className: 'border border-border bg-background [&>div:first-of-type>svg]:text-destructive',
+      },
+      {
+        variant: 'success',
+        appearance: 'stroke',
+        className: 'border border-border bg-background [&>div:first-of-type>svg]:text-green-500',
+      },
+      {
+        variant: 'info',
+        appearance: 'stroke',
+        className: 'border border-border bg-background [&>div:first-of-type>svg]:text-violet-600',
+      },
+      {
+        variant: 'warning',
+        appearance: 'stroke',
+        className: 'border border-border bg-background [&>div:first-of-type>svg]:text-yellow-500',
+      },
+      {
+        variant: 'mono',
+        appearance: 'stroke',
+        className: 'border border-border bg-background [&>div:first-of-type>svg]:text-mono',
+      },
+
+      {
+        variant: 'secondary',
+        appearance: 'light',
+        className: 'bg-muted border border-border text-foreground',
+      },
+      {
+        variant: 'primary',
+        appearance: 'light',
+        className: 'bg-primary/5 border border-primary/10 text-foreground [&>div:first-of-type>svg]:text-primary',
+      },
+      {
+        variant: 'destructive',
+        appearance: 'light',
+        className: 'bg-destructive/5 border border-destructive/10 text-foreground [&>div:first-of-type>svg]:text-destructive',
+      },
+      {
+        variant: 'success',
+        appearance: 'light',
+        className: 'bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-950/50 text-foreground [&>div:first-of-type>svg]:text-green-500',
+      },
+      {
+        variant: 'info',
+        appearance: 'light',
+        className: 'bg-violet-50 dark:bg-violet-950/30 border border-violet-200 dark:border-violet-950/50 text-foreground [&>div:first-of-type>svg]:text-violet-600',
+      },
+      {
+        variant: 'warning',
+        appearance: 'light',
+        className: 'bg-yellow-50 dark:bg-yellow-950/30 border border-yellow-200 dark:border-yellow-950/50 text-foreground [&>div:first-of-type>svg]:text-yellow-500',
+      },
+
+      {
+        variant: 'mono',
+        icon: 'primary',
+        className: '[&>div:first-of-type>svg]:text-primary',
+      },
+      {
+        variant: 'mono',
+        icon: 'warning',
+        className: '[&>div:first-of-type>svg]:text-yellow-500',
+      },
+      {
+        variant: 'mono',
+        icon: 'success',
+        className: '[&>div:first-of-type>svg]:text-green-500',
+      },
+      {
+        variant: 'mono',
+        icon: 'destructive',
+        className: '[&>div:first-of-type>svg]:text-destructive',
+      },
+      {
+        variant: 'mono',
+        icon: 'info',
+        className: '[&>div:first-of-type>svg]:text-violet-600',
+      },
+    ],
+    defaultVariants: {
+      variant: 'secondary',
+      appearance: 'solid',
+      size: 'md',
+    },
+  },
+);
+
+type AlertProps = ({
+  close?: false;
+  onClose?: never;
+} | {
+  close: true;
+  onClose: () => void;
+}) & React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof alertVariants>;
+
+function Alert({ className, variant, size, icon, appearance, close, onClose, children, ...props }: AlertProps) {
   return (
     <div
       data-slot="alert"
       role="alert"
-      className={cn(alertVariants({ variant }), className)}
+      className={cn(alertVariants({ variant, size, icon, appearance }), className)}
       {...props}
-    />
-  )
-}
-
-function AlertTitle({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="alert-title"
-      className={cn(
-        "font-medium group-has-[>svg]/alert:col-start-2 [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground",
-        className
+    >
+      {children}
+      {close && onClose && (
+        <Button
+          size="icon-xs"
+          variant="ghost"
+          onClick={onClose}
+          aria-label="Dismiss"
+          data-alert-close="true"
+          className="group shrink-0"
+        >
+          <X className="opacity-60 group-hover:opacity-100" />
+        </Button>
       )}
-      {...props}
-    />
-  )
+    </div>
+  );
 }
 
-function AlertDescription({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
+function AlertTitle({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
+  return <div data-slot="alert-title" className={cn('grow tracking-tight', className)} {...props} />;
+}
+
+function AlertIcon({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div
-      data-slot="alert-description"
-      className={cn(
-        "text-sm text-balance text-muted-foreground md:text-pretty [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground [&_p:not(:last-child)]:mb-4",
-        className
-      )}
-      {...props}
-    />
-  )
+    <div data-slot="alert-icon" className={cn('shrink-0', className)} {...props}>
+      {children}
+    </div>
+  );
 }
 
-function AlertAction({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="alert-action"
-      className={cn("absolute top-2.5 right-3", className)}
-      {...props}
-    />
-  )
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function AlertToolbar({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  return <div data-slot="alert-toolbar" className={cn(className)} {...props} />;
 }
 
-export { Alert, AlertTitle, AlertDescription, AlertAction }
+function AlertDescription({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) {
+  return <div data-slot="alert-description" className={cn('text-sm [&_p]:leading-relaxed [&_p]:mb-2', className)} {...props} />;
+}
+
+function AlertContent({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) {
+  return <div data-slot="alert-content" className={cn('space-y-2 [&_[data-slot=alert-title]]:font-semibold', className)} {...props} />;
+}
+
+export { Alert, AlertContent, AlertDescription, AlertIcon, AlertTitle, AlertToolbar };

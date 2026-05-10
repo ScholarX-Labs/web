@@ -1,37 +1,38 @@
-import { AiChatMessage, Opportunity } from "./types";
+import { AiChatMessage, Opportunity } from "@/components/ai-search/types";
+
+export const MOCK_OPPORTUNITIES: Opportunity[] = [
+  {
+    id: "1",
+    type: "scholarship",
+    title: "Fulbright Foreign Student Program",
+    subtitle: "United States",
+    description:
+      "Fully funded scholarships for graduate study in the US. Open to all fields of study.",
+    aiReason: "High match based on your academic profile.",
+    country: "USA",
+    deadline: "Oct 10, 2025",
+    fundingLabel: "Fully Funded",
+    matchScore: 95,
+  },
+  {
+    id: "2",
+    type: "internship",
+    title: "Google STEP Internship",
+    subtitle: "Remote / Global",
+    description:
+      "A paid internship program for first and second-year university students interested in tech.",
+    aiReason: "Matches your interest in computer science.",
+    country: "Global",
+    deadline: "Feb 15, 2025",
+    fundingLabel: "Paid",
+    matchScore: 88,
+  },
+];
 
 export const INITIAL_MESSAGES: AiChatMessage[] = [
   {
     id: "welcome",
     role: "assistant",
-    text: "Hi! I'm your ScholarX AI Assistant. I can help you find scholarships, internships, and other opportunities based on your skills and interests. What are you looking for today?",
+    text: "Hi! I'm your AI opportunity assistant. Ask me about scholarships, internships, fellowships, or conferences matching your profile.",
   },
 ];
-
-export const MOCK_OPPORTUNITIES = [
-  {
-    id: "opp-1",
-    type: "scholarship" as const,
-    title: "Global Excellence Scholarship",
-    subtitle: "London, UK",
-    description: "Fully funded scholarship for international students pursuing postgraduate studies in Engineering or Data Science.",
-    aiReason: "Matches your interest in international postgraduate studies.",
-    country: "UK",
-    deadline: "June 15, 2026",
-    fundingLabel: "Fully Funded",
-    matchScore: 94,
-  },
-  {
-    id: "opp-2",
-    type: "internship" as const,
-    title: "Software Engineering Intern",
-    subtitle: "Remote / San Francisco",
-    description: "12-week summer internship program at a leading tech company focusing on distributed systems.",
-    aiReason: "Based on your technical background in backend systems.",
-    country: "USA",
-    deadline: "Rolling",
-    fundingLabel: "Paid",
-    remote: true,
-    matchScore: 88,
-  },
-] satisfies Opportunity[];

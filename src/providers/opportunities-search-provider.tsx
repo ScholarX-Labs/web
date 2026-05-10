@@ -32,29 +32,14 @@ export function OpportunitiesSearchProvider({
     () => searchParams.get("q") || "",
   );
   const [filters, setFilters] = useState<Record<string, string[]>>(() => {
-    const initialFilters: Record<string, string[]> = {};
-    searchParams.forEach((value, key) => {
-      if (key !== "q" && key !== "page") {
-        initialFilters[key] = value ? value.split(",") : [];
-      }
-    });
-    return initialFilters;
-  });
-
-  const [prevParams, setPrevParams] = useState(searchParams);
-
-  if (searchParams !== prevParams) {
-    setPrevParams(searchParams);
-    const newQuery = searchParams.get("q") || "";
     const nextFilters: Record<string, string[]> = {};
     searchParams.forEach((value, key) => {
       if (key !== "q" && key !== "page") {
         nextFilters[key] = value ? value.split(",") : [];
       }
     });
-    setSearchQuery(newQuery);
-    setFilters(nextFilters);
-  }
+    return nextFilters;
+  });
 
   const updateFilter = (key: string, values: string[]) => {
     setFilters((prev) => ({ ...prev, [key]: values }));

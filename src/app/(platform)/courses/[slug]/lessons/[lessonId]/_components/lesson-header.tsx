@@ -25,47 +25,21 @@ export function LessonHeader({ slug, lessonTitle }: LessonHeaderProps) {
 
   const handleShare = useCallback(async () => {
     const url = window.location.href;
-    const shareData = { title: `Lesson: ${lessonTitle}`, url };
     try {
-      const nav = navigator as Navigator & {
-        share?: (data: ShareData) => Promise<void>;
-        canShare?: (data: ShareData) => boolean;
-      };
-
-      const hasShare = typeof nav !== "undefined" && typeof nav.share === "function";
-      const hasCanShare = typeof nav !== "undefined" && typeof nav.canShare === "function";
-
-      if (hasShare) {
-        try {
-          // If canShare exists, ask it first; otherwise assume share is available
-          if (hasCanShare && nav.canShare) {
-            const can = nav.canShare(shareData);
-            if (can) {
-              await nav.share!(shareData);
-              return;
-            }
-          } else {
-            await nav.share!(shareData);
-            return;
-          }
-        } catch {
-          // Sharing failed or was cancelled — fall back to clipboard below.
-        }
-      }
-
-      // Fallback: use Clipboard API if available.
-      if (typeof navigator?.clipboard?.writeText === "function") {
-        try {
-          await navigator.clipboard.writeText(url);
-          setCopied(true);
-          setTimeout(() => setCopied(false), 2000);
-          return;
-        } catch {
-          // Clipboard write failed — swallow to preserve UX
-        }
+      if (typeof navigator.share === "function") {
+        await navigator.share({ title: `Lesson: ${lessonTitle}`, url });
+        return;
       }
     } catch {
-      // User cancelled or an unexpected error occurred
+      // Sharing failed or was cancelled
+    }
+
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard write failed
     }
   }, [lessonTitle]);
 

@@ -7,7 +7,8 @@ export type EnrollmentTelemetryEventName =
   | "enroll_click"
   | "enroll_submission_started"
   | "enroll_submission_succeeded"
-  | "enroll_submission_failed";
+  | "enroll_submission_failed"
+  | "enroll_inquiry_prompted";
 
 interface BaseEnrollmentTelemetryEvent {
   event: EnrollmentTelemetryEventName;

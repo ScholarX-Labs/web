@@ -36,6 +36,7 @@ export interface Course {
 
   // Access and Status
   requiresForm: boolean;
+  salesInquiry?: boolean;
   isPublished: boolean;
 
   // Details
@@ -45,6 +46,7 @@ export interface Course {
   createdAt: string;
   updatedAt: string;
   isSubscribed?: boolean;
+  lessons?: Lesson[];
 }
 
 export interface Enrollment {

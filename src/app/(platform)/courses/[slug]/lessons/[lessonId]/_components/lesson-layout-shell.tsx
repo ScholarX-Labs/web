@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { AnimatePresence, LayoutGroup, MotionConfig, motion } from "framer-motion";
 import { Drawer } from "@/components/ui/drawer-sheet";
 import { useUILayoutStore } from "@/store/ui-layout-store";
@@ -16,16 +16,10 @@ interface LessonLayoutShellProps {
 
 export function LessonLayoutShell({ children, lessonKey }: LessonLayoutShellProps) {
   const { isDrawerOpen, setDrawerOpen, isFocusMode, isNotesOverlayOpen, isResourcesSheetOpen } = useUILayoutStore();
-  const [mounted, setMounted] = useState(false);
+  const [mounted] = useState(() => true);
 
   // Wire fullscreen → auto Focus Mode
   useFocusMode();
-
-  // Prevent hydration errors
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setMounted(true);
-  }, []);
 
 
   return (

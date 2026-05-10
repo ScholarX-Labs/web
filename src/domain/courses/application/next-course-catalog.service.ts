@@ -1,4 +1,5 @@
-import { Course } from "@/types/course.types";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Course, LessonSummary } from "@/types/course.types";
 import { CourseListQuery, CourseSearchQuery } from "@/domain/courses/contracts";
 import { PaginatedCoursesApiResponse } from "@/lib/api/courses.service";
 import {
@@ -6,6 +7,13 @@ import {
   NextCoursesRepository,
 } from "@/domain/courses/infrastructure/db/next-courses.repository";
 import { NextCourseError } from "@/domain/courses/application/next-course.errors";
+
+const formatDuration = (seconds?: number | null): string => {
+  if (!seconds || seconds <= 0) return "0:00";
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}:${secs.toString().padStart(2, "0")}`;
+};
 
 const parseNumber = (
   value: string | number | null | undefined,
@@ -58,6 +66,22 @@ const toCourse = (record: FlatCourseRecord, isSubscribed = false): Course => ({
   isSubscribed,
   createdAt: record.createdAt ?? new Date().toISOString(),
   updatedAt: record.updatedAt ?? new Date().toISOString(),
+});
+
+const toLessonSummary = (
+  lesson: { id: string; title: string; videoUrl?: string | null; duration?: number | null; sortIndex: number },
+  progress: { completed: boolean } | null,
+  isSubscribed: boolean,
+): LessonSummary => ({
+  id: lesson.id,
+  title: lesson.title,
+  duration: formatDuration(lesson.duration),
+  isCompleted: progress?.completed ?? false,
+  isLocked: !isSubscribed,
+  media: {
+    src: lesson.videoUrl ?? "",
+    poster: undefined,
+  },
 });
 
 export class NextCourseCatalogService {
@@ -155,11 +179,24 @@ export class NextCourseCatalogService {
       );
     }
 
-    const sub = userId
-      ? await this.repository.findActiveSubscription(userId, id)
-      : null;
+    const [sub, lessons] = await Promise.all([
+      userId ? this.repository.findActiveSubscription(userId, id) : null,
+      this.repository.listLessons(id),
+    ]);
 
-    return toCourse(course, Boolean(sub));
+    const mapped = toCourse(course, Boolean(sub));
+    mapped.lessons = lessons.map((l) => ({
+      id: l.id,
+      title: l.title,
+      description: l.description ?? undefined,
+      content: l.content ?? undefined,
+      videoUrl: l.videoUrl ?? undefined,
+      duration: l.duration ?? undefined,
+      order: l.sortIndex,
+      courseId: l.courseId,
+    }));
+
+    return mapped;
   }
 
   async getBySlug(slug: string, userId?: string): Promise<Course> {
@@ -173,11 +210,24 @@ export class NextCourseCatalogService {
       );
     }
 
-    const sub = userId
-      ? await this.repository.findActiveSubscription(userId, course.id)
-      : null;
+    const [sub, lessons] = await Promise.all([
+      userId ? this.repository.findActiveSubscription(userId, course.id) : null,
+      this.repository.listLessons(course.id),
+    ]);
 
-    return toCourse(course, Boolean(sub));
+    const mapped = toCourse(course, Boolean(sub));
+    mapped.lessons = lessons.map((l: any) => ({
+      id: l.id,
+      title: l.title,
+      description: l.description ?? undefined,
+      content: l.content ?? undefined,
+      videoUrl: l.videoUrl ?? undefined,
+      duration: l.duration ?? undefined,
+      order: l.sortIndex,
+      courseId: l.courseId,
+    }));
+
+    return mapped;
   }
 
   async getEnrollmentStatus(courseId: string, userId: string) {
@@ -197,5 +247,90 @@ export class NextCourseCatalogService {
       courseId,
       userId,
     };
+  }
+
+  async getLesson(courseSlug: string, lessonId: string, userId?: string) {
+    const course = await this.repository.findBySlugActive(courseSlug);
+    if (!course) {
+      throw new NextCourseError(
+        "COURSE_NOT_FOUND",
+        404,
+        `Course with slug '${courseSlug}' not found.`,
+        1001,
+      );
+    }
+
+    const lessons = await this.repository.listLessons(course.id);
+
+    // Resolve lessonId: try UUID match, then numeric index (raw or lesson-N prefix)
+    const rawId = lessonId.startsWith("lesson-") ? lessonId.slice(7) : lessonId;
+    let resolvedLesson = lessons.find((l: any) => l.id === lessonId);
+    if (!resolvedLesson) {
+      const numeric = parseInt(rawId, 10);
+      if (!isNaN(numeric) && numeric >= 1 && numeric <= lessons.length) {
+        resolvedLesson = lessons[numeric - 1];
+      }
+    }
+    if (!resolvedLesson) {
+      throw new NextCourseError(
+        "LESSON_NOT_FOUND",
+        404,
+        `Lesson '${lessonId}' not found in course '${courseSlug}'.`,
+        1003,
+      );
+    }
+
+    const resolvedLessonId = resolvedLesson.id;
+
+    const [sub, allProgress, lessonProgress] = await Promise.all([
+      userId ? this.repository.findActiveSubscription(userId, course.id) : null,
+      userId
+        ? this.repository.findProgressByCourse(userId, course.id)
+        : Promise.resolve([]),
+      userId
+        ? this.repository.findLessonProgress(userId, resolvedLessonId)
+        : null,
+    ]);
+
+    const isSubscribed = Boolean(sub);
+    const mappedCourse = toCourse(course, isSubscribed);
+    mappedCourse.lessons = lessons.map((l: any) => ({
+      id: l.id,
+      title: l.title,
+      description: l.description ?? undefined,
+      content: l.content ?? undefined,
+      videoUrl: l.videoUrl ?? undefined,
+      duration: l.duration ?? undefined,
+      order: l.sortIndex,
+      courseId: l.courseId,
+    }));
+
+    const progressMap = new Map(allProgress.map((p: any) => [p.lessonId, p]));
+
+    const allLessons: LessonSummary[] = lessons.map((l: any) =>
+      toLessonSummary(l, progressMap.get(l.id) ?? null, isSubscribed),
+    );
+
+    const currentLesson = toLessonSummary(resolvedLesson, lessonProgress, isSubscribed);
+
+    return {
+      course: mappedCourse,
+      currentLesson,
+      allLessons,
+    };
+  }
+
+  async syncProgress(
+    userId: string,
+    lessonId: string,
+    courseId: string,
+    data: {
+      completed?: boolean;
+      completedAt?: Date | null;
+      watchedPercentage?: number;
+      lastPosition?: number;
+    },
+  ) {
+    await this.repository.upsertLessonProgress(userId, lessonId, courseId, data);
   }
 }

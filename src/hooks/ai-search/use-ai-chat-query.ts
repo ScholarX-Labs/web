@@ -59,41 +59,25 @@ export function useAiChatQuery() {
 
       const data = await response.json();
       
-      interface ApiResult {
-        id: string;
-        score: number;
-        opportunity?: {
-          id?: string;
-          type?: { subtype?: string[] };
-          title?: string;
-          location?: string;
-          target_segment?: string[];
-          description?: string;
-          country?: string[];
-          degree?: string[];
-          funding_type?: string[];
-          deadline?: string;
-          link?: string;
-          verified?: boolean;
-        };
-      }
-
       // Safety checks / defaults mapping
-      const mappedOpportunities = (data.results || []).map((result: ApiResult) => {
-        const opp = result.opportunity || {};
+      const mappedOpportunities = (data.results || []).map((result: unknown) => {
+        const r = result as Record<string, unknown>;
+        const opp = (r.opportunity as Record<string, unknown>) || {};
         return {
-          id: opp.id || result.id || crypto.randomUUID(),
-          type: opp.type?.subtype?.[0] || "scholarship",
-          title: opp.title || "Unknown Opportunity",
-          subtitle: opp.location || (opp.target_segment ? opp.target_segment.join(", ") : ""),
-          description: opp.description ? opp.description.slice(0, 150) + "..." : "",
-          aiReason: `Matched based on semantic similarity of ${Math.round((result.score || 0) * 100)}%.`,
-          country: opp.country?.[0] || "Global",
-          degree: opp.degree?.[0] || "Bachelor",
-          fundingType: opp.funding_type?.[0] || "Fully Funded",
-          deadline: opp.deadline || "TBA",
-          link: opp.link || "#",
-          isVerified: opp.verified !== false, 
+          id: (opp.id as string) || (r.id as string) || crypto.randomUUID(),
+          type: ((opp.type as Record<string, unknown>)?.subtype as string[])?.[0] || "scholarship",
+          title: (opp.title as string) || "Unknown Opportunity",
+          subtitle: (opp.location as string) || ((opp.target_segment as string[])?.join(", ") ?? ""),
+          description: (opp.description as string) ? (opp.description as string).slice(0, 150) + "..." : "",
+          aiReason: `Matched based on semantic similarity of ${Math.round(((r.score as number) || 0) * 100)}%.`,
+          country: ((opp.country as string[])?.[0]) || "Global",
+          degree: ((opp.degree as string[])?.[0]) || "Bachelor",
+          deadline: (opp.deadline as string) || "TBA",
+          isVerified: opp.verified !== false,
+          fundingLabel: ((opp.funding_type as string[])?.[0]) || "Fully Funded",
+          applicationLink: (opp.link as string) || null,
+          remote: (opp.is_remote as boolean) || false,
+          matchScore: Math.round(((r.score as number) || 0) * 100),
         };
       });
 

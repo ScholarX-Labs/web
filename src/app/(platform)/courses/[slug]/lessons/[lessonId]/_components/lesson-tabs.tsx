@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, startTransition } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   BookOpen, NotebookPen, FolderOpen, Plus, Trash2,
@@ -9,6 +9,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useNotes } from "@/hooks/use-notes";
 import { useUILayoutStore } from "@/store/ui-layout-store";
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -35,43 +36,6 @@ interface LessonTabsProps {
 type TabId = "overview" | "notes" | "resources";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Mock Resources
-// ─────────────────────────────────────────────────────────────────────────────
-
-const DEFAULT_RESOURCES: Resource[] = [
-  {
-    id: "r1",
-    type: "pdf",
-    title: "Lesson Slides",
-    description: "Full slide deck for this lesson in PDF format",
-    url: "#",
-    size: "2.4 MB",
-  },
-  {
-    id: "r2",
-    type: "code",
-    title: "Starter Code",
-    description: "GitHub repository with the starter project template",
-    url: "https://github.com",
-    size: "ZIP",
-  },
-  {
-    id: "r3",
-    type: "link",
-    title: "React Documentation",
-    description: "Official React 18 docs referenced in this lesson",
-    url: "https://react.dev",
-  },
-  {
-    id: "r4",
-    type: "video",
-    title: "Supplemental Video",
-    description: "Extended walkthrough of the advanced patterns",
-    url: "#",
-  },
-];
-
-// ─────────────────────────────────────────────────────────────────────────────
 // Tab Bar
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -89,8 +53,6 @@ export function LessonTabs({
   lessonId,
   courseSlug,
   description,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  resources = DEFAULT_RESOURCES,
   initialTab,
   onTabChange,
 }: LessonTabsProps) {
@@ -114,12 +76,13 @@ export function LessonTabs({
   }, [setResourcesSheetOpen, onTabChange]);
 
   // React to external tab override (run only once when initialTab first arrives)
-  const seenInitialTabRef = useRef(false);
+  const seenInitialTabRef = useRef(initialTab);
   useEffect(() => {
-    if (!seenInitialTabRef.current && initialTab) {
-      seenInitialTabRef.current = true;
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setActiveTab(initialTab);
+    if (initialTab && initialTab !== seenInitialTabRef.current) {
+      seenInitialTabRef.current = initialTab;
+      startTransition(() => {
+        setActiveTab(initialTab);
+      });
       if (initialTab === "resources") {
         setResourcesSheetOpen(true);
       }

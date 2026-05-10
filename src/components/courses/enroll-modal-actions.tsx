@@ -108,7 +108,7 @@ export function EnrollModalActions({
                   ? "Starting secure checkout"
                   : course.requiresForm
                     ? "Apply Now"
-                    : "Checkout Now"}
+                    : "Contact Us"}
               </span>
               <span className="flex items-center gap-2">
                 ${course.currentPrice}

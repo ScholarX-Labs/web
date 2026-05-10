@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 /**
  * ImpactSection Component
  * Displays impact statistics with animated counters

@@ -44,11 +44,10 @@ export function CourseDetailSurfacePortal() {
   useEffect(() => {
     if (!mounted || !course || !isOpen) return;
 
-    // #region agent log
     agentLog({
       runId: "pre",
       hypothesisId: "H1",
-      location: "src/components/courses/course-detail-surface-portal.tsx:useEffect",
+      location: "src/components/courses/course-detail-surface-portal.tsx:render",
       message: "CourseDetailSurfacePortal render gate",
       data: {
         isOpen,
@@ -59,7 +58,6 @@ export function CourseDetailSurfacePortal() {
       },
       timestamp: Date.now(),
     });
-    // #endregion agent log
   }, [mounted, course, isOpen, intent, isEnrollmentModalOpen, originRect]);
 
   if (!mounted || !course || !isOpen) return null;

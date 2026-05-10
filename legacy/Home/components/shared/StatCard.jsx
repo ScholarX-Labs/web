@@ -30,6 +30,7 @@ const StatCard = memo(function StatCard({
   const IconComponent = ICON_COMPONENTS[icon];
 
   useEffect(() => {
+    const el = cardRef.current;
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -39,13 +40,13 @@ const StatCard = memo(function StatCard({
       { threshold: 0.3 }
     );
 
-    if (cardRef.current) {
-      observer.observe(cardRef.current);
+    if (el) {
+      observer.observe(el);
     }
 
     return () => {
-      if (cardRef.current) {
-        observer.unobserve(cardRef.current);
+      if (el) {
+        observer.unobserve(el);
       }
     };
   }, []);

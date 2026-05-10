@@ -8,15 +8,11 @@ import {
   Laptop,
   Globe,
   ChevronDown,
-  Monitor,
-  PenTool,
-  Database,
-  Cpu,
   Check,
   X,
 } from "lucide-react";
 import Image from "next/image";
-import { motion, type Variants } from "framer-motion";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useUiStore } from "@/stores/ui.store";
 import {
@@ -25,6 +21,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { CATEGORY_CONFIG } from "@/lib/course-categories";
 
 const FILTER_TAGS = [
   { label: "Career Preparation", icon: Briefcase, value: "Career Preparation" },
@@ -38,14 +35,14 @@ const FILTER_TAGS = [
   },
 ] as const;
 
-const COURSE_CATEGORIES = [
-  { label: "Engineering", icon: Monitor, colorClass: "text-blue-500", hoverBg: "hover:bg-blue-500 focus:bg-blue-500 dark:hover:bg-blue-500 dark:focus:bg-blue-500" },
-  { label: "Design", icon: PenTool, colorClass: "text-pink-500", hoverBg: "hover:bg-pink-500 focus:bg-pink-500 dark:hover:bg-pink-500 dark:focus:bg-pink-500" },
-  { label: "Backend", icon: Database, colorClass: "text-emerald-500", hoverBg: "hover:bg-emerald-500 focus:bg-emerald-500 dark:hover:bg-emerald-500 dark:focus:bg-emerald-500" },
-  { label: "Systems", icon: Cpu, colorClass: "text-purple-500", hoverBg: "hover:bg-purple-500 focus:bg-purple-500 dark:hover:bg-purple-500 dark:focus:bg-purple-500" },
-] as const;
+const COURSE_CATEGORIES = Object.entries(CATEGORY_CONFIG).map(([label, style]) => ({
+  label,
+  icon: style.icon,
+  colorClass: style.text,
+  hoverBg: style.hoverBg,
+}));
 
-const containerVariants: Variants = {
+const containerVariants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
@@ -53,12 +50,12 @@ const containerVariants: Variants = {
   },
 };
 
-const itemVariants: Variants = {
+const itemVariants = {
   hidden: { opacity: 0, y: 20 },
   show: {
     opacity: 1,
     y: 0,
-    transition: { type: "spring", stiffness: 100, damping: 15 },
+    transition: { type: "spring" as const, stiffness: 100, damping: 15 },
   },
 };
 

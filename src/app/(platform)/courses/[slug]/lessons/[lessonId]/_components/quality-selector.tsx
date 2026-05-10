@@ -1,28 +1,24 @@
 "use client";
 
-import { useVideoQualityOptions, useMediaStore } from "@vidstack/react";
+import { useVideoQualityOptions } from "@vidstack/react";
 import { CheckIcon, Gauge } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
-/**
- * QualitySelector — A premium, accessible quality picker that hooks
- * directly into VidStack's quality management API.
- */
 export function QualitySelector({ className }: { className?: string }) {
   const options = useVideoQualityOptions({ auto: true, sort: "descending" });
-  const { canSetQuality } = useMediaStore();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // --- Guard: hide entirely when quality is not user-controllable (e.g. YouTube embed) ---
-  if (!canSetQuality || options.length === 0) {
+  if (options.disabled || options.length === 0) {
     return null;
   }
 
-  const selectedLabel = options.selectedQuality
-    ? `${options.selectedQuality.height}p`
-    : "Auto";
+  const selectedOption = [...options].find((o) => o.selected);
+  const autoSelected = [...options].find((o) => o.autoSelected);
+  const selectedLabel = autoSelected
+    ? "Auto"
+    : selectedOption?.label ?? "Auto";
 
   return (
     <div className={cn("relative flex items-center", className)}>
@@ -37,11 +33,11 @@ export function QualitySelector({ className }: { className?: string }) {
           "bg-white/10 hover:bg-white/20 text-white",
           "border border-white/20 hover:border-white/40",
           "backdrop-blur-md transition-all duration-200 active:scale-95",
-          options.selectedValue === "auto" && "text-white/70"
+          autoSelected && "text-white/70"
         )}
       >
         <Gauge className="w-3.5 h-3.5 shrink-0" />
-        <span>{options.selectedValue === "auto" ? "Auto" : selectedLabel}</span>
+        <span>{selectedLabel}</span>
       </button>
 
       {isOpen && (
@@ -55,13 +51,10 @@ export function QualitySelector({ className }: { className?: string }) {
   );
 }
 
-// ─── Private sub-component: Dropdown ─────────────────────────────────────────
-
 import { forwardRef } from "react";
-import type { VideoQualityOption } from "@vidstack/react";
 
 interface QualityDropdownProps {
-  options: VideoQualityOption[];
+  options: ReturnType<typeof useVideoQualityOptions>;
   onClose: () => void;
 }
 
@@ -105,16 +98,22 @@ const QualityDropdown = forwardRef<HTMLDivElement, QualityDropdownProps>(
         </div>
 
         <ul className="flex flex-col gap-0.5 p-1.5">
-          {options.map((opt) => (
+          {[...options].map((option) => (
             <QualityOption
-              key={opt.value}
-              label={opt.label}
-              isSelected={opt.selected}
+              key={option.value}
+              label={option.label}
+              badge={
+                option.quality && option.quality.height >= 1080
+                  ? "HD"
+                  : option.quality && option.quality.height >= 720
+                    ? "HD"
+                    : undefined
+              }
+              isSelected={option.selected}
               onClick={() => {
-                opt.select();
+                option.select();
                 onClose();
               }}
-              badge={opt.quality && opt.quality.height >= 720 ? "HD" : undefined}
             />
           ))}
         </ul>

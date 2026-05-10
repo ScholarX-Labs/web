@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { Course } from "@/types/course.types";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   Loader2,
   ShieldCheck,
@@ -37,9 +37,6 @@ export function PriorityEnrollmentWindow({
   }, [isOpen]);
 
   const keynoteEasing: [number, number, number, number] = [0.22, 1, 0.36, 1];
-  const keynoteTransition = shouldReduceMotion
-    ? { duration: 0.15 }
-    : { duration: 0.56, ease: keynoteEasing };
 
   const overlayClassName =
     "z-85 bg-slate-950/60 supports-backdrop-filter:backdrop-blur-lg transition-[opacity,background-color,backdrop-filter] duration-560 ease-[cubic-bezier(0.22,1,0.36,1)]";

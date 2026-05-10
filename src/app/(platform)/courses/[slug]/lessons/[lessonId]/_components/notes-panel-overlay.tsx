@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Clock, Plus, Trash2, StickyNote } from "lucide-react";
 import { FloatingPanel } from "@/components/ui/glass-panel";

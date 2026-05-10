@@ -18,7 +18,7 @@ export type EnrollmentSourceSurface =
   | "course_detail_sheet"
   | "deep_link";
 
-export type EnrollmentMode = "free" | "paid" | "application";
+export type EnrollmentMode = "free" | "paid" | "inquiry" | "application";
 
 export type EnrollmentErrorCode =
   | "auth_required"
@@ -41,13 +41,16 @@ export interface EnrollIntentCommand {
 
 export interface EnrollmentContext {
   command: EnrollIntentCommand;
-  course: Pick<Course, "id" | "slug" | "title" | "requiresForm" | "price">;
+  course: Pick<
+    Course,
+    "id" | "slug" | "title" | "requiresForm" | "salesInquiry" | "price"
+  >;
 }
 
 export interface EnrollmentExecutionSuccess {
   ok: true;
   mode: EnrollmentMode;
-  nextAction: "resume_learning" | "checkout" | "application" | "none";
+  nextAction: "resume_learning" | "checkout" | "application" | "inquiry" | "none";
   message?: string;
   checkoutUrl?: string;
   applicationUrl?: string;

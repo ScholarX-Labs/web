@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useRef } from "react";
 
 export interface Note {
   id: string;
@@ -38,22 +38,19 @@ interface UseNotesReturn {
  * Extracted from LessonTabs to enable composition in NotesPanelOverlay.
  */
 export function useNotes({ lessonId, courseSlug }: UseNotesOptions): UseNotesReturn {
-  const [notes, setNotes] = useState<Note[]>([]);
+  const storageKey = `notes:${courseSlug}:${lessonId}`;
+
+  const [notes, setNotes] = useState<Note[]>(() => {
+    try {
+      const stored = localStorage.getItem(storageKey);
+      if (stored) return JSON.parse(stored) as Note[];
+    } catch { /* ignore */ }
+    return [];
+  });
   const [noteInput, setNoteInput] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-
-  const storageKey = `notes:${courseSlug}:${lessonId}`;
-
-  // Load persisted notes
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(storageKey);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      if (stored) setNotes(JSON.parse(stored));
-    } catch { /* ignore */ }
-  }, [storageKey]);
 
   const persist = useCallback((updated: Note[]) => {
     setNotes(updated);

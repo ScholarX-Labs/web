@@ -1,44 +1,6 @@
-import { type ElementType } from "react";
 import { motion } from "framer-motion";
-import { Monitor, PenTool, Database, Cpu, Tag } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const CATEGORY_STYLES: Record<
-  string,
-  { icon: ElementType; gradient: string; shadow: string; ring: string }
-> = {
-  Engineering: {
-    icon: Monitor,
-    gradient: "from-blue-500 to-cyan-400",
-    shadow: "shadow-[0_4px_14px_rgba(59,130,246,0.4)]",
-    ring: "ring-blue-400/30",
-  },
-  Design: {
-    icon: PenTool,
-    gradient: "from-pink-500 to-rose-400",
-    shadow: "shadow-[0_4px_14px_rgba(236,72,153,0.4)]",
-    ring: "ring-pink-400/30",
-  },
-  Backend: {
-    icon: Database,
-    gradient: "from-emerald-500 to-teal-400",
-    shadow: "shadow-[0_4px_14px_rgba(16,185,129,0.4)]",
-    ring: "ring-emerald-400/30",
-  },
-  Systems: {
-    icon: Cpu,
-    gradient: "from-purple-500 to-violet-400",
-    shadow: "shadow-[0_4px_14px_rgba(168,85,247,0.4)]",
-    ring: "ring-purple-400/30",
-  },
-};
-
-const DEFAULT_CATEGORY_STYLE = {
-  icon: Tag,
-  gradient: "from-hero-orange to-[#ff8a6a]",
-  shadow: "shadow-[0_4px_14px_rgba(255,106,58,0.4)]",
-  ring: "ring-white/30",
-};
+import { getCategoryStyle } from "@/lib/course-categories";
 
 interface CourseCategoryBadgeProps {
   category?: string;
@@ -53,7 +15,7 @@ export function CourseCategoryBadge({
 }: CourseCategoryBadgeProps) {
   if (!category) return null;
 
-  const style = CATEGORY_STYLES[category] || DEFAULT_CATEGORY_STYLE;
+  const style = getCategoryStyle(category);
   const Icon = style.icon;
 
   return (

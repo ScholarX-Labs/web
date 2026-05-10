@@ -35,6 +35,7 @@ interface CourseItemResponse {
   urgencyText: string | null;
   tags: string[] | null;
   requiresForm: boolean | null;
+  salesInquiry: boolean | null;
   createdAt: string | null;
   updatedAt: string | null;
   instructor?: InstructorSummary;
@@ -97,6 +98,20 @@ interface ApplicationEnrollmentInitResponse {
     applicationUrl: string;
     nextAction: "application";
   };
+}
+
+interface InquirySubmitResponse {
+  inquiryId: string;
+  message: string;
+}
+
+interface InquiryRequestBody {
+  name: string;
+  email: string;
+  phone?: string;
+  message?: string;
+  sourceSurface?: EnrollmentSourceSurface;
+  idempotencyKey?: string;
 }
 
 interface EnrollmentRequestBody {
@@ -169,6 +184,7 @@ const mapCourse = (course: CourseItemResponse): Course => {
         }
       : undefined,
     requiresForm: course.requiresForm ?? false,
+    salesInquiry: course.salesInquiry ?? false,
     isPublished: course.isPublished,
     isSubscribed: course.isSubscribed ?? false,
     createdAt: course.createdAt ?? new Date().toISOString(),
@@ -189,14 +205,14 @@ const parseApiErrorMessage = (error: unknown, fallback: string): string => {
     error !== null &&
     "error" in error
   ) {
-    const errObj = (error as { error: unknown }).error;
+    const err = (error as Record<string, unknown>).error;
     if (
-      typeof errObj === "object" &&
-      errObj !== null &&
-      "message" in errObj &&
-      typeof (errObj as { message: unknown }).message === "string"
+      typeof err === "object" &&
+      err !== null &&
+      "message" in err &&
+      typeof (err as Record<string, unknown>).message === "string"
     ) {
-      return (errObj as { message: string }).message;
+      return (err as Record<string, unknown>).message as string;
     }
   }
   if (error instanceof Error && error.message) {
@@ -710,6 +726,25 @@ export const coursesService = {
         error,
         "Failed to initialize application enrollment",
       );
+    }
+  },
+
+  submitInquiry: async (
+    courseId: string,
+    body?: InquiryRequestBody,
+    token?: string,
+  ): Promise<InquirySubmitResponse> => {
+    try {
+      return await postJson<InquirySubmitResponse>(
+        `/courses/${courseId}/inquiry`,
+        {
+          token,
+          body,
+        },
+        "Failed to submit inquiry",
+      );
+    } catch (error) {
+      return throwApiError(error, "Failed to submit inquiry");
     }
   },
 };

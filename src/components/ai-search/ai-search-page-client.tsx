@@ -18,24 +18,6 @@ function createId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
-interface ApiResult {
-  id: string;
-  score: number;
-  opportunity: {
-    id?: string;
-    type?: { subtype?: string[] };
-    title?: string;
-    location?: string;
-    target_segment?: string[];
-    description?: string;
-    country?: string[];
-    deadline?: string;
-    fund_type?: string[];
-    is_remote?: boolean;
-    application_link?: string;
-  };
-}
-
 export function AiSearchPageClient() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const messages = useAiChatStore((state) => state.messages);
@@ -91,7 +73,9 @@ export function AiSearchPageClient() {
 
       const data = await response.json();
 
-      const mappedOpportunities = (data.results || []).map((result: ApiResult) => {
+      const mappedOpportunities = (data.results || []).map(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (result: Record<string, any>) => {
         const opp = result.opportunity;
         return {
           id: opp.id || result.id,

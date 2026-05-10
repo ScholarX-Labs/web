@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, HTMLMotionProps, Variants } from "framer-motion";
-import { ReactNode, ElementType } from "react";
+import { ReactNode, ElementType, useMemo } from "react";
 
 export const staggerContainerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -41,51 +41,12 @@ interface StaggerItemProps extends HTMLMotionProps<"div"> {
   as?: ElementType;
 }
 
-// Pre-define motion components for common tags to avoid static-components error
-const MotionLi = motion.li;
-const MotionDiv = motion.div;
-const MotionSpan = motion.span;
-const MotionArticle = motion.article;
-const MotionSection = motion.section;
-
 export function StaggerItem({ children, as, ...props }: StaggerItemProps) {
-  // Use pre-defined components for common tags
-  if (as === "li") {
-    return (
-      <MotionLi variants={staggerItemVariants} {...(props as HTMLMotionProps<"li">)}>
-        {children}
-      </MotionLi>
-    );
-  }
-  
-  if (as === "span") {
-    return (
-      <MotionSpan variants={staggerItemVariants} {...(props as HTMLMotionProps<"span">)}>
-        {children}
-      </MotionSpan>
-    );
-  }
-
-  if (as === "article") {
-    return (
-      <MotionArticle variants={staggerItemVariants} {...(props as HTMLMotionProps<"article">)}>
-        {children}
-      </MotionArticle>
-    );
-  }
-
-  if (as === "section") {
-    return (
-      <MotionSection variants={staggerItemVariants} {...(props as HTMLMotionProps<"section">)}>
-        {children}
-      </MotionSection>
-    );
-  }
-
-  // Default to div
+  const Component = useMemo(() => as ? motion.create(as) : motion.div, [as]);
   return (
-    <MotionDiv variants={staggerItemVariants} {...props}>
+    // eslint-disable-next-line react-hooks/static-components
+    <Component variants={staggerItemVariants} {...props}>
       {children}
-    </MotionDiv>
+    </Component>
   );
 }

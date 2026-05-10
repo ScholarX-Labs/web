@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import "./Impact.css"
 import { BsCalendar4Event } from "react-icons/bs";
 import { GrGroup } from "react-icons/gr";
