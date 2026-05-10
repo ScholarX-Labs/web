@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState, memo } from "react"
+import React, { useEffect, useState, memo, useId } from "react"
 
 type IconType = "html" | "css" | "javascript" | "react" | "node" | "tailwind"
 type GlowColor = "cyan" | "purple"
@@ -142,6 +142,7 @@ GlowingOrbitPath.displayName = "GlowingOrbitPath"
 export default function OrbitingSkills() {
   const [time, setTime] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
+  const gradientId = useId()
 
   useEffect(() => {
     if (isPaused) return
@@ -176,9 +177,9 @@ export default function OrbitingSkills() {
           <div className="absolute inset-0 rounded-full bg-cyan-500/30 blur-xl animate-pulse"></div>
           <div className="absolute inset-0 rounded-full bg-purple-500/20 blur-2xl animate-pulse" style={{ animationDelay: "1s" }}></div>
           <div className="relative z-10">
-            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="url(#gradient)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke={`url(#${gradientId})`} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <defs>
-                <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stopColor="#06B6D4" />
                   <stop offset="100%" stopColor="#9333EA" />
                 </linearGradient>
