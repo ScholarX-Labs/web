@@ -24,7 +24,16 @@ const updateProfileSchema = z.object({
   currentInterest: z.string().max(500).optional(),
   nationality: z.string().max(100).optional(),
   city: z.string().max(100).optional(),
-  dateOfBirth: z.string().optional(),
+  dateOfBirth: z.preprocess(
+    (arg) => {
+      if (typeof arg === "string" && arg) {
+        const d = new Date(arg);
+        return isNaN(d.getTime()) ? undefined : d;
+      }
+      return arg instanceof Date ? arg : undefined;
+    },
+    z.date().optional()
+  ),
   industry: z.string().max(100).optional(),
   gpa: z.coerce.number().min(0).max(4).optional(),
 });
@@ -129,7 +138,7 @@ export async function updateProfile(
         .limit(1);
 
       await db.update(user).set({
-        name: sql`${user.firstName} || ' ' || ${user.lastName}`,
+        name: sql`concat_ws(' ', ${user.firstName}, ${user.lastName})`,
       }).where(eq(user.id, session.user.id));
 
       if (current?.username) {
@@ -203,6 +212,8 @@ export async function deleteAccount(): Promise<ActionResponse> {
         await deleteAvatar(key);
       }
     }
+
+    await db.delete(user).where(eq(user.id, session.user.id));
 
     revalidatePath("/scholar/" + (current?.username ?? ""));
     revalidatePath("/profile");
