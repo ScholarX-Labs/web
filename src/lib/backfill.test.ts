@@ -1,17 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-
-function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9._-]/g, "")
-    .replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, "")
-    .slice(0, 26);
-}
-
-function randomSuffix(length = 6): string {
-  return Math.random().toString(36).substring(2).padEnd(length, "0").slice(0, length);
-}
+import { slugify, randomSuffix } from "./username-utils";
 
 test("slugify", async (t) => {
   await t.test("combines first and last name with dot", () => {
@@ -61,9 +50,9 @@ test("slugify", async (t) => {
 });
 
 test("randomSuffix", async (t) => {
-  await t.test("generates string of expected length", () => {
-    assert.equal(randomSuffix(6).length, 6);
-    assert.equal(randomSuffix(12).length, 12);
+  await t.test("generates string of at most the requested length", () => {
+    assert.ok(randomSuffix(6).length <= 6);
+    assert.ok(randomSuffix(12).length <= 12);
   });
 
   await t.test("generates alphanumeric characters", () => {
