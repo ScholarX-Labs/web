@@ -1,20 +1,9 @@
 import { db } from "@/db";
 import { user } from "@/db/schema/auth-schema";
-import { isNull, eq, sql } from "drizzle-orm";
+import { isNull, sql } from "drizzle-orm";
+import { slugify, randomSuffix } from "@/lib/username-utils";
 
 const BATCH_SIZE = 100;
-
-function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9._-]/g, "")
-    .replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, "")
-    .slice(0, 26);
-}
-
-function randomSuffix(length = 6): string {
-  return Math.random().toString(36).substring(2, 2 + length);
-}
 
 async function backfillUsernames(): Promise<{
   succeeded: number;
@@ -41,26 +30,42 @@ async function backfillUsernames(): Promise<{
 
     const results = await Promise.allSettled(
       batch.map(async (u) => {
-        const base = slugify(`${u.firstName}.${u.lastName}`);
+        let base = slugify(`${u.firstName}.${u.lastName}`);
+        if (!base) {
+          base = `user-${randomSuffix()}`;
+        }
 
         for (let attempt = 0; attempt < 10; attempt++) {
           const candidate = attempt === 0 ? base : `${base}-${randomSuffix()}`;
 
-          const result = await db
-            .update(user)
-            .set({ username: candidate })
-            .where(
-              sql`${user.id} = ${u.id} AND ${user.username} IS NULL`
-            );
+          if (!candidate) continue;
 
-          if (result.rowCount !== null && result.rowCount > 0) {
-            return;
+          try {
+            const result = await db
+              .update(user)
+              .set({ username: candidate })
+              .where(
+                sql`${user.id} = ${u.id} AND ${user.username} IS NULL`
+              );
+
+            if (result.rowCount !== null && result.rowCount > 0) {
+              return;
+            }
+          } catch (err: unknown) {
+            const pgErr = err as { code?: string };
+            if (pgErr.code === "23505") {
+              continue;
+            }
+            throw err;
           }
         }
 
-        // Fallback: UUID-based guaranteed unique username
+        // Fallback: unique username with null-guard to avoid overwriting concurrent writes
         const fallback = `user-${randomSuffix(12)}`;
-        await db.update(user).set({ username: fallback }).where(eq(user.id, u.id));
+        await db
+          .update(user)
+          .set({ username: fallback })
+          .where(sql`${user.id} = ${u.id} AND ${user.username} IS NULL`);
       })
     );
 
