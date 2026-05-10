@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useCallback, startTransition } from "react";
+
 import { motion } from "framer-motion";
 import {
   User,
@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -34,7 +34,6 @@ import { SavedOpportunitiesList } from "@/components/profile/saved-opportunities
 import { AccountSettingsForm } from "@/components/profile/account-settings-form";
 import { TabErrorBoundary } from "@/components/profile/tab-error-boundary";
 import { getProfile, updateProfile, updateSocialLinks, toggleProfilePrivacy } from "@/actions/profile.actions";
-import type { ActionResponse } from "@/types/profile.types";
 
 type TabId = "personal" | "education" | "social" | "privacy" | "courses" | "saved" | "settings";
 
@@ -81,15 +80,11 @@ interface ProfileData {
 }
 
 export default function ProfilePage() {
-  const router = useRouter();
+
   const [activeTab, setActiveTab] = useState<TabId>("personal");
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    loadProfile();
-  }, []);
 
   async function loadProfile() {
     setLoading(true);
@@ -127,6 +122,12 @@ export default function ProfilePage() {
     setLoading(false);
   }
 
+  useEffect(() => {
+    startTransition(() => {
+      loadProfile();
+    });
+  }, []);
+
   const handleSavePersonal = useCallback(async () => {
     if (!profile) return;
     setSaving(true);
@@ -137,7 +138,7 @@ export default function ProfilePage() {
       lastNameAr: profile.lastNameAr || undefined,
       nationality: profile.nationality || undefined,
       city: profile.city || undefined,
-      dateOfBirth: profile.dateOfBirth || undefined,
+      dateOfBirth: profile.dateOfBirth ? new Date(profile.dateOfBirth) : undefined,
     });
     if (result.success) {
       toast.success("Profile updated");
