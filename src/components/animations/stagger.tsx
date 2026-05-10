@@ -44,6 +44,7 @@ interface StaggerItemProps extends HTMLMotionProps<"div"> {
 export function StaggerItem({ children, as, ...props }: StaggerItemProps) {
   const Component = useMemo(() => as ? motion.create(as) : motion.div, [as]);
   return (
+    // eslint-disable-next-line react-hooks/static-components
     <Component variants={staggerItemVariants} {...props}>
       {children}
     </Component>
