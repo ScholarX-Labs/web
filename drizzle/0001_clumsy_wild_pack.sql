@@ -78,3 +78,5 @@ CREATE INDEX "admin_audit_log_created_at_idx" ON "auth"."admin_audit_log" USING 
 CREATE INDEX "lessons_course_id_idx" ON "courses"."lessons" USING btree ("course_id");--> statement-breakpoint
 CREATE INDEX "lessons_sort_idx" ON "courses"."lessons" USING btree ("course_id","sort_index");--> statement-breakpoint
 ALTER TABLE "courses"."courses" ADD CONSTRAINT "courses_updated_by_user_id_fk" FOREIGN KEY ("updated_by") REFERENCES "auth"."user"("id") ON DELETE no action ON UPDATE no action;
+--> statement-breakpoint
+ALTER TABLE "courses"."lesson_progress" ADD CONSTRAINT "lesson_progress_lesson_id_fk" FOREIGN KEY ("lesson_id") REFERENCES "courses"."lessons"("id") ON DELETE cascade ON UPDATE cascade;
