@@ -1,5 +1,5 @@
 import * as React from "react";
-import { motion, Variants } from "framer-motion";
+import { motion } from "framer-motion";
 import { Plus, Info, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -20,10 +20,10 @@ interface AuthorFormCardProps {
   className?: string;
 }
 
-const FADE_IN_VARIANTS: Variants = {
+const FADE_IN_VARIANTS = {
   hidden: { opacity: 0, y: 10 },
   show: { opacity: 1, y: 0, transition: { type: "spring" } },
-};
+} as const;
 
 export const AuthorFormCard: React.FC<AuthorFormCardProps> = ({
   initialData,
