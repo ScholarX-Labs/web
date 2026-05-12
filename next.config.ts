@@ -1,9 +1,7 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
-  turbopack: {
-    root: __dirname,
-  },
   images: {
     remotePatterns: [
       {
@@ -21,12 +19,26 @@ const nextConfig: NextConfig = {
     ],
   },
 };
-export default nextConfig;
 
-// Optional Cloudflare helper used for local dev. Make this import safe
-// so builds won't fail when the package isn't installed (CI/Vercel).
-// import("@opennextjs/cloudflare")
-//   .then((m) => m.initOpenNextCloudflareForDev?.())
-//   .catch(() => {
-//     // no-op when package is missing
-//   });
+const requiredSentryVars = {
+  SENTRY_ORG: process.env.SENTRY_ORG,
+  SENTRY_PROJECT: process.env.SENTRY_PROJECT,
+  SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
+} as const;
+for (const [key, value] of Object.entries(requiredSentryVars)) {
+  if (!value) {
+    throw new Error(
+      `Missing required Sentry environment variable: ${key}. ` +
+        "Ensure it is set before building.",
+    );
+  }
+}
+
+export default withSentryConfig(nextConfig, {
+  org: process.env.SENTRY_ORG!,
+  project: process.env.SENTRY_PROJECT!,
+  authToken: process.env.SENTRY_AUTH_TOKEN!,
+  widenClientFileUpload: true,
+  tunnelRoute: "/monitoring",
+  silent: !process.env.CI,
+});

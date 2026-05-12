@@ -6,8 +6,8 @@ import {
   dbLessonProgress,
   dbSubscriptions,
   dbUsers,
-} from "@/domain/courses/infrastructure/db/courses-db.schema";
-import { dbLessons } from "@/domain/admin/infrastructure/db/admin-db.schema";
+} from "@/db/schema/courses-db.schema";
+import { dbLessons } from "@/db/schema/admin-db.schema";
 
 export interface CourseListFilter {
   page: number;
