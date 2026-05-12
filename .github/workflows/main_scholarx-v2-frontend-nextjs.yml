@@ -28,10 +28,15 @@ jobs:
 
       - name: pnpm install, build, and test
         env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
           SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
         run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "DATABASE_URL is required. Configure it as a GitHub secret." >&2
+            exit 1
+          fi
           pnpm install --frozen-lockfile
           pnpm run build
           pnpm run test
