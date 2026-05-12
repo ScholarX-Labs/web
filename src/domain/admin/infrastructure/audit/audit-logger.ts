@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { adminAuditLog } from "@/domain/admin/infrastructure/db/admin-db.schema";
+import { adminAuditLog } from "@/db/schema/admin-db.schema";
 
 export interface AuditLogEntry {
   adminId: string;

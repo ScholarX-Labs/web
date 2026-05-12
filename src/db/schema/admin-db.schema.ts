@@ -11,7 +11,7 @@ import {
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { user as dbUsers } from "@/db/schema/auth-schema";
-import { dbCourses } from "@/domain/courses/infrastructure/db/courses-db.schema";
+import { dbCourses } from "@/db/schema/courses-db.schema";
 
 const coursesSchema = pgSchema("courses");
 const authSchema = pgSchema("auth");

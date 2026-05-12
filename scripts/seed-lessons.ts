@@ -1,6 +1,6 @@
 import { db } from "../src/db";
-import { dbCourses } from "../src/domain/courses/infrastructure/db/courses-db.schema";
-import { dbLessons } from "../src/domain/admin/infrastructure/db/admin-db.schema";
+import { dbCourses } from "../src/db/schema/courses-db.schema";
+import { dbLessons } from "../src/db/schema/admin-db.schema";
 import { eq } from "drizzle-orm";
 
 const YOUTUBE_URLS: { url: string; duration: number }[] = [
