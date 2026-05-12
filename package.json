@@ -85,9 +85,14 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "sharp",
+      "@prisma/engines",
+      "@sentry/cli",
+      "@tsparticles/engine",
       "esbuild",
-      "@prisma/engines"
+      "msw",
+      "prisma",
+      "sharp",
+      "unrs-resolver"
     ]
   },
   "devDependencies": {
