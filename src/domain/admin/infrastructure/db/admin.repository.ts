@@ -1,8 +1,8 @@
 import { and, asc, count, desc, eq, gte, like, lte, or, sql, SQL } from "drizzle-orm";
 import { db } from "@/db";
 import { user as dbUsers } from "@/db/schema/auth-schema";
-import { dbCourses, dbSubscriptions, dbInquiries } from "@/domain/courses/infrastructure/db/courses-db.schema";
-import { dbLessons } from "@/domain/admin/infrastructure/db/admin-db.schema";
+import { dbCourses, dbSubscriptions, dbInquiries } from "@/db/schema/courses-db.schema";
+import { dbLessons } from "@/db/schema/admin-db.schema";
 import type { AdminRepository } from "@/domain/admin/contracts/admin-repository.contract";
 import { AdminErrors } from "@/domain/admin/application/admin-errors";
 import type {
