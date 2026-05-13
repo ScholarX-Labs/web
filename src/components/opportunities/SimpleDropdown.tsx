@@ -77,7 +77,7 @@ export default function SimpleDropdown({
           className="absolute left-0 z-50 mt-2 w-full max-h-64 max-w-[calc(100vw-2rem)] overflow-auto rounded-md border bg-white p-2 shadow-lg"
           style={{ whiteSpace: "normal" }}
         >
-          {options.map((opt) => {
+          {(options ?? []).map((opt) => {
             const checked = selected.includes(opt.value);
             return (
               <label
