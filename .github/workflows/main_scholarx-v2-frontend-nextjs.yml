@@ -36,7 +36,7 @@ jobs:
             echo "DATABASE_URL is required. Configure it as a GitHub secret." >&2
             exit 1
           fi
-          npm ci
+          npm install
           npm run build
           npm run test
 
