@@ -82,7 +82,7 @@ export function SearchResults({
   const firstPart = words.slice(0, -1).join(" ");
   const lastWord = words[words.length - 1];
 
-  const sortedResults = sortResults(results, sortBy);
+  const sortedResults = sortResults(results ?? [], sortBy);
   const visibleResults = sortedResults.slice(0, visibleCount);
   const hasMore = visibleCount < results.length;
 
