@@ -31,7 +31,7 @@ export function CoursesFilterSection({ courses }: CoursesFilterSectionProps) {
   const { courseSearch, activeCourseFilters } = useUiStore();
 
   const filtered = useMemo(() => {
-    let result = courses;
+    let result = courses ?? [];
 
     if (courseSearch.trim()) {
       const q = courseSearch.toLowerCase();
