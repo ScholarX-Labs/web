@@ -7,5 +7,8 @@ export function slugify(text: string): string {
 }
 
 export function randomSuffix(length = 6): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID().replace(/-/g, "").substring(0, length);
+  }
   return Math.random().toString(36).substring(2, 2 + length);
 }

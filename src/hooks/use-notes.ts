@@ -67,7 +67,9 @@ export function useNotes({ lessonId, courseSlug }: UseNotesOptions): UseNotesRet
       hour: "2-digit", minute: "2-digit", hour12: false,
     });
     const newNote: Note = {
-      id: `${Date.now()}-${Math.random()}`,
+      id: typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random()}`,
       text,
       timestamp,
       createdAt: now.getTime(),
