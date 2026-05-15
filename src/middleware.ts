@@ -19,7 +19,7 @@ function hasSessionCookie(request: NextRequest) {
   );
 }
 
-export function proxy(request: NextRequest) {
+export function middleware(request: NextRequest) {
   if (isDevAuthBypassEnabled && process.env.NODE_ENV !== "production") {
     return NextResponse.next();
   }
