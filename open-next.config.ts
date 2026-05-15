@@ -8,13 +8,13 @@ const config: OpenNextConfig = {
     override: {
       wrapper: "cloudflare-node",
       converter: "edge",
-      proxyExternalRequest: "node",
+      proxyExternalRequest: "fetch",
       incrementalCache: "dummy",
       tagCache: "dummy",
       queue: "dummy",
     },
   },
-  edgeExternals: ["node:crypto"],
+  edgeExternals: ["node:crypto", "pg-cloudflare", "sharp", "sharp-03c9e6d01f648d5d", "pg"],
   middleware: {
     external: true,
     override: {
