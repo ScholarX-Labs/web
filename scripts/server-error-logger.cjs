@@ -1,3 +1,6 @@
+const fs = require("node:fs");
+const path = require("node:path");
+
 const formatError = (error) => {
   if (error instanceof Error) {
     return {
@@ -18,6 +21,68 @@ const formatError = (error) => {
 
   return { value: error };
 };
+
+const patchRoutesManifest = () => {
+  const manifestPath = path.join(__dirname, ".next", "routes-manifest.json");
+
+  try {
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+    let changed = false;
+
+    if (!Array.isArray(manifest.headers)) {
+      manifest.headers = [];
+      changed = true;
+    }
+
+    if (!Array.isArray(manifest.onMatchHeaders)) {
+      manifest.onMatchHeaders = [];
+      changed = true;
+    }
+
+    if (!Array.isArray(manifest.redirects)) {
+      manifest.redirects = [];
+      changed = true;
+    }
+
+    if (!manifest.rewrites || Array.isArray(manifest.rewrites)) {
+      manifest.rewrites = {
+        beforeFiles: [],
+        afterFiles: Array.isArray(manifest.rewrites) ? manifest.rewrites : [],
+        fallback: [],
+      };
+      changed = true;
+    } else {
+      for (const key of ["beforeFiles", "afterFiles", "fallback"]) {
+        if (!Array.isArray(manifest.rewrites[key])) {
+          manifest.rewrites[key] = [];
+          changed = true;
+        }
+      }
+    }
+
+    if (changed) {
+      fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
+      console.info("[server-error-logger] patched routes-manifest.json", {
+        headers: manifest.headers.length,
+        onMatchHeaders: manifest.onMatchHeaders.length,
+        redirects: manifest.redirects.length,
+      });
+    } else {
+      console.info("[server-error-logger] routes-manifest.json ok", {
+        headers: manifest.headers.length,
+        onMatchHeaders: manifest.onMatchHeaders.length,
+        redirects: manifest.redirects.length,
+      });
+    }
+  } catch (error) {
+    console.error("[server-error-logger] routes manifest patch failed", {
+      manifestPath,
+      error: formatError(error),
+    });
+  }
+};
+
+patchRoutesManifest();
 
 process.on("uncaughtException", (error) => {
   console.error("[node:uncaughtException]", formatError(error));
