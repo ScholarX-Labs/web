@@ -64,6 +64,7 @@ jobs:
           if [ -d public ]; then
             cp -R public .next/standalone/public
           fi
+          cp scripts/server-error-logger.cjs .next/standalone/server-error-logger.cjs
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v7
@@ -98,4 +99,4 @@ jobs:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           slot-name: ${{ env.AZURE_WEBAPP_SLOT }}
           package: .
-          startup-command: "curl -sLf --proto '=https' --tlsv1.2 https://cli.doppler.com/install.sh | sh && doppler run -- node server.js"
+          startup-command: "curl -sLf --proto '=https' --tlsv1.2 https://cli.doppler.com/install.sh | sh && doppler run -- node --enable-source-maps --require ./server-error-logger.cjs server.js"
