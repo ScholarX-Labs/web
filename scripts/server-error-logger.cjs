@@ -1,3 +1,7 @@
+// Standalone server bundles its own node_modules; NODE_PATH from Oryx (/node_modules)
+// would resolve 'next' from the system tar.gz instead of the self-contained tree.
+delete process.env.NODE_PATH;
+
 const fs = require("node:fs");
 const path = require("node:path");
 
