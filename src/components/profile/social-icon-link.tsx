@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn, isValidUrl } from "@/lib/utils";
 import type { SocialPlatform } from "@/types/profile.types";
 import { SOCIAL_PLATFORMS } from "@/types/profile.types";
 
@@ -18,7 +18,7 @@ export function SocialIconLink({
   const config = SOCIAL_PLATFORMS[platform];
   const isInstagram = platform === "instagram";
 
-  if (!url) return null;
+  if (!url || !isValidUrl(url)) return null;
 
   return (
     <a
