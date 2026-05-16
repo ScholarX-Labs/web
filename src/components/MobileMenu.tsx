@@ -13,8 +13,10 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import Scholarx_horizontal_logo from "../../public/ScholarX-Logo-horizontal-Blue-Solid-Small_ScholarX.png";
 import { ROUTES } from "@/lib/routes";
+
+const SCHOLARX_HORIZONTAL_LOGO =
+  "/ScholarX-Logo-horizontal-Blue-Solid-Small_ScholarX.png";
 
 interface MobileMenuProps {
   isLoggedIn: boolean;
@@ -37,7 +39,7 @@ export default function MobileMenu({ isLoggedIn }: MobileMenuProps) {
           <Link href={ROUTES.HOME} className="flex items-center gap-2">
             <Image
               alt="ScholarX logo"
-              src={Scholarx_horizontal_logo}
+              src={SCHOLARX_HORIZONTAL_LOGO}
               width={120}
               height={40}
               className="object-contain"
