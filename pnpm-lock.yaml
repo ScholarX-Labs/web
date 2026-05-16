@@ -20,6 +20,9 @@ importers:
       '@hookform/resolvers':
         specifier: ^5.2.2
         version: 5.2.2(react-hook-form@7.71.2(react@19.2.3))
+      '@next/env':
+        specifier: ^16.2.6
+        version: 16.2.6
       '@radix-ui/react-avatar':
         specifier: ^1.1.11
         version: 1.1.11(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -234,9 +237,6 @@ importers:
       eslint-config-next:
         specifier: 16.1.6
         version: 16.1.6(@typescript-eslint/parser@8.56.0(eslint@9.39.3(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.3(jiti@2.6.1))(typescript@5.9.3)
-      lightningcss-win32-x64-msvc:
-        specifier: ^1.31.1
-        version: 1.31.1
       tailwindcss:
         specifier: ^4
         version: 4.2.0
@@ -12253,7 +12253,8 @@ snapshots:
   lightningcss-win32-arm64-msvc@1.31.1:
     optional: true
 
-  lightningcss-win32-x64-msvc@1.31.1: {}
+  lightningcss-win32-x64-msvc@1.31.1:
+    optional: true
 
   lightningcss@1.31.1:
     dependencies:
