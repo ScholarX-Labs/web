@@ -29,6 +29,16 @@ export function proxy(request: NextRequest) {
   const isPublicRoute = OPEN_ROUTES.has(pathname) || pathname.startsWith("/courses/");
   const isAdminRoute = pathname.startsWith("/admin");
 
+  if (process.env.NODE_ENV === "production") {
+    console.info("[proxy]", {
+      pathname,
+      isAuthenticated,
+      isAuthRoute,
+      isPublicRoute,
+      isAdminRoute,
+    });
+  }
+
   if (
     isAuthRoute &&
     isAuthenticated &&
