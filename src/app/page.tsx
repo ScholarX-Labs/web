@@ -37,7 +37,7 @@ export default function HomePage() {
         description={WHY_CHOOSE_SECTION.description}
         servicesKey="whyChoose"
         theme="light"
-        watermarkImage="/assets/Images/WaterMark.png"
+        watermarkImage="/ScholarX-Logo-Icon-Blue_ScholarX.svg"
       />
 
       {/* Who We Help Section */}
@@ -47,11 +47,11 @@ export default function HomePage() {
         description={WHO_WE_HELP_SECTION.description}
         servicesKey="whoWeHelp"
         theme="white"
-        watermarkImage="/assets/Images/image.png"
+        watermarkImage="/ScholarX-Logo-Icon-Blue_ScholarX.svg"
       />
 
       {/* Impact Section */}
-      <ImpactSection watermarkImage="/assets/Images/WaterMark.png" />
+      <ImpactSection watermarkImage="/ScholarX-Logo-Icon-Blue_ScholarX.svg" />
     </main>
   );
 }

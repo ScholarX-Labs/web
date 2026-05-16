@@ -64,7 +64,7 @@ export const FeaturesSection = memo(function FeaturesSection() {
               alt={FEATURES_CONTENT.imageAlt}
               width={540}
               height={400}
-              className="block h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              className="block h-auto w-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
             {/* Decorative Circles */}
             <div className="animate-[float_6s_ease-in-out_infinite] absolute -left-[50px] -top-[50px] -z-10 h-[200px] w-[200px] pointer-events-none rounded-full bg-[radial-gradient(circle,rgba(51,153,204,0.15)_0%,transparent_70%)] max-md:hidden" />

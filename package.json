@@ -6,7 +6,7 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
-    "start": "doppler run -- node ./node_modules/next/dist/bin/next start",
+    "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "node --import tsx --test src/**/*.test.ts",
@@ -21,7 +21,6 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1045.0",
-    "@next/env": "16.2.6",
     "@swc/helpers": "^0.5.15",
     "@base-ui/react": "^1.2.0",
     "@better-auth/drizzle-adapter": "^1.5.4",
