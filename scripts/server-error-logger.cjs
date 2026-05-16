@@ -27,4 +27,16 @@ process.on("unhandledRejection", (reason) => {
   console.error("[node:unhandledRejection]", formatError(reason));
 });
 
+const originalConsoleError = console.error.bind(console);
+
+console.error = (...args) => {
+  for (const arg of args) {
+    if (arg instanceof Error) {
+      originalConsoleError("[console.error:Error]", formatError(arg));
+    }
+  }
+
+  originalConsoleError(...args);
+};
+
 console.info("[server-error-logger] installed");
