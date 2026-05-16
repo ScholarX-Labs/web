@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import { useRef, useState } from "react";
-import Scholarx_horizontal_logo from "../../public/ScholarX-Logo-horizontal-Blue-Solid-Small_ScholarX.png";
 import Image from "next/image";
 import { User } from "lucide-react";
 import PremiumMobileMenu from "@/components/PremiumMobileMenu";
@@ -13,6 +12,9 @@ import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import { useScrollDirection } from "@/hooks/use-scroll-direction";
 import SignoutButton from "@/app/auth/_components/SignoutButton";
+
+const SCHOLARX_HORIZONTAL_LOGO =
+  "/ScholarX-Logo-horizontal-Blue-Solid-Small_ScholarX.png";
 
 const navItems = [
   { label: "Home", href: ROUTES.HOME },
@@ -131,7 +133,9 @@ function DesktopHeader({ isLoggedIn, isActive }: { isLoggedIn: boolean; isActive
         <Link href={ROUTES.HOME} className="shrink-0">
           <Image
             alt="ScholarX logo"
-            src={Scholarx_horizontal_logo}
+            src={SCHOLARX_HORIZONTAL_LOGO}
+            width={180}
+            height={32}
             style={{ width: "auto", height: "32px", objectFit: "contain" }}
             className="hover:cursor-pointer"
           />
@@ -217,7 +221,9 @@ function MobileCollapsibleHeader({ isLoggedIn, isActive }: { isLoggedIn: boolean
             <Link href={ROUTES.HOME} onClick={(e) => e.stopPropagation()}>
               <Image
                 alt="ScholarX"
-                src={Scholarx_horizontal_logo}
+                src={SCHOLARX_HORIZONTAL_LOGO}
+                width={135}
+                height={24}
                 style={{ width: "auto", height: "24px", objectFit: "contain" }}
               />
             </Link>
