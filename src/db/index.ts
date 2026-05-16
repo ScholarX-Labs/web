@@ -1,6 +1,9 @@
 import "dotenv/config";
 import { drizzle } from "drizzle-orm/node-postgres";
+import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import * as url from "url";
+
+export type DB = NodePgDatabase<Record<string, unknown>>;
 
 function createDb() {
   const connectionString = process.env.DATABASE_URL;
