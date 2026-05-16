@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Scholarx_vertical_logo from "../../public/ScholarX-Logo-vertical-Blue-White-Solid-Small_ScholarX.png";
 import Link from "next/link";
 import { Rubik } from "next/font/google";
 import { Mail, Phone } from "lucide-react";
@@ -7,6 +6,8 @@ import { FaLinkedinIn, FaInstagram, FaFacebook } from "react-icons/fa6";
 import { ROUTES } from "@/lib/routes";
 
 const rubik = Rubik({ subsets: ["latin"] });
+const SCHOLARX_VERTICAL_LOGO =
+  "/ScholarX-Logo-vertical-Blue-White-Solid-Small_ScholarX.png";
 
 function Footer() {
   return (
@@ -21,7 +22,9 @@ function Footer() {
           >
             <Image
               alt="ScholarX logo"
-              src={Scholarx_vertical_logo}
+              src={SCHOLARX_VERTICAL_LOGO}
+              width={220}
+              height={160}
               style={{
                 width: "50%",
                 minWidth: "75px",
