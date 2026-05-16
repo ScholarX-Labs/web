@@ -1,11 +1,13 @@
 import Link from "next/link";
-import Scholarx_horizontal_logo from "../../public/ScholarX-Logo-horizontal-Blue-Solid-Small_ScholarX.png";
 import Image from "next/image";
 import { getSession } from "@/lib/dal";
 import SignoutButton from "@/app/auth/_components/SignoutButton";
 import MobileMenu from "@/components/MobileMenu";
 import { ProfilePopup } from "@/components/profile/profile-popup";
 import { ROUTES } from "@/lib/routes";
+
+const SCHOLARX_HORIZONTAL_LOGO =
+  "/ScholarX-Logo-horizontal-Blue-Solid-Small_ScholarX.png";
 
 async function Header() {
   const session = await getSession();
@@ -19,7 +21,9 @@ async function Header() {
         >
           <Image
             alt="ScholarX logo"
-            src={Scholarx_horizontal_logo}
+            src={SCHOLARX_HORIZONTAL_LOGO}
+            width={180}
+            height={40}
             style={{
               width: "auto",
               height: "40px",
