@@ -1,12 +1,16 @@
 const fs = require("node:fs");
 const path = require("node:path");
 
-// Oryx replaces the standalone's node_modules with a symlink to the system
-// /node_modules (extracted from node_modules.tar.gz).  The system copy is a full
-// dev tree that lacks the correct @swc/helpers and other deps expected by the
-// webpack standalone server.  Oryx moves the real directory to _del_node_modules.
-const nm = path.join(__dirname, "node_modules");
-const backup = path.join(__dirname, "_del_node_modules");
+// When used as --require from the standalone root (where server.js lives),
+// __dirname IS the standalone root.
+const rootDir = __dirname;
+
+// Oryx replaces the standalone's node_modules with a symlink to /node_modules
+// and renames the real one to _del_node_modules.  Restore it here so the
+// standalone's own dep tree (which includes @swc/helpers at the correct version)
+// is used instead of the stale system tar.gz extraction.
+const nm = path.join(rootDir, "node_modules");
+const backup = path.join(rootDir, "_del_node_modules");
 
 try {
   if (fs.existsSync(backup)) {
@@ -21,7 +25,9 @@ try {
   // non-fatal – server.js will fail with a clear module-not-found message
 }
 
-// Safety net: prevent NODE_PATH from hijacking module resolution.
+// Safety net: Node reads NODE_PATH once at process start and caches it;
+// deleting at runtime has no effect, but clear it in case a future version
+// re-reads on module load.
 delete process.env.NODE_PATH;
 
 const formatError = (error) => {
@@ -46,7 +52,7 @@ const formatError = (error) => {
 };
 
 const patchRoutesManifest = () => {
-  const manifestPath = path.join(__dirname, ".next", "routes-manifest.json");
+  const manifestPath = path.join(rootDir, ".next", "routes-manifest.json");
 
   try {
     const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));

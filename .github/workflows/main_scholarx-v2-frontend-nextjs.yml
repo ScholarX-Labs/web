@@ -66,6 +66,17 @@ jobs:
           fi
           cp scripts/server-error-logger.cjs .next/standalone/server-error-logger.cjs
 
+          # Turbopack renames pg to .next/node_modules/pg-<hash>/ omitting transitive
+          # deps like pg-types.  Copy pg-types into the root node_modules so Node's
+          # walk-up resolution finds it when 'pg-types' is required from .next/.../pg-<hash>/.
+          PG_TYPES_SRC=$(find node_modules/.pnpm -maxdepth 3 -type d -name "pg-types" 2>/dev/null | head -1)
+          if [ -n "$PG_TYPES_SRC" ] && [ ! -d .next/standalone/node_modules/pg-types ]; then
+            cp -RL "$PG_TYPES_SRC" .next/standalone/node_modules/pg-types
+            echo "pg-types: copied from $PG_TYPES_SRC"
+          else
+            echo "pg-types: $( [ -d .next/standalone/node_modules/pg-types ] && echo 'already present' || echo 'not found in pnpm store' )"
+          fi
+
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v7
         with:
