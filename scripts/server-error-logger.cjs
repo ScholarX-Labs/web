@@ -1,9 +1,28 @@
-// Standalone server bundles its own node_modules; NODE_PATH from Oryx (/node_modules)
-// would resolve 'next' from the system tar.gz instead of the self-contained tree.
-delete process.env.NODE_PATH;
-
 const fs = require("node:fs");
 const path = require("node:path");
+
+// Oryx replaces the standalone's node_modules with a symlink to the system
+// /node_modules (extracted from node_modules.tar.gz).  The system copy is a full
+// dev tree that lacks the correct @swc/helpers and other deps expected by the
+// webpack standalone server.  Oryx moves the real directory to _del_node_modules.
+const nm = path.join(__dirname, "node_modules");
+const backup = path.join(__dirname, "_del_node_modules");
+
+try {
+  if (fs.existsSync(backup)) {
+    const st = fs.lstatSync(nm);
+    if (st.isSymbolicLink() || st.isDirectory()) {
+      fs.rmSync(nm, { recursive: true, force: true });
+    }
+    fs.renameSync(backup, nm);
+    console.info("[server-error-logger] restored node_modules from _del_node_modules");
+  }
+} catch {
+  // non-fatal – server.js will fail with a clear module-not-found message
+}
+
+// Safety net: prevent NODE_PATH from hijacking module resolution.
+delete process.env.NODE_PATH;
 
 const formatError = (error) => {
   if (error instanceof Error) {
