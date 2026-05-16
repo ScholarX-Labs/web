@@ -83,15 +83,18 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
 
   useEffect(() => {
     if (lesson) {
-      setFormData({
-        title: lesson.title || "",
-        description: lesson.description || "",
-        content: lesson.content || "",
-        videoUrl: lesson.videoUrl || "",
-        duration: lesson.duration || 1,
-        isPrivate: lesson.isPrivate ?? true,
-        status: lesson.status ?? "draft"
-      });
+      const timeoutId = setTimeout(() => {
+        setFormData({
+          title: lesson.title || "",
+          description: lesson.description || "",
+          content: lesson.content || "",
+          videoUrl: lesson.videoUrl || "",
+          duration: lesson.duration || 1,
+          isPrivate: lesson.isPrivate ?? true,
+          status: lesson.status ?? "draft"
+        });
+      }, 0);
+      return () => clearTimeout(timeoutId);
     }
   }, [lesson]);
 
@@ -110,9 +113,9 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
         className: "rounded-[20px] bg-white/80 backdrop-blur-xl border-emerald-100 shadow-xl",
       });
       onClose();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Sync Error:", error);
-      toast.error("Synchronization failure: " + (error?.response?.data?.message || "Check log"));
+      toast.error("Synchronization failure: " + ((error as { response?: { data?: { message?: string } } })?.response?.data?.message || "Check log"));
     }
   };
 
