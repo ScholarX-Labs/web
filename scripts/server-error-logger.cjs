@@ -1,34 +1,8 @@
 const fs = require("node:fs");
 const path = require("node:path");
 
-// When used as --require from the standalone root (where server.js lives),
-// __dirname IS the standalone root.
-const rootDir = __dirname;
-
-// Oryx replaces the standalone's node_modules with a symlink to /node_modules
-// and renames the real one to _del_node_modules.  Restore it here so the
-// standalone's own dep tree (which includes @swc/helpers at the correct version)
-// is used instead of the stale system tar.gz extraction.
-const nm = path.join(rootDir, "node_modules");
-const backup = path.join(rootDir, "_del_node_modules");
-
-try {
-  if (fs.existsSync(backup)) {
-    const st = fs.lstatSync(nm);
-    if (st.isSymbolicLink() || st.isDirectory()) {
-      fs.rmSync(nm, { recursive: true, force: true });
-    }
-    fs.renameSync(backup, nm);
-    console.info("[server-error-logger] restored node_modules from _del_node_modules");
-  }
-} catch {
-  // non-fatal – server.js will fail with a clear module-not-found message
-}
-
-// Safety net: Node reads NODE_PATH once at process start and caches it;
-// deleting at runtime has no effect, but clear it in case a future version
-// re-reads on module load.
-delete process.env.NODE_PATH;
+// scripts/server-error-logger.cjs -- loaded via --require from repo root
+const rootDir = path.resolve(__dirname, "..");
 
 const formatError = (error) => {
   if (error instanceof Error) {
