@@ -33,13 +33,13 @@ function normalizeResult(raw: RawSearchResult): SearchResult | null {
     : undefined;
 
   // Tags from fund_type or subtype
-  const tags = opp?.fund_type?.map((f) =>
+  const tags = (Array.isArray(opp?.fund_type) ? opp.fund_type : []).map((f) =>
     f.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()),
   );
 
   // Funding level: derive from fund_type, fall back to benefit keywords
   let fundingLevel: string | undefined;
-  if (opp?.fund_type && opp.fund_type.length > 0) {
+  if (Array.isArray(opp?.fund_type) && opp.fund_type.length > 0) {
     const ft = opp.fund_type[0].toLowerCase();
     if (ft.includes("full")) fundingLevel = "Fully Funded";
     else if (ft.includes("partial")) fundingLevel = "Partially Funded";
@@ -47,7 +47,7 @@ function normalizeResult(raw: RawSearchResult): SearchResult | null {
       fundingLevel = opp.fund_type[0]
         .replace(/_/g, " ")
         .replace(/\b\w/g, (l) => l.toUpperCase());
-  } else if (opp?.benefits && opp.benefits.length > 0) {
+  } else if (Array.isArray(opp?.benefits) && opp.benefits.length > 0) {
     const joined = opp.benefits.join(" ").toLowerCase();
     if (
       joined.includes("fully funded") ||
@@ -61,10 +61,14 @@ function normalizeResult(raw: RawSearchResult): SearchResult | null {
 
   // Funding: first benefit text for detail view
   const funding =
-    opp?.benefits && opp.benefits.length > 0 ? opp.benefits[0] : undefined;
+    Array.isArray(opp?.benefits) && opp.benefits.length > 0
+      ? opp.benefits[0]
+      : undefined;
 
   // Location
-  const location = opp?.country?.join(", ");
+  const location = Array.isArray(opp?.country)
+    ? opp.country.join(", ")
+    : undefined;
 
   // URL
   const url = opp?.application_link ?? opp?.official_website;
