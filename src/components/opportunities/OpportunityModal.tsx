@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { Opportunity, Funding } from "@/lib/opportunities/types";
 import { Calendar, MapPin, X, Globe, DollarSign } from "lucide-react";
 import { getBadgeColors } from "@/lib/opportunities/colors";
+import { isValidUrl } from "@/lib/utils";
 
 interface OpportunityModalProps {
   opportunity: Opportunity;
@@ -108,7 +109,7 @@ export default function OpportunityModal({
                 </span>
               </div>
             )}
-            {opportunity.officialWebsite && (
+            {opportunity.officialWebsite && isValidUrl(opportunity.officialWebsite) && (
               <div className="flex gap-2 items-center">
                 <Globe size={16} className="text-[#55AAD4]" />
                 <a
@@ -243,16 +244,18 @@ export default function OpportunityModal({
         </div>
 
         {/* Footer */}
-        <div className="p-5 sm:p-6 border-t border-border/50 bg-card sticky bottom-0 z-10 flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4 mt-auto">
-          <a
-            href={opportunity.applicationLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-6 py-2.5 bg-accent rounded-xl font-medium hover:opacity-90 transition-opacity text-center text-white w-full sm:w-auto shadow-sm"
-          >
-            Apply Now
-          </a>
-        </div>
+        {opportunity.applicationLink && isValidUrl(opportunity.applicationLink) && (
+          <div className="p-5 sm:p-6 border-t border-border/50 bg-card sticky bottom-0 z-10 flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4 mt-auto">
+            <a
+              href={opportunity.applicationLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-6 py-2.5 bg-accent rounded-xl font-medium hover:opacity-90 transition-opacity text-center text-white w-full sm:w-auto shadow-sm"
+            >
+              Apply Now
+            </a>
+          </div>
+        )}
       </div>
     </dialog>
   );

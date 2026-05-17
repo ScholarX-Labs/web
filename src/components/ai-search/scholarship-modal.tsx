@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Calendar, DollarSign, MapPin, ExternalLink } from "lucide-react";
+import { isValidUrl } from "@/lib/utils";
 
 interface ScholarshipModalProps {
   result: SearchResult | null;
@@ -158,7 +159,7 @@ export function ScholarshipModal({
         </div>
 
         {/* Apply button */}
-        {result.url && (
+        {result.url && isValidUrl(result.url) && (
           <Button
             asChild
             className="w-full font-semibold text-white mt-2"

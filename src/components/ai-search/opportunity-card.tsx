@@ -12,6 +12,7 @@ import { Opportunity } from "@/components/ai-search/types";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { isValidUrl } from "@/lib/utils";
 import {
   Card,
   CardContent,
@@ -168,7 +169,7 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
         >
           {opportunity.fundingLabel}
         </Badge>
-        {opportunity.applicationLink ? (
+        {opportunity.applicationLink && isValidUrl(opportunity.applicationLink) ? (
           <Button
             size="sm"
             className="group bg-sky-500 hover:bg-sky-600 text-white transition-all duration-300"
