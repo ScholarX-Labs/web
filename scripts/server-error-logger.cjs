@@ -1,8 +1,12 @@
 const fs = require("node:fs");
 const path = require("node:path");
 
-// scripts/server-error-logger.cjs -- loaded via --require from repo root
-const rootDir = path.resolve(__dirname, "..");
+// Loaded via --require from standalone root (server.js directory) or repo root.
+// In standalone the preload is copied to the root, so __dirname IS the root.
+// When invoked from scripts/ directory, resolve up one level.
+const rootDir = path.basename(__dirname) === "scripts"
+  ? path.resolve(__dirname, "..")
+  : __dirname;
 
 const formatError = (error) => {
   if (error instanceof Error) {
