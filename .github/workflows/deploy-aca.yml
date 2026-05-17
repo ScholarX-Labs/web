@@ -9,9 +9,9 @@ on:
 env:
   IMAGE_NAME: scholarx-web
   REGISTRY: ${{ secrets.REGISTRY_LOGIN_SERVER }}
-  ACA_ENVIRONMENT: scholarx-env
-  ACA_APP_NAME: scholarx-frontend
-  RESOURCE_GROUP: scholarx-rg
+  ACA_ENVIRONMENT: ScholarX-Production
+  ACA_APP_NAME: scholarx-web-aca
+  RESOURCE_GROUP: ScholarX_Production
 
 jobs:
   build-and-deploy:
