@@ -227,17 +227,37 @@ const Footer = () => {
 
         {/* Bottom: Credits & Meta */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-10 border-t border-zinc-100 dark:border-zinc-900 pt-10">
-          <div className="flex flex-col md:flex-row items-center gap-6 text-sm text-zinc-400 dark:text-zinc-500">
-            <span>© {new Date().getFullYear()} ScholarX Inc.</span>
-            <div className="hidden md:block w-1 h-1 bg-zinc-300 dark:bg-zinc-700 rounded-full" />
-            <span className="flex items-center gap-2">
-              Building with{" "}
-              <Heart
-                size={14}
-                className="text-red-500 fill-red-500 animate-pulse"
-              />{" "}
-              since 2024.
+          <div className="flex flex-col md:flex-row items-center gap-6">
+            <span className="text-sm text-zinc-400 dark:text-zinc-500">
+              © {new Date().getFullYear()} ScholarX Inc.
             </span>
+            <div className="hidden md:block w-1 h-1 bg-zinc-300 dark:bg-zinc-700 rounded-full" />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6 }}
+              className="relative px-4 py-2 rounded-full bg-gradient-to-r from-red-50 to-pink-50 dark:from-red-950/30 dark:to-pink-950/30 border border-red-200 dark:border-red-800/50 shadow-lg shadow-red-500/10 dark:shadow-red-500/5"
+            >
+              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-red-400/0 via-red-400/10 to-pink-400/0 dark:from-red-500/0 dark:via-red-500/5 dark:to-pink-500/0 animate-pulse" />
+              <span className="relative flex items-center gap-2.5 text-sm font-semibold">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-pink-600 dark:from-red-400 dark:to-pink-400">
+                  Building with
+                </span>
+                <motion.div
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                  className="flex items-center justify-center"
+                >
+                  <Heart
+                    size={18}
+                    className="text-red-500 dark:text-red-400 fill-red-500 dark:fill-red-400"
+                  />
+                </motion.div>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-red-600 dark:from-pink-400 dark:to-red-400">
+                  since 2024
+                </span>
+              </span>
+            </motion.div>
           </div>
 
           <div className="flex items-center gap-8">
@@ -247,7 +267,7 @@ const Footer = () => {
                   disabled
                   className={cn(
                     "p-2 rounded-lg transition-all cursor-not-allowed",
-                    "text-zinc-400"
+                    "text-zinc-400",
                   )}
                   aria-label="Light Mode (Coming Soon)"
                 >
@@ -257,7 +277,7 @@ const Footer = () => {
                   disabled
                   className={cn(
                     "p-2 rounded-lg transition-all cursor-not-allowed",
-                    "text-zinc-400"
+                    "text-zinc-400",
                   )}
                   aria-label="Dark Mode (Coming Soon)"
                 >
