@@ -1,4 +1,9 @@
-import { SearchResult, RawSearchResponse, RawSearchResult } from "./types";
+import {
+  SearchResult,
+  RawSearchResponse,
+  RawSearchResult,
+  RawOpportunity,
+} from "./types";
 
 const SEARCH_API_URL = "https://scholarx-search-api.vercel.app/api/search";
 const SEARCH_API_BASE = "https://scholarx-search-api.vercel.app/api";
