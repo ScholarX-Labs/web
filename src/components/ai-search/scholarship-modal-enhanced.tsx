@@ -19,7 +19,7 @@ import {
   BookOpen,
   Target,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 interface ScholarshipModalProps {
   result: SearchResult | null;
@@ -95,7 +95,7 @@ export function ScholarshipModal({
 
   return (
     <Dialog open={dialogOpen} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="p-0 border-0 bg-transparent shadow-none w-[80vw] max-w-none sm:max-w-none h-[90vh] overflow-hidden rounded-[2rem]">
+      <DialogContent className="p-0 border-0 bg-transparent shadow-none w-[80vw] max-w-none sm:max-w-none h-[90vh] overflow-hidden rounded-[2rem] data-open:animate-none">
         <DialogHeader className="hidden">
           <DialogTitle className="sr-only">{result.title}</DialogTitle>
         </DialogHeader>
@@ -105,18 +105,10 @@ export function ScholarshipModal({
 
         {/* Premium glass background with 2-column sidebar layout */}
         <motion.div
-          layout
           layoutId={cardId}
-          transition={{
-            type: "spring",
-            stiffness: 400,
-            damping: 35,
-            mass: 0.8,
-          }}
           variants={modalVariants}
           initial="hidden"
           animate="visible"
-          exit="exit"
           className="relative bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-[2rem] border border-white/40 dark:border-white/10 overflow-hidden h-full flex flex-col lg:flex-row"
           style={{
             boxShadow:
@@ -133,7 +125,6 @@ export function ScholarshipModal({
             >
               {/* Header inside scrollable area */}
               <motion.div
-                layout
                 layoutId="modal-header"
                 className="relative z-10"
               >
@@ -174,8 +165,7 @@ export function ScholarshipModal({
               {/* Eligibility Section */}
               {result.eligibility && (
                 <motion.div
-                  layout
-                  layoutId="eligibility-section"
+layoutId="eligibility-section"
                   variants={itemVariants}
                   className="space-y-5"
                 >
@@ -198,7 +188,6 @@ export function ScholarshipModal({
                 {/* Requirements */}
                 {hasRequirements && (
                   <motion.div
-                    layout
                     layoutId="requirements-section"
                     variants={itemVariants}
                     className="space-y-6"
@@ -215,7 +204,6 @@ export function ScholarshipModal({
                       {result.requirements?.map((req, i) => (
                         <motion.li
                           key={i}
-                          layout
                           layoutId={`requirement-${i}`}
                           className="flex gap-4 p-4 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
                         >
@@ -234,7 +222,6 @@ export function ScholarshipModal({
                 {/* Benefits */}
                 {hasBenefits && (
                   <motion.div
-                    layout
                     layoutId="benefits-section"
                     variants={itemVariants}
                     className="space-y-6"
@@ -251,7 +238,6 @@ export function ScholarshipModal({
                       {result.benefits?.map((benefit, i) => (
                         <motion.li
                           key={i}
-                          layout
                           layoutId={`benefit-${i}`}
                           className="flex gap-4 p-4 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
                         >
@@ -305,7 +291,6 @@ export function ScholarshipModal({
               <div className="space-y-4 flex-1">
                 {result.funding && (
                   <motion.div
-                    layout
                     layoutId="card-funding"
                     variants={itemVariants}
                     className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm flex items-center gap-5"
@@ -326,7 +311,6 @@ export function ScholarshipModal({
 
                 {result.deadline && (
                   <motion.div
-                    layout
                     layoutId="card-deadline"
                     variants={itemVariants}
                     className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm flex items-center gap-5"
@@ -347,7 +331,6 @@ export function ScholarshipModal({
 
                 {result.location && (
                   <motion.div
-                    layout
                     layoutId="card-location"
                     variants={itemVariants}
                     className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm flex items-center gap-5"
@@ -368,7 +351,6 @@ export function ScholarshipModal({
 
                 {result.url && (
                   <motion.div
-                    layout
                     layoutId="card-website"
                     variants={itemVariants}
                     className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm flex items-center gap-5"
@@ -395,7 +377,6 @@ export function ScholarshipModal({
 
               {/* Actions Footer */}
               <motion.div
-                layout
                 layoutId="modal-footer"
                 className="mt-auto pt-6 space-y-3"
               >
