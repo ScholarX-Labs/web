@@ -120,9 +120,17 @@ const MagneticButton = ({
 
 const Footer = () => {
   const containerRef = useRef<HTMLElement>(null);
+  const [copiedText, setCopiedText] = React.useState<string | null>(null);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleCopyContact = (text: string, type: "email" | "phone") => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopiedText(type);
+      setTimeout(() => setCopiedText(null), 2000);
+    });
   };
 
   return (
