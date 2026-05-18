@@ -202,7 +202,7 @@ const Footer = () => {
 
         {/* Middle: Links & Social */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-12 mb-16">
-          <div className="col-span-2 lg:col-span-2 pr-10">
+          <div className="col-span-2 md:col-span-2 lg:col-span-1 flex flex-col items-center">
             <Link
               href={ROUTES.HOME}
               className="inline-block mb-8 transition-transform hover:scale-105 cursor-pointer"
@@ -219,14 +219,14 @@ const Footer = () => {
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.1 }}
-              className="mb-6 p-4 rounded-lg bg-gradient-to-r from-blue-50/50 to-cyan-50/50 dark:from-blue-950/20 dark:to-cyan-950/20 border border-blue-200/50 dark:border-blue-800/30 backdrop-blur-sm"
+              className="mb-6 p-4 rounded-lg bg-gradient-to-r from-blue-50/50 to-cyan-50/50 dark:from-blue-950/20 dark:to-cyan-950/20 border border-blue-200/50 dark:border-blue-800/30 backdrop-blur-sm text-center"
             >
               <p className="text-base font-medium text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-cyan-600 dark:from-blue-300 dark:to-cyan-400 leading-relaxed tracking-tight">
                 Empowering academic success through personalized support and
                 mentorship
               </p>
             </motion.div>
-            <div className="flex gap-3">
+            <div className="flex gap-3 justify-center">
               {socialLinks.map((social) => (
                 <MagneticButton key={social.name}>
                   <a
