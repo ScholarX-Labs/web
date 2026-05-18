@@ -299,7 +299,7 @@ export function SearchResults({
             animate="visible"
             className="flex flex-col items-center justify-center py-20 text-center"
           >
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-100 to-blue-100 dark:from-purple-900/20 dark:to-purple-900/20 flex items-center justify-center mb-6">
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-100 to-blue-100 dark:from-purple-900/20 dark:to-blue-900/20 flex items-center justify-center mb-6">
               <Filter className="w-10 h-10 text-muted-foreground/50" />
             </div>
             <h2 className="text-2xl font-bold text-foreground mb-2">
