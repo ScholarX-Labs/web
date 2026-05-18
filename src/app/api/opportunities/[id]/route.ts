@@ -9,7 +9,9 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  const lang = normalizeLang(request.nextUrl.searchParams.get("lang") ?? undefined);
+  const lang = normalizeLang(
+    request.nextUrl.searchParams.get("lang") ?? undefined,
+  );
 
   if (!id || typeof id !== "string") {
     return NextResponse.json(
