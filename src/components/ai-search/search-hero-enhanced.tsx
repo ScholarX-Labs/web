@@ -104,10 +104,7 @@ export function SearchHero({ onSearch, isLoading }: SearchHeroProps) {
         </motion.div>
 
         {/* Search Card with enhanced styling */}
-        <motion.div
-          variants={searchCardVariants}
-          className="w-full max-w-2xl"
-        >
+        <motion.div variants={searchCardVariants} className="w-full max-w-2xl">
           <div
             className={`bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-3xl border transition-all duration-300 overflow-hidden shadow-2xl ${
               isFocused
