@@ -88,7 +88,6 @@ export function ScholarshipModal({
 }: ScholarshipModalProps) {
   const dialogOpen = typeof open === "boolean" ? open : Boolean(isOpen);
   const [isCopied, setIsCopied] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
 
   if (!result) return null;
 
@@ -100,7 +99,9 @@ export function ScholarshipModal({
   const canShare = Boolean(result.id);
 
   useEffect(() => {
-    if (!isCopied) return;
+    if (!isCopied) {
+      return;
+    }
     const timer = setTimeout(() => setIsCopied(false), 2500);
     return () => clearTimeout(timer);
   }, [isCopied]);
@@ -425,8 +426,6 @@ export function ScholarshipModal({
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={handleCopyLink}
-                    onMouseEnter={() => setIsHovered(true)}
-                    onMouseLeave={() => setIsHovered(false)}
                     className={`w-full flex items-center justify-center gap-2 px-8 py-5 rounded-2xl font-bold text-lg transition-all duration-300 ${
                       isCopied
                         ? "border border-emerald-500/50 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
