@@ -61,7 +61,8 @@ const socialLinks = [
     name: "LinkedIn",
     icon: Linkedin,
     href: "https://www.linkedin.com/company/scholarx0",
-    hoverColor: "hover:bg-blue-600 dark:hover:bg-blue-500",
+    hoverColor: "hover:bg-blue-700 dark:hover:bg-blue-600",
+    whiteOnHover: true,
   },
   {
     name: "Facebook",
