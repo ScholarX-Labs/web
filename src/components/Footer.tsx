@@ -182,8 +182,8 @@ const Footer = () => {
               />
             </Link>
             <p className="text-lg text-zinc-500 dark:text-zinc-400 mb-8 leading-relaxed">
-              We provide the tools and resources you need to excel in the
-              digital age. From coding to creative arts, find your path here.
+              Empowering academic success through personalized support and
+              mentorship
             </p>
             <div className="flex gap-4">
               {socialLinks.map((social) => (
