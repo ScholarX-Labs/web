@@ -202,7 +202,7 @@ const Footer = () => {
 
         {/* Middle: Links & Social */}
         <div className="flex flex-wrap justify-between items-start gap-8 md:gap-12 lg:gap-16 mb-16">
-          <div className="w-full md:w-auto flex flex-col items-center">
+          <div className="w-full md:w-auto md:max-w-xs flex flex-col items-center">
             <Link
               href={ROUTES.HOME}
               className="inline-block mb-4 transition-transform hover:scale-105 cursor-pointer"
@@ -255,7 +255,9 @@ const Footer = () => {
             </div>
           </div>
 
-          {footerLinks.map((section, idx) => (
+          {/* Link columns with tight spacing */}
+          <div className="flex gap-1 md:gap-2 lg:gap-3 flex-1">
+            {footerLinks.map((section, idx) => (
             <div key={section.title} className="flex-1 min-w-[150px]">
               <h3 className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-[0.15em] mb-6">
                 {section.title}
@@ -369,7 +371,8 @@ const Footer = () => {
                 ))}
               </ul>
             </div>
-          ))}
+            ))}
+          </div>
         </div>
 
         {/* Bottom: Credits & Meta */}
