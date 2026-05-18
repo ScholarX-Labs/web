@@ -27,13 +27,17 @@ export function ScholarshipCard({
 
   return (
     <motion.div
-      layout
       layoutId={cardId}
+      animate={{
+        opacity: isSelected ? 0 : 1,
+        scale: isSelected ? 0.95 : 1,
+      }}
       transition={{
         type: "spring",
         stiffness: 400,
-        damping: 35,
-        mass: 0.8,
+        damping: 26,
+        mass: 0.5,
+        delay: isSelected ? 0 : 0.15,
       }}
       onClick={() => onViewDetails(result)}
       onKeyDown={(e) => {
@@ -44,9 +48,7 @@ export function ScholarshipCard({
       }}
       role="button"
       tabIndex={0}
-      className={`bg-white rounded-xl border border-gray-200 flex flex-col h-full min-h-[280px] overflow-hidden hover:shadow-md hover:cursor-pointer transition-all duration-200 hover:-translate-y-0.5 ${
-        isSelected ? "opacity-0 pointer-events-none" : ""
-      }`}
+      className="bg-white rounded-xl border border-gray-200 flex flex-col h-full min-h-[280px] overflow-hidden hover:shadow-md hover:cursor-pointer hover:-translate-y-0.5 transition-shadow transition-transform duration-200"
     >
       {/* Top: category badge + match % */}
       <div className="flex items-start justify-between px-5 pt-5 pb-3">
