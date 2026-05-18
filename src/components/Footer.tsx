@@ -136,8 +136,58 @@ const Footer = () => {
       <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-orange-500/5 blur-[120px] rounded-full pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 py-16 relative z-20">
+        {/* Top: Stunning Animated Title */}
+        <div className="mb-20 flex justify-center items-center relative border-b border-zinc-100 dark:border-zinc-900 pb-16">
+          <div className="absolute inset-0 flex justify-center">
+            <motion.div
+              animate={{
+                opacity: [0.3, 0.6, 0.3],
+                scale: [0.8, 1.1, 0.8],
+              }}
+              transition={{
+                duration: 4,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+              className="w-96 h-96 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 blur-3xl rounded-full pointer-events-none"
+            />
+          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="relative text-center px-8"
+          >
+            <motion.h2
+              animate={{
+                y: [0, -8, 0],
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+              className="text-3xl md:text-4xl font-bold tracking-tight"
+            >
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-600 dark:from-blue-400 dark:via-purple-400 dark:to-cyan-400">
+                Unlock your potential
+              </span>
+              <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-600 dark:from-cyan-400 dark:via-blue-400 dark:to-purple-400">
+                with ScholarX
+              </span>
+            </motion.h2>
+            <motion.div
+              initial={{ scaleX: 0 }}
+              whileInView={{ scaleX: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="h-1 w-24 bg-gradient-to-r from-blue-600 to-cyan-600 dark:from-blue-400 dark:to-cyan-400 mx-auto mt-4 rounded-full origin-center"
+            />
+          </motion.div>
+        </div>
+
         {/* Middle: Links & Social */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-12 mb-16 border-t border-zinc-100 dark:border-zinc-900 pt-16">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-12 mb-16">
           <div className="col-span-2 lg:col-span-2 pr-10">
             <Link
               href={ROUTES.HOME}
@@ -234,56 +284,6 @@ const Footer = () => {
               </ul>
             </div>
           ))}
-        </div>
-
-        {/* Center: Stunning Animated Title */}
-        <div className="my-16 flex justify-center items-center relative">
-          <div className="absolute inset-0 flex justify-center">
-            <motion.div
-              animate={{ 
-                opacity: [0.3, 0.6, 0.3],
-                scale: [0.8, 1.1, 0.8]
-              }}
-              transition={{ 
-                duration: 4, 
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-              className="w-96 h-96 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 blur-3xl rounded-full pointer-events-none"
-            />
-          </div>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="relative text-center px-8"
-          >
-            <motion.h2
-              animate={{ 
-                y: [0, -8, 0],
-              }}
-              transition={{ 
-                duration: 3,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-              className="text-3xl md:text-4xl font-bold tracking-tight"
-            >
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-600 dark:from-blue-400 dark:via-purple-400 dark:to-cyan-400">
-                Unlock your potential
-              </span>
-              <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-600 dark:from-cyan-400 dark:via-blue-400 dark:to-purple-400">
-                with ScholarX
-              </span>
-            </motion.h2>
-            <motion.div
-              initial={{ scaleX: 0 }}
-              whileInView={{ scaleX: 1 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="h-1 w-24 bg-gradient-to-r from-blue-600 to-cyan-600 dark:from-blue-400 dark:to-cyan-400 mx-auto mt-4 rounded-full origin-center"
-            />
-          </motion.div>
         </div>
 
         {/* Bottom: Credits & Meta */}
