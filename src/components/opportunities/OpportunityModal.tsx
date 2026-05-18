@@ -1,7 +1,8 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Opportunity, Funding } from "@/lib/opportunities/types";
-import { Calendar, MapPin, X, Globe, DollarSign } from "lucide-react";
+import { Calendar, MapPin, X, Globe, DollarSign, Copy, Check } from "lucide-react";
 import { getBadgeColors } from "@/lib/opportunities/colors";
+import { cn } from "@/lib/utils";
 
 interface OpportunityModalProps {
   opportunity: Opportunity;
@@ -13,6 +14,71 @@ const FUNDING_DISPLAY_NAME: Record<string, string> = {
   [Funding.FullyFunded]: "Fully Funded",
   [Funding.PartiallyFunded]: "Partially Funded",
 };
+
+function CopyButton({ url }: { url: string }) {
+  const [copied, setCopied] = useState(false);
+  const [hovered, setHovered] = useState(false);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  };
+
+  return (
+    <div className="relative">
+      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">
+        Application Link
+      </p>
+      <div
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        className={cn(
+          "flex items-center px-3 py-2.5 rounded-xl border transition-all duration-300",
+          "bg-muted/30 border-border/60",
+          hovered && "border-primary/30 bg-muted/40",
+        )}
+      >
+        <p className="flex-1 min-w-0 text-xs text-muted-foreground truncate font-mono">
+          {url}
+        </p>
+        <div
+          className={cn(
+            "flex items-center transition-all duration-300",
+            hovered || copied ? "w-9 ml-2 opacity-100" : "w-0 opacity-0 overflow-hidden",
+          )}
+        >
+          <button
+            onClick={handleCopy}
+            className={cn(
+              "p-2 rounded-xl shrink-0 transition-all duration-300",
+              "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
+              copied
+                ? "bg-primary text-primary-foreground shadow-md"
+                : "bg-muted text-muted-foreground hover:bg-primary hover:text-primary-foreground hover:shadow-md",
+            )}
+            aria-label={copied ? "Link copied" : "Copy link"}
+          >
+            {copied ? <Check size={16} /> : <Copy size={16} />}
+          </button>
+        </div>
+      </div>
+
+      {copied && (
+        <div className="absolute -top-8 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
+          <div className="bg-green-500 text-white text-xs font-medium px-3 py-1.5 rounded-lg shadow-lg whitespace-nowrap flex items-center gap-1.5">
+            <Check size={12} />
+            Copied to clipboard
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function OpportunityModal({
   opportunity,
@@ -243,15 +309,23 @@ export default function OpportunityModal({
         </div>
 
         {/* Footer */}
-        <div className="p-5 sm:p-6 border-t border-border/50 bg-card sticky bottom-0 z-10 flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4 mt-auto">
-          <a
-            href={opportunity.applicationLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-6 py-2.5 bg-accent rounded-xl font-medium hover:opacity-90 transition-opacity text-center text-white w-full sm:w-auto shadow-sm"
-          >
-            Apply Now
-          </a>
+        <div className="p-5 sm:p-6 border-t border-border/50 bg-card sticky bottom-0 z-10 mt-auto">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+            <div className="flex-1 min-w-0">
+              <CopyButton url={opportunity.applicationLink} />
+            </div>
+            <a
+              href={opportunity.applicationLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-6 py-3 bg-primary rounded-xl font-semibold hover:opacity-90 transition-all duration-200 text-center text-primary-foreground shadow-sm hover:shadow-md active:scale-[0.98] flex items-center justify-center gap-2 sm:shrink-0"
+            >
+              Apply Now
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+            </a>
+          </div>
         </div>
       </div>
     </dialog>
