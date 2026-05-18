@@ -215,10 +215,17 @@ const Footer = () => {
                 className="dark:invert opacity-90 hover:opacity-100 transition-opacity"
               />
             </Link>
-            <p className="text-lg text-zinc-500 dark:text-zinc-400 mb-6 leading-relaxed">
-              Empowering academic success through personalized support and
-              mentorship
-            </p>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.1 }}
+              className="mb-6 p-4 rounded-lg bg-gradient-to-r from-blue-50/50 to-cyan-50/50 dark:from-blue-950/20 dark:to-cyan-950/20 border border-blue-200/50 dark:border-blue-800/30 backdrop-blur-sm"
+            >
+              <p className="text-base font-medium text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-cyan-600 dark:from-blue-300 dark:to-cyan-400 leading-relaxed tracking-tight">
+                Empowering academic success through personalized support and
+                mentorship
+              </p>
+            </motion.div>
             <div className="flex gap-3">
               {socialLinks.map((social) => (
                 <MagneticButton key={social.name}>
