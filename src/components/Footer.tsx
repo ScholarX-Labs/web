@@ -135,7 +135,7 @@ const Footer = () => {
       <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-orange-500/5 blur-[120px] rounded-full pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-6 py-20 relative z-20">
+      <div className="max-w-7xl mx-auto px-6 py-28 relative z-20">
         {/* Top: Premium Brand Statement & CTA */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-10 mb-24">
           <div className="max-w-2xl">
@@ -154,7 +154,7 @@ const Footer = () => {
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
             <Link
               href={ROUTES.COURSES}
-              className="group relative inline-flex items-center gap-3 px-10 py-5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-2xl font-semibold text-lg overflow-hidden transition-all hover:shadow-2xl hover:shadow-blue-500/20 cursor-pointer"
+              className="group relative inline-flex items-center gap-3 px-10 py-5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-2xl font-semibold text-lg overflow-hidden transition-all hover:shadow-2xl hover:shadow-blue-500/20 hover:scale-105 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-900"
             >
               <span className="relative z-10">Start Learning Now</span>
               <ChevronRight
@@ -167,7 +167,7 @@ const Footer = () => {
         </div>
 
         {/* Middle: Links & Social */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-12 mb-20 border-t border-zinc-100 dark:border-zinc-900 pt-16">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-14 mb-28 border-t border-zinc-100 dark:border-zinc-900 pt-20">
           <div className="col-span-2 lg:col-span-2 pr-10">
             <Link
               href={ROUTES.HOME}
@@ -193,7 +193,7 @@ const Footer = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     className={cn(
-                      "flex items-center justify-center w-12 h-12 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 transition-all duration-300 shadow-sm",
+                      "flex items-center justify-center w-12 h-12 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 transition-all duration-300 shadow-sm hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-900",
                       social.isGradient
                         ? "hover:bg-gradient-to-br hover:from-purple-500 hover:via-pink-500 hover:to-orange-400 dark:hover:from-purple-400 dark:hover:via-pink-400 dark:hover:to-orange-300 hover:border-transparent hover:text-white dark:hover:text-white"
                         : social.hoverColor,
@@ -216,27 +216,49 @@ const Footer = () => {
 
           {footerLinks.map((section, idx) => (
             <div key={section.title}>
-              <h3 className="text-sm font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-[0.2em] mb-8">
+              <h3 className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-[0.15em] mb-8">
                 {section.title}
               </h3>
-              <ul className="space-y-5">
+              <ul
+                className={cn(
+                  "space-y-4",
+                  section.title === "Contact" && "space-y-3",
+                )}
+              >
                 {section.links.map((link) => (
                   <li key={link.name}>
-                    <Link
-                      href={link.href}
-                      className="group flex items-center gap-3 text-zinc-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-500 transition-colors cursor-pointer"
-                    >
-                      {link.icon && (
-                        <link.icon
-                          size={18}
-                          className="text-zinc-400 dark:text-zinc-600 group-hover:text-blue-600 transition-colors"
-                        />
-                      )}
-                      <span className="text-base font-medium tracking-tight relative overflow-hidden">
-                        {link.name}
-                        <span className="absolute bottom-0 left-0 w-full h-px bg-blue-600 dark:bg-blue-500 translate-x-[-101%] group-hover:translate-x-0 transition-transform duration-300" />
-                      </span>
-                    </Link>
+                    {section.title === "Contact" ? (
+                      <Link
+                        href={link.href}
+                        className="group flex items-center gap-3 px-4 py-3 rounded-lg bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 hover:border-blue-300 dark:hover:border-blue-800/50 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-900"
+                      >
+                        {link.icon && (
+                          <link.icon
+                            size={18}
+                            className="text-zinc-400 dark:text-zinc-600 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200 flex-shrink-0"
+                          />
+                        )}
+                        <span className="text-xs font-medium tracking-tight overflow-hidden text-ellipsis">
+                          {link.name}
+                        </span>
+                      </Link>
+                    ) : (
+                      <Link
+                        href={link.href}
+                        className="group flex items-center gap-3 text-zinc-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-500 transition-all duration-200 cursor-pointer hover:scale-105 origin-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-900 rounded px-1 py-0.5"
+                      >
+                        {link.icon && (
+                          <link.icon
+                            size={18}
+                            className="text-zinc-400 dark:text-zinc-600 group-hover:text-blue-600 dark:group-hover:text-blue-500 transition-colors duration-200"
+                          />
+                        )}
+                        <span className="text-sm font-medium tracking-tight relative overflow-hidden">
+                          {link.name}
+                          <span className="absolute bottom-0 left-0 w-full h-px bg-blue-600 dark:bg-blue-500 translate-x-[-101%] group-hover:translate-x-0 transition-transform duration-300" />
+                        </span>
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -245,7 +267,7 @@ const Footer = () => {
         </div>
 
         {/* Bottom: Credits & Meta */}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-10 border-t border-zinc-100 dark:border-zinc-900 pt-10">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-10 border-t border-zinc-100 dark:border-zinc-900 pt-16">
           <div className="flex flex-col md:flex-row items-center gap-6">
             <motion.div
               initial={{ opacity: 0, x: -10 }}
@@ -318,7 +340,7 @@ const Footer = () => {
 
             <button
               onClick={scrollToTop}
-              className="group flex items-center gap-3 text-sm font-bold text-zinc-900 dark:text-zinc-100 hover:text-blue-600 dark:hover:text-blue-500 transition-colors cursor-pointer"
+              className="group flex items-center gap-3 text-sm font-semibold text-zinc-900 dark:text-zinc-100 hover:text-blue-600 dark:hover:text-blue-500 transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-900 rounded px-2 py-1"
             >
               <span>Back to Top</span>
               <div className="flex items-center justify-center w-10 h-10 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 group-hover:-translate-y-1.5 transition-all duration-300">
