@@ -88,8 +88,19 @@ export function ScholarshipModal({
 }: ScholarshipModalProps) {
   const dialogOpen = typeof open === "boolean" ? open : Boolean(isOpen);
   const [isCopied, setIsCopied] = useState(false);
+  useEffect(() => {
+    if (!isCopied) return;
+    const timer = setTimeout(() => setIsCopied(false), 2500);
+    return () => clearTimeout(timer);
+  }, [isCopied]);
 
-  if (!result) return null;
+  if (!result) {
+    return (
+      <Dialog open={dialogOpen} onOpenChange={onClose}>
+        <DialogContent className="max-w-2xl" />
+      </Dialog>
+    );
+  }
 
   const cardId = `scholarship-card-${result.id}`;
   const category = getCategory(result);
@@ -97,14 +108,6 @@ export function ScholarshipModal({
   const hasRequirements = result.requirements && result.requirements.length > 0;
   const hasBenefits = result.benefits && result.benefits.length > 0;
   const canShare = Boolean(result.id);
-
-  useEffect(() => {
-    if (!isCopied) {
-      return;
-    }
-    const timer = setTimeout(() => setIsCopied(false), 2500);
-    return () => clearTimeout(timer);
-  }, [isCopied]);
 
   async function handleCopyLink() {
     if (!result || !result.id || !navigator?.clipboard) return;
@@ -154,7 +157,7 @@ export function ScholarshipModal({
                   variants={itemVariants}
                   className="flex flex-wrap gap-2 mb-6"
                 >
-                  {allTags.map((tag, i) => (
+                  {allTags.map((tag) => (
                     <Badge
                       key={tag}
                       className="text-sm font-semibold px-4 py-1.5 rounded-full border border-scholar-blue/20 bg-scholar-blue/5 text-scholar-blue dark:text-scholar-blue-light backdrop-blur-md"
