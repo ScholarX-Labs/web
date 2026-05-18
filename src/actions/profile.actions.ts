@@ -8,7 +8,6 @@ import { z } from "zod";
 import { db } from "@/db";
 import { user } from "@/db/schema/auth-schema";
 import { auth } from "@/lib/auth";
-import { isValidUrl } from "@/lib/utils";
 import type { ActionResponse } from "@/types/profile.types";
 
 type ProfileData = Record<string, unknown>;
@@ -40,11 +39,11 @@ const updateProfileSchema = z.object({
 });
 
 const socialLinksSchema = z.object({
-  githubUrl: z.string().url().refine(isValidUrl, "Invalid URL protocol").optional().or(z.literal("")),
-  facebookUrl: z.string().url().refine(isValidUrl, "Invalid URL protocol").optional().or(z.literal("")),
-  instagramUrl: z.string().url().refine(isValidUrl, "Invalid URL protocol").optional().or(z.literal("")),
-  twitterUrl: z.string().url().refine(isValidUrl, "Invalid URL protocol").optional().or(z.literal("")),
-  linkedinUrl: z.string().url().refine(isValidUrl, "Invalid URL protocol").optional().or(z.literal("")),
+  githubUrl: z.string().url().optional().or(z.literal("")),
+  facebookUrl: z.string().url().optional().or(z.literal("")),
+  instagramUrl: z.string().url().optional().or(z.literal("")),
+  twitterUrl: z.string().url().optional().or(z.literal("")),
+  linkedinUrl: z.string().url().optional().or(z.literal("")),
 });
 
 export async function getProfile(): Promise<ActionResponse<ProfileData>> {

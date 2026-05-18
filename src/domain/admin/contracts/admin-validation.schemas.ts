@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { isValidUrl } from "@/lib/utils";
 
 export const CreateCourseSchema = z.object({
   title: z.string().min(3).max(255),
@@ -11,8 +10,8 @@ export const CreateCourseSchema = z.object({
   originalPrice: z.coerce.number().min(0).optional(),
   requiresForm: z.coerce.boolean().optional(),
   salesInquiry: z.coerce.boolean().optional(),
-  imageUrl: z.string().url().refine(isValidUrl, "Invalid URL protocol").optional().or(z.literal("")),
-  videoPreviewUrl: z.string().url().refine(isValidUrl, "Invalid URL protocol").optional().or(z.literal("")),
+  imageUrl: z.string().url().optional().or(z.literal("")),
+  videoPreviewUrl: z.string().url().optional().or(z.literal("")),
   tags: z.array(z.string()).optional(),
   status: z.enum(["active", "inactive", "draft"]).optional(),
   instructorId: z.string().uuid().optional(),
@@ -36,7 +35,7 @@ export const CreateLessonSchema = z.object({
   title: z.string().min(1).max(255),
   description: z.string().max(2000).optional(),
   content: z.string().optional(),
-  videoUrl: z.string().url().refine(isValidUrl, "Invalid URL protocol").optional().or(z.literal("")),
+  videoUrl: z.string().url().optional().or(z.literal("")),
   duration: z.coerce.number().int().positive().optional(),
   isPrivate: z.coerce.boolean().optional(),
   status: z.enum(["draft", "staging", "published", "archived"]).optional(),
