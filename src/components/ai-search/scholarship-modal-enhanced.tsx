@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { SearchResult } from "@/lib/ai-search/types";
 import {
   Dialog,
@@ -19,6 +20,7 @@ import {
   BookOpen,
   Target,
   Share2,
+  Check,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -85,6 +87,8 @@ export function ScholarshipModal({
   onClose,
 }: ScholarshipModalProps) {
   const dialogOpen = typeof open === "boolean" ? open : Boolean(isOpen);
+  const [isCopied, setIsCopied] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   if (!result) return null;
 
@@ -95,10 +99,21 @@ export function ScholarshipModal({
   const hasBenefits = result.benefits && result.benefits.length > 0;
   const canShare = Boolean(result.id);
 
-  function handleCopyLink() {
-    if (!result.id || !navigator?.clipboard) return;
+  useEffect(() => {
+    if (!isCopied) return;
+    const timer = setTimeout(() => setIsCopied(false), 2500);
+    return () => clearTimeout(timer);
+  }, [isCopied]);
+
+  async function handleCopyLink() {
+    if (!result || !result.id || !navigator?.clipboard) return;
     const shareUrl = `${window.location.origin}/opportunity/${result.id}`;
-    navigator.clipboard.writeText(shareUrl).catch(() => {});
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setIsCopied(true);
+    } catch {
+      setIsCopied(false);
+    }
   }
 
   return (
@@ -410,10 +425,46 @@ export function ScholarshipModal({
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={handleCopyLink}
-                    className="w-full flex items-center justify-center gap-2 px-8 py-5 rounded-2xl font-bold text-lg border border-scholar-blue/30 text-scholar-blue hover:bg-scholar-blue/10 transition-all"
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                    className={`w-full flex items-center justify-center gap-2 px-8 py-5 rounded-2xl font-bold text-lg transition-all duration-300 ${
+                      isCopied
+                        ? "border border-emerald-500/50 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                        : "border border-scholar-blue/30 text-scholar-blue hover:bg-scholar-blue/10 dark:hover:bg-scholar-blue/20"
+                    }`}
                   >
-                    Copy Link
-                    <Share2 className="w-5 h-5" />
+                    <motion.span
+                      initial={{ opacity: 1 }}
+                      animate={{ opacity: isCopied ? 0 : 1 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute"
+                    >
+                      Copy Link
+                    </motion.span>
+                    <motion.span
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: isCopied ? 1 : 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute"
+                    >
+                      Copied!
+                    </motion.span>
+                    <motion.div
+                      animate={{
+                        rotate: isCopied ? 360 : 0,
+                        scale: isCopied ? 1 : 1,
+                      }}
+                      transition={{
+                        duration: isCopied ? 0.5 : 0.3,
+                        ease: "easeInOut",
+                      }}
+                    >
+                      {isCopied ? (
+                        <Check className="w-5 h-5" />
+                      ) : (
+                        <Share2 className="w-5 h-5" />
+                      )}
+                    </motion.div>
                   </motion.button>
                 )}
 
