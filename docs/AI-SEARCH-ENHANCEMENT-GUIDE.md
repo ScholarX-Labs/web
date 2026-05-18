@@ -514,6 +514,7 @@ const isReducedMotion = window.matchMedia(
 The `scholarship-modal-enhanced.tsx` component elevates the opportunity details experience with:
 
 ### **Premium Design**
+
 - Smooth Framer Motion entrance animation (scale + opacity)
 - Glass morphism background with gradient overlay
 - Sticky header with match percentage badge (top-right)
@@ -521,12 +522,14 @@ The `scholarship-modal-enhanced.tsx` component elevates the opportunity details 
 - Smooth scroll content with proper overflow handling
 
 ### **Tabbed Interface**
+
 - Overview tab: Key details, funding, deadline, location, eligibility
 - Details tab: Requirements and benefits with animated lists
 - Smooth tab switching with animated indicator
 - AnimatePresence for smooth content transitions
 
 ### **Interactive Elements**
+
 - Hover effects on detail cards (shadow + scale)
 - Numbered requirement steps with circular badges
 - Benefits with checkmark icons
@@ -534,6 +537,7 @@ The `scholarship-modal-enhanced.tsx` component elevates the opportunity details 
 - Smooth button hover/tap animations
 
 ### **Accessibility & Responsiveness**
+
 - Full keyboard navigation support
 - Semantic HTML structure
 - Dark mode compatible
@@ -541,6 +545,7 @@ The `scholarship-modal-enhanced.tsx` component elevates the opportunity details 
 - ARIA-compliant dialog
 
 ### **Color-Coded Details**
+
 - 💰 **Funding**: Blue gradient background
 - 📅 **Deadline**: Amber gradient background
 - 📍 **Location**: Purple gradient background
