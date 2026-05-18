@@ -250,7 +250,11 @@ const Footer = () => {
                     {section.title === "Contact" ? (
                       <motion.div
                         whileHover={{ scale: 1.05, y: -2 }}
-                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 300,
+                          damping: 20,
+                        }}
                       >
                         <Link
                           href={link.href}
@@ -259,7 +263,11 @@ const Footer = () => {
                           {link.icon && (
                             <motion.div
                               whileHover={{ rotate: 12, scale: 1.15 }}
-                              transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                              transition={{
+                                type: "spring",
+                                stiffness: 400,
+                                damping: 15,
+                              }}
                             >
                               <link.icon
                                 size={20}
