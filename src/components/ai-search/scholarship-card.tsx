@@ -27,17 +27,16 @@ export function ScholarshipCard({
 
   return (
     <motion.div
+      layout
       layoutId={cardId}
       animate={{
         opacity: isSelected ? 0 : 1,
-        scale: isSelected ? 0.95 : 1,
       }}
       transition={{
         type: "spring",
         stiffness: 400,
         damping: 26,
         mass: 0.5,
-        delay: isSelected ? 0 : 0.15,
       }}
       onClick={() => onViewDetails(result)}
       onKeyDown={(e) => {

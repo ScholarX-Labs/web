@@ -321,11 +321,15 @@ export function SearchResults({
         )}
       </motion.div>
 
-      <ScholarshipModal
-        result={selectedResult}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      />
+      <AnimatePresence>
+        {isModalOpen && (
+          <ScholarshipModal
+            result={selectedResult}
+            isOpen={true}
+            onClose={() => setIsModalOpen(false)}
+          />
+        )}
+      </AnimatePresence>
     </div>
     </LayoutGroup>
   );

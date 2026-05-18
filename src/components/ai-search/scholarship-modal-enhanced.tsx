@@ -95,7 +95,7 @@ export function ScholarshipModal({
 
   return (
     <Dialog open={dialogOpen} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="p-0 border-0 bg-transparent shadow-none w-[80vw] max-w-none sm:max-w-none h-[90vh] overflow-hidden rounded-[2rem] data-open:animate-none">
+      <DialogContent className="p-0 border-0 bg-transparent shadow-none w-[80vw] max-w-none sm:max-w-none h-[90vh] overflow-hidden rounded-[2rem] data-open:animate-none data-closed:animate-none">
         <DialogHeader className="hidden">
           <DialogTitle className="sr-only">{result.title}</DialogTitle>
         </DialogHeader>
@@ -105,6 +105,7 @@ export function ScholarshipModal({
 
         {/* Premium glass background with 2-column sidebar layout */}
         <motion.div
+          layout
           layoutId={cardId}
           variants={modalVariants}
           initial="hidden"
@@ -257,7 +258,12 @@ layoutId="eligibility-section"
           </div>
 
           {/* Sticky Sidebar (Right) - Data Visualization & Actions */}
-          <div className="w-full lg:w-[420px] bg-slate-50/80 dark:bg-slate-900/80 border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-800 flex flex-col h-auto lg:h-full lg:overflow-y-auto">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1, transition: { delay: 0.2 } }}
+            exit={{ opacity: 0, transition: { duration: 0.1 } }}
+            className="w-full lg:w-[420px] bg-slate-50/80 dark:bg-slate-900/80 border-t lg:border-t-0 lg:border-l border-white/40 dark:border-white/10 lg:rounded-r-[2rem] flex flex-col h-auto lg:h-full lg:overflow-y-auto"
+          >
             <motion.div
               variants={contentVariants}
               initial="hidden"
@@ -404,7 +410,7 @@ layoutId="eligibility-section"
                 </motion.button>
               </motion.div>
             </motion.div>
-          </div>
+          </motion.div>
         </motion.div>
       </DialogContent>
     </Dialog>
