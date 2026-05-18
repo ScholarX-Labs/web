@@ -3,10 +3,12 @@
 import { SearchResult } from "@/lib/ai-search/types";
 import { Badge } from "@/components/ai-search/ui/badge";
 import { Calendar, DollarSign, ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
 
 interface ScholarshipCardProps {
   result: SearchResult;
   onViewDetails: (result: SearchResult) => void;
+  isSelected?: boolean;
 }
 
 function getCategory(result: SearchResult): string | null {
@@ -18,11 +20,21 @@ function getCategory(result: SearchResult): string | null {
 export function ScholarshipCard({
   result,
   onViewDetails,
+  isSelected,
 }: ScholarshipCardProps) {
   const category = getCategory(result);
+  const cardId = `scholarship-card-${result.id}`;
 
   return (
-    <div
+    <motion.div
+      layout
+      layoutId={cardId}
+      transition={{
+        type: "spring",
+        stiffness: 400,
+        damping: 35,
+        mass: 0.8,
+      }}
       onClick={() => onViewDetails(result)}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -32,7 +44,9 @@ export function ScholarshipCard({
       }}
       role="button"
       tabIndex={0}
-      className="bg-white rounded-xl border border-gray-200 flex flex-col h-full min-h-[280px] overflow-hidden hover:shadow-md hover:cursor-pointer transition-all duration-200 hover:-translate-y-0.5"
+      className={`bg-white rounded-xl border border-gray-200 flex flex-col h-full min-h-[280px] overflow-hidden hover:shadow-md hover:cursor-pointer transition-all duration-200 hover:-translate-y-0.5 ${
+        isSelected ? "opacity-0 pointer-events-none" : ""
+      }`}
     >
       {/* Top: category badge + match % */}
       <div className="flex items-start justify-between px-5 pt-5 pb-3">
@@ -69,9 +83,12 @@ export function ScholarshipCard({
       {/* Content */}
       <div className="px-5 flex-1 flex flex-col gap-3">
         <div>
-          <h3 className="font-bold text-base text-foreground leading-snug mb-1.5">
+          <motion.h3
+            layoutId={`${cardId}-title`}
+            className="font-bold text-base text-foreground leading-snug mb-1.5"
+          >
             {result.title}
-          </h3>
+          </motion.h3>
           <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
             {result.description}
           </p>
@@ -111,6 +128,6 @@ export function ScholarshipCard({
           <ArrowRight className="size-4" />
         </button>
       </div>
-    </div>
+    </motion.div>
   );
 }
