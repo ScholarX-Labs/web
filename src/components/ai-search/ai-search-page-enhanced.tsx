@@ -31,9 +31,9 @@ function EnhancedAISearchPageInner() {
   const resultsRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
 
-  const { data: results = [], isLoading, isFetching } = useSearch(activeQuery);
+  const { data: results = [], isLoading, isFetching } = useSearch(queryParam);
 
-  const hasSearched = activeQuery.trim().length > 0;
+  const hasSearched = queryParam.trim().length > 0;
   const loading = isLoading || isFetching;
 
   // Smooth scroll to results when a new search happens
@@ -47,13 +47,7 @@ function EnhancedAISearchPageInner() {
       }, 100);
       return () => clearTimeout(timer);
     }
-  }, [activeQuery, hasSearched]);
-
-  useEffect(() => {
-    if (queryParam !== activeQuery) {
-      setActiveQuery(queryParam);
-    }
-  }, [queryParam, activeQuery]);
+  }, [queryParam, hasSearched]);
 
   function handleSearch(query: string) {
     const trimmed = query.trim();
