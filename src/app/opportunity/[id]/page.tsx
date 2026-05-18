@@ -45,10 +45,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function OpportunityPage({
-  params,
-  searchParams,
-}: Props) {
+export default async function OpportunityPage({ params, searchParams }: Props) {
   const { id } = await params;
   const { lang } = (await searchParams) ?? {};
   const normalizedLang = normalizeLang(lang);
