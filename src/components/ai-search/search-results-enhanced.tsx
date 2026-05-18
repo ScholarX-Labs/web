@@ -7,7 +7,7 @@ import { ScholarshipCard } from "./scholarship-card";
 import { ScholarshipModal } from "./scholarship-modal-enhanced";
 import { Skeleton } from "@/components/ai-search/ui/skeleton";
 import { Button } from "@/components/ai-search/ui/button";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import {
   resultsContainerVariants,
   cardVariants,
@@ -106,6 +106,7 @@ export function SearchResults({
   const hasNoResults = !isLoading && results.length === 0;
 
   return (
+    <LayoutGroup>
     <div className="relative bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 min-h-screen">
       {/* Header with query heading + new search arrow */}
       <AnimatePresence>
@@ -265,6 +266,7 @@ export function SearchResults({
                 <ScholarshipCard
                   result={result}
                   onViewDetails={handleViewDetails}
+                  isSelected={selectedResult?.id === result.id && isModalOpen}
                 />
               </motion.div>
             ))}
@@ -297,7 +299,7 @@ export function SearchResults({
             animate="visible"
             className="flex flex-col items-center justify-center py-20 text-center"
           >
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-100 to-blue-100 dark:from-purple-900/20 dark:to-blue-900/20 flex items-center justify-center mb-6">
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-100 to-blue-100 dark:from-purple-900/20 dark:to-purple-900/20 flex items-center justify-center mb-6">
               <Filter className="w-10 h-10 text-muted-foreground/50" />
             </div>
             <h2 className="text-2xl font-bold text-foreground mb-2">
@@ -319,12 +321,12 @@ export function SearchResults({
         )}
       </motion.div>
 
-      {/* Modal */}
       <ScholarshipModal
         result={selectedResult}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       />
     </div>
+    </LayoutGroup>
   );
 }
