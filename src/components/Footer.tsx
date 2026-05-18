@@ -192,16 +192,20 @@ const Footer = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     className={cn(
-                      "flex items-center justify-center w-12 h-12 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 transition-all duration-300 shadow-sm [&_svg]:transition-all [&_svg]:duration-300",
-                      social.isGradient ? "hover:bg-gradient-to-br hover:from-purple-500 hover:via-pink-500 hover:to-orange-400 dark:hover:from-purple-400 dark:hover:via-pink-400 dark:hover:to-orange-300 hover:border-transparent hover:text-white dark:hover:text-white" : social.hoverColor,
-                      social.whiteOnHover ? "hover:text-white [&_svg:hover]:fill-white" : "hover:text-white dark:hover:text-white"
+                      "flex items-center justify-center w-12 h-12 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 transition-all duration-300 shadow-sm",
+                      social.isGradient
+                        ? "hover:bg-gradient-to-br hover:from-purple-500 hover:via-pink-500 hover:to-orange-400 dark:hover:from-purple-400 dark:hover:via-pink-400 dark:hover:to-orange-300 hover:border-transparent hover:text-white dark:hover:text-white"
+                        : social.hoverColor,
+                      social.whiteOnHover
+                        ? "hover:text-white"
+                        : "hover:text-white dark:hover:text-white",
                     )}
                     aria-label={social.name}
                   >
-                    <social.icon 
-                      size={22} 
+                    <social.icon
+                      size={22}
                       strokeWidth={1.5}
-                      className={social.whiteOnHover ? "group-hover:fill-white hover:fill-white" : ""}
+                      className={social.whiteOnHover ? "fill-current" : ""}
                     />
                   </a>
                 </MagneticButton>
