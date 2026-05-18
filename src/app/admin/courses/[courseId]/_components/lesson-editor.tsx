@@ -83,14 +83,18 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
 
   useEffect(() => {
     if (lesson) {
-      setFormData({
-        title: lesson.title || "",
-        description: lesson.description || "",
-        content: lesson.content || "",
-        videoUrl: lesson.videoUrl || "",
-        duration: lesson.duration || 1,
-        isPrivate: lesson.isPrivate ?? true,
-        status: lesson.status ?? "draft"
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setFormData((prev) => {
+        const nextData = {
+          title: lesson.title || "",
+          description: lesson.description || "",
+          content: lesson.content || "",
+          videoUrl: lesson.videoUrl || "",
+          duration: lesson.duration || 1,
+          isPrivate: lesson.isPrivate || false,
+          status: lesson.status || "draft"
+        };
+        return JSON.stringify(prev) === JSON.stringify(nextData) ? prev : nextData;
       });
     }
   }, [lesson]);
@@ -110,9 +114,13 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
         className: "rounded-[20px] bg-white/80 backdrop-blur-xl border-emerald-100 shadow-xl",
       });
       onClose();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Sync Error:", error);
-      toast.error("Synchronization failure: " + (error?.response?.data?.message || "Check log"));
+      const errorMessage =
+        error instanceof Error && "response" in error
+          ? (error as { response?: { data?: { message?: string } } }).response?.data?.message || error.message
+          : "Check log";
+      toast.error("Synchronization failure: " + errorMessage);
     }
   };
 
