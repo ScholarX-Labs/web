@@ -137,7 +137,7 @@ const Footer = () => {
 
       <div className="max-w-7xl mx-auto px-6 py-16 relative z-20">
         {/* Top: Stunning Animated Title */}
-        <div className="mb-20 flex justify-center items-center relative border-b border-zinc-100 dark:border-zinc-900 pb-16">
+        <div className="mb-12 flex justify-center items-center relative border-b border-zinc-100 dark:border-zinc-900 pb-12">
           <div className="absolute inset-0 flex justify-center">
             <motion.div
               animate={{
@@ -248,20 +248,30 @@ const Footer = () => {
                 {section.links.map((link) => (
                   <li key={link.name}>
                     {section.title === "Contact" ? (
-                      <Link
-                        href={link.href}
-                        className="group flex items-center gap-3 px-4 py-3 rounded-lg bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 hover:border-blue-300 dark:hover:border-blue-800/50 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-900"
+                      <motion.div
+                        whileHover={{ scale: 1.05, y: -2 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
                       >
-                        {link.icon && (
-                          <link.icon
-                            size={18}
-                            className="text-zinc-400 dark:text-zinc-600 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200 flex-shrink-0"
-                          />
-                        )}
-                        <span className="text-xs font-medium tracking-tight overflow-hidden text-ellipsis">
-                          {link.name}
-                        </span>
-                      </Link>
+                        <Link
+                          href={link.href}
+                          className="group flex items-center gap-3 px-5 py-4 rounded-xl bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/40 dark:to-cyan-950/40 border border-blue-200 dark:border-blue-800/60 text-zinc-600 dark:text-zinc-400 hover:from-blue-100 hover:to-cyan-100 dark:hover:from-blue-900/60 dark:hover:to-cyan-900/60 hover:border-blue-400 dark:hover:border-blue-600 hover:text-blue-700 dark:hover:text-blue-300 transition-all duration-300 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-900 shadow-sm hover:shadow-lg hover:shadow-blue-500/20 dark:hover:shadow-blue-500/10"
+                        >
+                          {link.icon && (
+                            <motion.div
+                              whileHover={{ rotate: 12, scale: 1.15 }}
+                              transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                            >
+                              <link.icon
+                                size={20}
+                                className="text-blue-500 dark:text-blue-400 group-hover:text-blue-600 dark:group-hover:text-blue-300 transition-colors duration-200 flex-shrink-0"
+                              />
+                            </motion.div>
+                          )}
+                          <span className="text-sm font-semibold tracking-tight overflow-hidden text-ellipsis">
+                            {link.name}
+                          </span>
+                        </Link>
+                      </motion.div>
                     ) : (
                       <Link
                         href={link.href}
