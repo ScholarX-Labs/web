@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { Suspense, useState, useRef, useEffect } from "react";
 import { SearchHero } from "@/components/ai-search/search-hero-enhanced";
 import { SearchResults } from "@/components/ai-search/search-results-enhanced";
 import { useSearch } from "@/hooks/ai-search/use-search";
 import { Rubik } from "next/font/google";
 import { motion } from "framer-motion";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const rubik = Rubik({
   subsets: ["latin"],
@@ -14,7 +15,18 @@ const rubik = Rubik({
 });
 
 export default function EnhancedAISearchPage() {
-  const [activeQuery, setActiveQuery] = useState("");
+  return (
+    <Suspense fallback={<div className="min-h-screen" />}>
+      <EnhancedAISearchPageInner />
+    </Suspense>
+  );
+}
+
+function EnhancedAISearchPageInner() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const queryParam = searchParams.get("q") ?? "";
+  const [activeQuery, setActiveQuery] = useState(queryParam);
 
   const resultsRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
@@ -37,8 +49,28 @@ export default function EnhancedAISearchPage() {
     }
   }, [activeQuery, hasSearched]);
 
+  useEffect(() => {
+    if (queryParam !== activeQuery) {
+      setActiveQuery(queryParam);
+    }
+  }, [queryParam, activeQuery]);
+
   function handleSearch(query: string) {
-    setActiveQuery(query);
+    const trimmed = query.trim();
+    setActiveQuery(trimmed);
+
+    const params = new URLSearchParams(searchParams.toString());
+    if (trimmed) {
+      params.set("q", trimmed);
+    } else {
+      params.delete("q");
+    }
+    params.delete("o");
+
+    const queryString = params.toString();
+    router.replace(queryString ? `?${queryString}` : "/ai-search", {
+      scroll: false,
+    });
   }
 
   function handleScrollToTop() {
