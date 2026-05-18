@@ -201,8 +201,8 @@ const Footer = () => {
         </div>
 
         {/* Middle: Links & Social */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-16 mb-16">
-          <div className="col-span-2 md:col-span-2 lg:col-span-2 flex flex-col items-center">
+        <div className="flex flex-wrap justify-between items-start gap-8 md:gap-12 lg:gap-16 mb-16">
+          <div className="w-full md:w-auto flex flex-col items-center">
             <Link
               href={ROUTES.HOME}
               className="inline-block mb-4 transition-transform hover:scale-105 cursor-pointer"
@@ -256,7 +256,7 @@ const Footer = () => {
           </div>
 
           {footerLinks.map((section, idx) => (
-            <div key={section.title}>
+            <div key={section.title} className="flex-1 min-w-[150px]">
               <h3 className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-[0.15em] mb-6">
                 {section.title}
               </h3>
@@ -373,7 +373,7 @@ const Footer = () => {
         </div>
 
         {/* Bottom: Credits & Meta */}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-10 border-t border-zinc-100 dark:border-zinc-900 pt-12">
+        <div className="flex flex-wrap justify-between items-center gap-6 md:gap-10 border-t border-zinc-100 dark:border-zinc-900 pt-12 w-full">
           <div className="flex flex-col md:flex-row items-center gap-4">
             <motion.div
               initial={{ opacity: 0, x: -10 }}
