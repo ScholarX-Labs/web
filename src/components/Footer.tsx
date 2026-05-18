@@ -68,7 +68,7 @@ const socialLinks = [
     name: "Facebook",
     icon: Facebook,
     href: "https://www.facebook.com/ScholarX.eg/",
-    hoverColor: "hover:bg-blue-500 dark:hover:bg-blue-400",
+    hoverColor: "hover:bg-blue-700 dark:hover:bg-blue-600",
     whiteOnHover: true,
   },
   {
