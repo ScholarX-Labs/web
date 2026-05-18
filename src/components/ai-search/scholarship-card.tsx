@@ -32,7 +32,7 @@ export function ScholarshipCard({
       }}
       role="button"
       tabIndex={0}
-      className="bg-white rounded-xl border border-gray-200 flex flex-col overflow-hidden hover:shadow-md hover:cursor-pointer transition-all duration-200 hover:-translate-y-0.5"
+      className="bg-white rounded-xl border border-gray-200 flex flex-col h-full min-h-[280px] overflow-hidden hover:shadow-md hover:cursor-pointer transition-all duration-200 hover:-translate-y-0.5"
     >
       {/* Top: category badge + match % */}
       <div className="flex items-start justify-between px-5 pt-5 pb-3">
