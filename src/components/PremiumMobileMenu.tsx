@@ -24,6 +24,7 @@ const navItems = [
   { label: "About us", href: ROUTES.ABOUT },
   { label: "Courses", href: ROUTES.COURSES },
   { label: "Opportunities", href: ROUTES.OPPORTUNITIES },
+  { label: "AI Search", href: ROUTES.AI_SEARCH },
   { label: "Contact us", href: ROUTES.CONTACT },
 ];
 

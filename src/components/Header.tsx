@@ -61,6 +61,12 @@ async function Header() {
           </Link>
           <Link
             className="text-black transition-colors duration-300 hover:text-primary"
+            href={ROUTES.AI_SEARCH}
+          >
+            AI Search
+          </Link>
+          <Link
+            className="text-black transition-colors duration-300 hover:text-primary"
             href={ROUTES.CONTACT}
           >
             Contact us
