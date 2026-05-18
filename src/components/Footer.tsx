@@ -1,22 +1,19 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, useInView } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Mail,
   Phone,
   ArrowUp,
-  Globe,
   Heart,
-  ExternalLink,
   Sun,
   Moon,
   Instagram,
   Facebook,
   Linkedin,
-  Twitter,
   ChevronRight,
 } from "lucide-react";
 import { ROUTES } from "@/lib/routes";
@@ -24,7 +21,18 @@ import { cn } from "@/lib/utils";
 
 const SCHOLARX_VERTICAL_LOGO = "/biglogo.png";
 
-const footerLinks = [
+type FooterLink = {
+  name: string;
+  href: string;
+  icon?: React.ComponentType<{ size?: number; className?: string }>;
+};
+
+type FooterSection = {
+  title: string;
+  links: FooterLink[];
+};
+
+const footerLinks: FooterSection[] = [
   {
     title: "Platform",
     links: [
@@ -121,6 +129,13 @@ const MagneticButton = ({
 const Footer = () => {
   const containerRef = useRef<HTMLElement>(null);
   const [copiedText, setCopiedText] = React.useState<string | null>(null);
+  const [pendingHref, setPendingHref] = React.useState<string | null>(null);
+
+  useEffect(() => {
+    if (pendingHref) {
+      window.location.href = pendingHref;
+    }
+  }, [pendingHref]);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -135,8 +150,7 @@ const Footer = () => {
       setCopiedText(type);
       setTimeout(() => setCopiedText(null), 2000);
     });
-    // Open the link (email or phone)
-    window.location.href = href;
+    setPendingHref(href);
   };
 
   return (
@@ -259,7 +273,7 @@ const Footer = () => {
           <div className="flex gap-1 md:gap-2 lg:gap-3 flex-1">
             {footerLinks
               .filter((s) => s.title !== "Contact")
-              .map((section, idx) => (
+              .map((section) => (
                 <div
                   key={section.title}
                   className="flex-1 min-w-[150px] rounded-xl bg-gradient-to-br from-zinc-50 to-zinc-100/50 dark:from-zinc-900/50 dark:to-zinc-800/30 border border-zinc-200 dark:border-zinc-800/60 p-6 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10 dark:hover:shadow-blue-500/5 hover:border-blue-300 dark:hover:border-blue-700/40"
