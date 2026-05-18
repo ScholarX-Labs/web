@@ -202,7 +202,7 @@ const Footer = () => {
 
         {/* Middle: Links & Social */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-12 mb-16">
-          <div className="col-span-2 md:col-span-2 lg:col-span-1 flex flex-col items-center">
+          <div className="col-span-2 md:col-span-2 lg:col-span-2 flex flex-col items-center">
             <Link
               href={ROUTES.HOME}
               className="inline-block mb-8 transition-transform hover:scale-105 cursor-pointer"
