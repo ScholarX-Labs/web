@@ -61,16 +61,20 @@ const socialLinks = [
     name: "LinkedIn",
     icon: Linkedin,
     href: "https://www.linkedin.com/company/scholarx0",
+    hoverColor: "hover:bg-blue-600 dark:hover:bg-blue-500",
   },
   {
     name: "Facebook",
     icon: Facebook,
     href: "https://www.facebook.com/ScholarX.eg/",
+    hoverColor: "hover:bg-blue-500 dark:hover:bg-blue-400",
   },
   {
     name: "Instagram",
     icon: Instagram,
     href: "https://www.instagram.com/scholarx.eg/",
+    hoverColor: "hover:bg-gradient-to-br hover:from-purple-500 hover:via-pink-500 hover:to-orange-400 dark:hover:from-purple-400 dark:hover:via-pink-400 dark:hover:to-orange-300",
+    isGradient: true,
   },
 ];
 
@@ -185,7 +189,11 @@ const Footer = () => {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center w-12 h-12 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-[#CA8A04] hover:text-white dark:hover:text-white transition-all duration-300 shadow-sm"
+                    className={cn(
+                      "flex items-center justify-center w-12 h-12 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 transition-all duration-300 shadow-sm",
+                      social.hoverColor,
+                      "hover:text-white dark:hover:text-white"
+                    )}
                     aria-label={social.name}
                   >
                     <social.icon size={22} strokeWidth={1.5} />
@@ -228,9 +236,17 @@ const Footer = () => {
         {/* Bottom: Credits & Meta */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-10 border-t border-zinc-100 dark:border-zinc-900 pt-10">
           <div className="flex flex-col md:flex-row items-center gap-6">
-            <span className="text-sm text-zinc-400 dark:text-zinc-500">
-              © {new Date().getFullYear()} ScholarX Inc.
-            </span>
+            <motion.div
+              initial={{ opacity: 0, x: -10 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+              className="relative px-4 py-2 rounded-full bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/30 dark:to-cyan-950/30 border border-blue-200 dark:border-blue-800/50 shadow-lg shadow-blue-500/10 dark:shadow-blue-500/5"
+            >
+              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-400/0 via-blue-400/10 to-cyan-400/0 dark:from-blue-500/0 dark:via-blue-500/5 dark:to-cyan-500/0 animate-pulse" />
+              <span className="relative text-sm font-semibold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-600 dark:from-blue-400 dark:to-cyan-400">
+                © {new Date().getFullYear()} ScholarX Inc.
+              </span>
+            </motion.div>
             <div className="hidden md:block w-1 h-1 bg-zinc-300 dark:bg-zinc-700 rounded-full" />
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
