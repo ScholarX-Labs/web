@@ -69,9 +69,7 @@ export function ScholarshipCard({
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.1 }}
             >
-              <Badge
-                className="text-[11px] font-semibold px-3 py-1 rounded-full h-auto bg-gradient-to-r from-scholar-blue/20 to-purple-500/10 border border-scholar-blue/30 text-scholar-blue"
-              >
+              <Badge className="text-[11px] font-semibold px-3 py-1 rounded-full h-auto bg-gradient-to-r from-scholar-blue/20 to-purple-500/10 border border-scholar-blue/30 text-scholar-blue">
                 {category}
               </Badge>
             </motion.div>
