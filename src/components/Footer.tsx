@@ -135,39 +135,9 @@ const Footer = () => {
       <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-orange-500/5 blur-[120px] rounded-full pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-6 py-28 relative z-20">
-        {/* Top: Premium Brand Statement & CTA */}
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-10 mb-24">
-          <div className="max-w-2xl">
-            <h2 className="text-5xl md:text-7xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 leading-[1.05] mb-6">
-              Master your future. <br />
-              <span className="text-blue-600 dark:text-blue-500">
-                Learning reimagined.
-              </span>
-            </h2>
-            <p className="text-xl text-zinc-500 dark:text-zinc-400 max-w-lg">
-              Unlock your potential with ScholarX. World-class education,
-              personalized mentorship, and a community that cares.
-            </p>
-          </div>
-
-          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-            <Link
-              href={ROUTES.COURSES}
-              className="group relative inline-flex items-center gap-3 px-10 py-5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-2xl font-semibold text-lg overflow-hidden transition-all hover:shadow-2xl hover:shadow-blue-500/20 hover:scale-105 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-900"
-            >
-              <span className="relative z-10">Start Learning Now</span>
-              <ChevronRight
-                size={22}
-                className="relative z-10 transition-transform group-hover:translate-x-1"
-              />
-              <div className="absolute inset-0 bg-[#CA8A04] translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
-            </Link>
-          </motion.div>
-        </div>
-
+      <div className="max-w-7xl mx-auto px-6 py-16 relative z-20">
         {/* Middle: Links & Social */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-14 mb-28 border-t border-zinc-100 dark:border-zinc-900 pt-20">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-12 mb-16 border-t border-zinc-100 dark:border-zinc-900 pt-16">
           <div className="col-span-2 lg:col-span-2 pr-10">
             <Link
               href={ROUTES.HOME}
@@ -181,11 +151,11 @@ const Footer = () => {
                 className="dark:invert opacity-90 hover:opacity-100 transition-opacity"
               />
             </Link>
-            <p className="text-lg text-zinc-500 dark:text-zinc-400 mb-8 leading-relaxed">
+            <p className="text-lg text-zinc-500 dark:text-zinc-400 mb-6 leading-relaxed">
               Empowering academic success through personalized support and
               mentorship
             </p>
-            <div className="flex gap-4">
+            <div className="flex gap-3">
               {socialLinks.map((social) => (
                 <MagneticButton key={social.name}>
                   <a
@@ -216,7 +186,7 @@ const Footer = () => {
 
           {footerLinks.map((section, idx) => (
             <div key={section.title}>
-              <h3 className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-[0.15em] mb-8">
+              <h3 className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-[0.15em] mb-6">
                 {section.title}
               </h3>
               <ul
@@ -266,9 +236,59 @@ const Footer = () => {
           ))}
         </div>
 
+        {/* Center: Stunning Animated Title */}
+        <div className="my-16 flex justify-center items-center relative">
+          <div className="absolute inset-0 flex justify-center">
+            <motion.div
+              animate={{ 
+                opacity: [0.3, 0.6, 0.3],
+                scale: [0.8, 1.1, 0.8]
+              }}
+              transition={{ 
+                duration: 4, 
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+              className="w-96 h-96 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 blur-3xl rounded-full pointer-events-none"
+            />
+          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="relative text-center px-8"
+          >
+            <motion.h2
+              animate={{ 
+                y: [0, -8, 0],
+              }}
+              transition={{ 
+                duration: 3,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+              className="text-3xl md:text-4xl font-bold tracking-tight"
+            >
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-600 dark:from-blue-400 dark:via-purple-400 dark:to-cyan-400">
+                Unlock your potential
+              </span>
+              <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-600 dark:from-cyan-400 dark:via-blue-400 dark:to-purple-400">
+                with ScholarX
+              </span>
+            </motion.h2>
+            <motion.div
+              initial={{ scaleX: 0 }}
+              whileInView={{ scaleX: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="h-1 w-24 bg-gradient-to-r from-blue-600 to-cyan-600 dark:from-blue-400 dark:to-cyan-400 mx-auto mt-4 rounded-full origin-center"
+            />
+          </motion.div>
+        </div>
+
         {/* Bottom: Credits & Meta */}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-10 border-t border-zinc-100 dark:border-zinc-900 pt-16">
-          <div className="flex flex-col md:flex-row items-center gap-6">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-10 border-t border-zinc-100 dark:border-zinc-900 pt-12">
+          <div className="flex flex-col md:flex-row items-center gap-4">
             <motion.div
               initial={{ opacity: 0, x: -10 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -309,7 +329,7 @@ const Footer = () => {
             </motion.div>
           </div>
 
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-6">
             <div className="relative group">
               <div className="flex items-center p-1 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-inner opacity-50 cursor-not-allowed">
                 <button
