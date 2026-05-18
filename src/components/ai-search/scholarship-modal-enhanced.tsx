@@ -148,9 +148,7 @@ export function ScholarshipModal({
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.05 + i * 0.05 }}
                 >
-                  <Badge
-                    className="text-xs font-semibold px-3 py-1.5 rounded-full border border-scholar-blue/20 bg-gradient-to-r from-scholar-blue/10 to-purple-500/10 text-scholar-blue dark:text-scholar-blue hover:from-scholar-blue/20 hover:to-purple-500/20 transition-all"
-                  >
+                  <Badge className="text-xs font-semibold px-3 py-1.5 rounded-full border border-scholar-blue/20 bg-gradient-to-r from-scholar-blue/10 to-purple-500/10 text-scholar-blue dark:text-scholar-blue hover:from-scholar-blue/20 hover:to-purple-500/20 transition-all">
                     {tag}
                   </Badge>
                 </motion.div>
