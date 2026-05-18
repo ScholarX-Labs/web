@@ -322,8 +322,8 @@ const Footer = () => {
                               )}
                             </motion.div>
                           )}
-                          <div className="flex flex-col gap-0.5">
-                            <span className="text-sm font-semibold tracking-tight overflow-hidden text-ellipsis">
+                          <div className="flex flex-col gap-0.5 min-w-0">
+                            <span className="text-sm font-semibold tracking-tight truncate">
                               {link.name}
                             </span>
                             {copiedText ===
