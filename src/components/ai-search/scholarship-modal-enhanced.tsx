@@ -18,6 +18,7 @@ import {
   Globe,
   BookOpen,
   Target,
+  Share2,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -92,6 +93,13 @@ export function ScholarshipModal({
   const allTags = result.tags ?? (category ? [category] : []);
   const hasRequirements = result.requirements && result.requirements.length > 0;
   const hasBenefits = result.benefits && result.benefits.length > 0;
+  const canShare = Boolean(result.id);
+
+  function handleCopyLink() {
+    if (!result.id || !navigator?.clipboard) return;
+    const shareUrl = `${window.location.origin}/opportunity/${result.id}`;
+    navigator.clipboard.writeText(shareUrl).catch(() => {});
+  }
 
   return (
     <Dialog open={dialogOpen} onOpenChange={(o) => !o && onClose()}>
@@ -125,10 +133,7 @@ export function ScholarshipModal({
               className="px-8 py-10 lg:px-14 lg:py-14 space-y-12"
             >
               {/* Header inside scrollable area */}
-              <motion.div
-                layoutId="modal-header"
-                className="relative z-10"
-              >
+              <motion.div layoutId="modal-header" className="relative z-10">
                 <motion.div
                   variants={itemVariants}
                   className="flex flex-wrap gap-2 mb-6"
@@ -166,7 +171,7 @@ export function ScholarshipModal({
               {/* Eligibility Section */}
               {result.eligibility && (
                 <motion.div
-layoutId="eligibility-section"
+                  layoutId="eligibility-section"
                   variants={itemVariants}
                   className="space-y-5"
                 >
@@ -258,7 +263,7 @@ layoutId="eligibility-section"
           </div>
 
           {/* Sticky Sidebar (Right) - Data Visualization & Actions */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1, transition: { delay: 0.2 } }}
             exit={{ opacity: 0, transition: { duration: 0.1 } }}
@@ -398,6 +403,18 @@ layoutId="eligibility-section"
                     Proceed to Application
                     <ExternalLink className="w-5 h-5 ml-1" />
                   </motion.a>
+                )}
+
+                {canShare && (
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handleCopyLink}
+                    className="w-full flex items-center justify-center gap-2 px-8 py-5 rounded-2xl font-bold text-lg border border-scholar-blue/30 text-scholar-blue hover:bg-scholar-blue/10 transition-all"
+                  >
+                    Copy Link
+                    <Share2 className="w-5 h-5" />
+                  </motion.button>
                 )}
 
                 <motion.button
