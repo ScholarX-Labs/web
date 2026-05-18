@@ -126,7 +126,11 @@ const Footer = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleCopyContact = (text: string, type: "email" | "phone", href: string) => {
+  const handleCopyContact = (
+    text: string,
+    type: "email" | "phone",
+    href: string,
+  ) => {
     navigator.clipboard.writeText(text).then(() => {
       setCopiedText(type);
       setTimeout(() => setCopiedText(null), 2000);
@@ -271,7 +275,7 @@ const Footer = () => {
                             handleCopyContact(
                               link.href.replace(/^(mailto:|tel:)/, ""),
                               link.href.includes("@") ? "email" : "phone",
-                              link.href
+                              link.href,
                             )
                           }
                           className="w-full text-left group flex items-center gap-3 px-5 py-4 rounded-xl bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/40 dark:to-cyan-950/40 border border-blue-200 dark:border-blue-800/60 text-zinc-600 dark:text-zinc-400 hover:from-blue-100 hover:to-cyan-100 dark:hover:from-blue-900/60 dark:hover:to-cyan-900/60 hover:border-blue-400 dark:hover:border-blue-600 hover:text-blue-700 dark:hover:text-blue-300 transition-all duration-300 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-900 shadow-sm hover:shadow-lg hover:shadow-blue-500/20 dark:hover:shadow-blue-500/10"
