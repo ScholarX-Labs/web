@@ -92,7 +92,12 @@ export default function AdminCourseDetailPage({ params }: { params: Promise<{ co
 
   useEffect(() => {
     if (lessonsData) {
-      setLessons(lessonsData as AdminLesson[]);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setLessons((prev) =>
+        JSON.stringify(prev) === JSON.stringify(lessonsData)
+          ? prev
+          : (lessonsData as AdminLesson[])
+      );
     }
   }, [lessonsData]);
 
