@@ -1,12 +1,11 @@
 "use client";
 
 import { useState, useLayoutEffect, useEffect } from "react";
-import { ArrowUp, ChevronDown, Filter, Loader2 } from "lucide-react";
+import { ArrowUp, Filter } from "lucide-react";
 import { SearchResult } from "@/lib/ai-search/types";
 import { ScholarshipCard } from "./scholarship-card";
 import { ScholarshipModal } from "./scholarship-modal-enhanced";
 import { Skeleton } from "@/components/ai-search/ui/skeleton";
-import { Button } from "@/components/ai-search/ui/button";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -94,22 +93,21 @@ export function SearchResults({
   }, [results]);
 
   useEffect(() => {
-    if (!opportunityIdFromUrl) {
-      if (isModalOpen) {
-        setIsModalOpen(false);
-        setSelectedResult(null);
-      }
-      return;
-    }
-
-    if (selectedResult?.id === opportunityIdFromUrl && isModalOpen) return;
-
+    if (!opportunityIdFromUrl) return;
     const match = results.find((r) => r.id === opportunityIdFromUrl);
-    if (match) {
+    if (match && (!selectedResult || selectedResult.id !== opportunityIdFromUrl)) {
       setSelectedResult(match);
       setIsModalOpen(true);
     }
-  }, [opportunityIdFromUrl, results, isModalOpen, selectedResult?.id]);
+  }, [opportunityIdFromUrl, results, selectedResult]);
+
+  useEffect(() => {
+    if (opportunityIdFromUrl) return;
+    if (isModalOpen) {
+      setIsModalOpen(false);
+      setSelectedResult(null);
+    }
+  }, [opportunityIdFromUrl, isModalOpen]);
 
   function handleViewDetails(result: SearchResult) {
     setSelectedResult(result);
