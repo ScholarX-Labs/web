@@ -219,7 +219,9 @@ export function SearchResults({
                             setSortBy(option as SortOption);
                             setShowSortMenu(false);
                           }}
-                          whileHover={{ backgroundColor: "rgba(51, 153, 204, 0.1)" }}
+                          whileHover={{
+                            backgroundColor: "rgba(51, 153, 204, 0.1)",
+                          }}
                           className={`w-full text-left px-4 py-3 text-sm font-medium transition-all ${
                             sortBy === option
                               ? "text-scholar-blue bg-scholar-blue/10"
