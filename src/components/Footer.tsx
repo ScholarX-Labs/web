@@ -415,7 +415,7 @@ const Footer = () => {
             </motion.div>
           </div>
 
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-6 ml-auto">
             <div className="relative group">
               <div className="flex items-center p-1 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-inner opacity-50 cursor-not-allowed">
                 <button
