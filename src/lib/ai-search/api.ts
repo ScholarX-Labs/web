@@ -1,7 +1,20 @@
 import { SearchResult, RawSearchResponse, RawSearchResult } from "./types";
 
 const SEARCH_API_URL = "https://scholarx-search-api.vercel.app/api/search";
+const SEARCH_API_BASE = "https://scholarx-search-api.vercel.app/api";
 const LIMIT_PER_REQUEST = 20;
+const SUPPORTED_LANGS = new Set(["en", "ar"]);
+
+interface RawSingleOpportunityResponse {
+  id: string;
+  data: RawOpportunity;
+}
+
+function normalizeLang(lang?: string): "en" | "ar" {
+  if (!lang) return "en";
+  const normalized = lang.toLowerCase();
+  return SUPPORTED_LANGS.has(normalized) ? (normalized as "en" | "ar") : "en";
+}
 
 function normalizeResult(raw: RawSearchResult): SearchResult | null {
   const opp = raw.opportunity;
@@ -124,4 +137,45 @@ export async function searchScholarships(
   return rawResults
     .map(normalizeResult)
     .filter((r): r is SearchResult => r !== null);
+}
+
+export async function getOpportunityById(
+  id: string,
+  lang?: string,
+): Promise<SearchResult | null> {
+  const normalizedLang = normalizeLang(lang);
+  const url = `${SEARCH_API_BASE}/opportunities/${encodeURIComponent(id)}?lang=${normalizedLang}`;
+  let response: Response;
+
+  try {
+    response = await fetch(url, {
+      next: { revalidate: 3600 },
+    });
+  } catch (error) {
+    console.error("getOpportunityById failed", {
+      id,
+      lang: normalizedLang,
+      error,
+    });
+    return null;
+  }
+
+  if (!response.ok) {
+    if (response.status >= 500) {
+      console.error("getOpportunityById upstream error", {
+        id,
+        lang: normalizedLang,
+        status: response.status,
+      });
+    }
+    return null;
+  }
+
+  const raw: RawSingleOpportunityResponse = await response.json();
+  const wrapped: RawSearchResult = {
+    id: raw.id,
+    opportunity: raw.data,
+  };
+
+  return normalizeResult(wrapped);
 }
