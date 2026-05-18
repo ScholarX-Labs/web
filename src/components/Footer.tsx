@@ -257,120 +257,131 @@ const Footer = () => {
 
           {/* Link columns with tight spacing */}
           <div className="flex gap-1 md:gap-2 lg:gap-3 flex-1">
-            {footerLinks.map((section, idx) => (
-              <div key={section.title} className="flex-1 min-w-[150px]">
-                <h3 className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-[0.15em] mb-6">
+            {footerLinks.filter(s => s.title !== "Contact").map((section, idx) => (
+              <div key={section.title} className="flex-1 min-w-[150px] rounded-xl bg-gradient-to-br from-zinc-50 to-zinc-100/50 dark:from-zinc-900/50 dark:to-zinc-800/30 border border-zinc-200 dark:border-zinc-800/60 p-6 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10 dark:hover:shadow-blue-500/5 hover:border-blue-300 dark:hover:border-blue-700/40">
+                <h3 className="text-xs font-bold text-transparent bg-clip-text bg-gradient-to-r from-zinc-600 to-zinc-400 dark:from-zinc-300 dark:to-zinc-500 uppercase tracking-[0.15em] mb-6 pb-3 border-b border-zinc-300 dark:border-zinc-700 transition-all duration-300 text-center">
                   {section.title}
                 </h3>
-                <ul
-                  className={cn(
-                    "space-y-4",
-                    section.title === "Contact" && "space-y-3",
-                  )}
-                >
+                <ul className="space-y-2">
                   {section.links.map((link) => (
                     <li key={link.name}>
-                      {section.title === "Contact" ? (
+                      <Link
+                        href={link.href}
+                        className="group flex items-center justify-center gap-2 text-zinc-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-300 transition-all duration-300 cursor-pointer px-3 py-2.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-950/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-900 text-center w-full"
+                      >
+                        <span className="text-sm font-medium tracking-tight relative overflow-hidden flex-1">
+                          {link.name}
+                        </span>
                         <motion.div
-                          whileHover={{ scale: 1.05, y: -2 }}
-                          transition={{
-                            type: "spring",
-                            stiffness: 300,
-                            damping: 20,
-                          }}
+                          initial={{ opacity: 0, x: -4 }}
+                          whileHover={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.3 }}
+                          className="flex-shrink-0"
                         >
-                          <button
-                            onClick={() =>
-                              handleCopyContact(
-                                link.href.replace(/^(mailto:|tel:)/, ""),
-                                link.href.includes("@") ? "email" : "phone",
-                                link.href,
-                              )
-                            }
-                            className="w-full text-left group flex items-center gap-3 px-5 py-4 rounded-xl bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/40 dark:to-cyan-950/40 border border-blue-200 dark:border-blue-800/60 text-zinc-600 dark:text-zinc-400 hover:from-blue-100 hover:to-cyan-100 dark:hover:from-blue-900/60 dark:hover:to-cyan-900/60 hover:border-blue-400 dark:hover:border-blue-600 hover:text-blue-700 dark:hover:text-blue-300 transition-all duration-300 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-900 shadow-sm hover:shadow-lg hover:shadow-blue-500/20 dark:hover:shadow-blue-500/10"
-                          >
-                            {link.icon && (
-                              <motion.div
-                                whileHover={{ rotate: 12, scale: 1.15 }}
-                                transition={{
-                                  type: "spring",
-                                  stiffness: 400,
-                                  damping: 15,
-                                }}
-                              >
-                                {copiedText ===
-                                (link.href.includes("@")
-                                  ? "email"
-                                  : "phone") ? (
-                                  <motion.div
-                                    key="checkmark"
-                                    initial={{ scale: 0, rotate: -180 }}
-                                    animate={{ scale: 1, rotate: 0 }}
-                                    transition={{
-                                      type: "spring",
-                                      stiffness: 500,
-                                      damping: 25,
-                                    }}
-                                  >
-                                    <div className="text-green-500 dark:text-green-400 flex-shrink-0">
-                                      <svg
-                                        width="20"
-                                        height="20"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="2"
-                                      >
-                                        <polyline points="20 6 9 17 4 12" />
-                                      </svg>
-                                    </div>
-                                  </motion.div>
-                                ) : (
-                                  <link.icon
-                                    size={20}
-                                    className="text-blue-500 dark:text-blue-400 group-hover:text-blue-600 dark:group-hover:text-blue-300 transition-colors duration-200 flex-shrink-0"
-                                  />
-                                )}
-                              </motion.div>
-                            )}
-                            <div className="flex flex-col gap-0.5 min-w-0">
-                              <span className="text-sm font-semibold tracking-tight truncate">
-                                {link.name}
-                              </span>
-                              {copiedText ===
-                                (link.href.includes("@")
-                                  ? "email"
-                                  : "phone") && (
-                                <motion.span
-                                  key="copied-text"
-                                  initial={{ opacity: 0, y: -2 }}
-                                  animate={{ opacity: 1, y: 0 }}
-                                  exit={{ opacity: 0, y: -2 }}
-                                  className="text-xs font-medium text-green-600 dark:text-green-400"
-                                >
-                                  Copied!
-                                </motion.span>
-                              )}
-                            </div>
-                          </button>
+                          <ChevronRight
+                            size={16}
+                            className="text-blue-500 dark:text-blue-400 group-hover:text-blue-600 dark:group-hover:text-blue-300 transition-colors duration-200"
+                          />
                         </motion.div>
-                      ) : (
-                        <Link
-                          href={link.href}
-                          className="group flex items-center gap-3 text-zinc-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-500 transition-all duration-200 cursor-pointer hover:scale-105 origin-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-900 rounded px-1 py-0.5"
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+
+            {/* Contact section - separate container */}
+            {footerLinks.filter(s => s.title === "Contact").map((section) => (
+              <div key={section.title} className="flex-1 min-w-[150px] rounded-xl bg-gradient-to-br from-blue-50 to-cyan-50/50 dark:from-blue-950/50 dark:to-cyan-900/30 border border-blue-200 dark:border-blue-800/60 p-6 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20 dark:hover:shadow-blue-500/10 hover:border-blue-400 dark:hover:border-blue-600/50">
+                <h3 className="text-xs font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-600 dark:from-blue-300 dark:to-cyan-400 uppercase tracking-[0.15em] mb-6 pb-3 border-b border-blue-300 dark:border-blue-700/60 transition-all duration-300 text-center">
+                  {section.title}
+                </h3>
+                <ul className="space-y-2.5">
+                  {section.links.map((link) => (
+                    <li key={link.name}>
+                      <motion.div
+                        whileHover={{ scale: 1.05, y: -2 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 300,
+                          damping: 20,
+                        }}
+                      >
+                        <button
+                          onClick={() =>
+                            handleCopyContact(
+                              link.href.replace(/^(mailto:|tel:)/, ""),
+                              link.href.includes("@") ? "email" : "phone",
+                              link.href,
+                            )
+                          }
+                          className="w-full text-center group flex items-center justify-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/40 dark:to-cyan-950/40 border border-blue-200 dark:border-blue-800/60 text-zinc-600 dark:text-zinc-400 hover:from-blue-100 hover:to-cyan-100 dark:hover:from-blue-900/50 dark:hover:to-cyan-900/50 hover:border-blue-400 dark:hover:border-blue-600 hover:text-blue-700 dark:hover:text-blue-300 transition-all duration-300 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-900 shadow-sm hover:shadow-md hover:shadow-blue-500/20 dark:hover:shadow-blue-500/10 hover:-translate-y-0.5"
                         >
                           {link.icon && (
-                            <link.icon
-                              size={18}
-                              className="text-zinc-400 dark:text-zinc-600 group-hover:text-blue-600 dark:group-hover:text-blue-500 transition-colors duration-200"
-                            />
+                            <motion.div
+                              whileHover={{ rotate: 12, scale: 1.15 }}
+                              transition={{
+                                type: "spring",
+                                stiffness: 400,
+                                damping: 15,
+                              }}
+                            >
+                              {copiedText ===
+                              (link.href.includes("@")
+                                ? "email"
+                                : "phone") ? (
+                                <motion.div
+                                  key="checkmark"
+                                  initial={{ scale: 0, rotate: -180 }}
+                                  animate={{ scale: 1, rotate: 0 }}
+                                  transition={{
+                                    type: "spring",
+                                    stiffness: 500,
+                                    damping: 25,
+                                  }}
+                                >
+                                  <div className="text-green-500 dark:text-green-400 flex-shrink-0">
+                                    <svg
+                                      width="20"
+                                      height="20"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      strokeWidth="2"
+                                    >
+                                      <polyline points="20 6 9 17 4 12" />
+                                    </svg>
+                                  </div>
+                                </motion.div>
+                              ) : (
+                                <link.icon
+                                  size={20}
+                                  className="text-blue-500 dark:text-blue-400 group-hover:text-blue-600 dark:group-hover:text-blue-300 transition-colors duration-200 flex-shrink-0"
+                                />
+                              )}
+                            </motion.div>
                           )}
-                          <span className="text-sm font-medium tracking-tight relative overflow-hidden">
-                            {link.name}
-                            <span className="absolute bottom-0 left-0 w-full h-px bg-blue-600 dark:bg-blue-500 translate-x-[-101%] group-hover:translate-x-0 transition-transform duration-300" />
-                          </span>
-                        </Link>
-                      )}
+                          <div className="flex flex-col gap-0.5 min-w-0 items-center text-center">
+                            <span className="text-sm font-semibold tracking-tight truncate">
+                              {link.name}
+                            </span>
+                            {copiedText ===
+                              (link.href.includes("@")
+                                ? "email"
+                                : "phone") && (
+                              <motion.span
+                                key="copied-text"
+                                initial={{ opacity: 0, y: -2 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -2 }}
+                                className="text-xs font-medium text-green-600 dark:text-green-400"
+                              >
+                                Copied!
+                              </motion.span>
+                            )}
+                          </div>
+                        </button>
+                      </motion.div>
                     </li>
                   ))}
                 </ul>
