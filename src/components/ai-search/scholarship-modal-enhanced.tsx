@@ -47,15 +47,6 @@ const modalVariants = {
       mass: 1,
     },
   },
-  exit: {
-    opacity: 0,
-    scale: 0.88,
-    y: 30,
-    transition: {
-      duration: 0.2,
-      type: "tween" as const,
-    },
-  },
 };
 
 const contentVariants = {
@@ -141,8 +132,15 @@ export function ScholarshipModal({
               className="px-8 py-10 lg:px-14 lg:py-14 space-y-12"
             >
               {/* Header inside scrollable area */}
-              <motion.div layout layoutId="modal-header" className="relative z-10">
-                <motion.div variants={itemVariants} className="flex flex-wrap gap-2 mb-6">
+              <motion.div
+                layout
+                layoutId="modal-header"
+                className="relative z-10"
+              >
+                <motion.div
+                  variants={itemVariants}
+                  className="flex flex-wrap gap-2 mb-6"
+                >
                   {allTags.map((tag, i) => (
                     <Badge
                       key={tag}
@@ -153,7 +151,7 @@ export function ScholarshipModal({
                   ))}
                 </motion.div>
 
-                <motion.h2 
+                <motion.h2
                   layoutId={`${cardId}-title`}
                   variants={itemVariants}
                   className="text-4xl md:text-5xl font-extrabold text-foreground leading-[1.1] tracking-tight mb-6 bg-clip-text text-transparent bg-gradient-to-br from-slate-900 to-slate-600 dark:from-white dark:to-slate-300"
@@ -162,7 +160,7 @@ export function ScholarshipModal({
                 </motion.h2>
 
                 {result.description && (
-                  <motion.p 
+                  <motion.p
                     variants={itemVariants}
                     className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-4xl"
                   >
@@ -274,7 +272,7 @@ export function ScholarshipModal({
 
           {/* Sticky Sidebar (Right) - Data Visualization & Actions */}
           <div className="w-full lg:w-[420px] bg-slate-50/80 dark:bg-slate-900/80 border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-800 flex flex-col h-auto lg:h-full lg:overflow-y-auto">
-            <motion.div 
+            <motion.div
               variants={contentVariants}
               initial="hidden"
               animate="visible"
@@ -396,7 +394,11 @@ export function ScholarshipModal({
               </div>
 
               {/* Actions Footer */}
-              <motion.div layout layoutId="modal-footer" className="mt-auto pt-6 space-y-3">
+              <motion.div
+                layout
+                layoutId="modal-footer"
+                className="mt-auto pt-6 space-y-3"
+              >
                 {result.url && (
                   <motion.a
                     whileHover={{ scale: 1.02 }}
@@ -410,7 +412,7 @@ export function ScholarshipModal({
                     <ExternalLink className="w-5 h-5 ml-1" />
                   </motion.a>
                 )}
-                
+
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
