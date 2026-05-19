@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Course, LessonSummary } from "@/types/course.types";
-import { CourseListQuery, CourseSearchQuery } from "@/domain/courses/contracts";
+import type {
+  CourseCategory,
+  CourseListQuery,
+  CourseSearchQuery,
+} from "@/domain/courses/contracts";
 import { PaginatedCoursesApiResponse } from "@/lib/api/courses.service";
 import {
   FlatCourseRecord,
@@ -136,6 +140,10 @@ export class NextCourseCatalogService {
       items: mapped,
       pagination: this.toPagination(totalCourses, page, limit),
     };
+  }
+
+  async listCategories(): Promise<CourseCategory[]> {
+    return this.repository.listActiveCategories();
   }
 
   getFeatured(query: CourseListQuery = {}, userId?: string) {
