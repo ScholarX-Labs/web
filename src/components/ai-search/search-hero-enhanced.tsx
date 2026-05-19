@@ -3,13 +3,14 @@
 import { useState, useRef, KeyboardEvent } from "react";
 import {
   ArrowRight,
-  Loader2,
   Sparkles,
   Zap,
   Globe,
   Target,
 } from "lucide-react";
 import { Textarea } from "@/components/ai-search/ui/textarea";
+import { SearchButtonLoader } from "@/components/ai-search/loading";
+import type { IndicatorConfig } from "@/components/ai-search/loading";
 import { motion } from "framer-motion";
 import {
   heroContainerVariants,
@@ -22,6 +23,7 @@ import {
 interface SearchHeroProps {
   onSearch: (query: string) => void;
   isLoading: boolean;
+  indicatorConfig: IndicatorConfig;
 }
 
 const SUGGESTION_CHIPS = [
@@ -39,7 +41,7 @@ const SUGGESTION_CHIPS = [
   },
 ];
 
-export function SearchHero({ onSearch, isLoading }: SearchHeroProps) {
+export function SearchHero({ onSearch, isLoading, indicatorConfig }: SearchHeroProps) {
   const [query, setQuery] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [isFocused, setIsFocused] = useState(false);
@@ -187,10 +189,7 @@ export function SearchHero({ onSearch, isLoading }: SearchHeroProps) {
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 group-hover:translate-x-full transition-transform duration-700" />
 
                 {isLoading ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    <span>Searching opportunities...</span>
-                  </>
+                  <SearchButtonLoader indicatorConfig={indicatorConfig} />
                 ) : (
                   <>
                     <span>Discover Opportunities</span>
