@@ -1,0 +1,36 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "nvidia-build/z-ai/glm-5.1",
+  "provider": {
+    "nvidia-build": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "NVIDIA Build NIM",
+      "options": {
+        "baseURL": "https://integrate.api.nvidia.com/v1"
+      },
+      "models": {
+        "z-ai/glm-5.1": {
+          "name": "GLM-5.1 Flagship Agent",
+          "reasoning": true,
+          "interleaved": {
+            "field": "reasoning_content"
+          },
+          "limit": {
+            "context": 200000,
+            "output": 16384
+          },
+          "options": {
+            "temperature": 1,
+            "topP": 1,
+            "extra_body": {
+              "chat_template_kwargs": {
+                "enable_thinking": true,
+                "clear_thinking": false
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
