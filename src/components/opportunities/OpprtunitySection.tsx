@@ -1,12 +1,14 @@
 "use client";
 
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
+import { ChevronLeft, ChevronRight, MoreHorizontal, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import OpportiuntyCard from "./OpportunityCard";
 import { Outfit } from "next/font/google";
 import { useOpportunitiesSearch as useOpportunitiesQuery } from "@/hooks/queries/useOpportunitiesSearch";
 import { Skeleton } from "@/components/ui/skeleton";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 const outfit = Outfit({ subsets: ["latin"] });
 
@@ -42,6 +44,16 @@ function generatePagination(currentPage: number, totalPages: number) {
   ];
 }
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
 function OpportunitySection() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -67,11 +79,11 @@ function OpportunitySection() {
 
   if (isLoading || isFetching) {
     return (
-      <div className="flex flex-col">
-        <div className="h-10 w-64 bg-gray-200 animate-pulse m-3 rounded-lg" />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
+      <div className="flex flex-col space-y-6 p-4 md:p-8">
+        <Skeleton className="h-12 w-64 rounded-xl" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {[...Array(6)].map((_, i) => (
-            <Skeleton key={i} className="h-100 w-full rounded-xl" />
+            <Skeleton key={i} className="h-[400px] w-full rounded-[24px]" />
           ))}
         </div>
       </div>
@@ -109,63 +121,100 @@ function OpportunitySection() {
   const pagesInfo = generatePagination(page, totalPages);
 
   return (
-    <div className="flex flex-col">
-      <h2 className={`text-3xl font-bold p-3 w-full ${outfit.className}`}>
-        {formattedTotal}{" "}
-        <span className="text-primary">Opportunities Found</span>
-      </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
-        {opportunities.map((item) => (
-          <OpportiuntyCard key={item.id} Opportunity={item} />
-        ))}
-      </div>
+    <div className="flex flex-col p-4 md:p-8 space-y-8">
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <h2 className={`text-4xl font-extrabold tracking-tight ${outfit.className}`}>
+          {formattedTotal}{" "}
+          <span className="text-primary bg-primary/10 px-4 py-1 rounded-2xl">
+            Opportunities Found
+          </span>
+        </h2>
+      </motion.div>
+
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+      >
+        <AnimatePresence mode="popLayout">
+          {opportunities.map((item) => (
+            <OpportiuntyCard key={item.id} Opportunity={item} />
+          ))}
+        </AnimatePresence>
+      </motion.div>
 
       {opportunities.length === 0 && (
-        <div className="flex flex-col items-center justify-center p-20 text-gray-500">
-          <h3 className="text-xl font-semibold">No opportunities found</h3>
-          <p>Try adjusting your search query or filters.</p>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="flex flex-col items-center justify-center py-32 text-slate-400 space-y-4"
+        >
+          <div className="p-6 bg-slate-100 dark:bg-slate-800 rounded-full">
+             <Search size={48} />
+          </div>
+          <div className="text-center">
+            <h3 className="text-2xl font-bold text-slate-900 dark:text-white">No opportunities found</h3>
+            <p>Try adjusting your search query or filters.</p>
+          </div>
+        </motion.div>
       )}
 
       {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-2 mt-8 mb-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="flex justify-center items-center gap-3 mt-12 pb-12"
+        >
           <Button
             variant="outline"
             size="icon"
             onClick={() => handlePageChange(page - 1)}
             disabled={page <= 1}
-            className="hover:cursor-pointer"
+            className="rounded-xl h-12 w-12 hover:bg-primary/5 hover:text-primary transition-colors cursor-pointer"
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-5 w-5" />
           </Button>
 
-          {pagesInfo.map((p, i) =>
-            p === "..." ? (
-              <span key={`ellipsis-${i}`} className="px-2 text-gray-400">
-                <MoreHorizontal className="h-5 w-5" />
-              </span>
-            ) : (
-              <Button
-                key={p}
-                variant={page === p ? "default" : "outline"}
-                className="w-10 hover:cursor-pointer"
-                onClick={() => handlePageChange(Number(p))}
-              >
-                {p}
-              </Button>
-            ),
-          )}
+          <div className="flex items-center gap-2">
+            {pagesInfo.map((p, i) =>
+              p === "..." ? (
+                <span key={`ellipsis-${i}`} className="px-2 text-slate-300">
+                  <MoreHorizontal className="h-5 w-5" />
+                </span>
+              ) : (
+                <Button
+                  key={p}
+                  variant={page === p ? "default" : "outline"}
+                  className={cn(
+                    "h-12 w-12 rounded-xl font-bold transition-all cursor-pointer",
+                    page === p 
+                      ? "shadow-lg shadow-primary/20 scale-110" 
+                      : "hover:bg-primary/5 hover:text-primary"
+                  )}
+                  onClick={() => handlePageChange(Number(p))}
+                >
+                  {p}
+                </Button>
+              ),
+            )}
+          </div>
 
           <Button
             variant="outline"
             size="icon"
             onClick={() => handlePageChange(page + 1)}
             disabled={page >= totalPages}
-            className="hover:cursor-pointer"
+            className="rounded-xl h-12 w-12 hover:bg-primary/5 hover:text-primary transition-colors cursor-pointer"
           >
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-5 w-5" />
           </Button>
-        </div>
+        </motion.div>
       )}
     </div>
   );
