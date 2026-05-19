@@ -38,7 +38,7 @@ function EnhancedAISearchPageInner() {
   const loading = isLoading || isFetching;
 
   // ★ SINGLE SOURCE OF TRUTH — useStageTimeline called exactly once
-  const { currentStage, stageIndex, progress } = useStageTimeline(loading);
+  const { currentStage, progress } = useStageTimeline(loading);
 
   // Smooth scroll to results when a new search happens
   useEffect(() => {
