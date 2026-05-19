@@ -5,13 +5,14 @@ import { usePathname } from "next/navigation";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import { useRef, useState } from "react";
 import Image from "next/image";
-import { User } from "lucide-react";
+import { ArrowRight, LogIn, User } from "lucide-react";
 import PremiumMobileMenu from "@/components/PremiumMobileMenu";
 import HamburgerIcon from "@/components/HamburgerIcon";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import { useScrollDirection } from "@/hooks/use-scroll-direction";
 import SignoutButton from "@/app/auth/_components/SignoutButton";
+import { Button } from "@/components/ui/button";
 
 const SCHOLARX_HORIZONTAL_LOGO =
   "/ScholarX-Logo-horizontal-Blue-Solid-Small_ScholarX.png";
@@ -80,16 +81,21 @@ function AuthButtons({ isLoggedIn }: { isLoggedIn: boolean }) {
     <div className="hidden lg:flex items-center gap-3">
       <Link
         href={ROUTES.SIGNIN}
-        className="px-4 py-2 rounded-full text-sm font-medium text-foreground/70 border border-border/50 hover:border-foreground/20 hover:text-foreground transition-all duration-200 active:scale-[0.97]"
+        className="group inline-flex h-10 items-center gap-2 rounded-full border border-[var(--color-hero-blue)]/15 bg-white/75 px-4 text-sm font-semibold text-[var(--color-hero-heading)] shadow-sm backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--color-hero-blue)]/30 hover:bg-[var(--color-hero-blue)]/6 hover:text-[var(--color-hero-blue)] hover:shadow-[0_16px_32px_-24px_rgba(51,153,204,0.75)]"
       >
+        <LogIn className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
         Log in
       </Link>
-      <Link
-        href={ROUTES.SIGNUP}
-        className="px-5 py-2 rounded-full text-sm font-medium bg-primary text-primary-foreground hover:opacity-90 transition-all duration-200 active:scale-[0.97]"
+      <Button
+        asChild
+        size="sm"
+        className="group h-10 rounded-full bg-[linear-gradient(135deg,var(--color-hero-blue)_0%,#2563eb_60%,var(--color-hero-orange)_100%)] px-5 text-sm font-semibold text-white shadow-[0_18px_36px_-18px_rgba(51,153,204,0.9)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_22px_44px_-20px_rgba(51,153,204,1)]"
       >
-        Sign up
-      </Link>
+        <Link href={ROUTES.SIGNUP}>
+          Sign up
+          <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+        </Link>
+      </Button>
     </div>
   );
 }
