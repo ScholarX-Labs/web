@@ -14,7 +14,7 @@
     "db:fix-schema": "node scripts/fix-auth-schema.js",
     "db:generate": "pnpm db:fix-schema && drizzle-kit generate",
     "db:push": "drizzle-kit push",
-    "db:migrate": "drizzle-kit migrate",
+    "db:migrate": "node scripts/baseline-drizzle-migrations.mjs && drizzle-kit migrate",
     "build:cloudflare": "opennextjs-cloudflare build",
     "preview:cloudflare": "opennextjs-cloudflare preview",
     "deploy:cloudflare": "opennextjs-cloudflare deploy"
