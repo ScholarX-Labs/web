@@ -4,31 +4,46 @@ import { useMemo } from "react";
 import { useUiStore } from "@/stores/ui.store";
 import { CourseGrid } from "./course-grid";
 import { LatestCourseCard } from "./latest-course-card";
-import { Course } from "@/types/course.types";
+import type { Course } from "@/types/course.types";
 import { CourseDetailSurfacePortal } from "./course-detail-surface-portal";
+import type { CourseCategory } from "@/domain/courses";
 
-// Maps hero filter pill labels to course category/level values
-const FILTER_MAP: Record<string, (course: Course) => boolean> = {
+const normalizedIncludes = (
+  value: string | null | undefined,
+  needle: string,
+) => (value ?? "").toLowerCase().includes(needle.toLowerCase());
+
+const STATIC_FILTER_MAP: Record<string, (course: Course) => boolean> = {
   "Career Preparation": (c) =>
-    ["Engineering", "Backend", "Systems", "Development"].includes(c.category ?? ""),
+    [c.category, c.level, ...(c.tags ?? [])].some((value) =>
+      normalizedIncludes(value, "career"),
+    ),
   "Skill Development": (c) =>
-    ["Design", "Engineering", "Backend", "Systems", "Development"].includes(c.category ?? ""),
+    [c.category, c.level, ...(c.tags ?? [])].some((value) =>
+      normalizedIncludes(value, "skill"),
+    ),
   "Free / Paid": (c) => (c.price ?? 0) === 0,
-  "Online / In-Person": () => true, // all are online; included for future use
-  "International Opportunities": () => true, // informational tag
-  "Engineering": (c) => (c.category ?? "") === "Engineering",
-  "Design": (c) => (c.category ?? "") === "Design",
-  "Backend": (c) => (c.category ?? "") === "Backend",
-  "Systems": (c) => (c.category ?? "") === "Systems",
-  "Development": (c) => (c.category ?? "") === "Development",
+  "Online / In-Person": () => true,
+  "International Opportunities": (c) =>
+    [c.category, c.description, ...(c.tags ?? [])].some((value) =>
+      normalizedIncludes(value, "international"),
+    ),
 };
 
 interface CoursesFilterSectionProps {
   courses: Course[];
+  categories: CourseCategory[];
 }
 
-export function CoursesFilterSection({ courses }: CoursesFilterSectionProps) {
+export function CoursesFilterSection({
+  courses,
+  categories,
+}: CoursesFilterSectionProps) {
   const { courseSearch, activeCourseFilters } = useUiStore();
+  const categoryNames = useMemo(
+    () => new Set(categories.map((category) => category.name)),
+    [categories],
+  );
 
   const filtered = useMemo(() => {
     let result = courses ?? [];
@@ -46,12 +61,15 @@ export function CoursesFilterSection({ courses }: CoursesFilterSectionProps) {
 
     if (activeCourseFilters.length > 0) {
       result = result.filter((c) =>
-        activeCourseFilters.every((tag) => FILTER_MAP[tag]?.(c) ?? true),
+        activeCourseFilters.every((tag) => {
+          if (categoryNames.has(tag)) return (c.category ?? "") === tag;
+          return STATIC_FILTER_MAP[tag]?.(c) ?? true;
+        }),
       );
     }
 
     return result;
-  }, [courses, courseSearch, activeCourseFilters]);
+  }, [courses, courseSearch, activeCourseFilters, categoryNames]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-12 w-full">
