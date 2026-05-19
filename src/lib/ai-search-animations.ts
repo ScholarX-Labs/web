@@ -203,3 +203,106 @@ export const pageTransitionVariants: Variants = {
     transition: { duration: 0.3 },
   },
 };
+
+// =====================================================
+// LOADING STATE ANIMATIONS
+// =====================================================
+
+// Orb base variants — used by AIThinkingOrb via AnimatePresence
+export const orbContainerVariants: Variants = {
+  initial: { opacity: 0, scale: 0.8 },
+  animate: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.5, ease: [0.23, 1, 0.32, 1] },
+  },
+  exit: {
+    opacity: 0,
+    scale: 0,
+    transition: { duration: 0.4, ease: [0.23, 1, 0.32, 1] },
+  },
+};
+
+// Orb breathing pulse for THINKING stage
+export const orbPulseVariants: Variants = {
+  animate: {
+    scale: [1, 1.08, 1],
+    transition: {
+      duration: 3,
+      repeat: Infinity,
+      ease: "easeInOut",
+    },
+  },
+};
+
+// Orb morphing for REMODELING stage
+export const orbMorphVariants: Variants = {
+  animate: {
+    borderRadius: ["50%", "35%", "50%"],
+    scaleX: [1, 1.3, 1],
+    transition: {
+      duration: 3,
+      repeat: Infinity,
+      ease: "easeInOut",
+    },
+  },
+};
+
+// Stage text variants — cross-fade between stages
+export const stageTextVariants: Variants = {
+  initial: { opacity: 0, y: 6 },
+  animate: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.3, ease: [0.23, 1, 0.32, 1] },
+  },
+  exit: {
+    opacity: 0,
+    y: -6,
+    transition: { duration: 0.2 },
+  },
+};
+
+// Progress bar variants
+export const progressBarVariants: Variants = {
+  initial: { width: "0%" },
+  animate: (progress: number) => ({
+    width: `${progress * 100}%`,
+    transition: { duration: 0.8, ease: [0.23, 1, 0.32, 1] },
+  }),
+};
+
+// Shimmer card entrance + exit variants
+export const shimmerCardVariants: Variants = {
+  initial: { opacity: 0, y: 20 },
+  animate: (delay: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      delay,
+      ease: [0.23, 1, 0.32, 1],
+    },
+  }),
+  exit: {
+    opacity: 0,
+    y: -10,
+    transition: { duration: 0.3 },
+  },
+};
+
+// Sparkle burst for DONE stage particles
+export const sparkleBurstVariants: Variants = {
+  initial: { scale: 0, opacity: 1, x: 0, y: 0 },
+  animate: (angle: number) => {
+    const distance = 40;
+    const rad = (angle * Math.PI) / 180;
+    return {
+      scale: [0, 1.2, 0],
+      opacity: [1, 1, 0],
+      x: Math.cos(rad) * distance,
+      y: Math.sin(rad) * distance,
+      transition: { duration: 0.6, ease: [0.23, 1, 0.32, 1] },
+    };
+  },
+};
