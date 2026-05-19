@@ -5,9 +5,10 @@ import { ArrowUp, Filter } from "lucide-react";
 import { SearchResult } from "@/lib/ai-search/types";
 import { ScholarshipCard } from "./scholarship-card";
 import { ScholarshipModal } from "./scholarship-modal-enhanced";
-import { Skeleton } from "@/components/ai-search/ui/skeleton";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { useRouter, useSearchParams } from "next/navigation";
+import { LoadingStateOverlay } from "@/components/ai-search/loading";
+import type { StageConfig } from "@/components/ai-search/loading";
 import {
   resultsContainerVariants,
   cardVariants,
@@ -20,36 +21,14 @@ interface SearchResultsProps {
   results: SearchResult[];
   isLoading: boolean;
   onScrollToTop: () => void;
+  currentStage: StageConfig;
+  stageIndex: number;
+  progress: number;
 }
 
 type SortOption = "match" | "deadline";
 
 const PAGE_SIZE = 6;
-
-function CardSkeleton() {
-  return (
-    <motion.div
-      className="bg-gradient-to-br from-gray-100 to-gray-50 dark:from-slate-800 dark:to-slate-700 rounded-2xl border border-gray-200/50 dark:border-slate-700/50 p-6 flex flex-col gap-4"
-      animate={{
-        backgroundPosition: ["200% center", "-200% center"],
-      }}
-      transition={{
-        duration: 2,
-        repeat: Infinity,
-        ease: "linear",
-      }}
-    >
-      <div className="flex justify-between">
-        <Skeleton className="h-5 w-20 rounded-full" />
-        <Skeleton className="h-7 w-12" />
-      </div>
-      <Skeleton className="h-5 w-3/4" />
-      <Skeleton className="h-4 w-full" />
-      <Skeleton className="h-4 w-5/6" />
-      <Skeleton className="h-4 w-1/2" />
-    </motion.div>
-  );
-}
 
 function sortResults(
   results: SearchResult[],
@@ -75,6 +54,9 @@ export function SearchResults({
   results,
   isLoading,
   onScrollToTop,
+  currentStage,
+  stageIndex,
+  progress,
 }: SearchResultsProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -283,18 +265,16 @@ export function SearchResults({
             </motion.div>
           )}
 
-          {/* Loading state */}
-          {isLoading && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-            >
-              {Array.from({ length: 6 }).map((_, i) => (
-                <CardSkeleton key={i} />
-              ))}
-            </motion.div>
-          )}
+          {/* Loading state — driven by single source of truth stage props */}
+          <AnimatePresence>
+            {isLoading && (
+              <LoadingStateOverlay
+                isLoading={isLoading}
+                currentStage={currentStage}
+                progress={progress}
+              />
+            )}
+          </AnimatePresence>
 
           {/* Results Grid */}
           {hasResults && (
