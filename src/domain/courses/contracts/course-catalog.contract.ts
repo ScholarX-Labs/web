@@ -15,8 +15,16 @@ export interface CourseSearchQuery {
   token?: string;
 }
 
+export interface CourseCategory {
+  name: string;
+  slug: string;
+  iconKey: string;
+  courseCount: number;
+}
+
 export interface CourseCatalogGateway {
   list(query?: CourseListQuery): Promise<PaginatedCoursesApiResponse>;
+  listCategories(): Promise<CourseCategory[]>;
   getFeatured(
     query?: Omit<CourseListQuery, "category">,
   ): Promise<PaginatedCoursesApiResponse>;
