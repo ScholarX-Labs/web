@@ -15,16 +15,15 @@ function createDb() {
   // attempting TLS handshakes against local/dev Postgres instances.
   const parsedUrl = new url.URL(connectionString);
   const enableSsl = process.env.DATABASE_SSL?.toLowerCase() === "true";
-  if (enableSsl) {
-    const currentSslMode = parsedUrl.searchParams.get("sslmode");
-    if (
-      !currentSslMode ||
-      ["prefer", "require", "verify-ca"].includes(currentSslMode)
-    ) {
-      // Force verify-full to avoid deprecation warnings and ensure strict TLS validation.
-      // The 'pg' driver currently treats 'require' etc. as 'verify-full' but will change this in v9.
-      parsedUrl.searchParams.set("sslmode", "verify-full");
-    }
+  const currentSslMode = parsedUrl.searchParams.get("sslmode");
+  if (
+    (enableSsl && !currentSslMode) ||
+    (currentSslMode &&
+      ["prefer", "require", "verify-ca"].includes(currentSslMode))
+  ) {
+    // Force verify-full to avoid deprecation warnings and ensure strict TLS validation.
+    // The 'pg' driver currently treats 'require' etc. as 'verify-full' but will change this in v9.
+    parsedUrl.searchParams.set("sslmode", "verify-full");
   }
   const connectionStringWithSslMode = parsedUrl.toString();
 
