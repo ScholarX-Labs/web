@@ -1,7 +1,6 @@
 import { BotAvatar } from "@/components/ai-search/bot-avatar";
 import { OpportunityCard } from "@/components/ai-search/opportunity-card";
 import { AiChatMessage } from "@/components/ai-search/types";
-import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { LoadingStateOverlay, useStageTimeline } from "@/components/ai-search/loading";
 
