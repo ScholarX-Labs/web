@@ -14,18 +14,44 @@ const FUNDING_DISPLAY_NAME: Record<Funding, string> = {
 function OpportiuntyCard({ Opportunity }: { Opportunity: Opportunity }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [originRect, setOriginRect] = useState<DOMRect | null>(null);
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    const cardElement = e.currentTarget as HTMLElement;
+    const rect = cardElement.getBoundingClientRect();
+    setOriginRect(rect);
+    
+    cardElement.style.transition = "opacity 160ms ease-out";
+    cardElement.style.opacity = "0.3";
+    
+    setIsModalOpen(true);
+  };
+
+  const handleClose = () => {
+    const activeCard = document.querySelector(
+      `[data-opportunity-id="${Opportunity.id}"]`
+    ) as HTMLElement | null;
+    
+    if (activeCard) {
+      activeCard.style.transition = "opacity 160ms ease-in";
+      activeCard.style.opacity = "1";
+    }
+    
+    setIsModalOpen(false);
+  };
 
   return (
     <>
       <motion.div
         layout
+        data-opportunity-id={Opportunity.id}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95 }}
         whileHover={{ y: -8, transition: { duration: 0.2 } }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        onClick={() => setIsModalOpen(true)}
+        onClick={handleCardClick}
         className={cn(
           "relative flex flex-col gap-4 p-6 border border-border/40 rounded-[24px]",
           "bg-white/70 backdrop-blur-xl dark:bg-slate-900/70",
@@ -136,11 +162,16 @@ function OpportiuntyCard({ Opportunity }: { Opportunity: Opportunity }) {
           </div>
         </div>
       </motion.div>
-      <OpportunityModal
-        opportunity={Opportunity}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      />
+      <AnimatePresence>
+        {isModalOpen && (
+          <OpportunityModal
+            opportunity={Opportunity}
+            isOpen={isModalOpen}
+            originRect={originRect}
+            onClose={handleClose}
+          />
+        )}
+      </AnimatePresence>
     </>
   );
 }
