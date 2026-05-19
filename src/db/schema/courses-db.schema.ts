@@ -15,6 +15,32 @@ import { user as dbUsers } from "@/db/schema/auth-schema";
 
 export const coursesSchema = pgSchema("courses");
 
+export const dbCourseCategories = coursesSchema.table(
+  "course_categories",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    name: varchar("name", { length: 80 }).notNull(),
+    slug: varchar("slug", { length: 100 }).notNull(),
+    description: text("description"),
+    iconKey: varchar("icon_key", { length: 50 }).notNull().default("tag"),
+    sortOrder: integer("sort_order").notNull().default(0),
+    isActive: boolean("is_active").notNull().default(true),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    courseCategoriesNameUq: uniqueIndex("course_categories_name_uq").on(
+      table.name,
+    ),
+    courseCategoriesSlugUq: uniqueIndex("course_categories_slug_uq").on(
+      table.slug,
+    ),
+    courseCategoriesActiveSortIdx: index(
+      "course_categories_active_sort_idx",
+    ).on(table.isActive, table.sortOrder),
+  }),
+);
+
 export const dbCourses = coursesSchema.table("courses", {
   id: uuid("id").primaryKey(),
   slug: varchar("slug", { length: 255 }),
