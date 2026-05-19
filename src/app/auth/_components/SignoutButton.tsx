@@ -2,16 +2,20 @@
 
 import type { ComponentProps, MouseEvent } from "react";
 import { useRouter } from "next/navigation";
+import { LogOut } from "lucide-react";
 import { signOut } from "@/lib/auth-client";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-type SignoutButtonProps = ComponentProps<"button">;
+type SignoutButtonProps = Omit<ComponentProps<typeof Button>, "asChild">;
 
 function SignoutButton({
   className,
   children,
   onClick,
   type = "button",
+  variant = "outline",
+  size = "sm",
   ...props
 }: SignoutButtonProps) {
   const router = useRouter();
@@ -29,14 +33,21 @@ function SignoutButton({
   };
 
   return (
-    <button
+    <Button
       type={type}
+      variant={variant}
+      size={size}
       onClick={handleClick}
-      className={cn("hover:cursor-pointer", className)}
+      className={cn(className)}
       {...props}
     >
-      {children ?? "Logout"}
-    </button>
+      {children ?? (
+        <>
+          <LogOut className="h-4 w-4" />
+          Logout
+        </>
+      )}
+    </Button>
   );
 }
 
