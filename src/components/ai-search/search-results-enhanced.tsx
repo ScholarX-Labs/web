@@ -22,7 +22,6 @@ interface SearchResultsProps {
   isLoading: boolean;
   onScrollToTop: () => void;
   currentStage: StageConfig;
-  stageIndex: number;
   progress: number;
 }
 
@@ -55,7 +54,6 @@ export function SearchResults({
   isLoading,
   onScrollToTop,
   currentStage,
-  stageIndex,
   progress,
 }: SearchResultsProps) {
   const searchParams = useSearchParams();
