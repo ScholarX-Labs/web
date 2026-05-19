@@ -7,7 +7,9 @@ import {
   Calendar,
   CircleDashed,
   ArrowRight,
-  Check
+  Check,
+  Compass,
+  Sparkles,
 } from "lucide-react";
 
 // Hero Section
@@ -29,14 +31,14 @@ export const HERO_BUTTONS = [
     text: "Get Started",
     type: "primary",
     link: "/auth/signup",
-    icon: ArrowRight,
+    icon: Sparkles,
   },
   {
     id: "join",
     text: "Explore Courses",
     type: "secondary",
     link: "/courses",
-    icon: ArrowRight,
+    icon: Compass,
   },
 ];
 
