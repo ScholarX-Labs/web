@@ -211,14 +211,14 @@ export default function OpportunityModal({
         ref={sheetRef}
         className={cn(
           "relative w-full max-w-2xl overflow-hidden rounded-[32px] border border-white/30 bg-white/95 shadow-[0_48px_140px_rgba(15,23,42,0.4)] ring-1 ring-slate-100/80 dark:border-slate-800/70 dark:bg-slate-950/95 dark:ring-slate-800/80",
-          "max-h-full flex flex-col z-10"
+          "max-h-[min(850px,90vh)] flex flex-col z-10"
         )}
       >
-        <div className="flex flex-col max-h-full">
+        <div className="flex flex-col flex-1 min-h-0">
           {/* Header */}
           <motion.div 
             {...reveal(0)}
-            className="flex justify-between items-start p-8 pb-4"
+            className="flex justify-between items-start p-8 pb-4 flex-shrink-0"
           >
             <div className="p-0">
               <h2 className="text-3xl font-black text-slate-900 dark:text-white leading-tight">
@@ -235,8 +235,12 @@ export default function OpportunityModal({
           </motion.div>
 
           {/* Body */}
-          <div className="px-8 pb-8 overflow-y-auto custom-scrollbar flex flex-col gap-8">
-            {/* Badges and Quick Info */}
+          <div className="relative flex-1 min-h-0 flex flex-col">
+            {/* Top Fade Indicator */}
+            <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-white/95 dark:from-slate-950/95 to-transparent z-20 pointer-events-none" />
+            
+            <div className="flex-1 overflow-y-auto custom-scrollbar px-8 pb-8 flex flex-col gap-8 scroll-smooth">
+              {/* Badges and Quick Info */}
             <motion.div 
               {...reveal(1)}
               className="flex flex-wrap gap-4 text-sm bg-slate-50/50 dark:bg-slate-800/30 p-5 rounded-[24px] border border-slate-100 dark:border-slate-800/50"
@@ -415,13 +419,17 @@ export default function OpportunityModal({
             )}
           </div>
 
+            {/* Bottom Fade Indicator */}
+            <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white/95 dark:from-slate-950/95 to-transparent z-10 pointer-events-none" />
+          </div>
+
           {/* Footer */}
           <motion.div 
             {...reveal(5)}
-            className="p-8 border-t border-slate-100 dark:border-slate-800/50 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md"
+            className="p-8 border-t border-slate-100 dark:border-slate-800/50 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md flex-shrink-0"
           >
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-6">
-              <div className="flex-1">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-6 min-w-0">
+              <div className="flex-1 min-w-0">
                 <CopyButton url={opportunity.applicationLink} />
               </div>
               <motion.a
