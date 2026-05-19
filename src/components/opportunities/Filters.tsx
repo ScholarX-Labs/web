@@ -59,6 +59,10 @@ const FILTERS: FilterItem[] = [
   },
 ];
 
+import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
+import { Filter, RefreshCcw } from "lucide-react";
+
 export default function Filters() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -86,12 +90,10 @@ export default function Filters() {
   );
 
   const isChanged = () => {
-    // Check if any filter in the current draft state is different from what's in the URL
     for (const filter of FILTERS) {
       const draftValues = filters[filter.queryKey] || [];
       const appliedValues = searchParams.get(filter.queryKey)?.split(",") || [];
 
-      // Sort both to compare easily
       if (
         draftValues.length !== appliedValues.length ||
         !draftValues.every((v) => appliedValues.includes(v))
@@ -124,8 +126,12 @@ export default function Filters() {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
-      <div className="w-full grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 lg:max-w-full">
+    <motion.div 
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4"
+    >
+      <div className="w-full grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 lg:max-w-full">
         {FILTERS.map((filter) => (
           <SimpleDropdown
             key={filter.name}
@@ -139,37 +145,48 @@ export default function Filters() {
           />
         ))}
       </div>
-      <div className="w-full lg:w-auto flex flex-row justify-end gap-2">
-        <button
+      <div className="w-full lg:w-auto flex flex-row justify-end gap-3 shrink-0">
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
           onClick={handleApply}
           disabled={!isChanged()}
-          className="flex-1 lg:w-32 rounded-xl px-4 py-2 font-medium transition-all duration-200 bg-accent text-white hover:cursor-pointer hover:bg-accent/90 active:scale-[0.98] disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed disabled:active:scale-100"
+          className={cn(
+            "flex-1 lg:w-40 flex items-center justify-center gap-2 rounded-xl px-6 py-2.5 font-bold transition-all shadow-sm",
+            "bg-primary text-white hover:bg-primary/90 active:shadow-inner cursor-pointer",
+            "disabled:bg-slate-100 dark:disabled:bg-slate-800 disabled:text-slate-400 disabled:cursor-not-allowed disabled:shadow-none"
+          )}
         >
-          Apply filters
-        </button>
-        <button
+          <Filter size={18} />
+          <span>Apply</span>
+        </motion.button>
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
           onClick={() => {
-            clearFilters(); // Clear drafted filters in context
-
+            clearFilters();
             const params = new URLSearchParams(searchParams.toString());
             FILTERS.forEach((f) => params.delete(f.queryKey));
-
-            // Ensure the URL reflected the current draft searchQuery
             if (searchQuery.trim()) {
               params.set("q", searchQuery.trim());
             } else {
               params.delete("q");
             }
-
             params.set("page", "1");
             router.push(`${pathname}?${params.toString()}`);
           }}
           disabled={!hasAppliedSelection && !hasDraftSelection}
-          className="flex-1 lg:w-32 border-2 border-accent rounded-xl px-4 py-2 font-medium transition-all duration-200 bg-transparent text-accent hover:bg-accent/5 hover:cursor-pointer active:scale-[0.98] disabled:border-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:active:scale-100"
+          className={cn(
+            "flex-1 lg:w-32 flex items-center justify-center gap-2 border-2 rounded-xl px-4 py-2 font-bold transition-all",
+            "border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer",
+            "disabled:border-slate-100 dark:disabled:border-slate-800 disabled:text-slate-300 disabled:cursor-not-allowed"
+          )}
         >
-          Clear
-        </button>
+          <RefreshCcw size={18} className={cn((hasAppliedSelection || hasDraftSelection) && "animate-spin-once")} />
+          <span>Clear</span>
+        </motion.button>
       </div>
-    </div>
+    </motion.div>
   );
 }
+
