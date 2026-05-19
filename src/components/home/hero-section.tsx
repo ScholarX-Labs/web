@@ -6,7 +6,7 @@ import { HERO_CONTENT, HERO_BUTTONS } from "@/lib/home-data";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { ArrowRight, ShieldCheck, GraduationCap } from "lucide-react";
+import { ArrowRight, ShieldCheck, GraduationCap, UsersRound } from "lucide-react";
 
 export const HeroSection = memo(function HeroSection() {
   return (
@@ -98,16 +98,32 @@ export const HeroSection = memo(function HeroSection() {
           </div>
 
           {/* Trust Metrics */}
-          <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 text-sm font-medium text-muted-foreground lg:justify-start">
-            <div className="flex items-center gap-2">
-              <GraduationCap className="h-5 w-5 text-[var(--color-hero-orange)]" />
-              <span>
-                {HERO_CONTENT.stats.count}+ {HERO_CONTENT.stats.text}
+          <div className="mt-10 grid w-full max-w-[520px] grid-cols-1 gap-3 sm:grid-cols-2 lg:justify-start">
+            <div className="group/trust flex items-center gap-3 rounded-2xl border border-[var(--color-hero-blue)]/10 bg-white/75 px-4 py-3 text-left shadow-[0_14px_34px_-28px_rgba(26,43,73,0.65)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--color-hero-blue)]/25 hover:bg-white hover:shadow-[0_18px_42px_-30px_rgba(51,153,204,0.7)] motion-reduce:transform-none dark:bg-white/10 dark:hover:bg-white/15">
+              <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[var(--color-hero-orange)]/12 text-[var(--color-hero-orange)] ring-1 ring-[var(--color-hero-orange)]/15 transition-colors duration-300 group-hover/trust:bg-[var(--color-hero-orange)] group-hover/trust:text-white">
+                <UsersRound className="h-5 w-5" />
+              </span>
+              <span className="min-w-0">
+                <span className="block text-lg font-extrabold leading-none tracking-normal text-[var(--color-hero-heading)] dark:text-white">
+                  {HERO_CONTENT.stats.count}+
+                </span>
+                <span className="mt-1 block text-sm font-semibold leading-snug text-[var(--color-hero-body)] dark:text-white/70">
+                  students supported worldwide
+                </span>
               </span>
             </div>
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="h-5 w-5 text-[var(--color-hero-blue)]" />
-              <span>Trusted by 96 Partners</span>
+            <div className="group/trust flex items-center gap-3 rounded-2xl border border-[var(--color-hero-blue)]/10 bg-white/75 px-4 py-3 text-left shadow-[0_14px_34px_-28px_rgba(26,43,73,0.65)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--color-hero-blue)]/25 hover:bg-white hover:shadow-[0_18px_42px_-30px_rgba(51,153,204,0.7)] motion-reduce:transform-none dark:bg-white/10 dark:hover:bg-white/15">
+              <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[var(--color-hero-blue)]/12 text-[var(--color-hero-blue)] ring-1 ring-[var(--color-hero-blue)]/15 transition-colors duration-300 group-hover/trust:bg-[var(--color-hero-blue)] group-hover/trust:text-white">
+                <ShieldCheck className="h-5 w-5" />
+              </span>
+              <span className="min-w-0">
+                <span className="block text-lg font-extrabold leading-none tracking-normal text-[var(--color-hero-heading)] dark:text-white">
+                  96
+                </span>
+                <span className="mt-1 block text-sm font-semibold leading-snug text-[var(--color-hero-body)] dark:text-white/70">
+                  verified partner institutions
+                </span>
+              </span>
             </div>
           </div>
         </div>
