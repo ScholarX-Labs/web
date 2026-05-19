@@ -4,6 +4,7 @@ import { Suspense, useState, useRef, useEffect } from "react";
 import { SearchHero } from "@/components/ai-search/search-hero-enhanced";
 import { SearchResults } from "@/components/ai-search/search-results-enhanced";
 import { useSearch } from "@/hooks/ai-search/use-search";
+import { useStageTimeline } from "@/components/ai-search/loading";
 import { Rubik } from "next/font/google";
 import { motion } from "framer-motion";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -35,6 +36,9 @@ function EnhancedAISearchPageInner() {
 
   const hasSearched = queryParam.trim().length > 0;
   const loading = isLoading || isFetching;
+
+  // ★ SINGLE SOURCE OF TRUTH — useStageTimeline called exactly once
+  const { currentStage, stageIndex, progress } = useStageTimeline(loading);
 
   // Smooth scroll to results when a new search happens
   useEffect(() => {
@@ -80,7 +84,7 @@ function EnhancedAISearchPageInner() {
       >
         {/* Hero Section */}
         <div ref={heroRef}>
-          <SearchHero onSearch={handleSearch} isLoading={loading} />
+          <SearchHero onSearch={handleSearch} isLoading={loading} indicatorConfig={currentStage.indicator} />
         </div>
 
         {/* Results Section with smooth fade in/out */}
@@ -97,6 +101,9 @@ function EnhancedAISearchPageInner() {
               results={results}
               isLoading={loading}
               onScrollToTop={handleScrollToTop}
+              currentStage={currentStage}
+              stageIndex={stageIndex}
+              progress={progress}
             />
           )}
         </motion.div>
