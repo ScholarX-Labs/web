@@ -76,7 +76,6 @@ export function StreamingMessageSkeleton() {
         <LoadingStateOverlay
           isLoading={true}
           currentStage={currentStage}
-          stageIndex={stageIndex}
           progress={progress}
           cardCount={3}
         />
