@@ -10,7 +10,17 @@ import {
 } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { ArrowRight, LogIn, User } from "lucide-react";
+import {
+  ArrowRight,
+  Bot,
+  BookOpen,
+  Compass,
+  Home,
+  Info,
+  LogIn,
+  MessageCircle,
+  User,
+} from "lucide-react";
 import PremiumMobileMenu from "@/components/PremiumMobileMenu";
 import HamburgerIcon from "@/components/HamburgerIcon";
 import { ROUTES } from "@/lib/routes";
@@ -23,12 +33,12 @@ const SCHOLARX_HORIZONTAL_LOGO =
   "/ScholarX-Logo-horizontal-Blue-Solid-Small_ScholarX.png";
 
 const navItems = [
-  { label: "Home", href: ROUTES.HOME },
-  { label: "About us", href: ROUTES.ABOUT },
-  { label: "Courses", href: ROUTES.COURSES },
-  { label: "Opportunities", href: ROUTES.OPPORTUNITIES },
-  { label: "AI Search", href: ROUTES.AI_SEARCH },
-  { label: "Contact us", href: ROUTES.CONTACT },
+  { label: "Home", href: ROUTES.HOME, icon: Home },
+  { label: "About us", href: ROUTES.ABOUT, icon: Info },
+  { label: "Courses", href: ROUTES.COURSES, icon: BookOpen },
+  { label: "Opportunities", href: ROUTES.OPPORTUNITIES, icon: Compass },
+  { label: "AI Search", href: ROUTES.AI_SEARCH, icon: Bot },
+  { label: "Contact us", href: ROUTES.CONTACT, icon: MessageCircle },
 ];
 
 const EXPAND_SCROLL_THRESHOLD = 50;
@@ -123,6 +133,7 @@ function NavLinks({ isActive }: { isActive: (href: string) => boolean }) {
       onMouseLeave={handleMouseLeave}
     >
       {navItems.map((item, index) => {
+        const Icon = item.icon;
         const active = isActive(item.href);
         const scale = shouldReduceMotion
           ? active
@@ -176,7 +187,7 @@ function NavLinks({ isActive }: { isActive: (href: string) => boolean }) {
               onFocus={() => setMouseX(itemCenters[index] ?? null)}
               onBlur={() => setMouseX(null)}
               className={cn(
-                "relative z-10 inline-flex h-9 items-center justify-center rounded-full px-4 text-sm font-semibold tracking-normal",
+                "group/nav-item relative z-10 inline-flex h-10 items-center justify-center gap-2 rounded-full px-3 text-sm font-semibold tracking-normal",
                 "cursor-pointer select-none outline-none transition-colors duration-200",
                 "focus-visible:ring-3 focus-visible:ring-[var(--color-hero-blue)]/25",
                 active || showDockBubble
@@ -184,6 +195,22 @@ function NavLinks({ isActive }: { isActive: (href: string) => boolean }) {
                   : "text-foreground/70 hover:text-[var(--color-hero-heading)] dark:hover:text-white",
               )}
             >
+              <span
+                className={cn(
+                  "flex size-6 shrink-0 items-center justify-center rounded-xl transition-all duration-200",
+                  active || showDockBubble
+                    ? "bg-[var(--color-hero-blue)]/12 text-[var(--color-hero-blue)] shadow-[inset_0_1px_0_rgba(255,255,255,0.85)] ring-1 ring-[var(--color-hero-blue)]/15 dark:bg-white/12 dark:text-white dark:ring-white/10"
+                    : "bg-foreground/[0.04] text-foreground/55 ring-1 ring-foreground/[0.06] group-hover/nav-item:bg-[var(--color-hero-blue)]/10 group-hover/nav-item:text-[var(--color-hero-blue)]",
+                )}
+                aria-hidden="true"
+              >
+                <Icon
+                  className={cn(
+                    "h-3.5 w-3.5 transition-transform duration-200",
+                    showDockBubble && "-translate-y-0.5 scale-110",
+                  )}
+                />
+              </span>
               {item.label}
             </Link>
           </motion.div>
