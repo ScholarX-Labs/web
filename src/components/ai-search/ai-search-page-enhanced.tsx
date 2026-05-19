@@ -102,7 +102,6 @@ function EnhancedAISearchPageInner() {
               isLoading={loading}
               onScrollToTop={handleScrollToTop}
               currentStage={currentStage}
-              stageIndex={stageIndex}
               progress={progress}
             />
           )}
