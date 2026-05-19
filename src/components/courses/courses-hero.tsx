@@ -21,7 +21,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CATEGORY_CONFIG } from "@/lib/course-categories";
+import { getCategoryStyle } from "@/lib/course-categories";
+import type { CourseCategory } from "@/domain/courses";
 
 const FILTER_TAGS = [
   { label: "Career Preparation", icon: Briefcase, value: "Career Preparation" },
@@ -34,13 +35,6 @@ const FILTER_TAGS = [
     value: "International Opportunities",
   },
 ] as const;
-
-const COURSE_CATEGORIES = Object.entries(CATEGORY_CONFIG).map(([label, style]) => ({
-  label,
-  icon: style.icon,
-  colorClass: style.text,
-  hoverBg: style.hoverBg,
-}));
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -59,7 +53,11 @@ const itemVariants = {
   },
 };
 
-export function CoursesHero() {
+interface CoursesHeroProps {
+  categories: CourseCategory[];
+}
+
+export function CoursesHero({ categories }: CoursesHeroProps) {
   const {
     courseSearch,
     activeCourseFilters,
@@ -68,7 +66,19 @@ export function CoursesHero() {
     clearCourseFilters,
   } = useUiStore();
 
-  const activeCategory = COURSE_CATEGORIES.find((cat) =>
+  const courseCategories = categories.map((category) => {
+    const style = getCategoryStyle(category.iconKey ?? category.slug);
+
+    return {
+      label: category.name,
+      count: category.courseCount,
+      icon: style.icon,
+      colorClass: style.text,
+      hoverBg: style.hoverBg,
+    };
+  });
+
+  const activeCategory = courseCategories.find((cat) =>
     activeCourseFilters.includes(cat.label)
   );
 
@@ -173,34 +183,49 @@ export function CoursesHero() {
                   sideOffset={12}
                   className="w-56 p-2 rounded-2xl bg-white/60 dark:bg-black/30 backdrop-blur-2xl border-white/40 dark:border-white/10 shadow-[0_10px_40px_rgba(0,0,0,0.08)]"
                 >
-                  {COURSE_CATEGORIES.map(({ label, icon: Icon, colorClass, hoverBg }) => (
-                    <DropdownMenuItem 
-                      key={label}
-                      className={cn(
-                        "flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer text-sm font-semibold transition-all duration-300 ease-out outline-none group",
-                        "hover:text-white focus:text-white",
-                        hoverBg
-                      )}
-                      onSelect={() => {
-                        toggleCourseFilter(label);
-                      }}
-                    >
-                      <div className="flex items-center gap-3 flex-1">
-                        <div className={cn(
-                          "p-1.5 rounded-lg bg-white/70 dark:bg-white/5 backdrop-blur-md shadow-sm border border-white/20 dark:border-white/5 transition-all duration-300 ease-out", 
-                          "group-hover:bg-transparent group-hover:border-transparent group-hover:shadow-none group-hover:text-white",
-                          "group-focus:bg-transparent group-focus:border-transparent group-focus:shadow-none group-focus:text-white",
-                          colorClass
-                        )}>
-                          <Icon className="w-4 h-4" />
-                        </div>
-                        {label}
-                      </div>
-                      {activeCourseFilters.includes(label) && (
-                        <Check className="w-4 h-4 text-white ml-auto" />
-                      )}
+                  {courseCategories.length > 0 ? (
+                    courseCategories.map(
+                      ({ label, count, icon: Icon, colorClass, hoverBg }) => (
+                        <DropdownMenuItem
+                          key={label}
+                          className={cn(
+                            "flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer text-sm font-semibold transition-all duration-300 ease-out outline-none group",
+                            "hover:text-white focus:text-white",
+                            hoverBg,
+                          )}
+                          onSelect={() => {
+                            toggleCourseFilter(label);
+                          }}
+                        >
+                          <div className="flex items-center gap-3 flex-1">
+                            <div
+                              className={cn(
+                                "p-1.5 rounded-lg bg-white/70 dark:bg-white/5 backdrop-blur-md shadow-sm border border-white/20 dark:border-white/5 transition-all duration-300 ease-out",
+                                "group-hover:bg-transparent group-hover:border-transparent group-hover:shadow-none group-hover:text-white",
+                                "group-focus:bg-transparent group-focus:border-transparent group-focus:shadow-none group-focus:text-white",
+                                colorClass,
+                              )}
+                            >
+                              <Icon className="w-4 h-4" />
+                            </div>
+                            <span className="min-w-0 flex-1 truncate">
+                              {label}
+                            </span>
+                            <span className="text-xs font-bold opacity-60 group-hover:text-white group-hover:opacity-90 group-focus:text-white group-focus:opacity-90">
+                              {count}
+                            </span>
+                          </div>
+                          {activeCourseFilters.includes(label) && (
+                            <Check className="w-4 h-4 text-white ml-auto" />
+                          )}
+                        </DropdownMenuItem>
+                      ),
+                    )
+                  ) : (
+                    <DropdownMenuItem disabled className="px-3 py-2.5 text-sm">
+                      No categories yet
                     </DropdownMenuItem>
-                  ))}
+                  )}
                 </DropdownMenuContent>
               </DropdownMenu>
               <input
@@ -259,7 +284,7 @@ export function CoursesHero() {
               })}
 
               {/* Category Pills (Dynamic) */}
-              {COURSE_CATEGORIES.map(({ label, icon: Icon }) => {
+              {courseCategories.map(({ label, icon: Icon }) => {
                 if (!activeCourseFilters.includes(label)) return null;
                 return (
                   <motion.button
