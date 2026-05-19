@@ -14,7 +14,7 @@ env:
   RESOURCE_GROUP: ScholarX_Production
 
 jobs:
-  build-and-deploy:
+  build-image:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -36,6 +36,44 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
 
+  migrate-production:
+    runs-on: ubuntu-latest
+    needs: build-image
+    environment: production
+    concurrency:
+      group: production-database-migrations
+      cancel-in-progress: false
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate Production Database URL
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: test -n "$DATABASE_URL"
+
+      - name: Run Production Database Migrations
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_SSL: ${{ secrets.DATABASE_SSL }}
+        run: pnpm db:migrate
+
+  deploy-production:
+    runs-on: ubuntu-latest
+    needs: migrate-production
+    steps:
       - name: Log in to Azure CLI
         uses: azure/login@v1
         with:
