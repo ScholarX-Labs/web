@@ -67,7 +67,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
 
 export function StreamingMessageSkeleton() {
   // Isolated chat context — standalone timeline (not shared with search hero)
-  const { currentStage, stageIndex, progress } = useStageTimeline(true);
+  const { currentStage, progress } = useStageTimeline(true);
 
   return (
     <div className="flex w-full gap-3 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150 fill-mode-backwards">
