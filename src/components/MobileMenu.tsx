@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Menu } from "lucide-react";
+import { ArrowRight, LogIn, Menu } from "lucide-react";
 import { useState } from "react";
 import SignoutButton from "@/app/auth/_components/SignoutButton";
 import {
@@ -94,7 +94,7 @@ export default function MobileMenu({ isLoggedIn }: MobileMenuProps) {
               </Link>
               <SignoutButton
                 onClick={() => setOpen(false)}
-                className="flex w-full items-center justify-center px-4 py-2 rounded-sm text-primary border border-primary font-medium hover:bg-primary/10"
+                className="flex w-full items-center justify-center gap-2 rounded-xl border border-[var(--color-hero-blue)]/15 bg-white/80 px-4 py-3 font-semibold text-[var(--color-hero-heading)] shadow-sm backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--color-hero-blue)]/30 hover:bg-white hover:text-[var(--color-hero-blue)]"
               />
             </div>
           ) : (
@@ -102,16 +102,18 @@ export default function MobileMenu({ isLoggedIn }: MobileMenuProps) {
               <Link
                 href={ROUTES.SIGNIN}
                 onClick={() => setOpen(false)}
-                className="flex w-full items-center justify-center px-4 py-2 rounded-sm text-primary border border-primary font-medium hover:bg-primary/10"
+                className="flex w-full items-center justify-center gap-2 rounded-xl border border-[var(--color-hero-blue)]/15 bg-white/80 px-4 py-3 font-semibold text-[var(--color-hero-heading)] shadow-sm backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--color-hero-blue)]/30 hover:bg-[var(--color-hero-blue)]/6 hover:text-[var(--color-hero-blue)]"
               >
+                <LogIn className="h-4 w-4" />
                 Log in
               </Link>
               <Link
                 href={ROUTES.SIGNUP}
                 onClick={() => setOpen(false)}
-                className="flex w-full items-center justify-center px-4 py-2 rounded-md bg-primary text-white font-medium hover:bg-chart-5"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-[linear-gradient(135deg,var(--color-hero-blue)_0%,#2563eb_60%,var(--color-hero-orange)_100%)] px-4 py-3 font-semibold text-white shadow-[0_18px_36px_-18px_rgba(51,153,204,0.9)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_22px_44px_-20px_rgba(51,153,204,1)]"
               >
                 Sign up
+                <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
           )}
