@@ -8,12 +8,12 @@ export type AgentLogPayload = {
   timestamp: number;
 };
 
-const ENDPOINT =
-  "http://127.0.0.1:7355/ingest/609c9440-ed6c-4452-8fa9-e3e15a5d069b";
-const SESSION_ID = "637bd4";
+const ENDPOINT = process.env.NEXT_PUBLIC_AGENT_LOG_INGEST_URL;
+const SESSION_ID = process.env.NEXT_PUBLIC_AGENT_LOG_SESSION_ID ?? "local";
 
 export function agentLog(payload: Omit<AgentLogPayload, "sessionId">) {
   if (typeof window === "undefined") return;
+  if (!ENDPOINT) return;
 
   const body = JSON.stringify({ sessionId: SESSION_ID, ...payload });
 
