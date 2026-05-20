@@ -4,6 +4,11 @@ import { createHash, randomUUID } from "crypto";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { createCourseProgressDomain, createNextCourseDomain } from "@/domain/courses";
+import type {
+  CertificateRecord,
+  CourseProgressResult,
+} from "@/domain/courses/contracts";
+import { ROUTES } from "@/lib/routes";
 
 const hashProgressPayload = (payload: unknown) =>
   createHash("sha256").update(JSON.stringify(payload)).digest("hex");
@@ -41,6 +46,29 @@ const warnAggregateSchemaUnavailable = () => {
   );
 };
 
+type SyncLessonProgressActionResult =
+  | {
+      success: true;
+      progress?: CourseProgressResult;
+      certificate?: CertificateRecord;
+      certificateUrl?: string;
+      certificateAlreadyIssued?: boolean;
+      certificateError?: string;
+    }
+  | {
+      success: false;
+      error: string;
+    };
+
+const shouldIssueCertificate = (
+  completed: boolean,
+  progress: CourseProgressResult | undefined,
+) =>
+  completed &&
+  progress?.course.status === "completed" &&
+  Boolean(progress.course.completedAt) &&
+  Boolean(progress.course.certificateEligibleAt);
+
 export async function syncLessonProgress(
   lessonId: string,
   courseId: string,
@@ -50,7 +78,7 @@ export async function syncLessonProgress(
     watchedPercentage?: number;
     lastPosition?: number;
   },
-) {
+): Promise<SyncLessonProgressActionResult> {
   try {
     const session = await auth.api.getSession({
       headers: await headers(),
@@ -82,6 +110,8 @@ export async function syncLessonProgress(
       return { success: true };
     }
 
+    let progressResult: CourseProgressResult | undefined;
+
     try {
       const domain = createCourseProgressDomain();
       const clientEventId = randomUUID();
@@ -97,7 +127,7 @@ export async function syncLessonProgress(
         clientEventId,
       };
 
-      await domain.progressCommand.syncLessonProgress({
+      progressResult = await domain.progressCommand.syncLessonProgress({
         userId: session.user.id,
         lessonId,
         courseId,
@@ -109,6 +139,45 @@ export async function syncLessonProgress(
         clientEventId,
         requestHash: hashProgressPayload(payload),
       });
+
+      if (shouldIssueCertificate(completed, progressResult)) {
+        try {
+          const courseDomain = createNextCourseDomain();
+          const course = await courseDomain.catalog.getById(
+            courseId,
+            session.user.id,
+          );
+          const certificateResult = await domain.certificate.issueCertificate({
+            userId: session.user.id,
+            courseId,
+            learnerDisplayName:
+              session.user.name ?? session.user.email ?? "ScholarX Learner",
+            courseTitle: course.title,
+            progress: progressResult.course,
+          });
+
+          return {
+            success: true,
+            progress: progressResult,
+            certificate: certificateResult.certificate,
+            certificateUrl: ROUTES.CERTIFICATE_DETAIL(
+              certificateResult.certificate.certificateNumber,
+            ),
+            certificateAlreadyIssued: certificateResult.alreadyIssued,
+          };
+        } catch (certificateError) {
+          console.error(
+            "[syncLessonProgress] certificate issuance failed:",
+            certificateError,
+          );
+          return {
+            success: true,
+            progress: progressResult,
+            certificateError:
+              "Course completed, but certificate generation failed. Please retry from your certificates page.",
+          };
+        }
+      }
     } catch (error) {
       if (!isSchemaNotReadyError(error)) throw error;
 
@@ -123,7 +192,7 @@ export async function syncLessonProgress(
       });
     }
 
-    return { success: true };
+    return { success: true, progress: progressResult };
   } catch (error) {
     console.error("[syncLessonProgress] error:", error);
     return { success: false, error: "Failed to sync progress" };
