@@ -1,10 +1,10 @@
 {
-  "ai": "agy",
+  "ai": "codex",
   "ai_skills": true,
   "branch_numbering": "sequential",
   "context_file": "AGENTS.md",
   "here": true,
-  "integration": "agy",
+  "integration": "codex",
   "preset": null,
   "script": "ps",
   "speckit_version": "0.7.3"

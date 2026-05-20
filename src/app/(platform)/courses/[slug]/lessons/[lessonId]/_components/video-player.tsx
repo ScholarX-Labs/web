@@ -1,7 +1,13 @@
 "use client";
 
 import React, { useRef } from "react";
-import { MediaPlayer, MediaProvider, type MediaPlayerInstance } from "@vidstack/react";
+import {
+  MediaPlayer,
+  MediaProvider,
+  isYouTubeProvider,
+  type MediaPlayerInstance,
+  type PlayerSrc,
+} from "@vidstack/react";
 import {
   defaultLayoutIcons,
   DefaultVideoLayout,
@@ -31,6 +37,41 @@ interface VideoPlayerProps {
   onDurationChange?: (duration: number) => void;
 }
 
+const getNumericDetail = (event: unknown): number | null => {
+  if (typeof event === "number") return event;
+  if (typeof event !== "object" || event === null) return null;
+
+  const detail = "detail" in event ? event.detail : event;
+  if (typeof detail === "number") return detail;
+
+  return null;
+};
+
+const getCurrentTime = (event: unknown): number | null => {
+  if (typeof event === "number") return event;
+  if (typeof event !== "object" || event === null) return null;
+
+  const detail = "detail" in event ? event.detail : event;
+  if (
+    typeof detail === "object" &&
+    detail !== null &&
+    "currentTime" in detail
+  ) {
+    const currentTime = (detail as { currentTime?: unknown }).currentTime;
+    return typeof currentTime === "number" ? currentTime : null;
+  }
+
+  return null;
+};
+
+const toPlayerSrc = (src: string): PlayerSrc => {
+  if (/youtube\.com|youtu\.be/i.test(src)) {
+    return { src, type: "video/youtube" };
+  }
+
+  return src;
+};
+
 export const VideoPlayer = React.forwardRef<MediaPlayerInstance, VideoPlayerProps>(
   ({
     title,
@@ -46,6 +87,7 @@ export const VideoPlayer = React.forwardRef<MediaPlayerInstance, VideoPlayerProp
   }, ref) => {
     const seekFromRef = useRef<number>(0);
     const { isFocusMode } = useUILayoutStore();
+    const playerSrc = toPlayerSrc(src);
 
     return (
       <div className="group relative w-full">
@@ -91,30 +133,40 @@ export const VideoPlayer = React.forwardRef<MediaPlayerInstance, VideoPlayerProp
         <MediaPlayer
           ref={ref}
           title={title}
-          src={src}
-          autoPlay
+          src={playerSrc}
           playsInline
           className="w-full aspect-video"
-          crossOrigin
-          onTimeUpdate={(detail) => {
-            if (typeof detail === "number") onTimeUpdate?.(detail);
-          }}
-          onPause={(detail) => {
-            if (typeof detail === "number") onPause?.(detail);
-          }}
-          onSeeked={(detail) => {
-            if (typeof detail === "number") {
-              onSeeked?.(seekFromRef.current, detail);
+          onProviderSetup={(provider) => {
+            if (isYouTubeProvider(provider)) {
+              provider.cookies = true;
             }
           }}
-          onSeeking={(detail) => {
-            if (typeof detail === "number") {
-              seekFromRef.current = detail;
+          onTimeUpdate={(event) => {
+            const currentTime = getCurrentTime(event);
+            if (currentTime !== null) onTimeUpdate?.(currentTime);
+          }}
+          onPause={() => {
+            const currentTime = ref && "current" in ref
+              ? ref.current?.currentTime
+              : null;
+            if (typeof currentTime === "number") onPause?.(currentTime);
+          }}
+          onSeeked={(event) => {
+            const currentTime = getNumericDetail(event);
+            if (currentTime !== null) {
+              onSeeked?.(seekFromRef.current, currentTime);
+            }
+          }}
+          onSeeking={(event) => {
+            const currentTime = getNumericDetail(event);
+            if (currentTime !== null) {
+              seekFromRef.current = currentTime;
             }
           }}
           onEnd={() => onEnded?.()}
-          onDurationChange={(detail) => {
-            if (typeof detail === "number") onDurationChange?.(detail);
+          onDurationChange={(event) => {
+            const duration = getNumericDetail(event);
+            if (duration !== null) onDurationChange?.(duration);
           }}
         >
           <MediaProvider />

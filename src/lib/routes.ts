@@ -20,6 +20,8 @@ export const ROUTES = {
     `/courses/${courseSlug}/lessons/${lessonId}`,
   MY_COURSES: "/my-courses",
   CERTIFICATES: "/certificates",
+  CERTIFICATE_DETAIL: (certificateNumber: string) =>
+    `/certificates/${certificateNumber}`,
   SEARCH: "/search",
   LOGIN: "/login",
   REGISTER: "/register",

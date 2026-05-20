@@ -30,6 +30,7 @@ interface LessonMetaProps {
   duration?: string;
   resumePoint?: number | null;
   onResume?: (position: number) => void;
+  isCompleted?: boolean;
 }
 
 // ── Inline Toast ───────────────────────────────────────────────────────────────
@@ -124,6 +125,7 @@ export function LessonMeta({
   duration = "18 min",
   resumePoint,
   onResume,
+  isCompleted = false,
 }: LessonMetaProps) {
   const idx = Number(lessonIndex) || 0;
   const total = Number(totalLessons) || 1;
@@ -269,6 +271,12 @@ export function LessonMeta({
                 <BookOpen className="w-3 h-3 text-blue-400" />
               </div>
               <span className="text-[10px] font-black uppercase tracking-[0.25em] text-blue-400/80">Episode {idx}</span>
+              {isCompleted && (
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/25 bg-emerald-500/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-emerald-300 shadow-[0_0_18px_rgba(16,185,129,0.12)]">
+                  <Check className="w-3 h-3" />
+                  Completed
+                </span>
+              )}
             </div>
             <h1 className="text-3xl lg:text-4xl xl:text-5xl font-black tracking-tighter text-white leading-[0.95] drop-shadow-sm">
               {title}

@@ -10,10 +10,6 @@ export const executeFormApplicationInit = async (
   apiClient: typeof coursesService = coursesService,
 ): Promise<EnrollmentExecutionResult> => {
   try {
-    console.log(
-      "[APP_ENROLL] calling initApplicationEnrollment with courseId:",
-      context.course.id,
-    );
     const response = await apiClient.initApplicationEnrollment(
       context.course.id,
       {
@@ -21,7 +17,6 @@ export const executeFormApplicationInit = async (
         idempotencyKey: context.command.correlationId,
       },
     );
-    console.log("[APP_ENROLL] initApplicationEnrollment response:", response);
 
     return {
       ok: true,
@@ -31,7 +26,6 @@ export const executeFormApplicationInit = async (
       applicationUrl: response.data.applicationUrl,
     };
   } catch (error) {
-    console.error("[APP_ENROLL] catch error:", error);
     const mapped = mapEnrollmentError(error);
     return {
       ok: false,

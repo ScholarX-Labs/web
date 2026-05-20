@@ -110,12 +110,14 @@ export default async function LessonPage({ params }: LessonPageProps) {
             lessonId={currentLesson.id}
             courseSlug={slug}
             courseId={lessonData.course.id}
+            courseTitle={lessonData.course.title}
             lessonTitle={currentLesson.title}
             lessonIndex={lessonIndex + 1}
             totalLessons={allLessons.length}
             prevLesson={allLessons[lessonIndex - 1]}
             nextLesson={allLessons[lessonIndex + 1]}
             lessons={allLessons}
+            initialIsCompleted={Boolean(currentLesson.isCompleted)}
           />
         </Suspense>
       </div>

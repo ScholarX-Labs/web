@@ -269,12 +269,16 @@ export function useLessonProgress({
           videoDuration > 0
             ? Math.min(100, (currentTime / videoDuration) * 100)
             : prev.watchedPercentage;
+        const watchedPercentage = Math.max(prev.watchedPercentage, pct);
+        const completedAt =
+          prev.completedAt ??
+          (watchedPercentage >= COMPLETE_AT_PCT ? Date.now() : null);
 
         return {
           ...prev,
           lastPosition:      currentTime,
-          watchedPercentage: Math.max(prev.watchedPercentage, pct),
-          completedAt: prev.completedAt ?? (Math.max(prev.watchedPercentage, pct) >= COMPLETE_AT_PCT ? Date.now() : null),
+          watchedPercentage,
+          completedAt,
         };
       });
     },
