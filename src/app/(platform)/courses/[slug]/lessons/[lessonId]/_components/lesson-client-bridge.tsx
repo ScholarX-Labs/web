@@ -10,6 +10,7 @@ import { useUILayoutStore } from "@/store/ui-layout-store";
 import { cn } from "@/lib/utils";
 import { springApple } from "@/lib/motion-variants";
 import { syncLessonProgress } from "@/actions/course.actions";
+import { toast } from "sonner";
 import type { MediaPlayerInstance } from "@vidstack/react";
 import type { LessonSummary } from "@/types/course.types";
 
@@ -23,6 +24,7 @@ interface LessonClientBridgeProps {
   prevLesson?: { id: string; title: string };
   nextLesson?: { id: string; title: string };
   lessons: LessonSummary[]; // The full curriculum array
+  initialIsCompleted?: boolean;
 }
 
 /**
@@ -42,8 +44,10 @@ export function LessonClientBridge({
   prevLesson,
   nextLesson,
   lessons,
+  initialIsCompleted = false,
 }: LessonClientBridgeProps) {
   const playerRef = useRef<MediaPlayerInstance>(null);
+  const completionToastShownRef = useRef(false);
   const { isFocusMode } = useUILayoutStore();
 
   // 1. Initialize Progress Tracking
@@ -62,9 +66,15 @@ export function LessonClientBridge({
     videoDuration: 0, // Will be updated via setVideoDuration
   });
 
+  const isLessonCompleted = initialIsCompleted || Boolean(progress?.completedAt);
+
   // 2. Sync progress to server when completed or on unmount
   const progressRef = useRef(progress);
   progressRef.current = progress;
+
+  useEffect(() => {
+    completionToastShownRef.current = false;
+  }, [lessonId]);
 
   const syncToServer = useCallback(async () => {
     const p = progressRef.current;
@@ -81,10 +91,14 @@ export function LessonClientBridge({
 
   useEffect(() => {
     if (!progressRef.current?.completedAt) return;
-    const timer = setTimeout(() => {
-      syncToServer();
-    }, 2000);
-    return () => clearTimeout(timer);
+    if (!completionToastShownRef.current) {
+      completionToastShownRef.current = true;
+      toast.success("Lesson completed", {
+        description: "Your progress is being saved to your account.",
+        id: `lesson-completed-${lessonId}`,
+      });
+    }
+    void syncToServer();
     // Intentionally only fire when completedAt first becomes truthy
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [progress?.completedAt ? "completed" : "not-completed", syncToServer]);
@@ -200,6 +214,7 @@ export function LessonClientBridge({
           duration="18 min"
           resumePoint={resumePoint}
           onResume={handleResume}
+          isCompleted={isLessonCompleted}
         />
       </motion.div>
 
@@ -210,7 +225,7 @@ export function LessonClientBridge({
         lessons={lessons}
         className="hidden lg:flex shrink-0 w-80 xl:w-96"
         progress={{
-          [lessonId]: progress?.watchedPercentage ?? 0,
+          [lessonId]: isLessonCompleted ? 100 : (progress?.watchedPercentage ?? 0),
           ...Object.fromEntries(
             lessons
               .filter((l) => l.isCompleted)

@@ -116,6 +116,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
             prevLesson={allLessons[lessonIndex - 1]}
             nextLesson={allLessons[lessonIndex + 1]}
             lessons={allLessons}
+            initialIsCompleted={Boolean(currentLesson.isCompleted)}
           />
         </Suspense>
       </div>
