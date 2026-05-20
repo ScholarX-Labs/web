@@ -21,7 +21,6 @@ export const executeEnrollment = async (
   context: EnrollmentContext,
 ): Promise<EnrollmentExecutionResult> => {
   const mode = deriveEnrollmentMode(context);
-  console.log("[EXECUTOR] executeEnrollment called with mode:", mode);
 
   emitEnrollmentEvent({
     event: "enroll_submission_started",
@@ -34,10 +33,8 @@ export const executeEnrollment = async (
   let result: EnrollmentExecutionResult;
 
   if (mode === "free") {
-    console.log("[EXECUTOR] executing free enroll strategy");
     result = await executeFreeEnroll(context);
   } else if (mode === "inquiry") {
-    console.log("[EXECUTOR] inquiry mode — deferring to UI for form data");
     emitEnrollmentEvent({
       event: "enroll_inquiry_prompted",
       timestamp: Date.now(),
@@ -53,11 +50,8 @@ export const executeEnrollment = async (
     };
     return result;
   } else {
-    console.log("[EXECUTOR] executing form application strategy");
     result = await executeFormApplicationInit(context);
   }
-
-  console.log("[EXECUTOR] strategy returned result:", result);
 
   if (result.ok) {
     emitEnrollmentEvent({

@@ -10,17 +10,12 @@ export const executePaidCheckoutInit = async (
   apiClient: typeof coursesService = coursesService,
 ): Promise<EnrollmentExecutionResult> => {
   try {
-    console.log(
-      "[PAID_ENROLL] calling initPaidEnrollment with courseId:",
-      context.course.id,
-    );
     const response = await apiClient.initPaidEnrollment(context.course.id, {
       sourceSurface: context.command.source,
       idempotencyKey: context.command.correlationId,
       returnUrl:
         typeof window !== "undefined" ? window.location.href : undefined,
     });
-    console.log("[PAID_ENROLL] initPaidEnrollment response:", response);
 
     return {
       ok: true,
@@ -30,7 +25,6 @@ export const executePaidCheckoutInit = async (
       checkoutUrl: response.data.checkoutUrl,
     };
   } catch (error) {
-    console.error("[PAID_ENROLL] catch error:", error);
     const mapped = mapEnrollmentError(error);
     return {
       ok: false,
