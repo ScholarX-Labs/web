@@ -55,6 +55,13 @@ const errorResponse = (error: unknown) => {
   );
 };
 
+const logUnexpectedError = (label: string, error: unknown) => {
+  if (isNextCourseError(error)) return;
+
+  console.error(label, error);
+  if (error instanceof Error && error.stack) console.error(error.stack);
+};
+
 const safeJson = async <T>(request: NextRequest): Promise<T | undefined> => {
   try {
     return (await request.json()) as T;
@@ -171,8 +178,7 @@ export const createCoursesRouteHandlers = (deps: CoursesRouteDeps) => {
         { status: 404 },
       );
     } catch (error) {
-      console.error("[api/courses] GET handler error:", error);
-      if (error instanceof Error && error.stack) console.error(error.stack);
+      logUnexpectedError("[api/courses] GET handler error:", error);
       return errorResponse(error);
     }
   };
@@ -284,8 +290,7 @@ export const createCoursesRouteHandlers = (deps: CoursesRouteDeps) => {
         { status: 404 },
       );
     } catch (error) {
-      console.error("[api/courses] POST handler error:", error);
-      if (error instanceof Error && error.stack) console.error(error.stack);
+      logUnexpectedError("[api/courses] POST handler error:", error);
       return errorResponse(error);
     }
   };

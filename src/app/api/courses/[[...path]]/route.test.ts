@@ -84,6 +84,16 @@ const createFakeDomain = (capture?: {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       isSubscribed: false,
+      lessons: [
+        {
+          id: "lesson-1",
+          title: "Playable lesson",
+          videoUrl: "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+          duration: 596,
+          order: 1,
+          courseId: slug,
+        },
+      ],
     }),
     getById: async (id: string) => ({
       id,
@@ -162,6 +172,29 @@ test("GET /api/courses/slug/:slug returns single course", async () => {
   const body = await response.json();
   assert.equal(body.id, "course-abc");
   assert.equal(body.slug, "course-abc");
+});
+
+test("GET /api/courses/slug/:slug returns playable lesson video URLs", async () => {
+  const createCoursesRouteHandlers = await loadHandlersFactory();
+  const handlers = createCoursesRouteHandlers({
+    getSession: async () => ({ user: { id: "user-2" } }),
+    createDomain: () => createFakeDomain() as never,
+  });
+
+  const request = new NextRequest(
+    "http://localhost:3000/api/courses/slug/course-abc",
+  );
+  const response = await handlers.GET(request, {
+    params: Promise.resolve({ path: ["slug", "course-abc"] }),
+  });
+
+  assert.equal(response.status, 200);
+  const body = await response.json();
+  assert.equal(body.lessons.length, 1);
+  assert.equal(
+    body.lessons[0].videoUrl,
+    "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+  );
 });
 
 test("GET /api/courses/:id/subscription-status requires authentication", async () => {
