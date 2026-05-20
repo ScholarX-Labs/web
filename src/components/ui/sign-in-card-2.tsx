@@ -1,28 +1,16 @@
 'use client'
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
 import { Mail, Lock, Eye, EyeClosed, ArrowRight } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { signIn } from '@/lib/auth-client';
 import { ROUTES } from '@/lib/routes';
 import { GoogleIcon } from '@/components/icons/GoogleIcon';
+import { springSnappy, tapScale } from '@/lib/motion-variants';
 
-function Input({ className, type, ...props }: React.ComponentProps<"input">) {
-  return (
-    <input
-      type={type}
-      data-slot="input"
-      className={cn(
-        "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-        "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
-        "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
-        className
-      )}
-      {...props}
-    />
-  )
+function validateEmail(email: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 export function Component() {
@@ -34,6 +22,8 @@ export function Component() {
   const [rememberMe, setRememberMe] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const [isSocialSubmitting, setIsSocialSubmitting] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({});
+  const [shakeKey, setShakeKey] = useState(0);
 
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -51,9 +41,27 @@ export function Component() {
     mouseY.set(0);
   };
 
+  const triggerShake = useCallback(() => setShakeKey((k) => k + 1), []);
+
+  const validateForm = useCallback(() => {
+    const errors: { email?: string; password?: string } = {};
+    if (!email.trim()) {
+      errors.email = "Email is required";
+    } else if (!validateEmail(email)) {
+      errors.email = "Enter a valid email address";
+    }
+    if (!password) {
+      errors.password = "Password is required";
+    }
+    setFieldErrors(errors);
+    if (Object.keys(errors).length > 0) triggerShake();
+    return Object.keys(errors).length === 0;
+  }, [email, password, triggerShake]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isSocialSubmitting) return;
+    if (!validateForm()) return;
     setServerError(null);
     setIsLoading(true);
 
@@ -67,6 +75,7 @@ export function Component() {
 
     if (error) {
       setServerError(error.message ?? "Unable to sign in. Please try again.");
+      triggerShake();
     }
   };
 
@@ -92,6 +101,10 @@ export function Component() {
   };
 
   const isAnySubmitting = isLoading || isSocialSubmitting;
+
+  const clearFieldError = (field: "email" | "password") => {
+    setFieldErrors((prev) => ({ ...prev, [field]: undefined }));
+  };
 
   return (
     <div className="min-h-screen w-screen bg-black relative overflow-hidden flex items-center justify-center">
@@ -138,7 +151,7 @@ export function Component() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        className="w-full max-w-sm relative z-10"
+        className="w-full max-w-sm relative z-10 px-4"
         style={{ perspective: 1500 }}
       >
         <motion.div
@@ -147,6 +160,8 @@ export function Component() {
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
           whileHover={{ z: 10 }}
+          animate={{ x: shakeKey ? [0, -8, 8, -6, 6, -3, 3, 0] : 0 }}
+          transition={{ duration: 0.4, ease: "easeInOut" }}
         >
           <div className="relative group">
             <motion.div 
@@ -370,101 +385,114 @@ export function Component() {
                 </motion.p>
               </div>
 
-              {serverError && (
-                <motion.p
-                  initial={{ opacity: 0, y: -5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-red-400 text-xs text-center mb-3"
-                >
-                  {serverError}
-                </motion.p>
-              )}
+              <AnimatePresence mode="wait">
+                {serverError && (
+                  <motion.p
+                    key="server-error"
+                    initial={{ opacity: 0, y: -5, height: 0 }}
+                    animate={{ opacity: 1, y: 0, height: "auto" }}
+                    exit={{ opacity: 0, y: -5, height: 0 }}
+                    className="text-red-400 text-xs text-center mb-3"
+                  >
+                    {serverError}
+                  </motion.p>
+                )}
+              </AnimatePresence>
 
               <form onSubmit={handleSubmit} className="space-y-4">
-                <motion.div className="space-y-3">
-                  <motion.div 
-                    className={`relative ${focusedInput === "email" ? 'z-10' : ''}`}
-                    whileFocus={{ scale: 1.02 }}
-                    whileHover={{ scale: 1.01 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                  >
-                    <div className="absolute -inset-[0.5px] bg-gradient-to-r from-white/10 via-white/5 to-white/10 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300" />
-                    
+                <div className="space-y-3">
+                  <div className="space-y-1">
                     <div className="relative flex items-center overflow-hidden rounded-lg">
-                      <Mail className={`absolute left-3 w-4 h-4 transition-all duration-300 ${
+                      <Mail className={`absolute left-3 w-4 h-4 transition-all duration-300 z-10 ${
                         focusedInput === "email" ? 'text-white' : 'text-white/40'
                       }`} />
-                      
-                      <Input
+                      <input
                         type="email"
                         placeholder="Email address"
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        onChange={(e) => {
+                          setEmail(e.target.value);
+                          clearFieldError("email");
+                        }}
                         onFocus={() => setFocusedInput("email")}
-                        onBlur={() => setFocusedInput(null)}
-                        className="w-full bg-white/5 border-transparent focus:border-white/20 text-white placeholder:text-white/30 h-10 transition-all duration-300 pl-10 pr-3 focus:bg-white/10"
+                        onBlur={() => {
+                          setFocusedInput(null);
+                          if (email && !validateEmail(email)) {
+                            setFieldErrors((prev) => ({ ...prev, email: "Enter a valid email address" }));
+                          }
+                        }}
+                        data-slot="input"
+                        className="w-full h-10 rounded-lg bg-white/5 border border-transparent focus:border-white/20 text-white placeholder:text-white/30 pl-10 pr-3 text-sm transition-all duration-300 focus:bg-white/10 focus-visible:ring-[3px] focus-visible:ring-white/20 outline-none"
+                        autoComplete="email"
                       />
-                      
-                      {focusedInput === "email" && (
-                        <motion.div 
-                          layoutId="input-highlight"
-                          className="absolute inset-0 bg-white/5 -z-10"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          transition={{ duration: 0.2 }}
-                        />
-                      )}
                     </div>
-                  </motion.div>
+                    <AnimatePresence mode="wait">
+                      {fieldErrors.email && (
+                        <motion.p
+                          key="email-error"
+                          initial={{ opacity: 0, y: -4, height: 0 }}
+                          animate={{ opacity: 1, y: 0, height: "auto" }}
+                          exit={{ opacity: 0, y: -4, height: 0 }}
+                          className="text-red-400 text-xs pl-1"
+                        >
+                          {fieldErrors.email}
+                        </motion.p>
+                      )}
+                    </AnimatePresence>
+                  </div>
 
-                  <motion.div 
-                    className={`relative ${focusedInput === "password" ? 'z-10' : ''}`}
-                    whileFocus={{ scale: 1.02 }}
-                    whileHover={{ scale: 1.01 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                  >
-                    <div className="absolute -inset-[0.5px] bg-gradient-to-r from-white/10 via-white/5 to-white/10 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300" />
-                    
+                  <div className="space-y-1">
                     <div className="relative flex items-center overflow-hidden rounded-lg">
-                      <Lock className={`absolute left-3 w-4 h-4 transition-all duration-300 ${
+                      <Lock className={`absolute left-3 w-4 h-4 transition-all duration-300 z-10 ${
                         focusedInput === "password" ? 'text-white' : 'text-white/40'
                       }`} />
-                      
-                      <Input
+                      <input
                         type={showPassword ? "text" : "password"}
                         placeholder="Password"
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        onChange={(e) => {
+                          setPassword(e.target.value);
+                          clearFieldError("password");
+                        }}
                         onFocus={() => setFocusedInput("password")}
-                        onBlur={() => setFocusedInput(null)}
-                        className="w-full bg-white/5 border-transparent focus:border-white/20 text-white placeholder:text-white/30 h-10 transition-all duration-300 pl-10 pr-10 focus:bg-white/10"
+                        onBlur={() => {
+                          setFocusedInput(null);
+                          if (password && password.length < 8) {
+                            setFieldErrors((prev) => ({ ...prev, password: "Password must be at least 8 characters" }));
+                          }
+                        }}
+                        data-slot="input"
+                        className="w-full h-10 rounded-lg bg-white/5 border border-transparent focus:border-white/20 text-white placeholder:text-white/30 pl-10 pr-10 text-sm transition-all duration-300 focus:bg-white/10 focus-visible:ring-[3px] focus-visible:ring-white/20 outline-none"
+                        autoComplete="current-password"
                       />
-                      
-                      <div 
-                        onClick={() => setShowPassword(!showPassword)} 
-                        className="absolute right-3 cursor-pointer"
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 z-10 cursor-pointer"
+                        tabIndex={-1}
                       >
                         {showPassword ? (
                           <Eye className="w-4 h-4 text-white/40 hover:text-white transition-colors duration-300" />
                         ) : (
                           <EyeClosed className="w-4 h-4 text-white/40 hover:text-white transition-colors duration-300" />
                         )}
-                      </div>
-                      
-                      {focusedInput === "password" && (
-                        <motion.div 
-                          layoutId="input-highlight"
-                          className="absolute inset-0 bg-white/5 -z-10"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          transition={{ duration: 0.2 }}
-                        />
-                      )}
+                      </button>
                     </div>
-                  </motion.div>
-                </motion.div>
+                    <AnimatePresence mode="wait">
+                      {fieldErrors.password && (
+                        <motion.p
+                          key="password-error"
+                          initial={{ opacity: 0, y: -4, height: 0 }}
+                          animate={{ opacity: 1, y: 0, height: "auto" }}
+                          exit={{ opacity: 0, y: -4, height: 0 }}
+                          className="text-red-400 text-xs pl-1"
+                        >
+                          {fieldErrors.password}
+                        </motion.p>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </div>
 
                 <div className="flex items-center justify-between pt-1">
                   <div className="flex items-center space-x-2">
@@ -489,7 +517,7 @@ export function Component() {
                         </motion.div>
                       )}
                     </div>
-                    <label htmlFor="remember-me" className="text-xs text-white/60 hover:text-white/80 transition-colors duration-200">
+                    <label htmlFor="remember-me" className="text-xs text-white/60 hover:text-white/80 transition-colors duration-200 cursor-pointer">
                       Remember me
                     </label>
                   </div>
@@ -502,8 +530,9 @@ export function Component() {
                 </div>
 
                 <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                  whileHover={tapScale.whileHover}
+                  whileTap={tapScale.whileTap}
+                  transition={springSnappy}
                   type="submit"
                   disabled={isAnySubmitting}
                   className="w-full relative group/button mt-5"
@@ -512,7 +541,7 @@ export function Component() {
                   
                   <div className="relative overflow-hidden bg-white text-black font-medium h-10 rounded-lg transition-all duration-300 flex items-center justify-center">
                     <motion.div 
-                      className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/30 to-white/0 -z-10"
+                      className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/30 to-white/0"
                       animate={{ 
                         x: ['-100%', '100%'],
                       }}
@@ -569,8 +598,9 @@ export function Component() {
                 </div>
 
                 <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                  whileHover={tapScale.whileHover}
+                  whileTap={tapScale.whileTap}
+                  transition={springSnappy}
                   type="button"
                   disabled={isAnySubmitting}
                   onClick={onGoogleSignIn}

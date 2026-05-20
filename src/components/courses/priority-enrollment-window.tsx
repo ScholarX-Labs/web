@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
 import { Course } from "@/types/course.types";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { motion, useReducedMotion } from "framer-motion";
 import {
   Loader2,
@@ -30,12 +29,6 @@ export function PriorityEnrollmentWindow({
 }: PriorityEnrollmentWindowProps) {
   const shouldReduceMotion = useReducedMotion();
 
-  useEffect(() => {
-    if (isOpen) {
-      console.log("[PRIORITY-WINDOW] Opening with isOpen:", isOpen);
-    }
-  }, [isOpen]);
-
   const keynoteEasing: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
   const overlayClassName =
@@ -53,6 +46,10 @@ export function PriorityEnrollmentWindow({
         overlayClassName={overlayClassName}
         className="z-90 sm:max-w-md p-0 overflow-hidden rounded-3xl border border-slate-200/90 bg-white/95 shadow-[0_32px_95px_rgba(2,6,23,0.28)] ring-1 ring-slate-100/80 backdrop-blur-xl gap-0 duration-560 ease-[cubic-bezier(0.22,1,0.36,1)] dark:border-slate-800 dark:bg-card/95 dark:ring-slate-800/80"
       >
+        <DialogTitle className="sr-only">
+          Your enrollment is processing
+        </DialogTitle>
+
         {/* Animated background elements */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <motion.div

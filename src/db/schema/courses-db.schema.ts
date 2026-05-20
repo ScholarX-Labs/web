@@ -1,4 +1,7 @@
 import {
+  sql,
+} from "drizzle-orm";
+import {
   pgSchema,
   text,
   uuid,
@@ -10,6 +13,7 @@ import {
   jsonb,
   index,
   uniqueIndex,
+  check,
 } from "drizzle-orm/pg-core";
 import { user as dbUsers } from "@/db/schema/auth-schema";
 
@@ -62,6 +66,11 @@ export const dbCourses = coursesSchema.table("courses", {
   studentsCount: integer("students_count"),
   isBestseller: boolean("is_bestseller"),
   lastLessonIndex: integer("last_lesson_index").notNull().default(0),
+  curriculumVersion: integer("curriculum_version").notNull().default(1),
+  requiredLessonsCount: integer("required_lessons_count")
+    .notNull()
+    .default(0),
+  certificateEnabled: boolean("certificate_enabled").notNull().default(true),
   urgencyText: varchar("urgency_text", { length: 255 }),
   tags: jsonb("tags").$type<string[] | null>(),
   requiresForm: boolean("requires_form"),
@@ -104,6 +113,7 @@ export const dbLessonProgress = coursesSchema.table(
     completedAt: timestamp("completed_at"),
     watchedPercentage: integer("watched_percentage").default(0).notNull(),
     lastPosition: integer("last_position").default(0).notNull(),
+    lastClientEventId: uuid("last_client_event_id"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
@@ -116,6 +126,176 @@ export const dbLessonProgress = coursesSchema.table(
       table.courseId,
       table.userId,
     ),
+    progressUserCourseCompletedIdx: index(
+      "progress_user_course_completed_idx",
+    ).on(table.userId, table.courseId, table.completed),
+    lessonProgressWatchedPctChk: check(
+      "lesson_progress_watched_percentage_chk",
+      sql`${table.watchedPercentage} BETWEEN 0 AND 100`,
+    ),
+    lessonProgressLastPositionChk: check(
+      "lesson_progress_last_position_chk",
+      sql`${table.lastPosition} >= 0`,
+    ),
+  }),
+);
+
+export type CourseProgressStatus =
+  | "not_started"
+  | "in_progress"
+  | "completed"
+  | "stale_after_curriculum_change"
+  | "revoked";
+
+export type ProgressSyncEventType =
+  | "heartbeat"
+  | "pause"
+  | "seek"
+  | "completion"
+  | "manual_complete";
+
+export type CertificateCompletionSource =
+  | "normal"
+  | "backfill_approximate"
+  | "admin_override";
+
+export interface CertificateMetadata {
+  learnerDisplayName: string;
+  courseTitle: string;
+  completionDate: string;
+  completionSource: CertificateCompletionSource;
+  ruleVersion: string;
+  requiredLessonCount: number;
+  certificateTemplateVersion: string;
+}
+
+export const dbCourseProgress = coursesSchema.table(
+  "course_progress",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => dbUsers.id, { onDelete: "cascade" }),
+    courseId: uuid("course_id")
+      .notNull()
+      .references(() => dbCourses.id, { onDelete: "cascade" }),
+    status: varchar("status", { length: 32 })
+      .$type<CourseProgressStatus>()
+      .notNull()
+      .default("not_started"),
+    completedLessons: integer("completed_lessons").notNull().default(0),
+    requiredLessons: integer("required_lessons").notNull().default(0),
+    progressPercentage: integer("progress_percentage").notNull().default(0),
+    completedAt: timestamp("completed_at"),
+    certificateEligibleAt: timestamp("certificate_eligible_at"),
+    lastLessonId: uuid("last_lesson_id"),
+    lastPosition: integer("last_position").notNull().default(0),
+    version: integer("version").notNull().default(0),
+    curriculumVersion: integer("curriculum_version").notNull().default(1),
+    ruleVersion: varchar("rule_version", { length: 32 })
+      .notNull()
+      .default("v1"),
+    completedByBackfill: boolean("completed_by_backfill")
+      .notNull()
+      .default(false),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    courseProgressUserCourseUq: uniqueIndex(
+      "course_progress_user_course_uq",
+    ).on(table.userId, table.courseId),
+    courseProgressCompletedUserCourseIdx: index(
+      "course_progress_completed_user_course_idx",
+    )
+      .on(table.userId, table.courseId)
+      .where(sql`${table.status} = 'completed'`),
+    courseProgressPctChk: check(
+      "course_progress_percentage_chk",
+      sql`${table.progressPercentage} BETWEEN 0 AND 100`,
+    ),
+    courseProgressCompletedLessonsChk: check(
+      "course_progress_completed_lessons_chk",
+      sql`${table.completedLessons} >= 0`,
+    ),
+    courseProgressRequiredLessonsChk: check(
+      "course_progress_required_lessons_chk",
+      sql`${table.requiredLessons} >= 0`,
+    ),
+    courseProgressLastPositionChk: check(
+      "course_progress_last_position_chk",
+      sql`${table.lastPosition} >= 0`,
+    ),
+    courseProgressVersionChk: check(
+      "course_progress_version_chk",
+      sql`${table.version} >= 0`,
+    ),
+  }),
+);
+
+export const dbProgressSyncEvents = coursesSchema.table(
+  "progress_sync_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    clientEventId: uuid("client_event_id").notNull(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => dbUsers.id, { onDelete: "cascade" }),
+    courseId: uuid("course_id")
+      .notNull()
+      .references(() => dbCourses.id, { onDelete: "cascade" }),
+    lessonId: uuid("lesson_id").notNull(),
+    eventType: varchar("event_type", { length: 32 })
+      .$type<ProgressSyncEventType>()
+      .notNull(),
+    requestHash: varchar("request_hash", { length: 128 }).notNull(),
+    responseSnapshot: jsonb("response_snapshot"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    progressSyncEventsUserClientEventUq: uniqueIndex(
+      "progress_sync_events_user_client_event_uq",
+    ).on(table.userId, table.clientEventId),
+    progressSyncEventsCreatedAtIdx: index(
+      "progress_sync_events_created_at_idx",
+    ).on(table.createdAt),
+  }),
+);
+
+export const dbCertificates = coursesSchema.table(
+  "certificates",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    certificateNumber: varchar("certificate_number", {
+      length: 64,
+    }).notNull(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => dbUsers.id, { onDelete: "cascade" }),
+    courseId: uuid("course_id")
+      .notNull()
+      .references(() => dbCourses.id, { onDelete: "cascade" }),
+    courseProgressId: uuid("course_progress_id")
+      .notNull()
+      .references(() => dbCourseProgress.id),
+    issuedAt: timestamp("issued_at").defaultNow().notNull(),
+    revokedAt: timestamp("revoked_at"),
+    revocationReason: text("revocation_reason"),
+    metadata: jsonb("metadata").$type<CertificateMetadata>().notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    certificatesNumberUq: uniqueIndex("certificates_number_uq").on(
+      table.certificateNumber,
+    ),
+    certificatesUserCourseUq: uniqueIndex("certificates_user_course_uq").on(
+      table.userId,
+      table.courseId,
+    ),
+    certificatesCourseProgressIdx: index(
+      "certificates_course_progress_idx",
+    ).on(table.courseProgressId),
   }),
 );
 

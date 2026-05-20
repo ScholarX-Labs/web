@@ -3,9 +3,8 @@
 This file is durable context for AI coding agents working on ScholarX. It should explain how the project is shaped, what must be preserved, and how to make good engineering decisions here. Keep task-specific instructions in the user request, specs, or issue text instead of adding them here.
 
 <!-- SPECKIT START -->
-
-For active feature context, read the relevant specification before changing related code.
-
+For additional context about technologies to be used, project structure,
+shell commands, and other important information, read the current plan
 <!-- SPECKIT END -->
 
 ## Product Context

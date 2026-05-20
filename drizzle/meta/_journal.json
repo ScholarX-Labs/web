@@ -43,6 +43,27 @@
       "when": 1779190000000,
       "tag": "0005_course_categories",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1779270000000,
+      "tag": "0006_course_completion_state",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1779280000000,
+      "tag": "0007_repair_course_completion_state",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1779290000000,
+      "tag": "0008_repair_course_completion_state_baseline_gap",
+      "breakpoints": true
     }
   ]
 }

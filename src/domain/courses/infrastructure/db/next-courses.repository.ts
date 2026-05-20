@@ -81,6 +81,19 @@ const instructorColumns = {
   image: dbUsers.image,
 };
 
+const lessonProgressColumns = {
+  id: dbLessonProgress.id,
+  userId: dbLessonProgress.userId,
+  lessonId: dbLessonProgress.lessonId,
+  courseId: dbLessonProgress.courseId,
+  completed: dbLessonProgress.completed,
+  completedAt: dbLessonProgress.completedAt,
+  watchedPercentage: dbLessonProgress.watchedPercentage,
+  lastPosition: dbLessonProgress.lastPosition,
+  createdAt: dbLessonProgress.createdAt,
+  updatedAt: dbLessonProgress.updatedAt,
+};
+
 const toWhereClause = (filter: CourseListFilter) => {
   const predicates = [eq(dbCourses.status, "active")];
 
@@ -346,7 +359,7 @@ export class NextCoursesRepository {
 
   async findLessonProgress(userId: string, lessonId: string) {
     const rows = await db
-      .select()
+      .select(lessonProgressColumns)
       .from(dbLessonProgress)
       .where(
         and(
@@ -380,7 +393,7 @@ export class NextCoursesRepository {
           updatedAt: new Date(),
         })
         .where(eq(dbLessonProgress.id, existing.id))
-        .returning();
+        .returning(lessonProgressColumns);
 
       return row;
     }
@@ -396,14 +409,14 @@ export class NextCoursesRepository {
         watchedPercentage: data.watchedPercentage ?? 0,
         lastPosition: data.lastPosition ?? 0,
       })
-      .returning();
+      .returning(lessonProgressColumns);
 
     return row;
   }
 
   async findProgressByCourse(userId: string, courseId: string) {
     return db
-      .select()
+      .select(lessonProgressColumns)
       .from(dbLessonProgress)
       .where(
         and(

@@ -4,16 +4,9 @@ import { dbLessons } from "../src/db/schema/admin-db.schema";
 import { eq } from "drizzle-orm";
 
 const YOUTUBE_URLS: { url: string; duration: number }[] = [
-  { url: "https://www.youtube.com/watch?v=aqz-KE-bpKQ", duration: 596 },   // Big Buck Bunny
-  { url: "https://www.youtube.com/watch?v=eRsGyueVLvQ", duration: 900 },   // Sintel
-  { url: "https://www.youtube.com/watch?v=7wtfhZwyrcc", duration: 268 },   // Imagine Dragons - Believer
-  { url: "https://www.youtube.com/watch?v=R6MlUcmOul8", duration: 720 },   // Tears of Steel
-  { url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", duration: 212 },   // Rick Astley
-  { url: "https://www.youtube.com/watch?v=jNQXAC9IVRw", duration: 18 },    // Me at the zoo
-  { url: "https://www.youtube.com/watch?v=kJQP7kiw5Fk", duration: 292 },   // Despacito
-  { url: "https://www.youtube.com/watch?v=9bZkp7q19f0", duration: 253 },   // Gangnam Style
-  { url: "https://www.youtube.com/watch?v=hT_nvWreIhg", duration: 277 },   // Counting Stars
-  { url: "https://www.youtube.com/watch?v=JGwWNGJdvx8", duration: 264 },   // Shape of You
+  { url: "https://www.youtube.com/watch?v=jNQXAC9IVRw", duration: 18 },
+  { url: "https://www.youtube.com/watch?v=aqz-KE-bpKQ", duration: 596 },
+  { url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", duration: 212 },
 ];
 
 async function main() {
@@ -48,12 +41,12 @@ async function main() {
         .set({ videoUrl: url, duration, status: "active" })
         .where(eq(dbLessons.id, lesson.id));
 
-      console.log(`    ${i + 1}. ${lesson.title} → ${url.split("v=")[1]}`);
+      console.log(`    ${i + 1}. ${lesson.title} -> ${url}`);
     }
     console.log();
   }
 
-  console.log("Done! All lessons now use verified YouTube URLs.");
+  console.log("Done! All lessons now use YouTube video URLs.");
   process.exit(0);
 }
 

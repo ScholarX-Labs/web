@@ -25,7 +25,7 @@ const springStable: Transition = {
   damping: 24,
 };
 
-const springSnappy: Transition = {
+export const springSnappy: Transition = {
   type: "spring",
   stiffness: 400,
   damping: 28,
