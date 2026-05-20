@@ -6,6 +6,7 @@ import { Client } from "pg";
 const MIGRATIONS_SCHEMA = "drizzle";
 const MIGRATIONS_TABLE = "__drizzle_migrations";
 const DEFAULT_BASELINE_THROUGH = "0004_rapid_stone_men";
+const COURSE_CATEGORIES_BASELINE_THROUGH = "0005_course_categories";
 
 function getConnectionString() {
   const connectionString = process.env.DATABASE_URL;
@@ -106,9 +107,11 @@ async function main() {
       "course_categories",
     );
 
-    const baselineThrough = hasCourseCategoriesTable
-      ? migrations.at(-1)?.tag
-      : process.env.DRIZZLE_BASELINE_THROUGH ?? DEFAULT_BASELINE_THROUGH;
+    const baselineThrough =
+      process.env.DRIZZLE_BASELINE_THROUGH ??
+      (hasCourseCategoriesTable
+        ? COURSE_CATEGORIES_BASELINE_THROUGH
+        : DEFAULT_BASELINE_THROUGH);
 
     const baselineIndex = migrations.findIndex(
       (migration) => migration.tag === baselineThrough,
