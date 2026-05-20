@@ -47,6 +47,18 @@ PDF is the required artifact. PNG preview is optional and should be generated on
 - Legacy columns such as `season_number` and `role` are required by the older model but do not belong in every course-completion certificate.
 - Certificate services are mixed with course infrastructure, which weakens ownership boundaries.
 
+### 2.3 Principal Review Corrections
+
+The plan is directionally correct, but implementation should not start until these gaps are resolved:
+
+- The repository does not currently define `certificates.*` in Drizzle. Add `src/db/schema/certificates-db.schema.ts` and include the `certificates` schema in `drizzle.config.ts` before creating certificate-domain repositories.
+- The feature must cut over both certificate entry points: `POST /api/courses/[courseId]/certificate` and the final-lesson server action in `src/actions/course.actions.ts`.
+- Public verification must show revoked certificates as revoked, not hide them as `404`, because the spec requires revoked credentials to remain queryable.
+- Use `source_type = "course_completion"` and `source_id = course_progress_id` for course-completion certificates. Keep `course_id` as query/reporting metadata, not the canonical source identifier.
+- Do not rely on "publish after commit plus repair scan" alone. Store a durable enqueue intent in the database transaction so Service Bus publish failures are recoverable without guessing from artifact state.
+- Azure SDK and Playwright/Chromium must be isolated to infrastructure adapters or a worker package/entrypoint. They must not enter Client Components, metadata generation, or general Next.js route bundles.
+- Local/test environments need fake or no-op queue/storage/renderer adapters so the core certificate domain remains testable without Azure credentials.
+
 ## 3. Target Architecture
 
 ### 3.1 Ownership Model
@@ -180,6 +192,8 @@ Idempotency constraints:
 - Azure Service Bus message ID:
   - `${artifactId}:${artifactType}:${templateVersion}`
 
+For course completion certificates, `source_id` is the `course_progress.id`. The certificate row must also store `course_id` for joins and support workflows, but idempotency should anchor to the durable completion source row.
+
 ### 4.7 State Machine Pattern
 
 Certificate and artifact status transitions should be explicit and validated.
@@ -198,8 +212,8 @@ Artifact status:
 ```text
 pending -> generating -> ready
 pending -> generating -> failed
-failed -> pending
 failed -> generating
+ready -> generating   -- explicit regeneration only
 ```
 
 The application service should reject invalid transitions instead of relying on UI behavior or worker assumptions.
@@ -211,8 +225,10 @@ Use Azure Service Bus for distributed processing. Use a durable database record 
 Recommended V1 behavior:
 
 - Create artifact row in `pending`.
+- Create a durable queue/outbox row in the same transaction as certificate issuance.
 - Publish Azure Service Bus message after commit.
-- Scheduled repair job re-enqueues stale `pending` or retryable `failed` artifacts.
+- Mark the outbox row as published only after Service Bus accepts the message.
+- Scheduled repair job re-publishes unpublished outbox rows and re-enqueues stale `pending` or retryable `failed` artifacts.
 - Worker uses artifact row locking or conditional update to claim work.
 
 ### 4.9 Strategy Pattern
@@ -242,7 +258,7 @@ For example:
 ```ts
 type CertificateEligibilitySnapshot = {
   sourceType: "course_completion";
-  sourceId: string;
+  sourceId: string; // courseProgressId for course_completion
   userId: string;
   recipientName: string;
   title: string;
@@ -311,9 +327,11 @@ certificates
 Recommended key format:
 
 ```text
-certificates/{yyyy}/{mm}/{certificateNumber}/{templateVersion}/certificate.pdf
-certificates/{yyyy}/{mm}/{certificateNumber}/{templateVersion}/preview.png
+certificates/{certificateNumber}/{templateVersion}/certificate.pdf
+certificates/{certificateNumber}/{templateVersion}/preview.png
 ```
+
+Do not date-partition artifact keys. Regeneration can happen in a later month after a template or renderer fix, and the stable lookup key should come from immutable certificate identity plus template version. Use artifact metadata, Blob Storage lifecycle policies, and Azure Monitor dimensions for date-based operations instead of encoding dates into the key path.
 
 ### 6.3 Azure Service Bus
 
@@ -357,6 +375,13 @@ Preferred V1 implementation:
 
 This prioritizes visual fidelity and supports the current template. The renderer must be deterministic and snapshot-testable.
 
+Dependency boundary:
+
+- Add Playwright/Chromium only for the worker/runtime that renders certificates.
+- Do not import Playwright from Next.js pages, route metadata, Client Components, or the normal certificate verification query path.
+- Keep a deterministic fake renderer for unit and route tests.
+- If the worker remains in the same repository, expose it through a separate entrypoint and package script so Vercel/Cloudflare builds do not bundle browser-rendering dependencies into the web app.
+
 ### 6.6 Certificate ID Strategy
 
 Use two IDs:
@@ -381,6 +406,33 @@ Rules:
 
 ## 7. Database Plan
 
+### 7.0 Drizzle Schema Integration
+
+The current application schema only models `courses.certificates`. Before repository work starts, add the canonical certificate schema to the codebase:
+
+```text
+src/db/schema/certificates-db.schema.ts
+```
+
+This schema file should define or align with:
+
+- `certificates.certificates`
+- `certificates.certificate_artifacts`
+- `certificates.certificate_events`
+- `certificates.certificate_jobs` or a dedicated artifact queue/outbox table
+
+Update `drizzle.config.ts`:
+
+- Add `./src/db/schema/certificates-db.schema.ts` to `schema`.
+- Add `certificates` to `schemaFilter`.
+- Generate migrations only after validating the live legacy `certificates.*` table definitions, because the spec notes those tables exist in the dev database but they are not represented in application code today.
+
+Exit gate:
+
+- `rg "certificatesSchema|certificateArtifacts|certificateEvents" src/db/schema` returns first-class Drizzle definitions.
+- `drizzle.config.ts` includes the `certificates` schema.
+- Generated migrations do not accidentally drop or rewrite legacy `certificates.*` objects.
+
 ### 7.1 Canonical Certificate Schema Changes
 
 Update `certificates.certificates` to support course-completion and future certificate sources.
@@ -390,8 +442,8 @@ Required additions:
 ```sql
 alter table certificates.certificates
   add column if not exists certificate_number text,
-  add column if not exists source_type text,
-  add column if not exists source_id text,
+  add column if not exists source_type text not null default 'course_completion',
+  add column if not exists source_id uuid,
   add column if not exists course_progress_id uuid,
   add column if not exists metadata jsonb not null default '{}'::jsonb,
   add column if not exists rule_version text not null default 'course_completion_v1',
@@ -462,7 +514,33 @@ Allowed artifact statuses:
 - `ready`
 - `failed`
 
-### 7.3 Legacy Table Removal
+### 7.3 Queue Outbox / Artifact Job Table
+
+Use a durable outbox or artifact job table so issuance can commit even when Service Bus is temporarily unavailable and still recover deterministically.
+
+Minimum fields:
+
+```sql
+create table if not exists certificates.certificate_artifact_queue (
+  id uuid primary key default gen_random_uuid(),
+  artifact_id uuid not null references certificates.certificate_artifacts(id) on delete cascade,
+  certificate_id uuid not null references certificates.certificates(id) on delete cascade,
+  message_id text not null,
+  queue_name text not null default 'certificate-artifact-generation',
+  status text not null default 'pending',
+  attempts integer not null default 0,
+  last_error text,
+  published_at timestamptz,
+  next_attempt_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (message_id)
+);
+```
+
+If the existing `certificates.certificate_jobs` table already supports this shape, reuse it. If it is batch-level only, keep it for batch orchestration and add this per-artifact outbox table.
+
+### 7.4 Legacy Table Removal
 
 `courses.certificates` must be removed only after:
 
@@ -472,17 +550,18 @@ Allowed artifact statuses:
 4. A production verification query confirms no reads or writes hit `courses.certificates`.
 5. A rollback backup or snapshot exists.
 
-### 7.4 Backfill Requirements
+### 7.5 Backfill Requirements
 
 Backfill must be explicit and auditable.
 
 For each row in `courses.certificates`:
 
 - Create a canonical certificate row.
-- Preserve the old certificate number in metadata.
+- Preserve the old certificate number as `certificate_number` when unique, or as a `short_id` legacy alias plus metadata if a new public number must be minted.
 - Preserve issued/completed timestamps.
 - Set `source_type = 'course_completion'`.
-- Set `source_id = course_id` unless a better course-progress source ID exists.
+- Set `source_id = course_progress_id`.
+- Preserve `course_id` in the canonical `course_id` column for joins, reporting, and support workflows.
 - Set `completion_source = 'legacy_migration'`.
 - Set `metadata.legacy_table = 'courses.certificates'`.
 
@@ -531,7 +610,7 @@ src/domain/certificates/
     certificate-services.factory.ts
 ```
 
-### 8.2 Route And UI Files
+### 8.2 Route, Server Action, And UI Files
 
 Expected route structure:
 
@@ -540,6 +619,7 @@ src/app/api/courses/[courseId]/certificate/route.ts
 src/app/api/certificates/[certificateNumber]/artifact-status/route.ts
 src/app/(platform)/certificates/[certificateNumber]/page.tsx
 src/app/(platform)/certificates/[certificateNumber]/download/route.ts
+src/actions/course.actions.ts
 ```
 
 Expected UI components:
@@ -581,6 +661,11 @@ type IssueCourseCertificateInput = {
 10. Publish Azure Service Bus message for pending artifact.
 11. Return certificate number and artifact status to the UI.
 
+Both current issuance callers must use this flow:
+
+- `src/app/api/courses/[courseId]/certificate/route.ts`
+- `src/actions/course.actions.ts` after final lesson completion
+
 ### 9.3 Completion UI Behavior
 
 When the last lesson completes:
@@ -588,12 +673,21 @@ When the last lesson completes:
 - Show course completion animation.
 - Show certificate generation pending state.
 - Call certificate issuance endpoint.
-- Redirect to public certificate page if issuance succeeds.
+- Treat successful issuance as "certificate issued", not "PDF ready".
+- Redirect or link to the public certificate page when issuance succeeds, even if `artifactStatus = "pending"`.
 - On certificate page, show:
   - Certificate metadata immediately.
   - PDF generation status while artifact is pending/generating.
   - Download CTA once PDF is ready.
   - Retry guidance if generation fails.
+
+Artifact status polling contract:
+
+- Poll `GET /api/certificates/{certificateNumber}/artifact-status` every 5 seconds while the PDF status is `pending` or `generating`.
+- Stop polling after 2 minutes in the browser and show "still generating" guidance with a manual refresh/retry action.
+- Stop polling immediately when the status becomes `ready`, `failed`, or the certificate becomes `revoked`.
+- Do not show the PDF download CTA until the status endpoint reports `ready`.
+- Avoid polling from server-rendered metadata or static rendering paths.
 
 Eligibility and artifact readiness are separate states. The learner can be certificate-eligible before the PDF file exists.
 
@@ -616,16 +710,32 @@ Eligibility and artifact readiness are separate states. The learner can be certi
 ### 10.2 Worker Steps
 
 1. Receive Service Bus message.
-2. Load artifact and certificate by ID.
-3. Reject if certificate is revoked.
-4. Skip if artifact is already `ready`.
-5. Claim artifact by conditional update from `pending` or `failed` to `generating`.
+2. Atomically claim the artifact by ID with a conditional update from `pending` or retryable `failed` to `generating`.
+3. If no row is claimed, reload only enough state to skip already-`ready` or non-retryable artifacts.
+4. Load the certificate snapshot needed for rendering.
+5. Reject if certificate is revoked.
 6. Render PDF from template and certificate data.
 7. Upload PDF to Azure Blob.
 8. Store content type, byte size, checksum, and storage key.
 9. Mark artifact `ready`.
 10. Insert `certificate.artifact_ready` event.
 11. Complete Service Bus message.
+
+The claim must be one atomic database operation, not read-then-write application logic:
+
+```sql
+update certificates.certificate_artifacts
+set
+  status = 'generating',
+  attempts = attempts + 1,
+  updated_at = now()
+where id = :artifact_id
+  and status in ('pending', 'failed')
+  and (next_attempt_at is null or next_attempt_at <= now())
+returning *;
+```
+
+If the update returns zero rows, the worker must reload the artifact only to determine whether it is already `ready`, not to perform rendering. This closes the at-least-once delivery race where two workers receive the same message.
 
 ### 10.3 Failure Handling
 
@@ -644,7 +754,42 @@ Retry budget:
 - Maximum 5 attempts before DLQ.
 - Admin repair action can requeue failed artifacts.
 
+### 10.4 Repair / Requeue Job
+
+Run a repair job on a timer every 5 minutes. Azure Functions timer trigger is acceptable for V1; Azure Container Apps scheduled job is also acceptable if the worker platform is already standardized there.
+
+The repair job must:
+
+- Publish unpublished outbox rows where `published_at is null`, `status = 'pending'`, and `created_at < now() - interval '2 minutes'`.
+- Requeue artifacts stuck in `pending` for more than 5 minutes when no unpublished outbox row exists.
+- Requeue artifacts stuck in `generating` for longer than the Service Bus lock timeout plus a safety margin, for example 15 minutes.
+- Requeue `failed` artifacts where `attempts < 5` and `next_attempt_at <= now()`.
+- Mark outbox rows as `published` only after Service Bus accepts the message.
+- Record structured logs and metrics for rows scanned, rows requeued, publish failures, and stale generating artifacts.
+
+Reference selection query:
+
+```sql
+select id, artifact_id, certificate_id, message_id
+from certificates.certificate_artifact_queue
+where status = 'pending'
+  and published_at is null
+  and created_at < now() - interval '2 minutes'
+order by created_at
+limit :batch_size;
+```
+
 ## 11. Azure Infrastructure Requirements
+
+Azure is the production artifact infrastructure, but it is not currently wired into the repository. Treat Azure support as an infrastructure slice with explicit package/deployment changes:
+
+- Add Azure SDK dependencies only when implementing the Azure adapters.
+- Keep environment variables server-only and out of `NEXT_PUBLIC_*`.
+- Provide local implementations:
+  - `NoopCertificateQueueAdapter` for route/unit tests.
+  - `FilesystemCertificateStorageAdapter` or in-memory storage for local worker tests.
+  - `FakeCertificateRenderer` for deterministic service tests.
+- Document a separate worker start command if the renderer runs outside the Next.js process.
 
 ### 11.1 Azure Blob Storage
 
@@ -729,7 +874,9 @@ Auth:
 Behavior:
 
 - Uses canonical certificate query service.
-- Returns 404 for missing, private, or revoked certificates unless product decides revoked certificates should show a public revoked page.
+- Returns 404 for missing certificates.
+- Returns 404 for private certificates unless the requester is authorized.
+- Shows revoked public certificates with a revoked state instead of hiding them.
 - Shows PDF status and download CTA.
 
 ### 12.3 Artifact Status
@@ -749,10 +896,13 @@ Response:
   "certificateNumber": "SX-7M4K-M2QD-8F4P-T6VN-X1RA",
   "pdf": {
     "status": "ready",
-    "downloadUrl": "/certificates/SX-7M4K-M2QD-8F4P-T6VN-X1RA/download"
+    "downloadUrl": "/certificates/SX-7M4K-M2QD-8F4P-T6VN-X1RA/download",
+    "nextPollAfterMs": null
   }
 }
 ```
+
+For `pending` or `generating`, return `downloadUrl: null` and `nextPollAfterMs: 5000`. The client should stop automatic polling after 2 minutes and leave the page in a recoverable manual-refresh state.
 
 ### 12.4 PDF Download
 
@@ -909,6 +1059,8 @@ Cover:
 - Artifact retry policy.
 - Template data mapping.
 - Public/private/revoked certificate visibility rules.
+- Source key mapping: course completion certificates use `course_progress.id` as `source_id`.
+- Fake queue/storage/renderer adapters satisfy the same contracts as production adapters.
 
 ### 16.2 Repository Tests
 
@@ -917,6 +1069,7 @@ Cover:
 - Unique source constraint.
 - Unique certificate number constraint.
 - Artifact unique key.
+- Queue/outbox uniqueness and publish-state transitions.
 - Concurrent issue requests for the same course completion.
 - Backfill conflict behavior.
 
@@ -941,6 +1094,7 @@ Cover:
 - Blob upload failure marks failure and retries.
 - Revoked certificate does not generate a public artifact.
 - DLQ path after retry budget.
+- Unpublished outbox rows are republished without creating duplicate artifact jobs.
 
 ### 16.5 E2E Tests
 
@@ -969,6 +1123,7 @@ Before production rollout:
 
 - Count rows in both certificate tables.
 - Export legacy `courses.certificates` snapshot.
+- Inspect live `certificates.*` table definitions and reconcile them with new Drizzle schema definitions.
 - Confirm existing public URLs and certificate numbers.
 - Document all code paths importing course certificate repository/service.
 
@@ -980,8 +1135,11 @@ Exit gate:
 
 ### Phase 1: Schema Expansion
 
+- Add `src/db/schema/certificates-db.schema.ts`.
+- Add the `certificates` schema to `drizzle.config.ts`.
 - Add missing canonical columns to `certificates.certificates`.
 - Add `certificates.certificate_artifacts`.
+- Add per-artifact queue/outbox support using `certificates.certificate_jobs` or a dedicated outbox table.
 - Add indexes concurrently where production requires it.
 - Make legacy-only columns nullable where needed.
 
@@ -1048,6 +1206,7 @@ Exit gate:
 
 - Remove old course certificate repository and service.
 - Remove `courses.certificates` Drizzle schema exports.
+- Add or document a reconstruction script/runbook that can recreate legacy `courses.certificates` rows from canonical certificate rows and migration metadata.
 - Drop `courses.certificates` table in a dedicated migration.
 - Remove temporary dual-read logic.
 
@@ -1067,15 +1226,22 @@ Before dropping `courses.certificates`, rollback is straightforward:
 
 After dropping `courses.certificates`, rollback requires:
 
-- Restoring database snapshot or recreating legacy rows from canonical metadata.
-- Therefore, table drop must happen only after stable production operation and backup verification.
+- Prefer reconstructing legacy rows from canonical certificate data when the failure is limited to application compatibility:
+  - Use `certificates.certificates` rows where `source_type = 'course_completion'`.
+  - Use `metadata.legacy_table = 'courses.certificates'`, preserved legacy certificate numbers, `course_id`, `course_progress_id`, issued timestamps, and migration events to recreate compatible `courses.certificates` rows.
+  - Validate reconstructed row counts and certificate numbers before routing traffic back to the legacy path.
+- Restore a database snapshot only when canonical data itself is corrupted or reconstruction cannot meet the recovery objective.
+- Therefore, table drop must happen only after stable production operation, backup verification, and a tested reconstruction script or runbook.
 
 ## 19. Implementation Checklist
 
 ### Schema
 
+- [ ] Add `src/db/schema/certificates-db.schema.ts`.
+- [ ] Include `certificates` in `drizzle.config.ts`.
 - [ ] Add canonical certificate columns.
 - [ ] Add artifact table.
+- [ ] Add queue/outbox table or extend `certificate_jobs` for per-artifact enqueue durability.
 - [ ] Add public lookup indexes.
 - [ ] Add source uniqueness indexes.
 - [ ] Make `season_number` and `role` nullable or metadata-only.
@@ -1097,16 +1263,21 @@ After dropping `courses.certificates`, rollback requires:
 - [ ] Add Drizzle repositories.
 - [ ] Add Azure Blob adapter.
 - [ ] Add Azure Service Bus adapter.
+- [ ] Add local/test fake queue, storage, and renderer adapters.
 - [ ] Add renderer adapter.
 - [ ] Add worker entrypoint.
-- [ ] Add repair/requeue job.
+- [ ] Add repair/requeue job with a 5-minute timer trigger and explicit unpublished-outbox query.
+- [ ] Use stable certificate artifact keys based on `certificateNumber` and `templateVersion`.
+- [ ] Implement worker artifact claim as one atomic conditional update with `RETURNING`.
 
 ### UI And Routes
 
 - [ ] Update issue route.
+- [ ] Update final-lesson server action in `src/actions/course.actions.ts`.
 - [ ] Update certificate public page.
 - [ ] Add PDF download route.
 - [ ] Add artifact status route.
+- [ ] Add artifact status polling every 5 seconds with a 2-minute automatic polling timeout.
 - [ ] Add pending/failed artifact UI.
 - [ ] Keep final-lesson celebration and certificate generation state separate.
 
@@ -1124,13 +1295,16 @@ After dropping `courses.certificates`, rollback requires:
 
 The feature is complete when:
 
+- The `certificates` schema is represented in Drizzle and included in migration configuration.
 - `certificates.certificates` is the only source of truth.
 - `courses.certificates` has been removed after migration.
 - Course completion issues certificates idempotently.
 - Public certificate pages are accessible without authentication.
+- Revoked public certificates render a revoked verification state.
 - Every issued course certificate has a required PDF artifact or a visible generation failure state.
 - PDFs are stored in Azure Blob Storage.
 - PDF generation runs asynchronously through Azure Service Bus.
+- Queue publication is recoverable through a durable outbox/job record.
 - Workers are retry-safe and duplicate-safe.
 - Certificate IDs use high-entropy public identifiers.
 - Observability exists for issuance, rendering, downloads, queue depth, and failures.
