@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Course, LessonSummary } from "@/types/course.types";
-import { CourseListQuery, CourseSearchQuery } from "@/domain/courses/contracts";
+import type {
+  CourseCategory,
+  CourseListQuery,
+  CourseSearchQuery,
+} from "@/domain/courses/contracts";
 import { PaginatedCoursesApiResponse } from "@/lib/api/courses.service";
 import {
   FlatCourseRecord,
@@ -51,7 +55,7 @@ const toCourse = (record: FlatCourseRecord, isSubscribed = false): Course => ({
   totalRatings: record.totalRatings ?? undefined,
   isBestseller: record.isBestseller ?? undefined,
   urgencyText: record.urgencyText ?? undefined,
-  tags: record.tags ?? undefined,
+  tags: Array.isArray(record.tags) ? record.tags : [],
   videoPreviewUrl: record.videoPreviewUrl ?? undefined,
   instructor: record.instructor
     ? {
@@ -112,14 +116,17 @@ export class NextCourseCatalogService {
       category: query.category,
     });
 
+    const items = Array.isArray(result?.items) ? result.items : [];
+    const totalCourses = result?.totalCourses ?? items.length;
+
     const subscribedCourseIds = userId
       ? await this.repository.findActiveSubscriptionsByUser(
           userId,
-          result.items.map((item) => item.id),
+          items.map((item) => item.id),
         )
       : new Set<string>();
 
-    const mapped = result.items.map((item) =>
+    const mapped = items.map((item) =>
       toCourse(item, subscribedCourseIds.has(item.id)),
     );
 
@@ -131,8 +138,12 @@ export class NextCourseCatalogService {
 
     return {
       items: mapped,
-      pagination: this.toPagination(result.totalCourses, page, limit),
+      pagination: this.toPagination(totalCourses, page, limit),
     };
+  }
+
+  async listCategories(): Promise<CourseCategory[]> {
+    return this.repository.listActiveCategories();
   }
 
   getFeatured(query: CourseListQuery = {}, userId?: string) {
@@ -162,10 +173,17 @@ export class NextCourseCatalogService {
         limit,
         searchTitle: query.title.trim(),
       })
-      .then((result) => ({
-        items: result.items.map((item) => toCourse(item, false)),
-        pagination: this.toPagination(result.totalCourses, page, limit),
-      }));
+      .then((result) => {
+        const items = Array.isArray(result?.items) ? result.items : [];
+        return {
+          items: items.map((item) => toCourse(item, false)),
+          pagination: this.toPagination(
+            result?.totalCourses ?? items.length,
+            page,
+            limit,
+          ),
+        };
+      });
   }
 
   async getById(id: string, userId?: string): Promise<Course> {

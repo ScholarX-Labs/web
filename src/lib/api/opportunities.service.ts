@@ -21,27 +21,28 @@ const DEFAULT_QUERY: OpportunitiesQuery = {
 
 export const mapOpportunity = (raw: {
   id: string;
-  data: SearchRawOpportunity;
+  data: Partial<SearchRawOpportunity>;
 }): Opportunity => {
   const { data } = raw;
+  const type: NonNullable<SearchRawOpportunity["type"]> = data.type ?? {};
 
   return {
     id: raw.id,
-    title: data.title,
-    description: data.description,
-    applicationLink: data.application_link,
-    eligibility: data.eligibility,
-    country: data.country,
-    location: data.location,
-    startDate: data.start_date,
-    endDate: data.end_date,
-    duration: data.duration,
+    title: data.title ?? "Untitled opportunity",
+    description: data.description ?? "",
+    applicationLink: data.application_link ?? "",
+    eligibility: data.eligibility ?? "",
+    country: Array.isArray(data.country) ? data.country : [],
+    location: data.location ?? "",
+    startDate: data.start_date ?? "",
+    endDate: data.end_date ?? "",
+    duration: data.duration ?? "",
     // Safely extract and cast to Enum array
-    fundType: (data.fund_type || []) as Funding[],
-    benefits: data.benefits,
-    applicationFee: data.application_fee,
-    officialWebsite: data.official_website,
-    deadline: data.deadline,
+    fundType: (Array.isArray(data.fund_type) ? data.fund_type : []) as Funding[],
+    benefits: Array.isArray(data.benefits) ? data.benefits : [],
+    applicationFee: data.application_fee ?? "",
+    officialWebsite: data.official_website ?? "",
+    deadline: data.deadline ?? "",
     // Conversions
     gpa:
       data.gpa !== null && data.gpa !== undefined
@@ -55,13 +56,24 @@ export const mapOpportunity = (raw: {
       data.max_age !== null && data.max_age !== undefined
         ? Number(data.max_age)
         : null,
-    category: data.type?.category as Categories,
-    subtype: data.type?.subtype as OpportunityType[],
-    targetSegment: data.target_segment as TargetSegment[],
-    eligibleNationalities: data.eligible_nationalities,
-    documentsRequired: data.documents_required,
-    languageRequirements: data.language_requirements,
-    isRemote: data.is_remote,
+    category: type.category as Categories,
+    subtype: (Array.isArray(type.subtype) ? type.subtype : []) as OpportunityType[],
+    targetSegment: (Array.isArray(data.target_segment)
+      ? data.target_segment
+      : []) as TargetSegment[],
+    eligibleNationalities: Array.isArray(data.eligible_nationalities)
+      ? data.eligible_nationalities
+      : [],
+    documentsRequired: Array.isArray(data.documents_required)
+      ? data.documents_required
+      : [],
+    languageRequirements:
+      typeof data.language_requirements === "object" &&
+      data.language_requirements !== null &&
+      !Array.isArray(data.language_requirements)
+        ? data.language_requirements
+        : {},
+    isRemote: Boolean(data.is_remote),
   };
 };
 
@@ -77,15 +89,26 @@ export const opportunitiesService = {
         params: { q, ...rest },
       },
     );
+    const opportunities = Array.isArray(response.data?.opportunities)
+      ? response.data.opportunities
+      : [];
+    const pagination = response.data?.pagination;
+
+    if (!Array.isArray(response.data?.opportunities)) {
+      console.error("[opportunitiesService] Expected opportunities array", {
+        payload: response.data,
+      });
+    }
+
     return {
-      opportunities: response.data.opportunities.map((item) =>
-        mapOpportunity({ id: item.id, data: item.data }),
+      opportunities: opportunities.map((item) =>
+        mapOpportunity({ id: item.id, data: item.data ?? {} }),
       ),
       pagination: {
-        page: response.data.pagination.page,
-        perPage: response.data.pagination.per_page,
-        total: response.data.pagination.total,
-        totalPages: response.data.pagination.total_pages,
+        page: pagination?.page ?? mergedQuery.page ?? 1,
+        perPage: pagination?.per_page ?? mergedQuery.per_page ?? 12,
+        total: pagination?.total ?? opportunities.length,
+        totalPages: pagination?.total_pages ?? 1,
       },
     };
   },

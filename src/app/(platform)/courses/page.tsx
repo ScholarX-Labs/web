@@ -8,15 +8,15 @@ export const dynamic = "force-dynamic";
 export default async function CoursesPage() {
   const session = await getSession();
   const courseDomain = createNextCourseDomain();
-  const data = await courseDomain.catalog.list(
-    { page: 1, limit: 9 },
-    session?.user.id,
-  );
+  const [data, categories] = await Promise.all([
+    courseDomain.catalog.list({ page: 1, limit: 9 }, session?.user.id),
+    courseDomain.catalog.listCategories(),
+  ]);
 
   return (
     <div className="w-full flex flex-col pb-10">
-      <CoursesHero />
-      <CoursesView courses={data.items} />
+      <CoursesHero categories={categories} />
+      <CoursesView courses={data.items} categories={categories} />
     </div>
   );
 }

@@ -4,7 +4,7 @@ import { useState, useLayoutEffect } from "react";
 import { ArrowUp, ChevronDown } from "lucide-react";
 import { SearchResult } from "@/lib/ai-search/types";
 import { ScholarshipCard } from "./scholarship-card";
-import { ScholarshipModal } from "./scholarship-modal";
+import { ScholarshipModal } from "./scholarship-modal-enhanced";
 import { Skeleton } from "@/components/ai-search/ui/skeleton";
 import { Button } from "@/components/ai-search/ui/button";
 
@@ -82,7 +82,7 @@ export function SearchResults({
   const firstPart = words.slice(0, -1).join(" ");
   const lastWord = words[words.length - 1];
 
-  const sortedResults = sortResults(results, sortBy);
+  const sortedResults = sortResults(results ?? [], sortBy);
   const visibleResults = sortedResults.slice(0, visibleCount);
   const hasMore = visibleCount < results.length;
 

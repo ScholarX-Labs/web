@@ -7,15 +7,13 @@ if (!connectionString) {
 }
 const dbUrl = new URL(connectionString);
 const enableSsl = process.env.DATABASE_SSL?.toLowerCase() === "true";
+const currentSslMode = dbUrl.searchParams.get("sslmode");
 
-if (enableSsl) {
-  const currentSslMode = dbUrl.searchParams.get("sslmode");
-  if (
-    !currentSslMode ||
-    ["prefer", "require", "verify-ca"].includes(currentSslMode)
-  ) {
-    dbUrl.searchParams.set("sslmode", "verify-full");
-  }
+if (
+  (enableSsl && !currentSslMode) ||
+  (currentSslMode && ["prefer", "require", "verify-ca"].includes(currentSslMode))
+) {
+  dbUrl.searchParams.set("sslmode", "verify-full");
 }
 
 export default defineConfig({

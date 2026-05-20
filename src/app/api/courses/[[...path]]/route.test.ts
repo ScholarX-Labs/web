@@ -5,7 +5,7 @@ import { NextRequest } from "next/server";
 const loadHandlersFactory = async () => {
   process.env.DATABASE_URL ??=
     "postgres://postgres:postgres@localhost:5432/postgres";
-  const mod = await import("./route");
+  const mod = await import("./route-handlers");
   return mod.createCoursesRouteHandlers;
 };
 

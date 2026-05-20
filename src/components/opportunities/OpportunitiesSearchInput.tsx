@@ -1,29 +1,29 @@
 "use client";
 
 import { useOpportunitiesSearch } from "@/providers/opportunities-search-provider";
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 export default function OpportunitiesSearchInput() {
   const { searchQuery, setSearchQuery, filters } = useOpportunitiesSearch();
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
+  const [isFocused, setIsFocused] = useState(false);
 
   const handleSearch = () => {
     const params = new URLSearchParams(searchParams.toString());
 
-    // Clear existing filter params to rebuild them
-    // We only keep 'page' if we want or just always reset to 'page' 1 when searching
     Object.keys(filters).forEach((key) => params.delete(key));
     params.delete("q");
 
-    // Add query
     if (searchQuery.trim()) {
       params.set("q", searchQuery.trim());
     }
 
-    // Add filters
     Object.entries(filters).forEach(([key, values]) => {
       if (values && values.length > 0) {
         params.set(key, values.join(","));
@@ -41,25 +41,56 @@ export default function OpportunitiesSearchInput() {
   };
 
   return (
-    <div className="flex flex-row relative w-3/4 my-4">
-      <input
-        type="text"
-        role="searchbox"
-        className="bg-white w-full rounded-sm p-3 pr-10 text-black focus:outline-primary"
-        maxLength={200}
-        placeholder="Search opportunities"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        onKeyDown={handleKeyDown}
-      />
-      <button
-        type="button"
-        aria-label="Search"
-        className="absolute right-0 top-0 h-full px-3 flex items-center cursor-pointer text-gray-400 hover:text-gray-600"
-        onClick={handleSearch}
+    <motion.div 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.2 }}
+      className="flex flex-row relative w-full max-w-2xl my-6 group"
+    >
+      <motion.div
+        animate={isFocused ? { scale: 1.01, boxShadow: "0 10px 40px rgba(0,0,0,0.15)" } : { scale: 1, boxShadow: "0 4px 20px rgba(0,0,0,0.05)" }}
+        className={cn(
+          "flex items-center w-full bg-white dark:bg-slate-900 rounded-full border-2 transition-colors duration-300 px-6 py-2",
+          isFocused ? "border-primary" : "border-slate-200 dark:border-slate-800"
+        )}
       >
-        <Search />
-      </button>
-    </div>
+        <Search className={cn("shrink-0 transition-colors", isFocused ? "text-primary" : "text-slate-400")} size={22} />
+        <input
+          type="text"
+          role="searchbox"
+          className="flex-1 bg-transparent p-3 text-lg text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none"
+          maxLength={200}
+          placeholder="Search for scholarships, grants..."
+          value={searchQuery}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyDown={handleKeyDown}
+        />
+        <AnimatePresence>
+          {searchQuery && (
+            <motion.button
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.5 }}
+              onClick={() => setSearchQuery("")}
+              className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors cursor-pointer"
+            >
+              <X size={18} className="text-slate-400" />
+            </motion.button>
+          )}
+        </AnimatePresence>
+        <div className="h-8 w-[1px] bg-slate-200 dark:bg-slate-800 mx-2" />
+        <button
+          type="button"
+          aria-label="Search"
+          className="shrink-0 px-4 py-2 bg-primary text-white rounded-full font-bold hover:bg-primary/90 transition-all active:scale-95 cursor-pointer shadow-md hover:shadow-lg"
+          onClick={handleSearch}
+        >
+          Search
+        </button>
+      </motion.div>
+    </motion.div>
   );
 }
+

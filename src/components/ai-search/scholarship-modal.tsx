@@ -15,7 +15,9 @@ import { Calendar, DollarSign, MapPin, ExternalLink } from "lucide-react";
 
 interface ScholarshipModalProps {
   result: SearchResult | null;
-  open: boolean;
+  // Support both `open` and `isOpen` for compatibility with callers
+  open?: boolean;
+  isOpen?: boolean;
   onClose: () => void;
 }
 
@@ -28,15 +30,19 @@ function getCategory(result: SearchResult): string | null {
 export function ScholarshipModal({
   result,
   open,
+  isOpen,
   onClose,
 }: ScholarshipModalProps) {
   if (!result) return null;
+
+  // prefer explicit `open`, fallback to `isOpen` for backwards compatibility
+  const dialogOpen = typeof open === "boolean" ? open : Boolean(isOpen);
 
   const category = getCategory(result);
   const allTags = result.tags ?? (category ? [category] : []);
 
   return (
-    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+    <Dialog open={dialogOpen} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           {/* Top row: tags + match% */}

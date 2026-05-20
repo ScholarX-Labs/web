@@ -5,7 +5,8 @@ import Link from "next/link";
 import { HERO_CONTENT, HERO_BUTTONS } from "@/lib/home-data";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ShieldCheck, GraduationCap } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { ArrowRight, ShieldCheck, GraduationCap, UsersRound } from "lucide-react";
 
 export const HeroSection = memo(function HeroSection() {
   return (
@@ -41,7 +42,7 @@ export const HeroSection = memo(function HeroSection() {
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col w-full sm:w-auto sm:flex-row items-center gap-4">
+          <div className="flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:items-center sm:gap-4">
             {HERO_BUTTONS.map((button) => {
               const Icon = button.icon;
               const isPrimary = button.type === "primary";
@@ -52,15 +53,44 @@ export const HeroSection = memo(function HeroSection() {
                   asChild
                   size="lg"
                   variant={isPrimary ? "default" : "outline"}
-                  className={`group w-full sm:w-auto h-14 px-8 text-base transition-all duration-300 ${
+                  className={cn(
+                    "group/hero-cta relative isolate h-16 w-full overflow-hidden rounded-full px-6 text-[15px] font-bold tracking-normal transition-all duration-300 ease-out cursor-pointer sm:w-auto sm:min-w-[190px]",
+                    "focus-visible:ring-[3px] focus-visible:ring-[var(--color-hero-blue)]/25 motion-safe:hover:-translate-y-1 motion-reduce:transition-none motion-reduce:hover:translate-y-0",
                     isPrimary
-                      ? "bg-[var(--color-hero-blue)] hover:bg-[var(--color-hero-blue-dark)] text-white shadow-md hover:shadow-lg hover:-translate-y-0.5"
-                      : "border-border text-foreground hover:bg-accent/50"
-                  }`}
+                      ? "border-0 bg-transparent text-white shadow-[0_18px_36px_-16px_rgba(51,153,204,0.75),0_10px_22px_-18px_rgba(255,106,58,0.75)] hover:bg-transparent hover:text-white hover:shadow-[0_24px_52px_-18px_rgba(51,153,204,0.9),0_16px_34px_-22px_rgba(255,106,58,0.75)] active:translate-y-0"
+                      : "border border-[var(--color-hero-blue)]/20 bg-white/80 text-[var(--color-hero-heading)] shadow-[0_16px_36px_-24px_rgba(26,43,73,0.55)] backdrop-blur-xl hover:border-[var(--color-hero-blue)]/45 hover:bg-white hover:text-[var(--color-hero-blue)] hover:shadow-[0_22px_46px_-26px_rgba(51,153,204,0.65)] active:translate-y-0 dark:bg-white/10 dark:text-white dark:hover:bg-white/15",
+                  )}
                 >
                   <Link href={button.link}>
-                    {button.text}
-                    <Icon className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                    {isPrimary ? (
+                      <>
+                        <span className="absolute inset-0 bg-[linear-gradient(135deg,var(--color-hero-blue)_0%,#2563eb_48%,var(--color-hero-orange)_100%)]" />
+                        <span className="absolute -inset-x-12 inset-y-0 translate-x-[-130%] skew-x-[-18deg] bg-white/25 transition-transform duration-700 ease-out group-hover/hero-cta:translate-x-[130%] group-focus-visible/hero-cta:translate-x-[130%] motion-reduce:hidden" />
+                        <span className="absolute inset-0 rounded-full ring-1 ring-inset ring-white/35" />
+                      </>
+                    ) : (
+                      <>
+                        <span className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_20%_20%,rgba(51,153,204,0.14),transparent_34%),linear-gradient(135deg,rgba(255,255,255,0.94),rgba(255,255,255,0.7))] opacity-100 transition-opacity duration-300 group-hover/hero-cta:opacity-90 dark:bg-[linear-gradient(135deg,rgba(255,255,255,0.12),rgba(255,255,255,0.04))]" />
+                        <span className="absolute inset-0 rounded-full ring-1 ring-inset ring-[var(--color-hero-blue)]/10 transition-colors duration-300 group-hover/hero-cta:ring-[var(--color-hero-blue)]/25" />
+                      </>
+                    )}
+                    <span className="relative z-10 flex w-full items-center justify-center gap-3">
+                      <span
+                        className={cn(
+                          "flex size-9 shrink-0 items-center justify-center rounded-full transition-all duration-300",
+                          isPrimary
+                            ? "bg-white/18 text-white ring-1 ring-white/25 group-hover/hero-cta:bg-white/24"
+                            : "bg-[var(--color-hero-blue)]/10 text-[var(--color-hero-blue)] group-hover/hero-cta:bg-[var(--color-hero-blue)] group-hover/hero-cta:text-white",
+                        )}
+                        aria-hidden="true"
+                      >
+                        <Icon className="h-4.5 w-4.5 transition-transform duration-300 group-hover/hero-cta:translate-x-0.5" />
+                      </span>
+                      <span className="whitespace-nowrap">{button.text}</span>
+                      {isPrimary && (
+                        <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/hero-cta:translate-x-1" />
+                      )}
+                    </span>
                   </Link>
                 </Button>
               );
@@ -68,16 +98,32 @@ export const HeroSection = memo(function HeroSection() {
           </div>
 
           {/* Trust Metrics */}
-          <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 text-sm font-medium text-muted-foreground lg:justify-start">
-            <div className="flex items-center gap-2">
-              <GraduationCap className="h-5 w-5 text-[var(--color-hero-orange)]" />
-              <span>
-                {HERO_CONTENT.stats.count}+ {HERO_CONTENT.stats.text}
+          <div className="mt-10 grid w-full max-w-[520px] grid-cols-1 gap-3 sm:grid-cols-2 lg:justify-start">
+            <div className="group/trust flex items-center gap-3 rounded-2xl border border-[var(--color-hero-blue)]/10 bg-white/75 px-4 py-3 text-left shadow-[0_14px_34px_-28px_rgba(26,43,73,0.65)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--color-hero-blue)]/25 hover:bg-white hover:shadow-[0_18px_42px_-30px_rgba(51,153,204,0.7)] motion-reduce:transform-none dark:bg-white/10 dark:hover:bg-white/15">
+              <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[var(--color-hero-orange)]/12 text-[var(--color-hero-orange)] ring-1 ring-[var(--color-hero-orange)]/15 transition-colors duration-300 group-hover/trust:bg-[var(--color-hero-orange)] group-hover/trust:text-white">
+                <UsersRound className="h-5 w-5" />
+              </span>
+              <span className="min-w-0">
+                <span className="block text-lg font-extrabold leading-none tracking-normal text-[var(--color-hero-heading)] dark:text-white">
+                  {HERO_CONTENT.stats.count}+
+                </span>
+                <span className="mt-1 block text-sm font-semibold leading-snug text-[var(--color-hero-body)] dark:text-white/70">
+                  students supported worldwide
+                </span>
               </span>
             </div>
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="h-5 w-5 text-[var(--color-hero-blue)]" />
-              <span>Trusted by 96 Partners</span>
+            <div className="group/trust flex items-center gap-3 rounded-2xl border border-[var(--color-hero-blue)]/10 bg-white/75 px-4 py-3 text-left shadow-[0_14px_34px_-28px_rgba(26,43,73,0.65)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--color-hero-blue)]/25 hover:bg-white hover:shadow-[0_18px_42px_-30px_rgba(51,153,204,0.7)] motion-reduce:transform-none dark:bg-white/10 dark:hover:bg-white/15">
+              <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[var(--color-hero-blue)]/12 text-[var(--color-hero-blue)] ring-1 ring-[var(--color-hero-blue)]/15 transition-colors duration-300 group-hover/trust:bg-[var(--color-hero-blue)] group-hover/trust:text-white">
+                <ShieldCheck className="h-5 w-5" />
+              </span>
+              <span className="min-w-0">
+                <span className="block text-lg font-extrabold leading-none tracking-normal text-[var(--color-hero-heading)] dark:text-white">
+                  96
+                </span>
+                <span className="mt-1 block text-sm font-semibold leading-snug text-[var(--color-hero-body)] dark:text-white/70">
+                  verified partner institutions
+                </span>
+              </span>
             </div>
           </div>
         </div>

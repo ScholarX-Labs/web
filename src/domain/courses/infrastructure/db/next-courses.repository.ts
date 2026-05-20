@@ -1,6 +1,7 @@
 import { and, asc, count, eq, ilike, inArray, sql } from "drizzle-orm";
 import { db } from "@/db";
 import {
+  dbCourseCategories,
   dbCourses,
   dbInquiries,
   dbLessonProgress,
@@ -158,6 +159,42 @@ export class NextCoursesRepository {
       totalCourses: totalRes?.count ?? 0,
       items: rows.map(mapCourseRecord),
     };
+  }
+
+  async listActiveCategories() {
+    const rows = await db
+      .select({
+        name: dbCourseCategories.name,
+        slug: dbCourseCategories.slug,
+        iconKey: dbCourseCategories.iconKey,
+        courseCount: count(dbCourses.id),
+        sortOrder: dbCourseCategories.sortOrder,
+      })
+      .from(dbCourseCategories)
+      .leftJoin(
+        dbCourses,
+        and(
+          eq(dbCourses.category, dbCourseCategories.name),
+          eq(dbCourses.status, "active"),
+        ),
+      )
+      .where(eq(dbCourseCategories.isActive, true))
+      .groupBy(
+        dbCourseCategories.name,
+        dbCourseCategories.slug,
+        dbCourseCategories.iconKey,
+        dbCourseCategories.sortOrder,
+      )
+      .orderBy(asc(dbCourseCategories.sortOrder), asc(dbCourseCategories.name));
+
+    return rows
+      .map((row) => ({
+        name: row.name.trim(),
+        slug: row.slug,
+        iconKey: row.iconKey,
+        courseCount: row.courseCount,
+      }))
+      .filter((category) => category.name.length > 0);
   }
 
   async findByIdActive(id: string): Promise<FlatCourseRecord | null> {

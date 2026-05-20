@@ -4,7 +4,8 @@ import VerifyEmailOtpForm from "@/app/auth/_components/VerifyEmailOtpForm";
 import { getSession } from "@/lib/dal";
 import { ROUTES } from "@/lib/routes";
 import Image from "next/image";
-import OTP_IMAGE from "../../../../public/otp.jpg";
+
+const OTP_IMAGE = "/otp.jpg";
 export default async function VerifyEmailPage() {
   const session = await getSession();
 

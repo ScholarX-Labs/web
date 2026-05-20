@@ -55,6 +55,12 @@ interface PaginatedCoursesResponseRaw {
   pagination: BackendPagination;
 }
 
+type MaybeWrappedPaginatedCoursesResponse =
+  | PaginatedCoursesResponseRaw
+  | {
+      data?: PaginatedCoursesResponseRaw | null;
+    };
+
 interface SubscriptionStatusResponse {
   isSubscribed: boolean;
   courseId: string;
@@ -173,7 +179,7 @@ const mapCourse = (course: CourseItemResponse): Course => {
     totalRatings: course.totalRatings ?? undefined,
     isBestseller: course.isBestseller ?? undefined,
     urgencyText: course.urgencyText ?? undefined,
-    tags: course.tags ?? undefined,
+    tags: Array.isArray(course.tags) ? course.tags : [],
     videoPreviewUrl: course.videoPreviewUrl ?? undefined,
     instructor: course.instructor
       ? {
@@ -192,12 +198,55 @@ const mapCourse = (course: CourseItemResponse): Course => {
   };
 };
 
+const defaultPagination: BackendPagination = {
+  currentPage: 1,
+  totalPages: 1,
+  totalCourses: 0,
+  hasNextPage: false,
+  hasPreviousPage: false,
+};
+
+const unwrapPaginatedCourses = (
+  payload: MaybeWrappedPaginatedCoursesResponse,
+): Partial<PaginatedCoursesResponseRaw> => {
+  if (
+    typeof payload === "object" &&
+    payload !== null &&
+    "data" in payload &&
+    payload.data &&
+    typeof payload.data === "object"
+  ) {
+    return payload.data;
+  }
+
+  if (
+    typeof payload === "object" &&
+    payload !== null &&
+    ("items" in payload || "pagination" in payload)
+  ) {
+    return payload as Partial<PaginatedCoursesResponseRaw>;
+  }
+
+  return {};
+};
+
 const mapPaginatedCourses = (
-  payload: PaginatedCoursesResponseRaw,
-): PaginatedCoursesApiResponse => ({
-  items: payload.items.map(mapCourse),
-  pagination: payload.pagination,
-});
+  payload: MaybeWrappedPaginatedCoursesResponse,
+): PaginatedCoursesApiResponse => {
+  const normalized = unwrapPaginatedCourses(payload);
+  const items = Array.isArray(normalized.items) ? normalized.items : [];
+
+  if (!Array.isArray(normalized.items)) {
+    console.error("[API] Expected courses payload.items to be an array", {
+      payload,
+    });
+  }
+
+  return {
+    items: items.map(mapCourse),
+    pagination: normalized.pagination ?? defaultPagination,
+  };
+};
 
 const parseApiErrorMessage = (error: unknown, fallback: string): string => {
   if (
@@ -463,7 +512,7 @@ export const coursesService = {
   }): Promise<PaginatedCoursesApiResponse> => {
     try {
       const { token, ...queryParams } = params ?? {};
-      const data = await getJson<PaginatedCoursesResponseRaw>(
+      const data = await getJson<MaybeWrappedPaginatedCoursesResponse>(
         "/courses",
         {
           params: queryParams,
@@ -489,7 +538,7 @@ export const coursesService = {
   }): Promise<PaginatedCoursesApiResponse> => {
     try {
       const { token, ...queryParams } = params ?? {};
-      const data = await getJson<PaginatedCoursesResponseRaw>(
+      const data = await getJson<MaybeWrappedPaginatedCoursesResponse>(
         "/courses/featured",
         {
           params: queryParams,
@@ -510,7 +559,7 @@ export const coursesService = {
   }): Promise<PaginatedCoursesApiResponse> => {
     try {
       const { token, ...queryParams } = params ?? {};
-      const data = await getJson<PaginatedCoursesResponseRaw>(
+      const data = await getJson<MaybeWrappedPaginatedCoursesResponse>(
         "/courses/scholarx",
         {
           params: queryParams,
@@ -530,7 +579,7 @@ export const coursesService = {
   ): Promise<PaginatedCoursesApiResponse> => {
     try {
       const { token, ...queryParams } = params ?? {};
-      const data = await getJson<PaginatedCoursesResponseRaw>(
+      const data = await getJson<MaybeWrappedPaginatedCoursesResponse>(
         "/courses/search",
         {
           params: {

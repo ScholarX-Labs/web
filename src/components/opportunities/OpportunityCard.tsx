@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Funding, FundingColors, Opportunity } from "@/lib/opportunities/types";
-import { Bookmark, Calendar, MapPin } from "lucide-react";
+import { Bookmark, Calendar, MapPin, ExternalLink, ArrowUpRight } from "lucide-react";
 import OpportunityModal from "./OpportunityModal";
 import { COLOR_MAP, getBadgeColors } from "@/lib/opportunities/colors";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 const FUNDING_DISPLAY_NAME: Record<Funding, string> = {
   [Funding.FullyFunded]: "Fully Funded",
@@ -11,58 +13,108 @@ const FUNDING_DISPLAY_NAME: Record<Funding, string> = {
 
 function OpportiuntyCard({ Opportunity }: { Opportunity: Opportunity }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [originRect, setOriginRect] = useState<DOMRect | null>(null);
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    const cardElement = e.currentTarget as HTMLElement;
+    const rect = cardElement.getBoundingClientRect();
+    setOriginRect(rect);
+    
+    cardElement.style.transition = "opacity 160ms ease-out";
+    cardElement.style.opacity = "0.3";
+    
+    setIsModalOpen(true);
+  };
+
+  const handleClose = () => {
+    const activeCard = document.querySelector(
+      `[data-opportunity-id="${Opportunity.id}"]`
+    ) as HTMLElement | null;
+    
+    if (activeCard) {
+      activeCard.style.transition = "opacity 160ms ease-in";
+      activeCard.style.opacity = "1";
+    }
+    
+    setIsModalOpen(false);
+  };
 
   return (
     <>
-      <div className="relative flex flex-col gap-1 p-4 border border-border rounded-xl bg-card shadow-sm hover:shadow-md active:shadow-md transition-all overflow-hidden group pt-0">
-        <div className="h-1.5 -mx-4 mb-2 bg-primary" />
-        <div className="flex flex-row justify-between">
-          <div className="flex flex-row gap-0.5 scroll-auto">
+      <motion.div
+        layout
+        data-opportunity-id={Opportunity.id}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        whileHover={{ y: -8, transition: { duration: 0.2 } }}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onClick={handleCardClick}
+        className={cn(
+          "relative flex flex-col gap-4 p-6 border border-border/40 rounded-[24px]",
+          "bg-white/70 backdrop-blur-xl dark:bg-slate-900/70",
+          "shadow-sm hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)]",
+          "transition-shadow duration-300 cursor-pointer overflow-hidden group"
+        )}
+      >
+        {/* Top Accent Line */}
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/40 via-primary to-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+        <div className="flex flex-row justify-between items-start">
+          <div className="flex flex-wrap gap-2">
             {Opportunity.subtype &&
-              Opportunity.subtype.map((subtype) => {
+              Opportunity.subtype.slice(0, 2).map((subtype) => {
                 const colors = getBadgeColors(subtype);
                 return (
                   <span
                     key={subtype}
-                    className={`text-xs m-0.5 rounded-full px-2.5 py-1 font-medium ${colors.bg} ${colors.text} border ${colors.border}`}
+                    className={cn(
+                      "text-[10px] uppercase tracking-wider rounded-full px-3 py-1 font-bold border",
+                      colors.bg,
+                      colors.text,
+                      colors.border
+                    )}
                   >
-                    {subtype.charAt(0).toUpperCase() + subtype.slice(1)}
+                    {subtype}
                   </span>
                 );
               })}
           </div>
-          <button
-            className="rounded-4xl transition-colors p-1 hover:bg-gray-400/50 active:bg-gray-400/70 hover:cursor-pointer"
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            className="rounded-full p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
             onClick={(e) => {
               e.stopPropagation();
               // TODO: Implement archiving
             }}
           >
-            <Bookmark />
-          </button>
+            <Bookmark size={20} />
+          </motion.button>
         </div>
-        <div className="w-full">
-          <h4 className="text-lg line-clamp-2 text-ellipsis min-h-14">
+
+        <div className="flex-1 space-y-2">
+          <h4 className="text-xl font-bold leading-tight group-hover:text-primary transition-colors duration-300 line-clamp-2 min-h-[3.5rem]">
             {Opportunity.title}
           </h4>
-        </div>
-        <div className="mb-2">
-          <p className="text-sm text-gray-500 line-clamp-4 min-h-20">
+          <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-3 leading-relaxed">
             {Opportunity.description}
           </p>
         </div>
-        <div className="relative w-full flex justify-center pt-2">
-          <div className="absolute top-0 w-3/4 border-t border-gray-400/30"></div>
-          <div className="flex flex-row gap-3 w-full mt-2 text-xs text-gray-500">
+
+        <div className="space-y-4 pt-4 border-t border-border/40">
+          <div className="flex flex-wrap gap-4 text-xs font-medium text-slate-400">
             {Opportunity.location && (
-              <div className="flex items-center gap-1">
-                <MapPin size={14} color="#55AAD4" />
+              <div className="flex items-center gap-1.5">
+                <MapPin size={14} className="text-primary/60" />
                 <span>{Opportunity.location}</span>
               </div>
             )}
             {Opportunity.deadline && (
-              <div className="flex items-center gap-1">
-                <Calendar size={14} color="#55AAD4" />
+              <div className="flex items-center gap-1.5">
+                <Calendar size={14} className="text-primary/60" />
                 <span>
                   {new Date(Opportunity.deadline).toLocaleDateString("en-US", {
                     month: "short",
@@ -73,42 +125,56 @@ function OpportiuntyCard({ Opportunity }: { Opportunity: Opportunity }) {
               </div>
             )}
           </div>
-        </div>
-        <div className="flex flex-row justify-between items-center text-center">
-          <div className="flex flex-row gap-0.5">
-            {Opportunity.fundType &&
-              Opportunity.fundType.map((type) => {
-                const colorBase = FundingColors[type];
-                const colors = COLOR_MAP[colorBase] || {
-                  bg: "bg-gray-500/10",
-                  text: "text-gray-500",
-                  border: "border-gray-500/20",
-                };
-                return (
-                  <span
-                    key={type}
-                    className={`text-xs m-0.5 rounded-full px-2.5 py-1 font-medium ${colors.bg} ${colors.text} border ${colors.border}`}
-                  >
-                    {FUNDING_DISPLAY_NAME[type]}
-                  </span>
-                );
-              })}
+
+          <div className="flex flex-row justify-between items-center pt-2">
+            <div className="flex flex-wrap gap-1.5">
+              {Opportunity.fundType &&
+                Opportunity.fundType.map((type) => {
+                  const colorBase = FundingColors[type];
+                  const colors = COLOR_MAP[colorBase] || {
+                    bg: "bg-slate-500/10",
+                    text: "text-slate-500",
+                    border: "border-slate-500/20",
+                  };
+                  return (
+                    <span
+                      key={type}
+                      className={cn(
+                        "text-[10px] font-bold px-2.5 py-1 rounded-md border",
+                        colors.bg,
+                        colors.text,
+                        colors.border
+                      )}
+                    >
+                      {FUNDING_DISPLAY_NAME[type]}
+                    </span>
+                  );
+                })}
+            </div>
+            
+            <motion.div
+              animate={isHovered ? { x: 5 } : { x: 0 }}
+              className="flex items-center gap-1 text-primary font-bold text-sm"
+            >
+              <span>View Details</span>
+              <ArrowUpRight size={16} />
+            </motion.div>
           </div>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="w-20 border-2 border-accent rounded-xl p-2 font-medium transition-all duration-200 bg-transparent text-accent hover:cursor-pointer hover:bg-accent/5 active:bg-accent/10 active:scale-[0.98]"
-          >
-            Apply
-          </button>
         </div>
-      </div>
-      <OpportunityModal
-        opportunity={Opportunity}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      />
+      </motion.div>
+      <AnimatePresence>
+        {isModalOpen && (
+          <OpportunityModal
+            opportunity={Opportunity}
+            isOpen={isModalOpen}
+            originRect={originRect}
+            onClose={handleClose}
+          />
+        )}
+      </AnimatePresence>
     </>
   );
 }
 
 export default OpportiuntyCard;
+

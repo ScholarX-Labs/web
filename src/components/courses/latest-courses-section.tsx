@@ -106,7 +106,7 @@ export function LatestCoursesSection({ courses }: LatestCoursesSectionProps) {
       {/* ── Embla carousel ─────────────────────────────────────── */}
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex gap-6">
-          {courses.map((course, index) => (
+          {(courses ?? []).map((course, index) => (
             <motion.div
               key={course.id}
               className={cn(

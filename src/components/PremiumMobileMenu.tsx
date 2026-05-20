@@ -1,15 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { X } from "lucide-react";
+import { ArrowRight, LogIn, X } from "lucide-react";
 import { useCallback } from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { usePathname } from "next/navigation";
 import SignoutButton from "@/app/auth/_components/SignoutButton";
 import Image from "next/image";
-import Scholarx_horizontal_logo from "../../public/ScholarX-Logo-horizontal-Blue-Solid-Small_ScholarX.png";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
+
+const SCHOLARX_HORIZONTAL_LOGO =
+  "/ScholarX-Logo-horizontal-Blue-Solid-Small_ScholarX.png";
 
 interface PremiumMobileMenuProps {
   isLoggedIn: boolean;
@@ -22,6 +24,7 @@ const navItems = [
   { label: "About us", href: ROUTES.ABOUT },
   { label: "Courses", href: ROUTES.COURSES },
   { label: "Opportunities", href: ROUTES.OPPORTUNITIES },
+  { label: "AI Search", href: ROUTES.AI_SEARCH },
   { label: "Contact us", href: ROUTES.CONTACT },
 ];
 
@@ -97,7 +100,7 @@ export default function PremiumMobileMenu({ isLoggedIn, open, onOpenChange }: Pr
               <Link href={ROUTES.HOME} onClick={close}>
                 <Image
                   alt="ScholarX logo"
-                  src={Scholarx_horizontal_logo}
+                  src={SCHOLARX_HORIZONTAL_LOGO}
                   width={100}
                   height={32}
                   className="object-contain"
@@ -167,7 +170,7 @@ export default function PremiumMobileMenu({ isLoggedIn, open, onOpenChange }: Pr
                   </Link>
                   <SignoutButton
                     onClick={close}
-                    className="flex w-full items-center justify-center px-4 py-2.5 rounded-xl text-sm font-medium text-primary border border-primary/30 hover:bg-primary/5 transition-colors duration-200"
+                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-[var(--color-hero-blue)]/15 bg-white/80 px-4 py-3 text-sm font-semibold text-[var(--color-hero-heading)] shadow-sm backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--color-hero-blue)]/30 hover:bg-white hover:text-[var(--color-hero-blue)]"
                   />
                 </div>
               ) : (
@@ -175,16 +178,18 @@ export default function PremiumMobileMenu({ isLoggedIn, open, onOpenChange }: Pr
                   <Link
                     href={ROUTES.SIGNIN}
                     onClick={close}
-                    className="flex w-full items-center justify-center px-4 py-2.5 rounded-xl text-sm font-medium text-primary border border-primary/30 hover:bg-primary/5 transition-colors duration-200"
+                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-[var(--color-hero-blue)]/15 bg-white/80 px-4 py-3 text-sm font-semibold text-[var(--color-hero-heading)] shadow-sm backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--color-hero-blue)]/30 hover:bg-[var(--color-hero-blue)]/6 hover:text-[var(--color-hero-blue)]"
                   >
+                    <LogIn className="h-4 w-4" />
                     Log in
                   </Link>
                   <Link
                     href={ROUTES.SIGNUP}
                     onClick={close}
-                    className="flex w-full items-center justify-center px-4 py-2.5 rounded-xl text-sm font-medium bg-primary text-primary-foreground hover:opacity-90 transition-opacity duration-200"
+                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-[linear-gradient(135deg,var(--color-hero-blue)_0%,#2563eb_60%,var(--color-hero-orange)_100%)] px-4 py-3 text-sm font-semibold text-white shadow-[0_18px_36px_-18px_rgba(51,153,204,0.9)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_22px_44px_-20px_rgba(51,153,204,1)]"
                   >
                     Sign up
+                    <ArrowRight className="h-4 w-4" />
                   </Link>
                 </div>
               )}

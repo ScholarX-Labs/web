@@ -2,9 +2,8 @@ import { betterAuth } from "better-auth";
 import { APIError, createAuthMiddleware } from "better-auth/api";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
-import { db } from "@/db";
+import { db, type DB } from "@/db";
 import { and, eq, gte, like, sql } from "drizzle-orm";
-import type { PgDatabase } from "drizzle-orm/pg-core";
 import * as schema from "@/db/schema/auth-schema";
 import { admin, bearer, emailOTP, phoneNumber } from "better-auth/plugins";
 import { parsePhoneNumberWithError } from "libphonenumber-js";
@@ -63,7 +62,7 @@ async function assertEmailOtpSendLimit(email: string): Promise<void> {
 async function countOtpSendsSince(
   email: string,
   since: Date,
-  tx: PgDatabase<any, any, any> = db,
+  tx: DB = db,
 ): Promise<number> {
   const escapedEmail = escapeLikePattern(email);
   const identifierPrefix = `${EMAIL_OTP_RATE_LIMIT_IDENTIFIER}:${escapedEmail}:%`;
@@ -80,7 +79,7 @@ async function countOtpSendsSince(
   return Number(result?.count ?? 0);
 }
 
-async function recordEmailOtpSend(email: string, tx: PgDatabase<any, any, any> = db): Promise<void> {
+async function recordEmailOtpSend(email: string, tx: DB = db): Promise<void> {
   const normalizedEmail = normalizeEmailAddress(email);
   const uniqueId = randomUUID();
 

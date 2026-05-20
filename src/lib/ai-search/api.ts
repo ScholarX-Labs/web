@@ -1,7 +1,25 @@
-import { SearchResult, RawSearchResponse, RawSearchResult } from "./types";
+import {
+  SearchResult,
+  RawSearchResponse,
+  RawSearchResult,
+  RawOpportunity,
+} from "./types";
 
 const SEARCH_API_URL = "https://scholarx-search-api.vercel.app/api/search";
+const SEARCH_API_BASE = "https://scholarx-search-api.vercel.app/api";
 const LIMIT_PER_REQUEST = 20;
+const SUPPORTED_LANGS = new Set(["en", "ar"]);
+
+interface RawSingleOpportunityResponse {
+  id: string;
+  data: RawOpportunity;
+}
+
+function normalizeLang(lang?: string): "en" | "ar" {
+  if (!lang) return "en";
+  const normalized = lang.toLowerCase();
+  return SUPPORTED_LANGS.has(normalized) ? (normalized as "en" | "ar") : "en";
+}
 
 function normalizeResult(raw: RawSearchResult): SearchResult | null {
   const opp = raw.opportunity;
@@ -33,13 +51,13 @@ function normalizeResult(raw: RawSearchResult): SearchResult | null {
     : undefined;
 
   // Tags from fund_type or subtype
-  const tags = opp?.fund_type?.map((f) =>
+  const tags = (Array.isArray(opp?.fund_type) ? opp.fund_type : []).map((f) =>
     f.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()),
   );
 
   // Funding level: derive from fund_type, fall back to benefit keywords
   let fundingLevel: string | undefined;
-  if (opp?.fund_type && opp.fund_type.length > 0) {
+  if (Array.isArray(opp?.fund_type) && opp.fund_type.length > 0) {
     const ft = opp.fund_type[0].toLowerCase();
     if (ft.includes("full")) fundingLevel = "Fully Funded";
     else if (ft.includes("partial")) fundingLevel = "Partially Funded";
@@ -47,7 +65,7 @@ function normalizeResult(raw: RawSearchResult): SearchResult | null {
       fundingLevel = opp.fund_type[0]
         .replace(/_/g, " ")
         .replace(/\b\w/g, (l) => l.toUpperCase());
-  } else if (opp?.benefits && opp.benefits.length > 0) {
+  } else if (Array.isArray(opp?.benefits) && opp.benefits.length > 0) {
     const joined = opp.benefits.join(" ").toLowerCase();
     if (
       joined.includes("fully funded") ||
@@ -61,10 +79,14 @@ function normalizeResult(raw: RawSearchResult): SearchResult | null {
 
   // Funding: first benefit text for detail view
   const funding =
-    opp?.benefits && opp.benefits.length > 0 ? opp.benefits[0] : undefined;
+    Array.isArray(opp?.benefits) && opp.benefits.length > 0
+      ? opp.benefits[0]
+      : undefined;
 
   // Location
-  const location = opp?.country?.join(", ");
+  const location = Array.isArray(opp?.country)
+    ? opp.country.join(", ")
+    : undefined;
 
   // URL
   const url = opp?.application_link ?? opp?.official_website;
@@ -120,4 +142,45 @@ export async function searchScholarships(
   return rawResults
     .map(normalizeResult)
     .filter((r): r is SearchResult => r !== null);
+}
+
+export async function getOpportunityById(
+  id: string,
+  lang?: string,
+): Promise<SearchResult | null> {
+  const normalizedLang = normalizeLang(lang);
+  const url = `${SEARCH_API_BASE}/opportunities/${encodeURIComponent(id)}?lang=${normalizedLang}`;
+  let response: Response;
+
+  try {
+    response = await fetch(url, {
+      next: { revalidate: 3600 },
+    });
+  } catch (error) {
+    console.error("getOpportunityById failed", {
+      id,
+      lang: normalizedLang,
+      error,
+    });
+    return null;
+  }
+
+  if (!response.ok) {
+    if (response.status >= 500) {
+      console.error("getOpportunityById upstream error", {
+        id,
+        lang: normalizedLang,
+        status: response.status,
+      });
+    }
+    return null;
+  }
+
+  const raw: RawSingleOpportunityResponse = await response.json();
+  const wrapped: RawSearchResult = {
+    id: raw.id,
+    opportunity: raw.data,
+  };
+
+  return normalizeResult(wrapped);
 }

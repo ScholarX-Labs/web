@@ -2,57 +2,221 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion, useScroll, useMotionValueEvent } from "framer-motion";
-import { useRef, useState } from "react";
-import Scholarx_horizontal_logo from "../../public/ScholarX-Logo-horizontal-Blue-Solid-Small_ScholarX.png";
+import {
+  motion,
+  useMotionValueEvent,
+  useReducedMotion,
+  useScroll,
+} from "framer-motion";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { User } from "lucide-react";
+import {
+  ArrowRight,
+  Bot,
+  BookOpen,
+  Compass,
+  Home,
+  Info,
+  LogIn,
+  MessageCircle,
+  User,
+} from "lucide-react";
 import PremiumMobileMenu from "@/components/PremiumMobileMenu";
 import HamburgerIcon from "@/components/HamburgerIcon";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import { useScrollDirection } from "@/hooks/use-scroll-direction";
 import SignoutButton from "@/app/auth/_components/SignoutButton";
+import { Button } from "@/components/ui/button";
+
+const SCHOLARX_HORIZONTAL_LOGO =
+  "/ScholarX-Logo-horizontal-Blue-Solid-Small_ScholarX.png";
 
 const navItems = [
-  { label: "Home", href: ROUTES.HOME },
-  { label: "About us", href: ROUTES.ABOUT },
-  { label: "Courses", href: ROUTES.COURSES },
-  { label: "Opportunities", href: ROUTES.OPPORTUNITIES },
-  { label: "Contact us", href: ROUTES.CONTACT },
+  { label: "Home", href: ROUTES.HOME, icon: Home },
+  { label: "About us", href: ROUTES.ABOUT, icon: Info },
+  { label: "Courses", href: ROUTES.COURSES, icon: BookOpen },
+  { label: "Opportunities", href: ROUTES.OPPORTUNITIES, icon: Compass },
+  { label: "AI Search", href: ROUTES.AI_SEARCH, icon: Bot },
+  { label: "Contact us", href: ROUTES.CONTACT, icon: MessageCircle },
 ];
 
 const EXPAND_SCROLL_THRESHOLD = 50;
+const DOCK_EFFECT_WIDTH = 280;
+const DOCK_MAX_SCALE = 1.2;
+const DOCK_MIN_SCALE = 1;
+
+function getDockScale(
+  centerX: number | undefined,
+  mouseX: number | null,
+  active: boolean,
+) {
+  if (mouseX === null || centerX === undefined) {
+    return active ? 1.04 : DOCK_MIN_SCALE;
+  }
+
+  const minX = mouseX - DOCK_EFFECT_WIDTH / 2;
+  const maxX = mouseX + DOCK_EFFECT_WIDTH / 2;
+
+  if (centerX < minX || centerX > maxX) {
+    return active ? 1.02 : DOCK_MIN_SCALE;
+  }
+
+  const theta = ((centerX - minX) / DOCK_EFFECT_WIDTH) * 2 * Math.PI;
+  const cappedTheta = Math.min(Math.max(theta, 0), 2 * Math.PI);
+  const scaleFactor = (1 - Math.cos(cappedTheta)) / 2;
+
+  return DOCK_MIN_SCALE + scaleFactor * (DOCK_MAX_SCALE - DOCK_MIN_SCALE);
+}
 
 function NavLinks({ isActive }: { isActive: (href: string) => boolean }) {
+  const dockRef = useRef<HTMLDivElement>(null);
+  const linkRefs = useRef<(HTMLAnchorElement | null)[]>([]);
+  const [mouseX, setMouseX] = useState<number | null>(null);
+  const [itemCenters, setItemCenters] = useState<number[]>([]);
+  const shouldReduceMotion = useReducedMotion();
+
+  const measureItems = useCallback(() => {
+    const dockRect = dockRef.current?.getBoundingClientRect();
+    if (!dockRect) return;
+
+    setItemCenters(
+      linkRefs.current.map((item) => {
+        if (!item) return 0;
+
+        const rect = item.getBoundingClientRect();
+        return rect.left - dockRect.left + rect.width / 2;
+      }),
+    );
+  }, []);
+
+  useEffect(() => {
+    measureItems();
+    window.addEventListener("resize", measureItems);
+
+    return () => window.removeEventListener("resize", measureItems);
+  }, [measureItems]);
+
+  const handleMouseMove = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      if (shouldReduceMotion) return;
+
+      const rect = dockRef.current?.getBoundingClientRect();
+      if (!rect) return;
+
+      setMouseX(event.clientX - rect.left);
+    },
+    [shouldReduceMotion],
+  );
+
+  const handleMouseLeave = useCallback(() => {
+    setMouseX(null);
+  }, []);
+
+  const closestIndex =
+    mouseX === null
+      ? null
+      : itemCenters.reduce(
+          (closest, center, index) => {
+            const distance = Math.abs(center - mouseX);
+            return distance < closest.distance ? { index, distance } : closest;
+          },
+          { index: -1, distance: Number.POSITIVE_INFINITY },
+        ).index;
+
   return (
-    <>
-      {navItems.map((item) => {
+    <motion.div
+      ref={dockRef}
+      className="flex items-end gap-1 overflow-visible rounded-full px-1 py-1"
+      onMouseMove={handleMouseMove}
+      onMouseEnter={measureItems}
+      onMouseLeave={handleMouseLeave}
+    >
+      {navItems.map((item, index) => {
+        const Icon = item.icon;
         const active = isActive(item.href);
+        const scale = shouldReduceMotion
+          ? active
+            ? 1.04
+            : 1
+          : getDockScale(itemCenters[index], mouseX, active);
+        const lift = mouseX === null ? 0 : -Math.round((scale - 1) * 42);
+        const isClosest = closestIndex === index;
+        const showDockBubble = mouseX !== null && isClosest;
+        const showActiveBubble = active && !showDockBubble;
+
         return (
-          <Link
+          <motion.div
             key={item.label}
-            href={item.href}
-            className={cn(
-              "relative px-4 py-2 text-sm font-medium rounded-full",
-              "transition-colors duration-200",
-              active
-                ? "text-primary"
-                : "text-foreground/70 hover:text-foreground",
-            )}
+            animate={{ scale, y: lift }}
+            transition={{
+              type: "spring",
+              stiffness: mouseX === null ? 320 : 520,
+              damping: mouseX === null ? 26 : 30,
+              mass: 0.62,
+            }}
+            className="relative origin-bottom rounded-full will-change-transform"
           >
-            {active && (
+            {(showActiveBubble || showDockBubble) && (
               <motion.span
-                layoutId="nav-indicator"
-                className="absolute inset-0 rounded-full bg-primary/10"
-                transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                layoutId={showDockBubble ? "nav-dock-glow" : "nav-indicator"}
+                className={cn(
+                  "absolute inset-0 rounded-full",
+                  showDockBubble
+                    ? "bg-white/90 shadow-[0_16px_32px_-18px_rgba(51,153,204,0.75),0_0_0_1px_rgba(51,153,204,0.18),inset_0_1px_0_rgba(255,255,255,0.95)] dark:bg-white/12 dark:shadow-[0_16px_34px_-18px_rgba(51,153,204,0.85),0_0_0_1px_rgba(255,255,255,0.12)]"
+                    : "bg-[var(--color-hero-blue)]/10",
+                )}
+                transition={{ type: "spring", stiffness: 420, damping: 30 }}
               />
             )}
-            <span className="relative z-10">{item.label}</span>
-          </Link>
+            {showDockBubble && (
+              <motion.span
+                layoutId="nav-dock-shadow"
+                className="pointer-events-none absolute -inset-x-2 -bottom-3 h-6 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(51,153,204,0.34),transparent_68%)] blur-md"
+                initial={{ opacity: 0, scale: 0.7 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.18 }}
+              />
+            )}
+            <Link
+              ref={(node) => {
+                linkRefs.current[index] = node;
+              }}
+              href={item.href}
+              title={item.label}
+              onFocus={() => setMouseX(itemCenters[index] ?? null)}
+              onBlur={() => setMouseX(null)}
+              className={cn(
+                "group/nav-item relative z-10 inline-flex h-10 items-center justify-center gap-2 rounded-full px-3 text-sm font-semibold tracking-normal",
+                "cursor-pointer select-none outline-none transition-colors duration-200",
+                "focus-visible:ring-3 focus-visible:ring-[var(--color-hero-blue)]/25",
+                active || showDockBubble
+                  ? "text-[var(--color-hero-heading)] dark:text-white"
+                  : "text-foreground/70 hover:text-[var(--color-hero-heading)] dark:hover:text-white",
+              )}
+            >
+              <span
+                className={cn(
+                  "flex size-6 shrink-0 items-center justify-center rounded-xl transition-all duration-200",
+                  active || showDockBubble
+                    ? "bg-[var(--color-hero-blue)]/12 text-[var(--color-hero-blue)] shadow-[inset_0_1px_0_rgba(255,255,255,0.85)] ring-1 ring-[var(--color-hero-blue)]/15 dark:bg-white/12 dark:text-white dark:ring-white/10"
+                    : "bg-foreground/[0.04] text-foreground/55 ring-1 ring-foreground/[0.06] group-hover/nav-item:bg-[var(--color-hero-blue)]/10 group-hover/nav-item:text-[var(--color-hero-blue)]",
+                )}
+                aria-hidden="true"
+              >
+                <Icon
+                  className={cn(
+                    "h-3.5 w-3.5 transition-transform duration-200",
+                    showDockBubble && "-translate-y-0.5 scale-110",
+                  )}
+                />
+              </span>
+              {item.label}
+            </Link>
+          </motion.div>
         );
       })}
-    </>
+    </motion.div>
   );
 }
 
@@ -77,21 +241,32 @@ function AuthButtons({ isLoggedIn }: { isLoggedIn: boolean }) {
     <div className="hidden lg:flex items-center gap-3">
       <Link
         href={ROUTES.SIGNIN}
-        className="px-4 py-2 rounded-full text-sm font-medium text-foreground/70 border border-border/50 hover:border-foreground/20 hover:text-foreground transition-all duration-200 active:scale-[0.97]"
+        className="group inline-flex h-10 items-center gap-2 rounded-full border border-[var(--color-hero-blue)]/15 bg-white/75 px-4 text-sm font-semibold text-[var(--color-hero-heading)] shadow-sm backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--color-hero-blue)]/30 hover:bg-[var(--color-hero-blue)]/6 hover:text-[var(--color-hero-blue)] hover:shadow-[0_16px_32px_-24px_rgba(51,153,204,0.75)]"
       >
+        <LogIn className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
         Log in
       </Link>
-      <Link
-        href={ROUTES.SIGNUP}
-        className="px-5 py-2 rounded-full text-sm font-medium bg-primary text-primary-foreground hover:opacity-90 transition-all duration-200 active:scale-[0.97]"
+      <Button
+        asChild
+        size="sm"
+        className="group h-10 rounded-full bg-[linear-gradient(135deg,var(--color-hero-blue)_0%,#2563eb_60%,var(--color-hero-orange)_100%)] px-5 text-sm font-semibold text-white shadow-[0_18px_36px_-18px_rgba(51,153,204,0.9)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_22px_44px_-20px_rgba(51,153,204,1)]"
       >
-        Sign up
-      </Link>
+        <Link href={ROUTES.SIGNUP}>
+          Sign up
+          <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+        </Link>
+      </Button>
     </div>
   );
 }
 
-function DesktopHeader({ isLoggedIn, isActive }: { isLoggedIn: boolean; isActive: (href: string) => boolean }) {
+function DesktopHeader({
+  isLoggedIn,
+  isActive,
+}: {
+  isLoggedIn: boolean;
+  isActive: (href: string) => boolean;
+}) {
   const { direction, isAtTop } = useScrollDirection(15);
 
   return (
@@ -131,7 +306,9 @@ function DesktopHeader({ isLoggedIn, isActive }: { isLoggedIn: boolean; isActive
         <Link href={ROUTES.HOME} className="shrink-0">
           <Image
             alt="ScholarX logo"
-            src={Scholarx_horizontal_logo}
+            src={SCHOLARX_HORIZONTAL_LOGO}
+            width={180}
+            height={32}
             style={{ width: "auto", height: "32px", objectFit: "contain" }}
             className="hover:cursor-pointer"
           />
@@ -149,7 +326,13 @@ function DesktopHeader({ isLoggedIn, isActive }: { isLoggedIn: boolean; isActive
   );
 }
 
-function MobileCollapsibleHeader({ isLoggedIn, isActive }: { isLoggedIn: boolean; isActive: (href: string) => boolean }) {
+function MobileCollapsibleHeader({
+  isLoggedIn,
+  isActive,
+}: {
+  isLoggedIn: boolean;
+  isActive: (href: string) => boolean;
+}) {
   const [isExpanded, setIsExpanded] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { scrollY } = useScroll();
@@ -165,7 +348,7 @@ function MobileCollapsibleHeader({ isLoggedIn, isActive }: { isLoggedIn: boolean
     } else if (
       !isExpanded &&
       latest < previous &&
-      (scrollPositionOnCollapse.current - latest > EXPAND_SCROLL_THRESHOLD)
+      scrollPositionOnCollapse.current - latest > EXPAND_SCROLL_THRESHOLD
     ) {
       setIsExpanded(true);
     }
@@ -180,7 +363,7 @@ function MobileCollapsibleHeader({ isLoggedIn, isActive }: { isLoggedIn: boolean
 
   return (
     <>
-      <div className={cn("fixed top-6 left-1/2 -translate-x-1/2 z-50 lg:hidden")}>
+      <div className="fixed top-6 left-1/2 z-50 -translate-x-1/2 lg:hidden">
         <motion.div
           initial={{ y: -80, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -194,12 +377,11 @@ function MobileCollapsibleHeader({ isLoggedIn, isActive }: { isLoggedIn: boolean
             "h-12",
             "rounded-full",
             "transition-all duration-[450ms] ease-[cubic-bezier(0.34,1.56,0.64,1)]",
-              isExpanded
+            isExpanded
               ? "md:max-w-[680px] max-w-[600px]"
               : "max-w-12 justify-center",
           )}
         >
-          {/* Collapsed click target — entire pill */}
           {!isExpanded && (
             <div
               className="absolute inset-0 z-10 cursor-pointer rounded-full"
@@ -207,27 +389,31 @@ function MobileCollapsibleHeader({ isLoggedIn, isActive }: { isLoggedIn: boolean
             />
           )}
 
-          {/* Logo */}
           <div
             className={cn(
               "flex-shrink-0 flex items-center pl-4 pr-2 transition-all duration-300",
-              isExpanded ? "opacity-100 translate-x-0 rotate-0" : "opacity-0 -translate-x-6 -rotate-180",
+              isExpanded
+                ? "opacity-100 translate-x-0 rotate-0"
+                : "opacity-0 -translate-x-6 -rotate-180",
             )}
           >
             <Link href={ROUTES.HOME} onClick={(e) => e.stopPropagation()}>
               <Image
                 alt="ScholarX"
-                src={Scholarx_horizontal_logo}
+                src={SCHOLARX_HORIZONTAL_LOGO}
+                width={135}
+                height={24}
                 style={{ width: "auto", height: "24px", objectFit: "contain" }}
               />
             </Link>
           </div>
 
-          {/* Nav links — shown on md+ screens where there's room */}
           <div
             className={cn(
               "hidden md:flex items-center gap-0 lg:gap-1 pr-4 shrink-0 transition-all duration-300",
-              isExpanded ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-5 pointer-events-none",
+              isExpanded
+                ? "opacity-100 translate-x-0"
+                : "opacity-0 -translate-x-5 pointer-events-none",
             )}
           >
             {navItems.map((item, i) => (
@@ -252,7 +438,6 @@ function MobileCollapsibleHeader({ isLoggedIn, isActive }: { isLoggedIn: boolean
             ))}
           </div>
 
-          {/* Hamburger in expanded state — hidden on md+ where nav links show */}
           <div className={cn("flex items-center pr-3 md:hidden", !isExpanded && "sr-only")}>
             <HamburgerIcon
               open={mobileMenuOpen}
@@ -260,7 +445,6 @@ function MobileCollapsibleHeader({ isLoggedIn, isActive }: { isLoggedIn: boolean
             />
           </div>
 
-          {/* Centered Hamburger icon when collapsed */}
           <div
             className={cn(
               "absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-300",
@@ -269,10 +453,7 @@ function MobileCollapsibleHeader({ isLoggedIn, isActive }: { isLoggedIn: boolean
             style={{ transitionDelay: isExpanded ? "0ms" : "150ms" }}
           >
             <div className="pointer-events-auto">
-              <HamburgerIcon
-                open={false}
-                onToggle={handleCollapsedTap}
-              />
+              <HamburgerIcon open={false} onToggle={handleCollapsedTap} />
             </div>
           </div>
         </motion.div>
@@ -287,7 +468,11 @@ function MobileCollapsibleHeader({ isLoggedIn, isActive }: { isLoggedIn: boolean
   );
 }
 
-export default function PremiumHeaderClient({ isLoggedIn }: { isLoggedIn: boolean }) {
+export default function PremiumHeaderClient({
+  isLoggedIn,
+}: {
+  isLoggedIn: boolean;
+}) {
   const pathname = usePathname();
 
   const isActive = (href: string) => {

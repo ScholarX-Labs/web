@@ -1,0 +1,709 @@
+"filename", "language", "JSON with Comments", "Ignore", "JSON", "Log", "TypeScript", "XML", "Markdown", "YAML", "TypeScript JSX", "Skill", "JavaScript", "Python", "MS SQL", "CSV", "PostCSS", "Docker", "PowerShell", "Shell Script", "JavaScript JSX", "comment", "blank", "total"
+"c:\Users\dell\Documents\ScholarX\V2\web\.agent\skills\speckit-analyze\SKILL.md", "Skill", 0, 0, 0, 0, 0, 0, 0, 0, 0, 177, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 79, 256
+"c:\Users\dell\Documents\ScholarX\V2\web\.agent\skills\speckit-checklist\SKILL.md", "Skill", 0, 0, 0, 0, 0, 0, 0, 0, 0, 291, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 77, 368
+"c:\Users\dell\Documents\ScholarX\V2\web\.agent\skills\speckit-clarify\SKILL.md", "Skill", 0, 0, 0, 0, 0, 0, 0, 0, 0, 206, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 44, 250
+"c:\Users\dell\Documents\ScholarX\V2\web\.agent\skills\speckit-constitution\SKILL.md", "Skill", 0, 0, 0, 0, 0, 0, 0, 0, 0, 120, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 33, 153
+"c:\Users\dell\Documents\ScholarX\V2\web\.agent\skills\speckit-git-commit\SKILL.md", "Skill", 0, 0, 0, 0, 0, 0, 0, 0, 0, 39, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 53
+"c:\Users\dell\Documents\ScholarX\V2\web\.agent\skills\speckit-git-feature\SKILL.md", "Skill", 0, 0, 0, 0, 0, 0, 0, 0, 0, 51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 21, 72
+"c:\Users\dell\Documents\ScholarX\V2\web\.agent\skills\speckit-git-initialize\SKILL.md", "Skill", 0, 0, 0, 0, 0, 0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 54
+"c:\Users\dell\Documents\ScholarX\V2\web\.agent\skills\speckit-git-remote\SKILL.md", "Skill", 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 50
+"c:\Users\dell\Documents\ScholarX\V2\web\.agent\skills\speckit-git-validate\SKILL.md", "Skill", 0, 0, 0, 0, 0, 0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 54
+"c:\Users\dell\Documents\ScholarX\V2\web\.agent\skills\speckit-implement\SKILL.md", "Skill", 0, 0, 0, 0, 0, 0, 0, 0, 0, 169, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 205
+"c:\Users\dell\Documents\ScholarX\V2\web\.agent\skills\speckit-plan\SKILL.md", "Skill", 0, 0, 0, 0, 0, 0, 0, 0, 0, 113, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 35, 148
+"c:\Users\dell\Documents\ScholarX\V2\web\.agent\skills\speckit-specify\SKILL.md", "Skill", 0, 0, 0, 0, 0, 0, 0, 0, 0, 256, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 75, 331
+"c:\Users\dell\Documents\ScholarX\V2\web\.agent\skills\speckit-tasks\SKILL.md", "Skill", 0, 0, 0, 0, 0, 0, 0, 0, 0, 158, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 40, 198
+"c:\Users\dell\Documents\ScholarX\V2\web\.agent\skills\speckit-taskstoissues\SKILL.md", "Skill", 0, 0, 0, 0, 0, 0, 0, 0, 0, 88, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 112
+"c:\Users\dell\Documents\ScholarX\V2\web\.codex\skills\ui-ux-pro-max\SKILL.md", "Skill", 0, 0, 0, 0, 0, 0, 0, 0, 0, 212, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 81, 293
+"c:\Users\dell\Documents\ScholarX\V2\web\.codex\skills\ui-ux-pro-max\data\charts.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 26, 0, 0, 0, 0, 0, 0, 1, 27
+"c:\Users\dell\Documents\ScholarX\V2\web\.codex\skills\ui-ux-pro-max\data\colors.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 97, 0, 0, 0, 0, 0, 0, 1, 98
+"c:\Users\dell\Documents\ScholarX\V2\web\.codex\skills\ui-ux-pro-max\data\icons.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 1, 102
+"c:\Users\dell\Documents\ScholarX\V2\web\.codex\skills\ui-ux-pro-max\data\landing.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 0, 0, 0, 0, 0, 0, 1, 32
+"c:\Users\dell\Documents\ScholarX\V2\web\.codex\skills\ui-ux-pro-max\data\products.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 97, 0, 0, 0, 0, 0, 0, 0, 97
+"c:\Users\dell\Documents\ScholarX\V2\web\.codex\skills\ui-ux-pro-max\data\react-performance.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 45, 0, 0, 0, 0, 0, 0, 1, 46
+"c:\Users\dell\Documents\ScholarX\V2\web\.codex\skills\ui-ux-pro-max\data\stacks\astro.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 54, 0, 0, 0, 0, 0, 0, 1, 55
+"c:\Users\dell\Documents\ScholarX\V2\web\.codex\skills\ui-ux-pro-max\data\stacks\flutter.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 53, 0, 0, 0, 0, 0, 0, 1, 54
+"c:\Users\dell\Documents\ScholarX\V2\web\.codex\skills\ui-ux-pro-max\data\stacks\html-tailwind.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 56, 0, 0, 0, 0, 0, 0, 1, 57
+"c:\Users\dell\Documents\ScholarX\V2\web\.codex\skills\ui-ux-pro-max\data\stacks\jetpack-compose.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 53, 0, 0, 0, 0, 0, 0, 1, 54
+"c:\Users\dell\Documents\ScholarX\V2\web\.codex\skills\ui-ux-pro-max\data\stacks\nextjs.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 53, 0, 0, 0, 0, 0, 0, 1, 54
+"c:\Users\dell\Documents\ScholarX\V2\web\.codex\skills\ui-ux-pro-max\data\stacks\nuxt-ui.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51, 0, 0, 0, 0, 0, 0, 1, 52
+"c:\Users\dell\Documents\ScholarX\V2\web\.codex\skills\ui-ux-pro-max\data\stacks\nuxtjs.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 60
+"c:\Users\dell\Documents\ScholarX\V2\web\.codex\skills\ui-ux-pro-max\data\stacks\react-native.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 52, 0, 0, 0, 0, 0, 0, 1, 53
+"c:\Users\dell\Documents\ScholarX\V2\web\.codex\skills\ui-ux-pro-max\data\stacks\react.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 54, 0, 0, 0, 0, 0, 0, 1, 55
+"c:\Users\dell\Documents\ScholarX\V2\web\.codex\skills\ui-ux-pro-max\data\stacks\shadcn.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 61, 0, 0, 0, 0, 0, 0, 1, 62
+"c:\Users\dell\Documents\ScholarX\V2\web\.codex\skills\ui-ux-pro-max\data\stacks\svelte.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 54, 0, 0, 0, 0, 0, 0, 1, 55
+"c:\Users\dell\Documents\ScholarX\V2\web\.codex\skills\ui-ux-pro-max\data\stacks\swiftui.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51, 0, 0, 0, 0, 0, 0, 1, 52
+"c:\Users\dell\Documents\ScholarX\V2\web\.codex\skills\ui-ux-pro-max\data\stacks\vue.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 50, 0, 0, 0, 0, 0, 0, 1, 51
+"c:\Users\dell\Documents\ScholarX\V2\web\.codex\skills\ui-ux-pro-max\data\styles.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 68, 0, 0, 0, 0, 0, 0, 1, 69
+"c:\Users\dell\Documents\ScholarX\V2\web\.codex\skills\ui-ux-pro-max\data\typography.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 58, 0, 0, 0, 0, 0, 0, 0, 58
+"c:\Users\dell\Documents\ScholarX\V2\web\.codex\skills\ui-ux-pro-max\data\ui-reasoning.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 1, 102
+"c:\Users\dell\Documents\ScholarX\V2\web\.codex\skills\ui-ux-pro-max\data\ux-guidelines.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 100
+"c:\Users\dell\Documents\ScholarX\V2\web\.codex\skills\ui-ux-pro-max\data\web-interface.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 0, 0, 0, 0, 0, 0, 1, 32
+"c:\Users\dell\Documents\ScholarX\V2\web\.codex\skills\ui-ux-pro-max\scripts\core.py", "Python", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 189, 0, 0, 0, 0, 0, 0, 0, 21, 44, 254
+"c:\Users\dell\Documents\ScholarX\V2\web\.codex\skills\ui-ux-pro-max\scripts\design_system.py", "Python", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 795, 0, 0, 0, 0, 0, 0, 0, 138, 135, 1068
+"c:\Users\dell\Documents\ScholarX\V2\web\.codex\skills\ui-ux-pro-max\scripts\search.py", "Python", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 79, 0, 0, 0, 0, 0, 0, 0, 23, 13, 115
+"c:\Users\dell\Documents\ScholarX\V2\web\.cursor\debug-637bd4.log", "Log", 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 73
+"c:\Users\dell\Documents\ScholarX\V2\web\.dockerignore", "Ignore", 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 9
+"c:\Users\dell\Documents\ScholarX\V2\web\.gemini\settings.json", "JSON with Comments", 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11
+"c:\Users\dell\Documents\ScholarX\V2\web\.gemini\skills\ui-ux-pro-max\SKILL.md", "Skill", 0, 0, 0, 0, 0, 0, 0, 0, 0, 212, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 81, 293
+"c:\Users\dell\Documents\ScholarX\V2\web\.gemini\skills\ui-ux-pro-max\data\charts.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 26, 0, 0, 0, 0, 0, 0, 1, 27
+"c:\Users\dell\Documents\ScholarX\V2\web\.gemini\skills\ui-ux-pro-max\data\colors.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 97, 0, 0, 0, 0, 0, 0, 1, 98
+"c:\Users\dell\Documents\ScholarX\V2\web\.gemini\skills\ui-ux-pro-max\data\icons.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 1, 102
+"c:\Users\dell\Documents\ScholarX\V2\web\.gemini\skills\ui-ux-pro-max\data\landing.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 0, 0, 0, 0, 0, 0, 1, 32
+"c:\Users\dell\Documents\ScholarX\V2\web\.gemini\skills\ui-ux-pro-max\data\products.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 97, 0, 0, 0, 0, 0, 0, 0, 97
+"c:\Users\dell\Documents\ScholarX\V2\web\.gemini\skills\ui-ux-pro-max\data\react-performance.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 45, 0, 0, 0, 0, 0, 0, 1, 46
+"c:\Users\dell\Documents\ScholarX\V2\web\.gemini\skills\ui-ux-pro-max\data\stacks\astro.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 54, 0, 0, 0, 0, 0, 0, 1, 55
+"c:\Users\dell\Documents\ScholarX\V2\web\.gemini\skills\ui-ux-pro-max\data\stacks\flutter.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 53, 0, 0, 0, 0, 0, 0, 1, 54
+"c:\Users\dell\Documents\ScholarX\V2\web\.gemini\skills\ui-ux-pro-max\data\stacks\html-tailwind.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 56, 0, 0, 0, 0, 0, 0, 1, 57
+"c:\Users\dell\Documents\ScholarX\V2\web\.gemini\skills\ui-ux-pro-max\data\stacks\jetpack-compose.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 53, 0, 0, 0, 0, 0, 0, 1, 54
+"c:\Users\dell\Documents\ScholarX\V2\web\.gemini\skills\ui-ux-pro-max\data\stacks\nextjs.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 53, 0, 0, 0, 0, 0, 0, 1, 54
+"c:\Users\dell\Documents\ScholarX\V2\web\.gemini\skills\ui-ux-pro-max\data\stacks\nuxt-ui.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51, 0, 0, 0, 0, 0, 0, 1, 52
+"c:\Users\dell\Documents\ScholarX\V2\web\.gemini\skills\ui-ux-pro-max\data\stacks\nuxtjs.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 60
+"c:\Users\dell\Documents\ScholarX\V2\web\.gemini\skills\ui-ux-pro-max\data\stacks\react-native.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 52, 0, 0, 0, 0, 0, 0, 1, 53
+"c:\Users\dell\Documents\ScholarX\V2\web\.gemini\skills\ui-ux-pro-max\data\stacks\react.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 54, 0, 0, 0, 0, 0, 0, 1, 55
+"c:\Users\dell\Documents\ScholarX\V2\web\.gemini\skills\ui-ux-pro-max\data\stacks\shadcn.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 61, 0, 0, 0, 0, 0, 0, 1, 62
+"c:\Users\dell\Documents\ScholarX\V2\web\.gemini\skills\ui-ux-pro-max\data\stacks\svelte.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 54, 0, 0, 0, 0, 0, 0, 1, 55
+"c:\Users\dell\Documents\ScholarX\V2\web\.gemini\skills\ui-ux-pro-max\data\stacks\swiftui.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51, 0, 0, 0, 0, 0, 0, 1, 52
+"c:\Users\dell\Documents\ScholarX\V2\web\.gemini\skills\ui-ux-pro-max\data\stacks\vue.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 50, 0, 0, 0, 0, 0, 0, 1, 51
+"c:\Users\dell\Documents\ScholarX\V2\web\.gemini\skills\ui-ux-pro-max\data\styles.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 68, 0, 0, 0, 0, 0, 0, 1, 69
+"c:\Users\dell\Documents\ScholarX\V2\web\.gemini\skills\ui-ux-pro-max\data\typography.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 58, 0, 0, 0, 0, 0, 0, 0, 58
+"c:\Users\dell\Documents\ScholarX\V2\web\.gemini\skills\ui-ux-pro-max\data\ui-reasoning.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 1, 102
+"c:\Users\dell\Documents\ScholarX\V2\web\.gemini\skills\ui-ux-pro-max\data\ux-guidelines.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 100
+"c:\Users\dell\Documents\ScholarX\V2\web\.gemini\skills\ui-ux-pro-max\data\web-interface.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 0, 0, 0, 0, 0, 0, 1, 32
+"c:\Users\dell\Documents\ScholarX\V2\web\.gemini\skills\ui-ux-pro-max\scripts\core.py", "Python", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 189, 0, 0, 0, 0, 0, 0, 0, 21, 44, 254
+"c:\Users\dell\Documents\ScholarX\V2\web\.gemini\skills\ui-ux-pro-max\scripts\design_system.py", "Python", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 795, 0, 0, 0, 0, 0, 0, 0, 138, 135, 1068
+"c:\Users\dell\Documents\ScholarX\V2\web\.gemini\skills\ui-ux-pro-max\scripts\search.py", "Python", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 79, 0, 0, 0, 0, 0, 0, 0, 23, 13, 115
+"c:\Users\dell\Documents\ScholarX\V2\web\.github\prompts\ui-ux-pro-max\PROMPT.md", "Markdown", 0, 0, 0, 0, 0, 0, 208, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 81, 289
+"c:\Users\dell\Documents\ScholarX\V2\web\.github\prompts\ui-ux-pro-max\data\charts.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 26, 0, 0, 0, 0, 0, 0, 1, 27
+"c:\Users\dell\Documents\ScholarX\V2\web\.github\prompts\ui-ux-pro-max\data\colors.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 97, 0, 0, 0, 0, 0, 0, 1, 98
+"c:\Users\dell\Documents\ScholarX\V2\web\.github\prompts\ui-ux-pro-max\data\icons.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 1, 102
+"c:\Users\dell\Documents\ScholarX\V2\web\.github\prompts\ui-ux-pro-max\data\landing.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 0, 0, 0, 0, 0, 0, 1, 32
+"c:\Users\dell\Documents\ScholarX\V2\web\.github\prompts\ui-ux-pro-max\data\products.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 97, 0, 0, 0, 0, 0, 0, 0, 97
+"c:\Users\dell\Documents\ScholarX\V2\web\.github\prompts\ui-ux-pro-max\data\react-performance.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 45, 0, 0, 0, 0, 0, 0, 1, 46
+"c:\Users\dell\Documents\ScholarX\V2\web\.github\prompts\ui-ux-pro-max\data\stacks\astro.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 54, 0, 0, 0, 0, 0, 0, 1, 55
+"c:\Users\dell\Documents\ScholarX\V2\web\.github\prompts\ui-ux-pro-max\data\stacks\flutter.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 53, 0, 0, 0, 0, 0, 0, 1, 54
+"c:\Users\dell\Documents\ScholarX\V2\web\.github\prompts\ui-ux-pro-max\data\stacks\html-tailwind.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 56, 0, 0, 0, 0, 0, 0, 1, 57
+"c:\Users\dell\Documents\ScholarX\V2\web\.github\prompts\ui-ux-pro-max\data\stacks\jetpack-compose.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 53, 0, 0, 0, 0, 0, 0, 1, 54
+"c:\Users\dell\Documents\ScholarX\V2\web\.github\prompts\ui-ux-pro-max\data\stacks\nextjs.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 53, 0, 0, 0, 0, 0, 0, 1, 54
+"c:\Users\dell\Documents\ScholarX\V2\web\.github\prompts\ui-ux-pro-max\data\stacks\nuxt-ui.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51, 0, 0, 0, 0, 0, 0, 1, 52
+"c:\Users\dell\Documents\ScholarX\V2\web\.github\prompts\ui-ux-pro-max\data\stacks\nuxtjs.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 60
+"c:\Users\dell\Documents\ScholarX\V2\web\.github\prompts\ui-ux-pro-max\data\stacks\react-native.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 52, 0, 0, 0, 0, 0, 0, 1, 53
+"c:\Users\dell\Documents\ScholarX\V2\web\.github\prompts\ui-ux-pro-max\data\stacks\react.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 54, 0, 0, 0, 0, 0, 0, 1, 55
+"c:\Users\dell\Documents\ScholarX\V2\web\.github\prompts\ui-ux-pro-max\data\stacks\shadcn.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 61, 0, 0, 0, 0, 0, 0, 1, 62
+"c:\Users\dell\Documents\ScholarX\V2\web\.github\prompts\ui-ux-pro-max\data\stacks\svelte.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 54, 0, 0, 0, 0, 0, 0, 1, 55
+"c:\Users\dell\Documents\ScholarX\V2\web\.github\prompts\ui-ux-pro-max\data\stacks\swiftui.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51, 0, 0, 0, 0, 0, 0, 1, 52
+"c:\Users\dell\Documents\ScholarX\V2\web\.github\prompts\ui-ux-pro-max\data\stacks\vue.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 50, 0, 0, 0, 0, 0, 0, 1, 51
+"c:\Users\dell\Documents\ScholarX\V2\web\.github\prompts\ui-ux-pro-max\data\styles.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 68, 0, 0, 0, 0, 0, 0, 1, 69
+"c:\Users\dell\Documents\ScholarX\V2\web\.github\prompts\ui-ux-pro-max\data\typography.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 58, 0, 0, 0, 0, 0, 0, 0, 58
+"c:\Users\dell\Documents\ScholarX\V2\web\.github\prompts\ui-ux-pro-max\data\ui-reasoning.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 1, 102
+"c:\Users\dell\Documents\ScholarX\V2\web\.github\prompts\ui-ux-pro-max\data\ux-guidelines.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 100
+"c:\Users\dell\Documents\ScholarX\V2\web\.github\prompts\ui-ux-pro-max\data\web-interface.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 0, 0, 0, 0, 0, 0, 1, 32
+"c:\Users\dell\Documents\ScholarX\V2\web\.github\prompts\ui-ux-pro-max\scripts\core.py", "Python", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 189, 0, 0, 0, 0, 0, 0, 0, 21, 44, 254
+"c:\Users\dell\Documents\ScholarX\V2\web\.github\prompts\ui-ux-pro-max\scripts\design_system.py", "Python", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 795, 0, 0, 0, 0, 0, 0, 0, 138, 135, 1068
+"c:\Users\dell\Documents\ScholarX\V2\web\.github\prompts\ui-ux-pro-max\scripts\search.py", "Python", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 79, 0, 0, 0, 0, 0, 0, 0, 23, 13, 115
+"c:\Users\dell\Documents\ScholarX\V2\web\.github\workflows\deploy-aca.yml", "YAML", 0, 0, 0, 0, 0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 50
+"c:\Users\dell\Documents\ScholarX\V2\web\.opencode\skills\ui-ux-pro-max\SKILL.md", "Skill", 0, 0, 0, 0, 0, 0, 0, 0, 0, 212, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 81, 293
+"c:\Users\dell\Documents\ScholarX\V2\web\.opencode\skills\ui-ux-pro-max\data\charts.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 26, 0, 0, 0, 0, 0, 0, 1, 27
+"c:\Users\dell\Documents\ScholarX\V2\web\.opencode\skills\ui-ux-pro-max\data\colors.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 97, 0, 0, 0, 0, 0, 0, 1, 98
+"c:\Users\dell\Documents\ScholarX\V2\web\.opencode\skills\ui-ux-pro-max\data\icons.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 1, 102
+"c:\Users\dell\Documents\ScholarX\V2\web\.opencode\skills\ui-ux-pro-max\data\landing.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 0, 0, 0, 0, 0, 0, 1, 32
+"c:\Users\dell\Documents\ScholarX\V2\web\.opencode\skills\ui-ux-pro-max\data\products.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 97, 0, 0, 0, 0, 0, 0, 0, 97
+"c:\Users\dell\Documents\ScholarX\V2\web\.opencode\skills\ui-ux-pro-max\data\react-performance.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 45, 0, 0, 0, 0, 0, 0, 1, 46
+"c:\Users\dell\Documents\ScholarX\V2\web\.opencode\skills\ui-ux-pro-max\data\stacks\astro.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 54, 0, 0, 0, 0, 0, 0, 1, 55
+"c:\Users\dell\Documents\ScholarX\V2\web\.opencode\skills\ui-ux-pro-max\data\stacks\flutter.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 53, 0, 0, 0, 0, 0, 0, 1, 54
+"c:\Users\dell\Documents\ScholarX\V2\web\.opencode\skills\ui-ux-pro-max\data\stacks\html-tailwind.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 56, 0, 0, 0, 0, 0, 0, 1, 57
+"c:\Users\dell\Documents\ScholarX\V2\web\.opencode\skills\ui-ux-pro-max\data\stacks\jetpack-compose.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 53, 0, 0, 0, 0, 0, 0, 1, 54
+"c:\Users\dell\Documents\ScholarX\V2\web\.opencode\skills\ui-ux-pro-max\data\stacks\nextjs.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 53, 0, 0, 0, 0, 0, 0, 1, 54
+"c:\Users\dell\Documents\ScholarX\V2\web\.opencode\skills\ui-ux-pro-max\data\stacks\nuxt-ui.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51, 0, 0, 0, 0, 0, 0, 1, 52
+"c:\Users\dell\Documents\ScholarX\V2\web\.opencode\skills\ui-ux-pro-max\data\stacks\nuxtjs.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 60
+"c:\Users\dell\Documents\ScholarX\V2\web\.opencode\skills\ui-ux-pro-max\data\stacks\react-native.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 52, 0, 0, 0, 0, 0, 0, 1, 53
+"c:\Users\dell\Documents\ScholarX\V2\web\.opencode\skills\ui-ux-pro-max\data\stacks\react.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 54, 0, 0, 0, 0, 0, 0, 1, 55
+"c:\Users\dell\Documents\ScholarX\V2\web\.opencode\skills\ui-ux-pro-max\data\stacks\shadcn.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 61, 0, 0, 0, 0, 0, 0, 1, 62
+"c:\Users\dell\Documents\ScholarX\V2\web\.opencode\skills\ui-ux-pro-max\data\stacks\svelte.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 54, 0, 0, 0, 0, 0, 0, 1, 55
+"c:\Users\dell\Documents\ScholarX\V2\web\.opencode\skills\ui-ux-pro-max\data\stacks\swiftui.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51, 0, 0, 0, 0, 0, 0, 1, 52
+"c:\Users\dell\Documents\ScholarX\V2\web\.opencode\skills\ui-ux-pro-max\data\stacks\vue.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 50, 0, 0, 0, 0, 0, 0, 1, 51
+"c:\Users\dell\Documents\ScholarX\V2\web\.opencode\skills\ui-ux-pro-max\data\styles.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 68, 0, 0, 0, 0, 0, 0, 1, 69
+"c:\Users\dell\Documents\ScholarX\V2\web\.opencode\skills\ui-ux-pro-max\data\typography.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 58, 0, 0, 0, 0, 0, 0, 0, 58
+"c:\Users\dell\Documents\ScholarX\V2\web\.opencode\skills\ui-ux-pro-max\data\ui-reasoning.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 1, 102
+"c:\Users\dell\Documents\ScholarX\V2\web\.opencode\skills\ui-ux-pro-max\data\ux-guidelines.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 100
+"c:\Users\dell\Documents\ScholarX\V2\web\.opencode\skills\ui-ux-pro-max\data\web-interface.csv", "CSV", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 0, 0, 0, 0, 0, 0, 1, 32
+"c:\Users\dell\Documents\ScholarX\V2\web\.opencode\skills\ui-ux-pro-max\scripts\core.py", "Python", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 189, 0, 0, 0, 0, 0, 0, 0, 21, 44, 254
+"c:\Users\dell\Documents\ScholarX\V2\web\.opencode\skills\ui-ux-pro-max\scripts\design_system.py", "Python", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 795, 0, 0, 0, 0, 0, 0, 0, 138, 135, 1068
+"c:\Users\dell\Documents\ScholarX\V2\web\.opencode\skills\ui-ux-pro-max\scripts\search.py", "Python", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 79, 0, 0, 0, 0, 0, 0, 0, 23, 13, 115
+"c:\Users\dell\Documents\ScholarX\V2\web\.specify\extensions.yml", "YAML", 0, 0, 0, 0, 0, 0, 0, 148, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 149
+"c:\Users\dell\Documents\ScholarX\V2\web\.specify\extensions\git\README.md", "Markdown", 0, 0, 0, 0, 0, 0, 77, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 101
+"c:\Users\dell\Documents\ScholarX\V2\web\.specify\extensions\git\commands\speckit.git.commit.md", "Markdown", 0, 0, 0, 0, 0, 0, 34, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 49
+"c:\Users\dell\Documents\ScholarX\V2\web\.specify\extensions\git\commands\speckit.git.feature.md", "Markdown", 0, 0, 0, 0, 0, 0, 46, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 68
+"c:\Users\dell\Documents\ScholarX\V2\web\.specify\extensions\git\commands\speckit.git.initialize.md", "Markdown", 0, 0, 0, 0, 0, 0, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 50
+"c:\Users\dell\Documents\ScholarX\V2\web\.specify\extensions\git\commands\speckit.git.remote.md", "Markdown", 0, 0, 0, 0, 0, 0, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 46
+"c:\Users\dell\Documents\ScholarX\V2\web\.specify\extensions\git\commands\speckit.git.validate.md", "Markdown", 0, 0, 0, 0, 0, 0, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 50
+"c:\Users\dell\Documents\ScholarX\V2\web\.specify\extensions\git\config-template.yml", "YAML", 0, 0, 0, 0, 0, 0, 0, 52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 4, 63
+"c:\Users\dell\Documents\ScholarX\V2\web\.specify\extensions\git\extension.yml", "YAML", 0, 0, 0, 0, 0, 0, 0, 133, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 141
+"c:\Users\dell\Documents\ScholarX\V2\web\.specify\extensions\git\git-config.yml", "YAML", 0, 0, 0, 0, 0, 0, 0, 52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 4, 63
+"c:\Users\dell\Documents\ScholarX\V2\web\.specify\extensions\git\scripts\bash\auto-commit.sh", "Shell Script", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 136, 0, 33, 22, 191
+"c:\Users\dell\Documents\ScholarX\V2\web\.specify\extensions\git\scripts\bash\create-new-feature.sh", "Shell Script", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 377, 0, 32, 45, 454
+"c:\Users\dell\Documents\ScholarX\V2\web\.specify\extensions\git\scripts\bash\git-common.sh", "Shell Script", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 34, 0, 13, 8, 55
+"c:\Users\dell\Documents\ScholarX\V2\web\.specify\extensions\git\scripts\bash\initialize-repo.sh", "Shell Script", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 35, 0, 10, 10, 55
+"c:\Users\dell\Documents\ScholarX\V2\web\.specify\extensions\git\scripts\powershell\auto-commit.ps1", "PowerShell", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 170, 0, 0, 28, 23, 221
+"c:\Users\dell\Documents\ScholarX\V2\web\.specify\extensions\git\scripts\powershell\create-new-feature.ps1", "PowerShell", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 341, 0, 0, 21, 42, 404
+"c:\Users\dell\Documents\ScholarX\V2\web\.specify\extensions\git\scripts\powershell\git-common.ps1", "PowerShell", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 38, 0, 0, 7, 7, 52
+"c:\Users\dell\Documents\ScholarX\V2\web\.specify\extensions\git\scripts\powershell\initialize-repo.ps1", "PowerShell", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 52, 0, 0, 10, 8, 70
+"c:\Users\dell\Documents\ScholarX\V2\web\.specify\feature.json", "JSON", 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 4
+"c:\Users\dell\Documents\ScholarX\V2\web\.specify\init-options.json", "JSON", 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11
+"c:\Users\dell\Documents\ScholarX\V2\web\.specify\integration.json", "JSON", 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 5
+"c:\Users\dell\Documents\ScholarX\V2\web\.specify\integrations\agy.manifest.json", "JSON", 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 17
+"c:\Users\dell\Documents\ScholarX\V2\web\.specify\integrations\speckit.manifest.json", "JSON", 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 17
+"c:\Users\dell\Documents\ScholarX\V2\web\.specify\memory\constitution.md", "Markdown", 0, 0, 0, 0, 0, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 17, 14, 56
+"c:\Users\dell\Documents\ScholarX\V2\web\.specify\scripts\powershell\check-prerequisites.ps1", "PowerShell", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 92, 0, 0, 31, 26, 149
+"c:\Users\dell\Documents\ScholarX\V2\web\.specify\scripts\powershell\common.ps1", "PowerShell", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 267, 0, 0, 51, 39, 357
+"c:\Users\dell\Documents\ScholarX\V2\web\.specify\scripts\powershell\create-new-feature.ps1", "PowerShell", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 290, 0, 0, 49, 44, 383
+"c:\Users\dell\Documents\ScholarX\V2\web\.specify\scripts\powershell\setup-plan.ps1", "PowerShell", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 42, 0, 0, 10, 10, 62
+"c:\Users\dell\Documents\ScholarX\V2\web\.specify\templates\checklist-template.md", "Markdown", 0, 0, 0, 0, 0, 0, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 10, 41
+"c:\Users\dell\Documents\ScholarX\V2\web\.specify\templates\constitution-template.md", "Markdown", 0, 0, 0, 0, 0, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 14, 51
+"c:\Users\dell\Documents\ScholarX\V2\web\.specify\templates\plan-template.md", "Markdown", 0, 0, 0, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 25, 105
+"c:\Users\dell\Documents\ScholarX\V2\web\.specify\templates\spec-template.md", "Markdown", 0, 0, 0, 0, 0, 0, 56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 29, 44, 129
+"c:\Users\dell\Documents\ScholarX\V2\web\.specify\templates\tasks-template.md", "Markdown", 0, 0, 0, 0, 0, 0, 153, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 81, 252
+"c:\Users\dell\Documents\ScholarX\V2\web\.specify\workflows\speckit\workflow.yml", "YAML", 0, 0, 0, 0, 0, 0, 0, 55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 64
+"c:\Users\dell\Documents\ScholarX\V2\web\.specify\workflows\workflow-registry.json", "JSON", 0, 0, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13
+"c:\Users\dell\Documents\ScholarX\V2\web\AGENTS.md", "Markdown", 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 7
+"c:\Users\dell\Documents\ScholarX\V2\web\Dockerfile", "Docker", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 26, 0, 0, 0, 12, 9, 47
+"c:\Users\dell\Documents\ScholarX\V2\web\README.md", "Markdown", 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 37
+"c:\Users\dell\Documents\ScholarX\V2\web\commit-all.ps1", "PowerShell", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 92, 0, 0, 0, 7, 99
+"c:\Users\dell\Documents\ScholarX\V2\web\components.json", "JSON", 0, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 26
+"c:\Users\dell\Documents\ScholarX\V2\web\design-system\scholarx-admin\MASTER.md", "Markdown", 0, 0, 0, 0, 0, 0, 158, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 49, 207
+"c:\Users\dell\Documents\ScholarX\V2\web\design-system\scholarx-admin\pages\admin-shell.md", "Markdown", 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 21, 53
+"c:\Users\dell\Documents\ScholarX\V2\web\design-system\scholarx-admin\pages\course-builder.md", "Markdown", 0, 0, 0, 0, 0, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 21, 46
+"c:\Users\dell\Documents\ScholarX\V2\web\design-system\scholarx-admin\pages\edit-lesson.md", "Markdown", 0, 0, 0, 0, 0, 0, 27, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 21, 48
+"c:\Users\dell\Documents\ScholarX\V2\web\design-system\scholarx-admin\pages\new-course.md", "Markdown", 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 21, 49
+"c:\Users\dell\Documents\ScholarX\V2\web\docs\Pixel-perfect-animation-specs.md", "Markdown", 0, 0, 0, 0, 0, 0, 1739, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 371, 2110
+"c:\Users\dell\Documents\ScholarX\V2\web\docs\courses-workflow-production-plan.md", "Markdown", 0, 0, 0, 0, 0, 0, 951, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 265, 1216
+"c:\Users\dell\Documents\ScholarX\V2\web\docs\enroll-click-production-implementation-plan.md", "Markdown", 0, 0, 0, 0, 0, 0, 593, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 158, 751
+"c:\Users\dell\Documents\ScholarX\V2\web\docs\frontend-courses-api-handover.md", "Markdown", 0, 0, 0, 0, 0, 0, 320, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 95, 415
+"c:\Users\dell\Documents\ScholarX\V2\web\docs\frontend-nextjs-schema-auth-guide.md", "Markdown", 0, 0, 0, 0, 0, 0, 128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 52, 180
+"c:\Users\dell\Documents\ScholarX\V2\web\docs\sprint-2-motion-system-requirements.md", "Markdown", 0, 0, 0, 0, 0, 0, 253, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 106, 359
+"c:\Users\dell\Documents\ScholarX\V2\web\drizzle.config.ts", "TypeScript", 0, 0, 0, 0, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 35
+"c:\Users\dell\Documents\ScholarX\V2\web\drizzle\0000_round_william_stryker.sql", "MS SQL", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 126, 0, 0, 0, 0, 0, 0, 9, 0, 135
+"c:\Users\dell\Documents\ScholarX\V2\web\drizzle\0001_clumsy_wild_pack.sql", "MS SQL", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 77, 0, 0, 0, 0, 0, 0, 5, 0, 82
+"c:\Users\dell\Documents\ScholarX\V2\web\drizzle\0002_lessons_sort_unique.sql", "MS SQL", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\Users\dell\Documents\ScholarX\V2\web\drizzle\0003_add_last_lesson_index.sql", "MS SQL", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 2, 8
+"c:\Users\dell\Documents\ScholarX\V2\web\drizzle\0004_rapid_stone_men.sql", "MS SQL", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 8
+"c:\Users\dell\Documents\ScholarX\V2\web\drizzle\meta\0000_snapshot.json", "JSON", 0, 0, 869, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 869
+"c:\Users\dell\Documents\ScholarX\V2\web\drizzle\meta\0001_snapshot.json", "JSON", 0, 0, 1560, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1560
+"c:\Users\dell\Documents\ScholarX\V2\web\drizzle\meta\0002_snapshot.json", "JSON", 0, 0, 1581, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1581
+"c:\Users\dell\Documents\ScholarX\V2\web\drizzle\meta\0003_snapshot.json", "JSON", 0, 0, 1588, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1589
+"c:\Users\dell\Documents\ScholarX\V2\web\drizzle\meta\0004_snapshot.json", "JSON", 0, 0, 1638, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1638
+"c:\Users\dell\Documents\ScholarX\V2\web\drizzle\meta\_journal.json", "JSON", 0, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 41
+"c:\Users\dell\Documents\ScholarX\V2\web\eslint.config.mjs", "JavaScript", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 19
+"c:\Users\dell\Documents\ScholarX\V2\web\legacy\Home\Home.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 37, 1, 38
+"c:\Users\dell\Documents\ScholarX\V2\web\legacy\Home\Home.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 47, 10, 10, 67
+"c:\Users\dell\Documents\ScholarX\V2\web\legacy\Home\Home.module.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 4, 6, 27
+"c:\Users\dell\Documents\ScholarX\V2\web\legacy\Home\README.md", "Markdown", 0, 0, 0, 0, 0, 0, 236, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 85, 321
+"c:\Users\dell\Documents\ScholarX\V2\web\legacy\Home\components\Contact\Contact.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 107, 6, 12, 125
+"c:\Users\dell\Documents\ScholarX\V2\web\legacy\Home\components\Contact\Contact.module.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 38, 0, 0, 0, 0, 0, 8, 46
+"c:\Users\dell\Documents\ScholarX\V2\web\legacy\Home\components\Features\Features.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 52, 7, 7, 66
+"c:\Users\dell\Documents\ScholarX\V2\web\legacy\Home\components\Features\Features.module.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 287, 0, 0, 0, 0, 7, 47, 341
+"c:\Users\dell\Documents\ScholarX\V2\web\legacy\Home\components\Hero\Hero.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 59, 9, 7, 75
+"c:\Users\dell\Documents\ScholarX\V2\web\legacy\Home\components\Hero\Hero.module.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 441, 0, 0, 0, 0, 8, 65, 514
+"c:\Users\dell\Documents\ScholarX\V2\web\legacy\Home\components\ImpactSection\ImpactSection.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 49, 8, 7, 64
+"c:\Users\dell\Documents\ScholarX\V2\web\legacy\Home\components\ImpactSection\ImpactSection.module.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 153, 0, 0, 0, 0, 7, 26, 186
+"c:\Users\dell\Documents\ScholarX\V2\web\legacy\Home\components\Impact\Impact.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 65, 0, 0, 0, 0, 0, 15, 80
+"c:\Users\dell\Documents\ScholarX\V2\web\legacy\Home\components\Impact\Impact.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 43, 1, 6, 50
+"c:\Users\dell\Documents\ScholarX\V2\web\legacy\Home\components\ServicesSection\ServicesSection.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 63, 8, 7, 78
+"c:\Users\dell\Documents\ScholarX\V2\web\legacy\Home\components\ServicesSection\ServicesSection.module.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 152, 0, 0, 0, 0, 6, 28, 186
+"c:\Users\dell\Documents\ScholarX\V2\web\legacy\Home\components\Services\Services.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 136, 0, 0, 0, 0, 2, 15, 153
+"c:\Users\dell\Documents\ScholarX\V2\web\legacy\Home\components\Services\Services.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 52, 1, 9, 62
+"c:\Users\dell\Documents\ScholarX\V2\web\legacy\Home\components\index.js", "JavaScript", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 3, 2, 10
+"c:\Users\dell\Documents\ScholarX\V2\web\legacy\Home\components\shared\ServiceCard.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 43, 4, 7, 54
+"c:\Users\dell\Documents\ScholarX\V2\web\legacy\Home\components\shared\ServiceCard.module.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 145, 0, 0, 0, 0, 6, 22, 173
+"c:\Users\dell\Documents\ScholarX\V2\web\legacy\Home\components\shared\StatCard.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 95, 5, 17, 117
+"c:\Users\dell\Documents\ScholarX\V2\web\legacy\Home\components\shared\StatCard.module.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 152, 0, 0, 0, 0, 5, 23, 180
+"c:\Users\dell\Documents\ScholarX\V2\web\legacy\Home\components\shared\index.js", "JavaScript", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 3, 2, 7
+"c:\Users\dell\Documents\ScholarX\V2\web\legacy\Home\constants\index.js", "JavaScript", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 175, 0, 0, 0, 0, 0, 0, 0, 0, 12, 14, 201
+"c:\Users\dell\Documents\ScholarX\V2\web\legacy\Home\index.js", "JavaScript", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 3, 2, 7
+"c:\Users\dell\Documents\ScholarX\V2\web\next.config.ts", "TypeScript", 0, 0, 0, 0, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 41
+"c:\Users\dell\Documents\ScholarX\V2\web\package.json", "JSON", 0, 0, 118, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 119
+"c:\Users\dell\Documents\ScholarX\V2\web\pnpm-lock.yaml", "YAML", 0, 0, 0, 0, 0, 0, 0, 11241, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2629, 13870
+"c:\Users\dell\Documents\ScholarX\V2\web\postcss.config.mjs", "JavaScript", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 8
+"c:\Users\dell\Documents\ScholarX\V2\web\public\31.svg", "XML", 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 4
+"c:\Users\dell\Documents\ScholarX\V2\web\public\AI_Robot_03_3d 1.svg", "XML", 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 10
+"c:\Users\dell\Documents\ScholarX\V2\web\public\Bot_Logo.svg", "XML", 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 10
+"c:\Users\dell\Documents\ScholarX\V2\web\public\ExclaminationMarkVector.svg", "XML", 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 4
+"c:\Users\dell\Documents\ScholarX\V2\web\public\ScholarX-Logo-Icon-Blue_ScholarX.svg", "XML", 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12
+"c:\Users\dell\Documents\ScholarX\V2\web\public\ScholarX-Logo-Icon-White-Blue-BG_ScholarX.svg", "XML", 0, 0, 0, 0, 0, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 20
+"c:\Users\dell\Documents\ScholarX\V2\web\public\assets\noise.svg", "XML", 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 9
+"c:\Users\dell\Documents\ScholarX\V2\web\public\certificate-template.svg", "XML", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1
+"c:\Users\dell\Documents\ScholarX\V2\web\public\courses-hero-10k_students.svg", "XML", 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 10
+"c:\Users\dell\Documents\ScholarX\V2\web\public\courses-hero-birds.svg", "XML", 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 10
+"c:\Users\dell\Documents\ScholarX\V2\web\public\file.svg", "XML", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1
+"c:\Users\dell\Documents\ScholarX\V2\web\public\globe.svg", "XML", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1
+"c:\Users\dell\Documents\ScholarX\V2\web\public\next.svg", "XML", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1
+"c:\Users\dell\Documents\ScholarX\V2\web\public\thumb-2-1.4b9d026878e55263d488.png.svg", "XML", 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 10
+"c:\Users\dell\Documents\ScholarX\V2\web\public\thumb-2-2.ff7e4b702e36c420d1e4.png.svg", "XML", 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 10
+"c:\Users\dell\Documents\ScholarX\V2\web\public\vercel.svg", "XML", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1
+"c:\Users\dell\Documents\ScholarX\V2\web\public\vite.svg", "XML", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1
+"c:\Users\dell\Documents\ScholarX\V2\web\public\window.svg", "XML", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1
+"c:\Users\dell\Documents\ScholarX\V2\web\scripts\backfill-usernames.ts", "TypeScript", 0, 0, 0, 0, 90, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 20, 112
+"c:\Users\dell\Documents\ScholarX\V2\web\scripts\convert-course-userids.js", "JavaScript", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 52, 0, 0, 0, 0, 0, 0, 0, 0, 1, 8, 61
+"c:\Users\dell\Documents\ScholarX\V2\web\scripts\fix-auth-schema.js", "JavaScript", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 38, 0, 0, 0, 0, 0, 0, 0, 0, 5, 9, 52
+"c:\Users\dell\Documents\ScholarX\V2\web\scripts\fix-course-user-fks-now.js", "JavaScript", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 39, 0, 0, 0, 0, 0, 0, 0, 0, 1, 6, 46
+"c:\Users\dell\Documents\ScholarX\V2\web\scripts\inspect-constraints.js", "JavaScript", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 43, 0, 0, 0, 0, 0, 0, 0, 0, 1, 5, 49
+"c:\Users\dell\Documents\ScholarX\V2\web\scripts\inspect-db.js", "JavaScript", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 52, 0, 0, 0, 0, 0, 0, 0, 0, 1, 8, 61
+"c:\Users\dell\Documents\ScholarX\V2\web\scripts\migrations\001_add_profile_columns.sql", "MS SQL", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 0, 0, 0, 0, 0, 0, 4, 4, 26
+"c:\Users\dell\Documents\ScholarX\V2\web\scripts\migrations\001_rollback.sql", "MS SQL", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 1, 1, 12
+"c:\Users\dell\Documents\ScholarX\V2\web\scripts\migrations\002_rollback.sql", "MS SQL", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 3
+"c:\Users\dell\Documents\ScholarX\V2\web\scripts\migrations\002_set_username_not_null.sql", "MS SQL", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 3, 1, 5
+"c:\Users\dell\Documents\ScholarX\V2\web\scripts\seed-lessons.ts", "TypeScript", 0, 0, 0, 0, 52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 64
+"c:\Users\dell\Documents\ScholarX\V2\web\scripts\server-error-logger.cjs", "JavaScript", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 94, 0, 0, 0, 0, 0, 0, 0, 0, 3, 18, 115
+"c:\Users\dell\Documents\ScholarX\V2\web\scripts\set-first-admin.js", "JavaScript", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 1, 9, 50
+"c:\Users\dell\Documents\ScholarX\V2\web\scripts\test-insert-subscription.js", "JavaScript", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 26, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 30
+"c:\Users\dell\Documents\ScholarX\V2\web\sentry.edge.config.ts", "TypeScript", 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 15
+"c:\Users\dell\Documents\ScholarX\V2\web\sentry.server.config.ts", "TypeScript", 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 17
+"c:\Users\dell\Documents\ScholarX\V2\web\specs\001-premium-lesson-ui\checklists\requirements.md", "Markdown", 0, 0, 0, 0, 0, 0, 43, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 57
+"c:\Users\dell\Documents\ScholarX\V2\web\specs\001-premium-lesson-ui\data-model.md", "Markdown", 0, 0, 0, 0, 0, 0, 164, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 42, 206
+"c:\Users\dell\Documents\ScholarX\V2\web\specs\001-premium-lesson-ui\plan.md", "Markdown", 0, 0, 0, 0, 0, 0, 358, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 116, 474
+"c:\Users\dell\Documents\ScholarX\V2\web\specs\001-premium-lesson-ui\quickstart.md", "Markdown", 0, 0, 0, 0, 0, 0, 51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 69
+"c:\Users\dell\Documents\ScholarX\V2\web\specs\001-premium-lesson-ui\research.md", "Markdown", 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 49, 149
+"c:\Users\dell\Documents\ScholarX\V2\web\specs\001-premium-lesson-ui\spec.md", "Markdown", 0, 0, 0, 0, 0, 0, 144, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 71, 215
+"c:\Users\dell\Documents\ScholarX\V2\web\specs\001-premium-lesson-ui\tasks.md", "Markdown", 0, 0, 0, 0, 0, 0, 134, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 71, 205
+"c:\Users\dell\Documents\ScholarX\V2\web\specs\002-home-page-ui\checklists\requirements.md", "Markdown", 0, 0, 0, 0, 0, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 35
+"c:\Users\dell\Documents\ScholarX\V2\web\specs\002-home-page-ui\contracts\home-page-contract.md", "Markdown", 0, 0, 0, 0, 0, 0, 126, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 42, 168
+"c:\Users\dell\Documents\ScholarX\V2\web\specs\002-home-page-ui\data-model.md", "Markdown", 0, 0, 0, 0, 0, 0, 122, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 39, 161
+"c:\Users\dell\Documents\ScholarX\V2\web\specs\002-home-page-ui\plan.md", "Markdown", 0, 0, 0, 0, 0, 0, 224, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 76, 300
+"c:\Users\dell\Documents\ScholarX\V2\web\specs\002-home-page-ui\quickstart.md", "Markdown", 0, 0, 0, 0, 0, 0, 34, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 48
+"c:\Users\dell\Documents\ScholarX\V2\web\specs\002-home-page-ui\research.md", "Markdown", 0, 0, 0, 0, 0, 0, 89, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 49, 138
+"c:\Users\dell\Documents\ScholarX\V2\web\specs\002-home-page-ui\spec.md", "Markdown", 0, 0, 0, 0, 0, 0, 61, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 38, 99
+"c:\Users\dell\Documents\ScholarX\V2\web\specs\002-home-page-ui\tasks.md", "Markdown", 0, 0, 0, 0, 0, 0, 52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 21, 73
+"c:\Users\dell\Documents\ScholarX\V2\web\specs\003-admin-dashboard\plan.md", "Markdown", 0, 0, 0, 0, 0, 0, 894, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 155, 1049
+"c:\Users\dell\Documents\ScholarX\V2\web\specs\004-profile-feature\plan.md", "Markdown", 0, 0, 0, 0, 0, 0, 1648, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 327, 1975
+"c:\Users\dell\Documents\ScholarX\V2\web\src\actions\course.actions.ts", "TypeScript", 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 49
+"c:\Users\dell\Documents\ScholarX\V2\web\src\actions\profile.actions.ts", "TypeScript", 0, 0, 0, 0, 220, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 40, 260
+"c:\Users\dell\Documents\ScholarX\V2\web\src\actions\public-profile.actions.ts", "TypeScript", 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 46
+"c:\Users\dell\Documents\ScholarX\V2\web\src\actions\user.actions.ts", "TypeScript", 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 8, 58
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\(platform)\courses\[slug]\_components\course-curriculum.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 104, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 113
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\(platform)\courses\[slug]\_components\course-hero.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 181, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 17, 206
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\(platform)\courses\[slug]\_components\course-instructor.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 70
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\(platform)\courses\[slug]\_components\course-sticky-cta.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 92, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 101
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\(platform)\courses\[slug]\lessons\[lessonId]\_components\focus-mode-controls.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 9, 77
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\(platform)\courses\[slug]\lessons\[lessonId]\_components\focus-toggle-floating.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 102, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 14, 121
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\(platform)\courses\[slug]\lessons\[lessonId]\_components\heatmap-timeline.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 7, 66
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\(platform)\courses\[slug]\lessons\[lessonId]\_components\lesson-client-bridge.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 186, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 21, 17, 224
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\(platform)\courses\[slug]\lessons\[lessonId]\_components\lesson-header.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 12, 121
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\(platform)\courses\[slug]\lessons\[lessonId]\_components\lesson-layout-shell.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 78, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 12, 98
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\(platform)\courses\[slug]\lessons\[lessonId]\_components\lesson-meta.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 354, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 23, 392
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\(platform)\courses\[slug]\lessons\[lessonId]\_components\lesson-sidebar.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 214, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 18, 243
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\(platform)\courses\[slug]\lessons\[lessonId]\_components\lesson-tabs.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 250, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 21, 20, 291
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\(platform)\courses\[slug]\lessons\[lessonId]\_components\mobile-curriculum-trigger.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 22
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\(platform)\courses\[slug]\lessons\[lessonId]\_components\notes-panel-overlay.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 10, 225
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\(platform)\courses\[slug]\lessons\[lessonId]\_components\quality-selector.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 144, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 160
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\(platform)\courses\[slug]\lessons\[lessonId]\_components\resources-bottom-sheet.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 94, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 10, 113
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\(platform)\courses\[slug]\lessons\[lessonId]\_components\resume-prompt-banner.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 79, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 11, 103
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\(platform)\courses\[slug]\lessons\[lessonId]\_components\video-player.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 123, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 12, 140
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\(platform)\courses\[slug]\lessons\[lessonId]\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 107, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 16, 137
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\(platform)\courses\[slug]\lessons\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 4, 20
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\(platform)\courses\[slug]\loading.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 34, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 7, 45
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\(platform)\courses\[slug]\not-found.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 37
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\(platform)\courses\[slug]\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 13, 73
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\(platform)\courses\[slug]\template.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 9
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\(platform)\courses\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 23
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\(platform)\layout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 2, 21
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\(platform)\opportunities\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 6, 69
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\about\about-animations.module.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 170, 0, 0, 0, 0, 0, 26, 196
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\about\components\HeroSection.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 61
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\about\components\ImpactSection.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 47, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 52
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\about\components\VisionSection.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 40
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\about\components\shared\ContentRow.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 74, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 83
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\about\components\shared\ImpactCard.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 44
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\about\constants.ts", "TypeScript", 0, 0, 0, 0, 126, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 137
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\about\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 65, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 74
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\admin\_actions\signout.ts", "TypeScript", 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 11
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\admin\_components\admin-shell.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 199, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 17, 222
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\admin\_components\admin-sidebar.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 178, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 189
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\admin\courses\[courseId]\_components\lesson-editor.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 607, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 34, 655
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\admin\courses\[courseId]\lessons\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 96, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 103
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\admin\courses\[courseId]\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 928, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 58, 991
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\admin\courses\_components\courses-table.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 201, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 208
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\admin\courses\new\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 267, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 289
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\admin\courses\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 19
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\admin\inquiries\[inquiryId]\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 145, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 156
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\admin\inquiries\_components\inquiries-table.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 189, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 198
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\admin\inquiries\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 14
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\admin\layout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 40
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\admin\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 239, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 255
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\admin\reports\[reportType]\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 76, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 85
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\admin\reports\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 114, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 122
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\admin\settings\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 71
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\admin\subscriptions\[subscriptionId]\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 90, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 97
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\admin\subscriptions\_components\subscriptions-table.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 158, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 165
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\admin\subscriptions\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 16
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\admin\users\[userId]\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 127, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 137
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\admin\users\_components\users-table.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 220, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 230
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\admin\users\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 14
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\ai-search\ai-search.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 146, 0, 0, 0, 0, 0, 7, 153
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\ai-search\layout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 20
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\ai-search\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 11, 67
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\api\admin\[[...path]]\route.ts", "TypeScript", 0, 0, 0, 0, 343, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 61, 435
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\api\admin\config\[key]\route.ts", "TypeScript", 0, 0, 0, 0, 64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 78
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\api\admin\storage-check\route.ts", "TypeScript", 0, 0, 0, 0, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 71
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\api\auth\[...all]\route.ts", "TypeScript", 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 4
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\api\collect-phone\route.ts", "TypeScript", 0, 0, 0, 0, 82, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 13, 97
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\api\contact\route.ts", "TypeScript", 0, 0, 0, 0, 34, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 43
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\api\courses\[[...path]]\route-handlers.ts", "TypeScript", 0, 0, 0, 0, 261, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 34, 295
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\api\courses\[[...path]]\route.test.ts", "TypeScript", 0, 0, 0, 0, 171, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 185
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\api\courses\[[...path]]\route.ts", "TypeScript", 0, 0, 0, 0, 21, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 27
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\api\health\route.ts", "TypeScript", 0, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 33
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\api\upload\avatar\route.ts", "TypeScript", 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 117
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\auth\_components\Field.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 39, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 45
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\auth\_components\ForgotPasswordForm.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 76, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 89
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\auth\_components\PhoneForm.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 73, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 79
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\auth\_components\ResetPasswordForm.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 172, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 187
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\auth\_components\SignoutButton.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 44
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\auth\_components\VerifyEmailOtpForm.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 223, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 259
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\auth\collect-phone\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 26, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 31
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\auth\forgot-password\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 23
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\auth\reset-password\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 40
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\auth\signin\layout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 15
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\auth\signin\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 4
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\auth\signup\layout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 15
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\auth\signup\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 240, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 26, 267
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\auth\verify-email\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 55
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\contact\_components\ContactForm.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 166, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 184
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\contact\contact.schema.ts", "TypeScript", 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 35
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\contact\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 38
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\global-error.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 26, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 4, 31
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\globals.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 664, 0, 0, 0, 0, 5, 91, 760
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\layout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 61
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\not-found.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 6
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 44, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 9, 58
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\profile\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 682, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 37, 724
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\scholar\[username]\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 112, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 16, 131
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\Footer.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 114, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 5, 125
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\HamburgerIcon.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 65, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 71
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\Header.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 108, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 112
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\MobileMenu.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 117, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 123
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\PremiumHeader.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 9
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\PremiumHeaderClient.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 280, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 26, 311
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\PremiumMobileMenu.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 187, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 200
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\admin\data-table.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 366, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 19, 388
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ai-search\ai-search-page-client.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 175, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 23, 199
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ai-search\ai-search-sidebar.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 149, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 159
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ai-search\bot-avatar.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 32
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ai-search\chat-header.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 27, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 29
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ai-search\chat-input.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 39
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ai-search\chat-message.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 109, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 11, 124
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ai-search\mock-data.ts", "TypeScript", 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 39
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ai-search\opportunity-card.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 170, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 22, 195
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ai-search\providers.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 21
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ai-search\scholarship-card.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 105, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 9, 117
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ai-search\scholarship-modal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 161, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 16, 180
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ai-search\search-hero.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 140, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 58, 15, 213
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ai-search\search-results.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 182, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 18, 210
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ai-search\types.ts", "TypeScript", 0, 0, 0, 0, 26, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 29
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ai-search\ui\alert-dialog.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 184, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 200
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ai-search\ui\badge.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 44, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 50
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ai-search\ui\button.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 62, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 68
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ai-search\ui\card.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 94, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 104
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ai-search\ui\combobox.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 282, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 21, 303
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ai-search\ui\dialog.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 151, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 165
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ai-search\ui\dropdown-menu.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 19, 274
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ai-search\ui\field.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 218, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 21, 239
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ai-search\ui\input-group.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 148, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 160
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ai-search\ui\input.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 20
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ai-search\ui\label.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 25
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ai-search\ui\select.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 182, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 196
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ai-search\ui\separator.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 29
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ai-search\ui\skeleton.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 16
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ai-search\ui\textarea.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 19
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\animations\page-transition.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 34, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 39
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\animations\parallax-3d-card.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 15, 91
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\animations\shiny-text.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 54, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 59
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\animations\spotlight-card.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 119, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 16, 140
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\animations\stagger.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 44, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 8, 53
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\component-example.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 479, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 8, 488
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\courses\card-parts\course-badges.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 40
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\courses\card-parts\course-price-display.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 65
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\courses\card-parts\hover-media.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 9, 70
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\courses\card-parts\social-proof-ribbon.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 41
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\courses\card-parts\visual-level-meter.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 45
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\courses\course-card-skeleton.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 5, 50
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\courses\course-card.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 205, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 28, 236
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\courses\course-detail-sheet.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 351, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 387
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\courses\course-detail-surface-portal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 81, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 12, 96
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\courses\course-grid.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 84, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 92
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\courses\course-meta.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 47
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\courses\course-price.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 5, 49
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\courses\course-rating.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 6, 49
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\courses\courses-filter-section.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 73, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 11, 85
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\courses\courses-hero.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 343, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 28, 24, 395
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\courses\courses-view.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 23
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\courses\enroll-modal-actions.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 168, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 9, 180
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\courses\enroll-modal-ambient.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 68, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 6, 77
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\courses\enroll-modal-benefits.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 63
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\courses\enroll-modal-content.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 150, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 161
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\courses\enroll-modal-success-view.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 46
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\courses\enroll-modal-title-media.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 67, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 74
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\courses\enroll-modal.test.ts", "TypeScript", 0, 0, 0, 0, 47, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 53
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\courses\enroll-modal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 365, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 37, 414
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\courses\enrollment-success.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 154, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 14, 171
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\courses\index.ts", "TypeScript", 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 12
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\courses\instructor-info.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 39, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 5, 45
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\courses\latest-course-card.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 289, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 29, 330
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\courses\latest-courses-section.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 170, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 16, 190
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\courses\priority-enrollment-window.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 362, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 18, 394
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\courses\sales-inquiry-form.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 291, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 313
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\example.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 56
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\global-shell-exclusions.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 15
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\home\features-section.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 68, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 9, 80
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\home\hero-section.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 97, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 13, 118
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\home\hero-wrapper.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 11
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\home\home-cta-section.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 5, 54
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\home\impact-section.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 157, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 21, 184
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\home\motion-wrapper.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 9
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\home\services-section.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 123, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 12, 142
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\icons\GoogleIcon.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 27, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 28
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\opportunities\Filters.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 154, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 19, 176
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\opportunities\OpportunitiesSearchInput.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 10, 66
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\opportunities\OpportunityCard.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 109, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 5, 115
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\opportunities\OpportunityModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 233, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 19, 260
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\opportunities\OpprtunitySection.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 150, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 23, 175
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\opportunities\SimpleDropdown.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 93, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 10, 104
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\profile\account-settings-form.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 172, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 181
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\profile\avatar-upload.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 109, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 17, 126
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\profile\my-enrolled-courses.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 33
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\profile\profile-popup.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 159, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 173
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\profile\saved-opportunities-list.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 33
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\profile\social-icon-link.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 104, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 115
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\profile\tab-error-boundary.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 58
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\action-search-bar-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 54, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 58
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\action-search-bar.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 259, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 21, 282
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\alert-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 62
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\alert-dialog.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 184, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 200
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\alert.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 256, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 14, 272
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\animated-button.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 17, 5, 51
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\animated-glowing-search-bar.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 71, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 5, 77
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\animated-select-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 39
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\animated-select.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 199, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 212
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\animated-text-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 46
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\animated-text.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 118, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 127
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\aspect-ratio.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 12
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\author-form-card.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 134, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 144
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\avatar-border.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 21, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 24
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\avatar.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 103, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 113
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\badge.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 44, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 50
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\bg-pattern-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 39
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\bg-pattern.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 76, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 8, 85
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\bucket-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 14
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\bucket.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 354, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 363
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\button.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 62, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 68
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\card.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 94, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 104
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\combobox.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 282, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 21, 303
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\context-tooltip.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 6, 79
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\copy-button.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 61, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 68
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\cybernetic-grid-shader-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 12
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\cybernetic-grid-shader.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 127, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 19, 146
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\dialog.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 150, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 164
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\digital-petals-shader-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 12
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\digital-petals-shader.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 62, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 77
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\drawer-sheet.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 27, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 4, 32
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\dropdown-menu.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 19, 274
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\emoji-rating.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 82, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 11, 96
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\expand-map-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 18
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\expand-map.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 216, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 19, 235
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\falling-pattern-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 17
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\falling-pattern.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 144, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 151
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\field-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 57
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\field.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 84, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 94
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\floating-action-menu-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 27, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 30
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\floating-action-menu.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 87, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 96
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\footer.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 5, 39
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\glass-panel.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 74, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 6, 102
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\globe-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 8
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\globe.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 34, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 37
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\glowing-shadow.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 235, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 4, 240
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\gradient-dots-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 11
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\gradient-dots.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 5, 78
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\hand-writing-text-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 8
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\hand-writing-text.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 74, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 80
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\image-upload-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 112, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 125
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\input-group.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 145, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 157
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\input.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 20
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\interactive-globe-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 39, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 43
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\interactive-globe.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 224, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 30, 255
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\label.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 25
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\lever-switch-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 8
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\lever-switch.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 60
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\liquid-glass-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 8
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\liquid-glass.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 176, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 13, 190
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\mac-os-dock-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 78
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\mac-os-dock.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 230, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 23, 255
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\map-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 32
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\map.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 206, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 15, 223
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\modern-background-paths-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 8
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\modern-background-paths.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 365, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 27, 393
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\modern-mobile-menu-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 24
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\modern-mobile-menu.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 81, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 16, 98
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\morphing-popover.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 203, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 27, 231
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\neon-button-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 12
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\neon-button.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 6, 63
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\not-found.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 185, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 197
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\notification-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 158, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 8, 167
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\orbiting-skills-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 8
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\orbiting-skills.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 188, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 203
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\pagination.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 92, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 102
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\popover.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 38
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\pricing-card-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 117, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 126
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\pricing-card.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 167, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 183
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\progress-indicator.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 119, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 7, 127
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\progress-ring.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 57, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 6, 77
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\radial-orbital-timeline-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 69
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\radial-orbital-timeline.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 233, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 23, 256
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\scroll-area.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 56
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\select.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 182, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 196
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\separator.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 29
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\shader-animation-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 6
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\shader-animation.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 172, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 33, 205
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\sheet.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 130, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 144
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\shine-border.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 4, 47
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\sidebar.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 638, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 55, 703
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\sign-in-card-2.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 574, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51, 625
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\skeleton.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 14
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\sparkles-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 73, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 80
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\sparkles.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 192, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 14, 208
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\spiral-animation-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 5, 30
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\spiral-animation.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 234, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 46, 281
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\stack-feature-section-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 8
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\stack-feature-section.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 111
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\switch-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 39, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 43
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\switch.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 79
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\tabs.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 56
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\testimonial-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 32
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\testimonial.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 83, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 9, 93
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\textarea.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 19
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\tooltip.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 58
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\tree-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 97, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 100
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\tree.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 394, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 46, 440
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\trusted-by-experts-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 62, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 73
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\unsave-popup.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 20, 247
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\upgrade-banner-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\upgrade-banner.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 119, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 126
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\use-image-upload.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 60
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\use-pagination-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 90
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\use-pagination.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 61
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\warp-drive-shader-demo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 12
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\warp-drive-shader.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 109, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 19, 128
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\wave-path.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 73, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 13, 88
+"c:\Users\dell\Documents\ScholarX\V2\web\src\config\dev-auth-bypass.ts", "TypeScript", 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 17
+"c:\Users\dell\Documents\ScholarX\V2\web\src\config\env.ts", "TypeScript", 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 49
+"c:\Users\dell\Documents\ScholarX\V2\web\src\config\query-keys.ts", "TypeScript", 0, 0, 0, 0, 88, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 2, 95
+"c:\Users\dell\Documents\ScholarX\V2\web\src\config\routes.ts", "TypeScript", 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 2, 16
+"c:\Users\dell\Documents\ScholarX\V2\web\src\db\README.md", "Markdown", 0, 0, 0, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 17, 46
+"c:\Users\dell\Documents\ScholarX\V2\web\src\db\index.ts", "TypeScript", 0, 0, 0, 0, 44, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 8, 57
+"c:\Users\dell\Documents\ScholarX\V2\web\src\db\schema\admin-db.schema.ts", "TypeScript", 0, 0, 0, 0, 75, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 79
+"c:\Users\dell\Documents\ScholarX\V2\web\src\db\schema\app-config-schema.ts", "TypeScript", 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 9
+"c:\Users\dell\Documents\ScholarX\V2\web\src\db\schema\auth-schema.ts", "TypeScript", 0, 0, 0, 0, 125, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 10, 138
+"c:\Users\dell\Documents\ScholarX\V2\web\src\db\schema\contact-us-schema.ts", "TypeScript", 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 15
+"c:\Users\dell\Documents\ScholarX\V2\web\src\db\schema\courses-db.schema.ts", "TypeScript", 0, 0, 0, 0, 127, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 133
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\admin\application\admin-courses.service.test.ts", "TypeScript", 0, 0, 0, 0, 198, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 26, 224
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\admin\application\admin-courses.service.ts", "TypeScript", 0, 0, 0, 0, 111, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 23, 134
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\admin\application\admin-errors.ts", "TypeScript", 0, 0, 0, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 28
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\admin\application\admin-inquiries.service.ts", "TypeScript", 0, 0, 0, 0, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 42
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\admin\application\admin-lessons.service.ts", "TypeScript", 0, 0, 0, 0, 93, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 113
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\admin\application\admin-reports.service.ts", "TypeScript", 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 20
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\admin\application\admin-stats.service.ts", "TypeScript", 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 8
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\admin\application\admin-subscriptions.service.ts", "TypeScript", 0, 0, 0, 0, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 42
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\admin\application\admin-users.service.ts", "TypeScript", 0, 0, 0, 0, 109, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 27, 136
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\admin\contracts\admin-repository.contract.ts", "TypeScript", 0, 0, 0, 0, 51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 7, 59
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\admin\contracts\admin-types.ts", "TypeScript", 0, 0, 0, 0, 134, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 150
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\admin\contracts\admin-validation.schemas.ts", "TypeScript", 0, 0, 0, 0, 67, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 81
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\admin\factory\admin-domain.factory.ts", "TypeScript", 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 27
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\admin\index.ts", "TypeScript", 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 4
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\admin\infrastructure\audit\audit-logger.ts", "TypeScript", 0, 0, 0, 0, 48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 54
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\admin\infrastructure\db\RACE-CONDITION-FIX.md", "Markdown", 0, 0, 0, 0, 0, 0, 143, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 46, 189
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\admin\infrastructure\db\admin.repository.ts", "TypeScript", 0, 0, 0, 0, 722, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 39, 73, 834
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\courses\application\index.ts", "TypeScript", 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 4
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\courses\application\next-course-catalog.service.ts", "TypeScript", 0, 0, 0, 0, 303, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 41, 347
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\courses\application\next-course-enrollment.service.ts", "TypeScript", 0, 0, 0, 0, 219, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 250
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\courses\application\next-course.errors.ts", "TypeScript", 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 20
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\courses\contracts\course-catalog.contract.ts", "TypeScript", 0, 0, 0, 0, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 40
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\courses\contracts\course-enrollment.contract.ts", "TypeScript", 0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 44
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\courses\contracts\index.ts", "TypeScript", 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\courses\factory\next-course-domain.factory.ts", "TypeScript", 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 20
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\courses\index.ts", "TypeScript", 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 4
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\courses\infrastructure\db\next-courses.repository.ts", "TypeScript", 0, 0, 0, 0, 340, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 39, 379
+"c:\Users\dell\Documents\ScholarX\V2\web\src\hooks\admin\use-admin-courses.ts", "TypeScript", 0, 0, 0, 0, 82, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 92
+"c:\Users\dell\Documents\ScholarX\V2\web\src\hooks\admin\use-admin-inquiries.ts", "TypeScript", 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 37
+"c:\Users\dell\Documents\ScholarX\V2\web\src\hooks\admin\use-admin-lessons.ts", "TypeScript", 0, 0, 0, 0, 68, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 77
+"c:\Users\dell\Documents\ScholarX\V2\web\src\hooks\admin\use-admin-reports.ts", "TypeScript", 0, 0, 0, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 30
+"c:\Users\dell\Documents\ScholarX\V2\web\src\hooks\admin\use-admin-stats.ts", "TypeScript", 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 13
+"c:\Users\dell\Documents\ScholarX\V2\web\src\hooks\admin\use-admin-subscriptions.ts", "TypeScript", 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 37
+"c:\Users\dell\Documents\ScholarX\V2\web\src\hooks\admin\use-admin-users.ts", "TypeScript", 0, 0, 0, 0, 74, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 83
+"c:\Users\dell\Documents\ScholarX\V2\web\src\hooks\ai-search\use-ai-chat-query.ts", "TypeScript", 0, 0, 0, 0, 103, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 17, 124
+"c:\Users\dell\Documents\ScholarX\V2\web\src\hooks\ai-search\use-search.ts", "TypeScript", 0, 0, 0, 0, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 17
+"c:\Users\dell\Documents\ScholarX\V2\web\src\hooks\mutations\use-enrollment.ts", "TypeScript", 0, 0, 0, 0, 22, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 3, 29
+"c:\Users\dell\Documents\ScholarX\V2\web\src\hooks\queries\useOpportunitiesSearch.ts", "TypeScript", 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 2, 16
+"c:\Users\dell\Documents\ScholarX\V2\web\src\hooks\use-click-outside.ts", "TypeScript", 0, 0, 0, 0, 21, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 25
+"c:\Users\dell\Documents\ScholarX\V2\web\src\hooks\use-flip-animation.ts", "TypeScript", 0, 0, 0, 0, 120, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 19, 140
+"c:\Users\dell\Documents\ScholarX\V2\web\src\hooks\use-focus-mode.ts", "TypeScript", 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 5, 33
+"c:\Users\dell\Documents\ScholarX\V2\web\src\hooks\use-lesson-progress.ts", "TypeScript", 0, 0, 0, 0, 252, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 54, 47, 353
+"c:\Users\dell\Documents\ScholarX\V2\web\src\hooks\use-media-query.ts", "TypeScript", 0, 0, 0, 0, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 23
+"c:\Users\dell\Documents\ScholarX\V2\web\src\hooks\use-mobile.ts", "TypeScript", 0, 0, 0, 0, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 20
+"c:\Users\dell\Documents\ScholarX\V2\web\src\hooks\use-notes.ts", "TypeScript", 0, 0, 0, 0, 95, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 14, 117
+"c:\Users\dell\Documents\ScholarX\V2\web\src\hooks\use-scroll-direction.ts", "TypeScript", 0, 0, 0, 0, 26, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 36
+"c:\Users\dell\Documents\ScholarX\V2\web\src\instrumentation-client.ts", "TypeScript", 0, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 38
+"c:\Users\dell\Documents\ScholarX\V2\web\src\instrumentation.ts", "TypeScript", 0, 0, 0, 0, 34, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 40
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\admin\admin-api-client.ts", "TypeScript", 0, 0, 0, 0, 132, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 41, 173
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\admin\admin-constants.ts", "TypeScript", 0, 0, 0, 0, 57, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 63
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\admin\admin-utils.ts", "TypeScript", 0, 0, 0, 0, 56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 62
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\admin\rate-limiter.ts", "TypeScript", 0, 0, 0, 0, 51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 62
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\ai-search\api.ts", "TypeScript", 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 20, 128
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\ai-search\types.ts", "TypeScript", 0, 0, 0, 0, 55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 5, 63
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\ai-search\utils.ts", "TypeScript", 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 7
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\api\client.ts", "TypeScript", 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 3, 26
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\api\courses.service.ts", "TypeScript", 0, 0, 0, 0, 724, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 72, 800
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\api\index.ts", "TypeScript", 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 4
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\api\opportunities.service.ts", "TypeScript", 0, 0, 0, 0, 106, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 8, 116
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\app-config.ts", "TypeScript", 0, 0, 0, 0, 54, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 11, 80
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\auth-client.ts", "TypeScript", 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 21
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\auth.ts", "TypeScript", 0, 0, 0, 0, 387, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 36, 426
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\backfill.test.ts", "TypeScript", 0, 0, 0, 0, 57, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 71
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\course-categories.ts", "TypeScript", 0, 0, 0, 0, 78, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 83
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\dal.ts", "TypeScript", 0, 0, 0, 0, 82, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 19, 102
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\debug\agent-log.ts", "TypeScript", 0, 0, 0, 0, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 6, 42
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\design-tokens.ts", "TypeScript", 0, 0, 0, 0, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 27, 14, 76
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\email.ts", "TypeScript", 0, 0, 0, 0, 80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 98
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\enrollment\enrollment-executor.ts", "TypeScript", 0, 0, 0, 0, 74, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 83
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\enrollment\error-mapper.ts", "TypeScript", 0, 0, 0, 0, 38, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 8, 47
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\enrollment\intent-controller.ts", "TypeScript", 0, 0, 0, 0, 132, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 20, 159
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\enrollment\strategies\enrollment-strategies.test.ts", "TypeScript", 0, 0, 0, 0, 106, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 119
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\enrollment\strategies\form-application.strategy.ts", "TypeScript", 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 44
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\enrollment\strategies\free-enroll.strategy.ts", "TypeScript", 0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 43
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\enrollment\strategies\paid-checkout.strategy.ts", "TypeScript", 0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 43
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\enrollment\strategies\sales-inquiry.strategy.ts", "TypeScript", 0, 0, 0, 0, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 55
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\enrollment\types.ts", "TypeScript", 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 69
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\home-data.ts", "TypeScript", 0, 0, 0, 0, 163, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 11, 179
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\motion-variants.ts", "TypeScript", 0, 0, 0, 0, 201, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 74, 38, 313
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\opportunities\colors.ts", "TypeScript", 0, 0, 0, 0, 56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 59
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\opportunities\types.ts", "TypeScript", 0, 0, 0, 0, 130, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 27, 164
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\rate-limiter.ts", "TypeScript", 0, 0, 0, 0, 118, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 136
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\routes.ts", "TypeScript", 0, 0, 0, 0, 27, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 2, 32
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\server\internal-auth-bridge.ts", "TypeScript", 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 50
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\telemetry\enrollment-events.ts", "TypeScript", 0, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 6, 36
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\upload-key.test.ts", "TypeScript", 0, 0, 0, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 32
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\upload.test.ts", "TypeScript", 0, 0, 0, 0, 43, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 54
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\upload.ts", "TypeScript", 0, 0, 0, 0, 147, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 21, 168
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\username-utils.ts", "TypeScript", 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 12
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\utils.ts", "TypeScript", 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 7
+"c:\Users\dell\Documents\ScholarX\V2\web\src\providers\app-providers.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 65
+"c:\Users\dell\Documents\ScholarX\V2\web\src\providers\opportunities-search-provider.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 67, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 77
+"c:\Users\dell\Documents\ScholarX\V2\web\src\proxy.ts", "TypeScript", 0, 0, 0, 0, 53, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 64
+"c:\Users\dell\Documents\ScholarX\V2\web\src\store\ui-layout-store.ts", "TypeScript", 0, 0, 0, 0, 46, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 7, 65
+"c:\Users\dell\Documents\ScholarX\V2\web\src\stores\ai-chat.store.ts", "TypeScript", 0, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 35
+"c:\Users\dell\Documents\ScholarX\V2\web\src\stores\course-sheet.store.ts", "TypeScript", 0, 0, 0, 0, 27, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 32
+"c:\Users\dell\Documents\ScholarX\V2\web\src\stores\enrollment.store.ts", "TypeScript", 0, 0, 0, 0, 99, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 17, 116
+"c:\Users\dell\Documents\ScholarX\V2\web\src\stores\ui.store.ts", "TypeScript", 0, 0, 0, 0, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 10, 49
+"c:\Users\dell\Documents\ScholarX\V2\web\src\types\api.types.ts", "TypeScript", 0, 0, 0, 0, 47, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 8, 59
+"c:\Users\dell\Documents\ScholarX\V2\web\src\types\course.ts", "TypeScript", 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 35
+"c:\Users\dell\Documents\ScholarX\V2\web\src\types\course.types.ts", "TypeScript", 0, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 11, 86
+"c:\Users\dell\Documents\ScholarX\V2\web\src\types\profile.types.ts", "TypeScript", 0, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 77
+"c:\Users\dell\Documents\ScholarX\V2\web\src\types\user.types.ts", "TypeScript", 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 26
+"c:\Users\dell\Documents\ScholarX\V2\web\tsconfig.json", "JSON with Comments", 34, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 35
+"c:\Users\dell\Documents\ScholarX\V2\web\vercel.json", "JSON", 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 4
+"Total", "-", 45, 8, 7486, 72, 10546, 105, 9762, 11723, 32397, 2420, 588, 4252, 248, 5824, 2566, 26, 1384, 582, 610, 2374, 12708, 105726
