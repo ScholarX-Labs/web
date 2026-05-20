@@ -5,6 +5,7 @@ import {
   isNextCourseError,
 } from "@/domain/courses";
 import { auth } from "@/lib/auth";
+import { ROUTES } from "@/lib/routes";
 
 export const dynamic = "force-dynamic";
 
@@ -98,7 +99,9 @@ export async function POST(request: NextRequest, context: RouteContext) {
     return NextResponse.json(
       {
         ...result,
-        certificateUrl: `/certificates/${result.certificate.certificateNumber}`,
+        certificateUrl: ROUTES.CERTIFICATE_DETAIL(
+          result.certificate.certificateNumber,
+        ),
       },
       { status: result.alreadyIssued ? 200 : 201 },
     );
