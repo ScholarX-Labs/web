@@ -1,0 +1,4 @@
+## 2025-02-24 - [Enforce secure protocols in Zod URL validation]
+**Vulnerability:** Zod's `z.string().url()` permits any valid URI scheme, including `javascript:` and `file:`. If an attacker submits a `javascript:` URL and it is rendered in an `href` attribute, it creates a Stored Cross-Site Scripting (XSS) vulnerability.
+**Learning:** This codebase relies heavily on Zod for form and server action validation. The default `.url()` validation is insufficient for ensuring that links are safe to render.
+**Prevention:** All Zod URL schemas handling user input intended for `href` or `src` attributes MUST be refined to strictly enforce `http://` or `https://` protocols (e.g., using `.refine(s => s.startsWith('http://') || s.startsWith('https://'))`) or be sanitized via a utility function before rendering.
