@@ -5,6 +5,7 @@ import { LessonLayoutShell } from "./_components/lesson-layout-shell";
 import { LessonHeader } from "./_components/lesson-header";
 import { LessonClientBridge } from "./_components/lesson-client-bridge";
 import { createNextCourseDomain } from "@/domain/courses";
+import { isNextCourseError } from "@/domain/courses/application/next-course.errors";
 import { getSession, requireSession } from "@/lib/dal";
 
 interface LessonPageProps {
@@ -41,11 +42,20 @@ export default async function LessonPage({ params }: LessonPageProps) {
   const session = await requireSession();
   const courseDomain = createNextCourseDomain();
 
-  const lessonData = await courseDomain.catalog.getLesson(
-    slug,
-    lessonId,
-    session.user.id,
-  );
+  let lessonData;
+  try {
+    lessonData = await courseDomain.catalog.getLesson(
+      slug,
+      lessonId,
+      session.user.id,
+    );
+  } catch (error) {
+    if (isNextCourseError(error) && error.statusCode === 404) {
+      notFound();
+    }
+
+    throw error;
+  }
 
   // If the lesson is locked (user not subscribed), return a 404.
   if (lessonData.currentLesson.isLocked) {

@@ -31,6 +31,11 @@ const parseNumber = (
   return undefined;
 };
 
+const isUuid = (value: string): boolean =>
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+    value,
+  );
+
 const toCourse = (record: FlatCourseRecord, isSubscribed = false): Course => ({
   id: record.id,
   slug: record.slug ?? record.id,
@@ -218,7 +223,10 @@ export class NextCourseCatalogService {
   }
 
   async getBySlug(slug: string, userId?: string): Promise<Course> {
-    const course = await this.repository.findBySlugActive(slug);
+    const course =
+      (await this.repository.findBySlugActive(slug)) ??
+      (isUuid(slug) ? await this.repository.findByIdActive(slug) : null);
+
     if (!course) {
       throw new NextCourseError(
         "COURSE_NOT_FOUND",
@@ -268,7 +276,12 @@ export class NextCourseCatalogService {
   }
 
   async getLesson(courseSlug: string, lessonId: string, userId?: string) {
-    const course = await this.repository.findBySlugActive(courseSlug);
+    const course =
+      (await this.repository.findBySlugActive(courseSlug)) ??
+      (isUuid(courseSlug)
+        ? await this.repository.findByIdActive(courseSlug)
+        : null);
+
     if (!course) {
       throw new NextCourseError(
         "COURSE_NOT_FOUND",

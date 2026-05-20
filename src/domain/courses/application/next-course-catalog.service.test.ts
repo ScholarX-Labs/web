@@ -59,6 +59,18 @@ const lessons = [
 const createRepository = () =>
   ({
     findBySlugActive: async () => activeCourse,
+    findByIdActive: async () => activeCourse,
+    listLessons: async () => lessons,
+    findActiveSubscription: async () => ({ id: "sub-1" }),
+    findProgressByCourse: async () => [],
+    findLessonProgress: async () => null,
+  }) as never;
+
+const createRepositoryWithUuidFallback = () =>
+  ({
+    findBySlugActive: async () => null,
+    findByIdActive: async (id: string) =>
+      id === activeCourse.id ? activeCourse : null,
     listLessons: async () => lessons,
     findActiveSubscription: async () => ({ id: "sub-1" }),
     findProgressByCourse: async () => [],
@@ -98,4 +110,13 @@ test("getLesson returns playable media sources for every lesson", async () => {
       "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
     ],
   );
+});
+
+test("getLesson resolves UUID course params when no slug record exists", async () => {
+  const service = new NextCourseCatalogService(createRepositoryWithUuidFallback());
+
+  const result = await service.getLesson(activeCourse.id, "1", "user-1");
+
+  assert.equal(result.course.id, activeCourse.id);
+  assert.equal(result.currentLesson.id, "lesson-id-1");
 });
