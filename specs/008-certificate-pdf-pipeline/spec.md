@@ -165,9 +165,9 @@ These are separate states and must not be collapsed into one boolean.
 | Certificate template | Use `public/certificate-template.svg` as V1 template source | The uploaded template exists in the repo and should be treated as `certificateTemplateVersion = "scholarx-v1"`. |
 | `season_number` | Remove from required course-certificate model; keep nullable/deprecated only for legacy cohort certificates | Course completion certificates do not need season semantics. Required `season_number` creates confusion unless a certificate source is explicitly cohort/season-based. |
 | `role` | Remove from required course-certificate model; keep nullable/deprecated only for legacy role-based certificates | Course certificates represent completion, not participant role. |
-| Artifact storage | Cloudflare R2 primary, Azure Blob Storage as adapter fallback | The app already has R2/S3-compatible upload infrastructure and Cloudflare deploy scripts. R2 avoids public-download egress charges. Azure Blob is a valid alternative if ScholarX standardizes on Azure to use credits. |
+| Artifact storage | Azure Blob Storage primary | ScholarX will use Azure credits for certificate artifacts. Keep storage behind a port so R2 or S3-compatible storage remains replaceable later. |
 | Queue/job model | DB outbox/job table plus managed queue worker | `certificates.certificate_jobs` should be the durable source of truth. A managed queue wakes workers. Do not block lesson completion requests on PDF rendering. |
-| Queue provider | Cloudflare Queues if staying on Cloudflare; Azure Service Bus if moving certificate workers to Azure | Both are managed and more operationally suitable than Redis/BullMQ for serverless deployments. BullMQ is acceptable only if ScholarX runs and operates Redis plus persistent workers. |
+| Queue provider | Azure Service Bus | It aligns with Azure Blob Storage, Azure credits, managed operations, dead-lettering, duplicate detection, competing consumers, and Azure Functions/Container Apps workers. BullMQ is acceptable only if ScholarX deliberately operates Redis plus persistent Node workers. |
 | Certificate public ID | Internal UUID primary key plus 128-bit random public ID | Public IDs must be opaque, non-sequential, human-shareable, and collision-protected by a unique index. |
 
 ---
@@ -234,8 +234,7 @@ BullMQ decision:
 
 Managed queue decision:
 
-- If production remains Cloudflare-centered, use Cloudflare Queues with R2.
-- If production moves certificate workers to Azure to use credits, use Azure Service Bus with Azure Blob Storage.
+- Use Azure Service Bus with Azure Blob Storage for the first production implementation.
 - Keep the application service behind `CertificateArtifactQueue` and `CertificateArtifactStorage` ports so either provider can be swapped.
 
 ---
@@ -710,13 +709,13 @@ certificates/{certificateId}/{templateVersion}/certificate.png
 
 Primary storage provider:
 
-- Cloudflare R2.
-- Reason: S3-compatible, existing AWS SDK-compatible upload path exists in the repo, and public certificate downloads avoid egress-fee pressure.
+- Azure Blob Storage.
+- Reason: ScholarX will use Azure credits for durable certificate PDFs and generated previews.
 
-Azure-compatible provider:
+Alternative provider:
 
-- Azure Blob Storage may implement the same storage port if ScholarX chooses to use Azure credits or runs workers in Azure.
-- Do not couple the domain service to R2 or Azure SDK types.
+- Cloudflare R2 or S3-compatible storage may implement the same storage port later.
+- Do not couple the domain service to Azure SDK, R2, or S3 SDK types.
 
 ---
 
@@ -914,8 +913,8 @@ Alerts:
 ## Open Questions
 
 - Should download URLs use public R2 URLs directly or a controlled route that redirects to signed/public CDN URLs?
-- Should Azure Blob Storage be implemented immediately, or only after Azure deployment is confirmed?
-- Should Cloudflare Queues or Azure Service Bus be selected as the first managed queue provider?
+- Should certificate workers run on Azure Functions or Azure Container Apps?
+- Which Azure Blob container access policy should be used for public certificate artifacts?
 - Should the artifact model be a separate table in V1, or should V1 write `pdf_storage_key` directly and migrate to artifact rows later?
 - What is the final official certificate template version naming scheme after design approval?
 - Should claim tokens remain part of the learner flow?
