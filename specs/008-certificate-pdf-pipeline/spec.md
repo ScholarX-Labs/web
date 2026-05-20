@@ -107,6 +107,19 @@ Static certificate templates exist:
 
 No active PDF generation service, worker, route, or package was found in application code.
 
+### Current Codebase Constraints
+
+Implementation must account for the current repository shape:
+
+- `src/db/schema/courses-db.schema.ts` currently exports the only Drizzle certificate table: `courses.certificates`.
+- No `src/db/schema/certificates-db.schema.ts` file currently exists.
+- `drizzle.config.ts` currently includes only the `auth`, `public`, and `courses` schemas in `schemaFilter`.
+- The public certificate page currently lives at `src/app/(platform)/certificates/[certificateNumber]/page.tsx` and must remain publicly reachable.
+- Current certificate issuance is also called from `src/actions/course.actions.ts` after final lesson completion, not only from `POST /api/courses/{courseId}/certificate`.
+- Azure Blob Storage, Azure Service Bus, and Playwright/Chromium dependencies are not currently installed. They must be isolated to server/worker infrastructure and never imported into Client Components or public page rendering code.
+
+Therefore, the implementation must add first-class Drizzle definitions for the `certificates` schema and update migration configuration before application code can safely target `certificates.certificates`.
+
 ---
 
 ## Goals
@@ -417,7 +430,7 @@ If the existing legacy table is reused, add missing fields through migrations ra
 
 Required additions if not present:
 
-- `source_type varchar(32)` default `course`
+- `source_type varchar(32)` default `course_completion`
 - `source_id uuid`
 - `course_progress_id uuid`
 - `metadata jsonb`
@@ -596,6 +609,8 @@ Behavior:
 
 - Returns artifact generation state for UI polling.
 - Must not expose private storage keys.
+- For pending or generating PDFs, clients should poll every 5 seconds and stop automatic polling after 2 minutes.
+- Download URLs must be null until the PDF artifact is ready.
 
 ---
 
@@ -625,10 +640,11 @@ Behavior:
 
 - Copy records from `courses.certificates` into `certificates.certificates`.
 - Preserve certificate number as public ID.
+- Preserve the previous public certificate number as either `certificate_number` or a legacy `short_id` alias so existing public URLs keep resolving.
 - Preserve issued timestamp.
 - Preserve metadata snapshot.
-- Set `source_type = 'course'`.
-- Set `source_id = course_id`.
+- Set `source_type = 'course_completion'`.
+- Set `source_id = course_progress_id`.
 - Set `course_progress_id` from the source row.
 - Record migration event in `certificates.certificate_events`.
 - Do not generate PDFs during the backfill unless explicitly requested.
@@ -703,9 +719,11 @@ Storage adapter must support:
 Object keys should follow:
 
 ```text
-certificates/{certificateId}/{templateVersion}/certificate.pdf
-certificates/{certificateId}/{templateVersion}/certificate.png
+certificates/{certificateNumber}/{templateVersion}/certificate.pdf
+certificates/{certificateNumber}/{templateVersion}/certificate.png
 ```
+
+Do not date-partition certificate artifact keys. Certificate regeneration may occur months after issuance, and the storage key must remain derivable from immutable certificate identity plus template version. Date-based analysis belongs in artifact metadata, Blob Storage lifecycle rules, and monitoring, not in the key path.
 
 Primary storage provider:
 
