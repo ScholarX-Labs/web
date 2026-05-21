@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { LessonLayoutShell } from "./_components/lesson-layout-shell";
 import { LessonHeader } from "./_components/lesson-header";
@@ -7,7 +7,6 @@ import { LessonClientBridge } from "./_components/lesson-client-bridge";
 import { createNextCourseDomain } from "@/domain/courses";
 import { isNextCourseError } from "@/domain/courses/application/next-course.errors";
 import { getSession, requireSession } from "@/lib/dal";
-import { ROUTES } from "@/lib/routes";
 
 interface LessonPageProps {
   params: Promise<{ slug: string; lessonId: string }>;
@@ -66,13 +65,10 @@ export default async function LessonPage({ params }: LessonPageProps) {
   const currentLesson = lessonData.currentLesson;
   const allLessons = lessonData.allLessons;
   const lessonIndex = allLessons.findIndex((l) => l.id === currentLesson.id);
-
-  if (lessonData.course.slug !== slug || currentLesson.id !== lessonId) {
-    redirect(ROUTES.LESSON(lessonData.course.slug, currentLesson.id));
-  }
+  const canonicalCourseSlug = lessonData.course.slug;
 
   return (
-    <LessonLayoutShell lessonKey={lessonId}>
+    <LessonLayoutShell lessonKey={currentLesson.id}>
       {/* ─────────────────────────────────────────────────────────────
           CINEMATIC AMBIENT MESH — creates the color field that
           glass surfaces refract. Fixed and animated for "life".
@@ -117,13 +113,13 @@ export default async function LessonPage({ params }: LessonPageProps) {
         className="relative flex min-h-[100dvh] flex-col text-white font-sans"
       >
         {/* STICKY GLASS HEADER */}
-        <LessonHeader slug={slug} lessonTitle={currentLesson.title} />
+        <LessonHeader slug={canonicalCourseSlug} lessonTitle={currentLesson.title} />
 
         {/* CONTENT BRIDGE — Wires up interactive states (Client) */}
         <Suspense fallback={<LessonLoadingSkeleton />}>
           <LessonClientBridge
             lessonId={currentLesson.id}
-            courseSlug={slug}
+            courseSlug={canonicalCourseSlug}
             courseId={lessonData.course.id}
             courseTitle={lessonData.course.title}
             lessonTitle={currentLesson.title}
