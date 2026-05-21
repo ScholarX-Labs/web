@@ -14,6 +14,7 @@ export interface ICourse {
   subscriberCount: number;
   lastSyncedAt: Date | string;
   requiresForm: boolean;
+  autoApproveApplications: boolean;
   salesInquiry: boolean;
   createdAt: Date | string;
   updatedAt: Date | string;
