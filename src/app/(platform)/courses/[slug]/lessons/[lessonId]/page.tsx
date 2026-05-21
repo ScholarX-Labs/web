@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
 import { LessonLayoutShell } from "./_components/lesson-layout-shell";
 import { LessonHeader } from "./_components/lesson-header";
@@ -7,6 +7,7 @@ import { LessonClientBridge } from "./_components/lesson-client-bridge";
 import { createNextCourseDomain } from "@/domain/courses";
 import { isNextCourseError } from "@/domain/courses/application/next-course.errors";
 import { getSession, requireSession } from "@/lib/dal";
+import { ROUTES } from "@/lib/routes";
 
 interface LessonPageProps {
   params: Promise<{ slug: string; lessonId: string }>;
@@ -65,6 +66,10 @@ export default async function LessonPage({ params }: LessonPageProps) {
   const currentLesson = lessonData.currentLesson;
   const allLessons = lessonData.allLessons;
   const lessonIndex = allLessons.findIndex((l) => l.id === currentLesson.id);
+
+  if (lessonData.course.slug !== slug || currentLesson.id !== lessonId) {
+    redirect(ROUTES.LESSON(lessonData.course.slug, currentLesson.id));
+  }
 
   return (
     <LessonLayoutShell lessonKey={lessonId}>

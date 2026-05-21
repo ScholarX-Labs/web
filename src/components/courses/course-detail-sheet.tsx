@@ -45,6 +45,7 @@ export function CourseDetailSheet({
   const { applyInverseFromRect, play, playReverse } = useFlipAnimation();
   const isPaid = (course.price ?? 0) > 0;
   const isEnrolled = Boolean(course.isSubscribed);
+  const firstLessonId = course.lessons?.[0]?.id ?? "1";
   const sheetRef = useRef<HTMLDivElement | null>(null);
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const [flipComplete, setFlipComplete] = useState(false);
@@ -358,7 +359,7 @@ export function CourseDetailSheet({
                     <div className="pt-4">
                       {isEnrolled ? (
                         <Link
-                          href={ROUTES.LESSON(course.slug, "1")}
+                          href={ROUTES.LESSON(course.slug, firstLessonId)}
                           className="inline-flex w-full items-center justify-center rounded-2xl bg-slate-900 px-6 py-4 text-[15px] font-medium text-white transition-transform hover:scale-[1.02] active:scale-[0.98] dark:bg-white dark:text-slate-900"
                         >
                           Resume Learning

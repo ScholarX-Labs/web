@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
 import { ROUTES } from "@/lib/routes";
+import { createNextCourseDomain } from "@/domain/courses";
+import { getSession } from "@/lib/dal";
 
 interface LessonsRootPageProps {
   params: Promise<{ slug: string }>;
@@ -12,8 +14,14 @@ interface LessonsRootPageProps {
  */
 export default async function LessonsRootPage({ params }: LessonsRootPageProps) {
   const { slug } = await params;
-  
-  // Always redirect to the first lesson (lesson-1)
-  // In a more complex app, this could check the user's last watched lesson
-  redirect(ROUTES.LESSON(slug, "lesson-1"));
+  const session = await getSession();
+  const courseDomain = createNextCourseDomain();
+  const course = await courseDomain.catalog.getBySlug(slug, session?.user.id);
+  const firstLessonId = course.lessons?.[0]?.id;
+
+  if (!firstLessonId) {
+    redirect(ROUTES.COURSE_DETAIL(course.slug));
+  }
+
+  redirect(ROUTES.LESSON(course.slug, firstLessonId));
 }
