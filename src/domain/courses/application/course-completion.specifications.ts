@@ -4,6 +4,7 @@ import type {
   SubscriptionRecord,
 } from "@/domain/courses/contracts/course-progress.types";
 import { NextCourseError } from "@/domain/courses/application/next-course.errors";
+import { isPublicLessonStatus } from "@/domain/courses/application/public-lesson-status";
 
 export class CourseWritableSpecification {
   assertSatisfiedBy(course: CourseProgressCourseRecord | null): asserts course is CourseProgressCourseRecord {
@@ -39,7 +40,10 @@ export class LessonBelongsToCourseSpecification {
       );
     }
 
-    if (lesson.status !== "active" || lesson.isArchived === true) {
+    if (
+      !isPublicLessonStatus(lesson.status) ||
+      lesson.isArchived === true
+    ) {
       throw new NextCourseError(
         "LESSON_NOT_ACTIVE",
         409,
