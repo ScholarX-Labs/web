@@ -119,6 +119,7 @@ const createFakeDomain = (capture?: {
     enrollFree: async () => ({ success: true }),
     initPaidEnrollment: async () => ({ success: true }),
     initApplicationEnrollment: async () => ({ success: true }),
+    submitApplication: async () => ({ id: "application-1" }),
   },
 });
 
