@@ -64,6 +64,27 @@
       "when": 1779290000000,
       "tag": "0008_repair_course_completion_state_baseline_gap",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1780000000000,
+      "tag": "0009_course_applications",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1780001000000,
+      "tag": "0010_course_auto_approve_applications",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1780002000000,
+      "tag": "0011_align_course_application_age_check",
+      "breakpoints": true
     }
   ]
 }
