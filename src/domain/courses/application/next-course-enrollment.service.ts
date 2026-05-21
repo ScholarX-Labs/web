@@ -62,6 +62,16 @@ export class NextCourseEnrollmentService {
 
     await this.assertUserActive(userId);
 
+    if (course.requiresForm) {
+      throw new NextCourseError(
+        "COURSE_REQUIRES_APPLICATION",
+        409,
+        "This course requires an application form before enrollment.",
+        9006,
+        { courseId },
+      );
+    }
+
     if ((course.currentPrice ?? 0) > 0) {
       throw new NextCourseError(
         "BAD_REQUEST",
@@ -245,5 +255,64 @@ export class NextCourseEnrollmentService {
     });
 
     return result;
+  }
+
+  async submitApplication(
+    courseId: string,
+    userId: string,
+    params: {
+      name: string;
+      email: string;
+      phone?: string;
+      learningGoals: string;
+      background?: string;
+      sourceSurface?: string;
+      idempotencyKey?: string;
+    },
+  ) {
+    const course = await this.repository.findByIdActive(courseId);
+
+    if (!course) {
+      throw new NextCourseError(
+        "COURSE_NOT_FOUND",
+        404,
+        `Course (ID: ${courseId}) not found for application submission.`,
+        1001,
+      );
+    }
+
+    await this.assertUserActive(userId);
+
+    if (!course.requiresForm) {
+      throw new NextCourseError(
+        "BAD_REQUEST",
+        400,
+        "This course does not require an application",
+        9005,
+      );
+    }
+
+    const messageParts = [
+      "Course application",
+      "",
+      "Learning goals:",
+      params.learningGoals.trim(),
+    ];
+
+    const background = params.background?.trim();
+    if (background) {
+      messageParts.push("", "Background:", background);
+    }
+
+    return this.repository.createInquiry({
+      courseId,
+      userId,
+      name: params.name,
+      email: params.email,
+      phone: params.phone,
+      message: messageParts.join("\n"),
+      sourceSurface: params.sourceSurface,
+      idempotencyKey: params.idempotencyKey,
+    });
   }
 }
