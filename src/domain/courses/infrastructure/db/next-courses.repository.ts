@@ -1,7 +1,8 @@
-import { and, asc, count, eq, ilike, inArray, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, ilike, inArray, sql } from "drizzle-orm";
 import { db } from "@/db";
 import {
   dbCourseCategories,
+  dbCourseApplications,
   dbCourses,
   dbInquiries,
   dbLessonProgress,
@@ -40,6 +41,7 @@ export interface FlatCourseRecord {
   urgencyText: string | null;
   tags: string[] | null;
   requiresForm: boolean | null;
+  autoApproveApplications: boolean;
   createdAt: string | null;
   updatedAt: string | null;
   instructor: {
@@ -72,6 +74,7 @@ const courseColumns = {
   urgencyText: dbCourses.urgencyText,
   tags: dbCourses.tags,
   requiresForm: dbCourses.requiresForm,
+  autoApproveApplications: dbCourses.autoApproveApplications,
   createdAt: dbCourses.createdAt,
   updatedAt: dbCourses.updatedAt,
 };
@@ -134,6 +137,7 @@ const mapCourseRecord = (row: {
   urgencyText: row.course.urgencyText as string | null,
   tags: row.course.tags as string[] | null,
   requiresForm: row.course.requiresForm as boolean | null,
+  autoApproveApplications: row.course.autoApproveApplications as boolean,
   createdAt: row.course.createdAt
     ? (row.course.createdAt as Date).toISOString()
     : null,
@@ -151,6 +155,13 @@ const mapCourseRecord = (row: {
 });
 
 export class NextCoursesRepository {
+  private readonly activeApplicationStatuses = [
+    "pending",
+    "reviewing",
+    "approved",
+    "waitlisted",
+  ] as const;
+
   async listActive(filter: CourseListFilter) {
     const offset = (filter.page - 1) * filter.limit;
     const whereClause = toWhereClause(filter);
@@ -327,6 +338,134 @@ export class NextCoursesRepository {
         status: "pending",
       })
       .returning({ id: dbInquiries.id });
+
+    return row;
+  }
+
+  async findLatestApplication(userId: string, courseId: string) {
+    const rows = await db
+      .select({
+        id: dbCourseApplications.id,
+        status: dbCourseApplications.status,
+        submittedAt: dbCourseApplications.submittedAt,
+        reviewedAt: dbCourseApplications.reviewedAt,
+      })
+      .from(dbCourseApplications)
+      .where(
+        and(
+          eq(dbCourseApplications.userId, userId),
+          eq(dbCourseApplications.courseId, courseId),
+        ),
+      )
+      .orderBy(desc(dbCourseApplications.submittedAt))
+      .limit(1);
+
+    return rows[0] ?? null;
+  }
+
+  async findActiveApplication(userId: string, courseId: string) {
+    const rows = await db
+      .select({
+        id: dbCourseApplications.id,
+        status: dbCourseApplications.status,
+        submittedAt: dbCourseApplications.submittedAt,
+        reviewedAt: dbCourseApplications.reviewedAt,
+      })
+      .from(dbCourseApplications)
+      .where(
+        and(
+          eq(dbCourseApplications.userId, userId),
+          eq(dbCourseApplications.courseId, courseId),
+          inArray(dbCourseApplications.status, [
+            ...this.activeApplicationStatuses,
+          ]),
+        ),
+      )
+      .orderBy(desc(dbCourseApplications.submittedAt))
+      .limit(1);
+
+    return rows[0] ?? null;
+  }
+
+  async findApplicationByIdempotencyKey(
+    userId: string,
+    courseId: string,
+    idempotencyKey: string,
+  ) {
+    const rows = await db
+      .select({
+        id: dbCourseApplications.id,
+        status: dbCourseApplications.status,
+        submittedAt: dbCourseApplications.submittedAt,
+      })
+      .from(dbCourseApplications)
+      .where(
+        and(
+          eq(dbCourseApplications.userId, userId),
+          eq(dbCourseApplications.courseId, courseId),
+          eq(dbCourseApplications.idempotencyKey, idempotencyKey),
+        ),
+      )
+      .limit(1);
+
+    return rows[0] ?? null;
+  }
+
+  async createCourseApplication(params: {
+    courseId: string;
+    userId: string;
+    fullName: string;
+    age: number;
+    email: string;
+    phone: string;
+    learnerStatus: "high_school" | "undergraduate" | "graduate" | "professional";
+    highSchoolName?: string;
+    university?: string;
+    faculty?: string;
+    graduationYear?: number;
+    workField?: string;
+    yearsOfExperience?: number;
+    personalStatement: string;
+    learningGoals: string;
+    background: string;
+    sourceSurface?: string;
+    idempotencyKey?: string;
+    formVersion?: string;
+    extraAnswers?: Record<string, unknown> | null;
+    status?: "pending" | "reviewing" | "approved" | "rejected" | "waitlisted" | "withdrawn";
+    reviewedAt?: Date | null;
+  }) {
+    const [row] = await db
+      .insert(dbCourseApplications)
+      .values({
+        courseId: params.courseId,
+        userId: params.userId,
+        fullName: params.fullName,
+        age: params.age,
+        email: params.email,
+        phone: params.phone,
+        learnerStatus: params.learnerStatus,
+        highSchoolName: params.highSchoolName ?? null,
+        university: params.university ?? null,
+        faculty: params.faculty ?? null,
+        graduationYear: params.graduationYear ?? null,
+        workField: params.workField ?? null,
+        yearsOfExperience: params.yearsOfExperience ?? null,
+        personalStatement: params.personalStatement,
+        learningGoals: params.learningGoals,
+        background: params.background,
+        sourceSurface: params.sourceSurface ?? null,
+        idempotencyKey: params.idempotencyKey ?? null,
+        formVersion: params.formVersion ?? "v1",
+        extraAnswers: params.extraAnswers ?? null,
+        status: params.status ?? "pending",
+        reviewedAt: params.reviewedAt ?? null,
+      })
+      .returning({
+        id: dbCourseApplications.id,
+        status: dbCourseApplications.status,
+        submittedAt: dbCourseApplications.submittedAt,
+      });
 
     return row;
   }
