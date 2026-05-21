@@ -111,11 +111,26 @@ interface InquirySubmitResponse {
   message: string;
 }
 
+interface ApplicationSubmitResponse {
+  applicationId: string;
+  message: string;
+}
+
 interface InquiryRequestBody {
   name: string;
   email: string;
   phone?: string;
   message?: string;
+  sourceSurface?: EnrollmentSourceSurface;
+  idempotencyKey?: string;
+}
+
+interface ApplicationRequestBody {
+  name: string;
+  email: string;
+  phone?: string;
+  learningGoals: string;
+  background?: string;
   sourceSurface?: EnrollmentSourceSurface;
   idempotencyKey?: string;
 }
@@ -326,10 +341,15 @@ const normalizeEnrollmentErrorCode = (
     return "course_not_found";
   }
 
+  if (code === "COURSE_REQUIRES_APPLICATION") {
+    return "application_required";
+  }
+
   const allowedCodes: EnrollmentErrorCode[] = [
     "auth_required",
     "already_enrolled",
     "course_not_found",
+    "application_required",
     "payment_unavailable",
     "validation_failure",
     "network_transient",
@@ -794,6 +814,25 @@ export const coursesService = {
       );
     } catch (error) {
       return throwApiError(error, "Failed to submit inquiry");
+    }
+  },
+
+  submitApplication: async (
+    courseId: string,
+    body: ApplicationRequestBody,
+    token?: string,
+  ): Promise<ApplicationSubmitResponse> => {
+    try {
+      return await postJson<ApplicationSubmitResponse>(
+        `/courses/${courseId}/enroll/application`,
+        {
+          token,
+          body,
+        },
+        "Failed to submit application",
+      );
+    } catch (error) {
+      return throwApiError(error, "Failed to submit application");
     }
   },
 };
