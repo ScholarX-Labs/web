@@ -1,0 +1,82 @@
+"filename", "language", "Markdown", "TypeScript", "JSON", "MS SQL", "Skill", "TypeScript JSX", "PostCSS", "comment", "blank", "total"
+"c:\Users\dell\Documents\ScholarX\V2\web\.agents\skills\speckit-analyze\SKILL.md", "Skill", 0, 0, 0, 0, 177, 0, 0, 0, 79, 256
+"c:\Users\dell\Documents\ScholarX\V2\web\.agents\skills\speckit-checklist\SKILL.md", "Skill", 0, 0, 0, 0, 291, 0, 0, 0, 77, 368
+"c:\Users\dell\Documents\ScholarX\V2\web\.agents\skills\speckit-clarify\SKILL.md", "Skill", 0, 0, 0, 0, 206, 0, 0, 0, 44, 250
+"c:\Users\dell\Documents\ScholarX\V2\web\.agents\skills\speckit-constitution\SKILL.md", "Skill", 0, 0, 0, 0, 120, 0, 0, 0, 33, 153
+"c:\Users\dell\Documents\ScholarX\V2\web\.agents\skills\speckit-implement\SKILL.md", "Skill", 0, 0, 0, 0, 169, 0, 0, 0, 36, 205
+"c:\Users\dell\Documents\ScholarX\V2\web\.agents\skills\speckit-plan\SKILL.md", "Skill", 0, 0, 0, 0, 113, 0, 0, 0, 35, 148
+"c:\Users\dell\Documents\ScholarX\V2\web\.agents\skills\speckit-specify\SKILL.md", "Skill", 0, 0, 0, 0, 253, 0, 0, 0, 73, 326
+"c:\Users\dell\Documents\ScholarX\V2\web\.agents\skills\speckit-tasks\SKILL.md", "Skill", 0, 0, 0, 0, 158, 0, 0, 0, 40, 198
+"c:\Users\dell\Documents\ScholarX\V2\web\.agents\skills\speckit-taskstoissues\SKILL.md", "Skill", 0, 0, 0, 0, 80, 0, 0, 0, 22, 102
+"c:\Users\dell\Documents\ScholarX\V2\web\.specify\integrations\codex.manifest.json", "JSON", 0, 0, 16, 0, 0, 0, 0, 0, 1, 17
+"c:\Users\dell\Documents\ScholarX\V2\web\.specify\integrations\speckit.manifest.json", "JSON", 0, 0, -10, 0, 0, 0, 0, 0, 0, -10
+"c:\Users\dell\Documents\ScholarX\V2\web\AGENTS.md", "Markdown", 1, 0, 0, 0, 0, 0, 0, 0, -2, -1
+"c:\Users\dell\Documents\ScholarX\V2\web\drizzle\0009_course_applications.sql", "MS SQL", 0, 0, 0, 49, 0, 0, 0, 0, 7, 56
+"c:\Users\dell\Documents\ScholarX\V2\web\drizzle\0010_course_auto_approve_applications.sql", "MS SQL", 0, 0, 0, 2, 0, 0, 0, 0, 1, 3
+"c:\Users\dell\Documents\ScholarX\V2\web\drizzle\0011_align_course_application_age_check.sql", "MS SQL", 0, 0, 0, 5, 0, 0, 0, 0, 2, 7
+"c:\Users\dell\Documents\ScholarX\V2\web\drizzle\meta\_journal.json", "JSON", 0, 0, 21, 0, 0, 0, 0, 0, 0, 21
+"c:\Users\dell\Documents\ScholarX\V2\web\next.config.ts", "TypeScript", 0, 7, 0, 0, 0, 0, 0, 2, 1, 10
+"c:\Users\dell\Documents\ScholarX\V2\web\specs\008-certificate-pdf-pipeline\plan.md", "Markdown", 971, 0, 0, 0, 0, 0, 0, 0, 341, 1312
+"c:\Users\dell\Documents\ScholarX\V2\web\specs\008-certificate-pdf-pipeline\spec.md", "Markdown", 705, 0, 0, 0, 0, 0, 0, 0, 249, 954
+"c:\Users\dell\Documents\ScholarX\V2\web\specs\009-course-application-form\checklists\requirements.md", "Markdown", 26, 0, 0, 0, 0, 0, 0, 0, 10, 36
+"c:\Users\dell\Documents\ScholarX\V2\web\specs\009-course-application-form\contracts\course-application-api.md", "Markdown", 190, 0, 0, 0, 0, 0, 0, 0, 40, 230
+"c:\Users\dell\Documents\ScholarX\V2\web\specs\009-course-application-form\contracts\course-application-ui.md", "Markdown", 49, 0, 0, 0, 0, 0, 0, 0, 19, 68
+"c:\Users\dell\Documents\ScholarX\V2\web\specs\009-course-application-form\data-model.md", "Markdown", 101, 0, 0, 0, 0, 0, 0, 0, 25, 126
+"c:\Users\dell\Documents\ScholarX\V2\web\specs\009-course-application-form\plan.md", "Markdown", 378, 0, 0, 0, 0, 0, 0, 0, 126, 504
+"c:\Users\dell\Documents\ScholarX\V2\web\specs\009-course-application-form\quickstart.md", "Markdown", 69, 0, 0, 0, 0, 0, 0, 0, 18, 87
+"c:\Users\dell\Documents\ScholarX\V2\web\specs\009-course-application-form\research.md", "Markdown", 72, 0, 0, 0, 0, 0, 0, 0, 61, 133
+"c:\Users\dell\Documents\ScholarX\V2\web\specs\009-course-application-form\spec.md", "Markdown", 107, 0, 0, 0, 0, 0, 0, 0, 49, 156
+"c:\Users\dell\Documents\ScholarX\V2\web\specs\009-course-application-form\tasks.md", "Markdown", 121, 0, 0, 0, 0, 0, 0, 0, 76, 197
+"c:\Users\dell\Documents\ScholarX\V2\web\src\actions\course.actions.ts", "TypeScript", 0, 64, 0, 0, 0, 0, 0, 0, 5, 69
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\(platform)\certificates\[certificateNumber]\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 189, 0, 0, 24, 213
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\(platform)\courses\[slug]\_components\course-hero.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 3, 0, 0, 0, 3
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\(platform)\courses\[slug]\_components\course-sticky-cta.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 1, 0, 0, 0, 1
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\(platform)\courses\[slug]\lessons\[lessonId]\_components\course-completion-celebration.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 243, 0, 0, 14, 257
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\(platform)\courses\[slug]\lessons\[lessonId]\_components\lesson-client-bridge.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 91, 0, 0, 14, 105
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\(platform)\courses\[slug]\lessons\[lessonId]\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 11, 0, 0, 1, 12
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\(platform)\courses\[slug]\lessons\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 9, 0, -2, 1, 8
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\(platform)\courses\[slug]\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 5, 0, 0, 1, 6
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\admin\courses\[courseId]\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 79, 0, 0, 3, 82
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\admin\courses\new\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 39, 0, 0, 0, 39
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\api\courses\[[...path]]\route-handlers.ts", "TypeScript", 0, 70, 0, 0, 0, 0, 0, 0, 5, 75
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\api\courses\[[...path]]\route.test.ts", "TypeScript", 0, 61, 0, 0, 0, 0, 0, 0, 8, 69
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\api\courses\[courseId]\certificate\route.ts", "TypeScript", 0, 3, 0, 0, 0, 0, 0, 0, 0, 3
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\api\v1\courses\[courseId]\enroll\application\route.ts", "TypeScript", 0, 65, 0, 0, 0, 0, 0, 0, 10, 75
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\api\v1\courses\[courseId]\enroll\application\status\route.ts", "TypeScript", 0, 33, 0, 0, 0, 0, 0, 0, 8, 41
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\api\v1\courses\_application-route-helpers.ts", "TypeScript", 0, 110, 0, 0, 0, 0, 0, 0, 18, 128
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\auth\signin\layout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 3, 0, 0, 0, 3
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\auth\signup\layout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 3, 0, 0, 0, 3
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\auth\signup\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 464, 0, 0, 26, 490
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\globals.css", "PostCSS", 0, 0, 0, 0, 0, 0, 14, 1, 3, 18
+"c:\Users\dell\Documents\ScholarX\V2\web\src\app\sentry-test\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 1, 0, 0, 1, 2
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\courses\course-application-form.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 838, 0, 0, 68, 906
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\courses\course-application-status.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 115, 0, 0, 9, 124
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\courses\course-detail-sheet.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 1, 0, 0, 0, 1
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\courses\enroll-modal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 62, 0, 0, 5, 67
+"c:\Users\dell\Documents\ScholarX\V2\web\src\components\ui\sign-in-card-2.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 34, 0, 0, -4, 30
+"c:\Users\dell\Documents\ScholarX\V2\web\src\db\schema\courses-db.schema.ts", "TypeScript", 0, 93, 0, 0, 0, 0, 0, 0, 3, 96
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\admin\contracts\admin-types.ts", "TypeScript", 0, 2, 0, 0, 0, 0, 0, 0, 0, 2
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\admin\contracts\admin-validation.schemas.ts", "TypeScript", 0, 1, 0, 0, 0, 0, 0, 0, 0, 1
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\admin\infrastructure\db\admin.repository.ts", "TypeScript", 0, 6, 0, 0, 0, 0, 0, 0, 0, 6
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\courses\application\course-application.schemas.ts", "TypeScript", 0, 123, 0, 0, 0, 0, 0, 0, 16, 139
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\courses\application\course-completion.policy.test.ts", "TypeScript", 0, 12, 0, 0, 0, 0, 0, 0, 2, 14
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\courses\application\course-completion.specifications.ts", "TypeScript", 0, 4, 0, 0, 0, 0, 0, 0, 0, 4
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\courses\application\index.ts", "TypeScript", 0, 1, 0, 0, 0, 0, 0, 0, 0, 1
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\courses\application\next-course-catalog.service.test.ts", "TypeScript", 0, 17, 0, 0, 0, 0, 0, 0, 4, 21
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\courses\application\next-course-catalog.service.ts", "TypeScript", 0, 11, 0, 0, 0, 0, 0, 0, 3, 14
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\courses\application\next-course-enrollment.service.ts", "TypeScript", 0, 208, 0, 0, 0, 0, 0, 0, 28, 236
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\courses\application\public-lesson-status.ts", "TypeScript", 0, 3, 0, 0, 0, 0, 0, 0, 2, 5
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\courses\infrastructure\db\next-course-progress.repository.ts", "TypeScript", 0, 8, 0, 0, 0, 0, 0, 0, 0, 8
+"c:\Users\dell\Documents\ScholarX\V2\web\src\domain\courses\infrastructure\db\next-courses.repository.ts", "TypeScript", 0, 131, 0, 0, 0, 0, 0, 0, 9, 140
+"c:\Users\dell\Documents\ScholarX\V2\web\src\instrumentation-client.ts", "TypeScript", 0, -8, 0, 0, 0, 0, 0, 5, -1, -4
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\api\courses.service.ts", "TypeScript", 0, 120, 0, 0, 0, 0, 0, 0, 9, 129
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\enrollment\create-enrollment-execution-context.ts", "TypeScript", 0, 33, 0, 0, 0, 0, 0, 0, 3, 36
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\enrollment\enrollment-executor.ts", "TypeScript", 0, 11, 0, 0, 0, 0, 0, 0, 0, 11
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\enrollment\intent-controller.ts", "TypeScript", 0, 1, 0, 0, 0, 0, 0, 0, 0, 1
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\enrollment\strategies\course-application.strategy.ts", "TypeScript", 0, 72, 0, 0, 0, 0, 0, 0, 5, 77
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\enrollment\strategies\enrollment-strategies.test.ts", "TypeScript", 0, 49, 0, 0, 0, 0, 0, 0, 3, 52
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\enrollment\types.ts", "TypeScript", 0, 1, 0, 0, 0, 0, 0, 0, 0, 1
+"c:\Users\dell\Documents\ScholarX\V2\web\src\lib\routes.ts", "TypeScript", 0, 3, 0, 0, 0, 0, 0, 0, 0, 3
+"c:\Users\dell\Documents\ScholarX\V2\web\src\types\course.ts", "TypeScript", 0, 1, 0, 0, 0, 0, 0, 0, 0, 1
+"c:\Users\dell\Documents\ScholarX\V2\web\src\types\course.types.ts", "TypeScript", 0, 1, 0, 0, 0, 0, 0, 0, 0, 1
+"Total", "-", 2790, 1317, 27, 56, 1567, 2191, 14, 6, 1769, 9737
