@@ -8,10 +8,19 @@ import { emitEnrollmentEvent } from "@/lib/telemetry/enrollment-events";
 
 export interface CourseApplicationFormData {
   name: string;
+  age: number;
   email: string;
-  phone?: string;
+  phone: string;
+  learnerStatus: "high_school" | "undergraduate" | "graduate" | "professional";
+  highSchoolName?: string;
+  university?: string;
+  faculty?: string;
+  graduationYear?: number;
+  workField?: string;
+  yearsOfExperience?: number;
+  personalStatement: string;
   learningGoals: string;
-  background?: string;
+  background: string;
 }
 
 export const executeCourseApplication = async (
@@ -22,8 +31,17 @@ export const executeCourseApplication = async (
   try {
     const response = await apiClient.submitApplication(context.course.id, {
       name: formData.name,
+      age: formData.age,
       email: formData.email,
       phone: formData.phone,
+      learnerStatus: formData.learnerStatus,
+      highSchoolName: formData.highSchoolName,
+      university: formData.university,
+      faculty: formData.faculty,
+      graduationYear: formData.graduationYear,
+      workField: formData.workField,
+      yearsOfExperience: formData.yearsOfExperience,
+      personalStatement: formData.personalStatement,
       learningGoals: formData.learningGoals,
       background: formData.background,
       sourceSurface: context.command.source,
@@ -41,7 +59,7 @@ export const executeCourseApplication = async (
     return {
       ok: true,
       mode: "application",
-      nextAction: "none",
+      nextAction: response.enrolledImmediately ? "resume_learning" : "none",
       message:
         response.message ||
         "Your application has been submitted. Our team will review it shortly.",
