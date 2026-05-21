@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertCircle,
@@ -30,6 +30,7 @@ import {
 } from "@/lib/enrollment/types";
 import { executeCourseApplication } from "@/lib/enrollment/strategies/course-application.strategy";
 import { learnerStatusValues } from "@/domain/courses/application/course-application.schemas";
+import { createEnrollmentExecutionContext } from "@/lib/enrollment/create-enrollment-execution-context";
 
 interface CourseApplicationFormProps {
   course: Course;
@@ -163,34 +164,33 @@ export function CourseApplicationForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitResult, setSubmitResult] = useState<EnrollmentExecutionResult | null>(null);
 
+  useEffect(() => {
+    if (!session?.user) return;
+
+    setForm((current) => {
+      const nextName = session.user.name ?? "";
+      const nextEmail = session.user.email ?? "";
+      const nextPhone = session.user.phoneNumber ?? "";
+
+      const shouldHydrateName = !current.name.trim() && Boolean(nextName);
+      const shouldHydrateEmail = !current.email.trim() && Boolean(nextEmail);
+      const shouldHydratePhone = !current.phone.trim() && Boolean(nextPhone);
+
+      if (!shouldHydrateName && !shouldHydrateEmail && !shouldHydratePhone) {
+        return current;
+      }
+
+      return {
+        ...current,
+        ...(shouldHydrateName ? { name: nextName } : {}),
+        ...(shouldHydrateEmail ? { email: nextEmail } : {}),
+        ...(shouldHydratePhone ? { phone: nextPhone } : {}),
+      };
+    });
+  }, [session]);
+
   const currentStep = steps[currentStepIndex];
   const CurrentStepIcon = currentStep.icon;
-
-  const buildExecutionContext = (): EnrollmentContext =>
-    context ?? {
-      command: {
-        courseId: course.id,
-        source: "deep_link",
-        correlationId:
-          typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
-            ? crypto.randomUUID()
-            : `${Date.now()}-${Math.random().toString(16).slice(2)}`,
-        timestamp: Date.now(),
-        viewport:
-          typeof window !== "undefined" && window.innerWidth >= 1024
-            ? "desktop"
-            : "mobile",
-        reducedMotion: shouldReduceMotion,
-      },
-      course: {
-        id: course.id,
-        slug: course.slug,
-        title: course.title,
-        requiresForm: course.requiresForm,
-        salesInquiry: course.salesInquiry,
-        price: course.price,
-      },
-    };
 
   const statusSummary = useMemo(() => {
     switch (form.learnerStatus) {
@@ -440,36 +440,54 @@ export function CourseApplicationForm({
     onSubmittingChange?.(true);
     setErrors({});
 
-    const result = await executeCourseApplication(buildExecutionContext(), {
-      name: form.name.trim(),
-      age: Number(form.age),
-      email: form.email.trim(),
-      phone: form.phone.trim(),
-      learnerStatus: form.learnerStatus,
-      highSchoolName: form.highSchoolName.trim() || undefined,
-      university: form.university.trim() || undefined,
-      faculty: form.faculty.trim() || undefined,
-      graduationYear: form.graduationYear ? Number(form.graduationYear) : undefined,
-      workField: form.workField.trim() || undefined,
-      yearsOfExperience: form.yearsOfExperience
-        ? Number(form.yearsOfExperience)
-        : undefined,
-      personalStatement: form.personalStatement.trim(),
-      learningGoals: form.learningGoals.trim(),
-      background: form.background.trim(),
-    }).finally(() => {
+    try {
+      const result = await executeCourseApplication(
+        createEnrollmentExecutionContext(course, context, shouldReduceMotion),
+        {
+        name: form.name.trim(),
+        age: Number(form.age),
+        email: form.email.trim(),
+        phone: form.phone.trim(),
+        learnerStatus: form.learnerStatus,
+        highSchoolName: form.highSchoolName.trim() || undefined,
+        university: form.university.trim() || undefined,
+        faculty: form.faculty.trim() || undefined,
+        graduationYear: form.graduationYear ? Number(form.graduationYear) : undefined,
+        workField: form.workField.trim() || undefined,
+        yearsOfExperience: form.yearsOfExperience
+          ? Number(form.yearsOfExperience)
+          : undefined,
+        personalStatement: form.personalStatement.trim(),
+        learningGoals: form.learningGoals.trim(),
+        background: form.background.trim(),
+      },
+      );
+
+      setSubmitResult(result);
+
+      if (result.ok) {
+        onSuccess(result);
+        return;
+      }
+
+      onError(result.message);
+    } catch (error) {
+      const message =
+        error instanceof Error && error.message
+          ? error.message
+          : "Unexpected error";
+      const failureResult: EnrollmentExecutionResult = {
+        ok: false,
+        mode: "application",
+        code: "unknown",
+        message,
+      };
+      setSubmitResult(failureResult);
+      onError("Something went wrong while submitting your application. Please try again.");
+    } finally {
       setIsSubmitting(false);
       onSubmittingChange?.(false);
-    });
-
-    setSubmitResult(result);
-
-    if (result.ok) {
-      onSuccess(result);
-      return;
     }
-
-    onError(result.message);
   };
 
   const renderError = (error?: string) =>
