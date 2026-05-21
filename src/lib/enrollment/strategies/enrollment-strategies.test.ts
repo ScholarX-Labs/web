@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { executeFreeEnroll } from "@/lib/enrollment/strategies/free-enroll.strategy";
 import { executePaidCheckoutInit } from "@/lib/enrollment/strategies/paid-checkout.strategy";
 import { executeFormApplicationInit } from "@/lib/enrollment/strategies/form-application.strategy";
+import { executeCourseApplication } from "@/lib/enrollment/strategies/course-application.strategy";
 import { EnrollmentContext } from "@/lib/enrollment/types";
 import { ApiRequestError, coursesService } from "@/lib/api/courses.service";
 
@@ -41,6 +42,7 @@ const createFakeApi = (overrides: Partial<ApiClient> = {}): ApiClient => ({
   initPaidEnrollment: async () => { throw new Error("not implemented"); },
   initApplicationEnrollment: async () => { throw new Error("not implemented"); },
   submitInquiry: async () => ({ inquiryId: "test", message: "ok" }),
+  submitApplication: async () => ({ applicationId: "test", message: "ok" }),
   ...overrides,
 });
 
@@ -114,5 +116,36 @@ test("executeFormApplicationInit returns application redirect", async () => {
   if (result.ok) {
     assert.equal(result.mode, "application");
     assert.equal(result.applicationUrl, "/apply/course-1");
+  }
+});
+
+test("executeCourseApplication submits required-form application", async () => {
+  const fakeApi = createFakeApi({
+    submitApplication: async (_courseId, body) => {
+      assert.equal(body.learningGoals, "Build scholarship skills");
+      return {
+        applicationId: "application-1",
+        message: "application submitted",
+      };
+    },
+  });
+
+  const result = await executeCourseApplication(
+    {
+      ...baseContext,
+      course: { ...baseContext.course, requiresForm: true },
+    },
+    {
+      name: "Learner",
+      email: "learner@example.com",
+      learningGoals: "Build scholarship skills",
+    },
+    fakeApi,
+  );
+
+  assert.equal(result.ok, true);
+  if (result.ok) {
+    assert.equal(result.mode, "application");
+    assert.equal(result.nextAction, "none");
   }
 });
