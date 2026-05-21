@@ -36,6 +36,7 @@ export interface Course {
 
   // Access and Status
   requiresForm: boolean;
+  autoApproveApplications?: boolean;
   salesInquiry?: boolean;
   isPublished: boolean;
 

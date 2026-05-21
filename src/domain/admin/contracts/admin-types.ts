@@ -85,6 +85,7 @@ export interface CreateCourseInput {
   price?: number;
   originalPrice?: number;
   requiresForm?: boolean;
+  autoApproveApplications?: boolean;
   salesInquiry?: boolean;
   imageUrl?: string;
   videoPreviewUrl?: string;
@@ -104,6 +105,7 @@ export interface UpdateCourseInput {
   price?: number;
   originalPrice?: number;
   requiresForm?: boolean;
+  autoApproveApplications?: boolean;
   salesInquiry?: boolean;
   imageUrl?: string;
   videoPreviewUrl?: string;

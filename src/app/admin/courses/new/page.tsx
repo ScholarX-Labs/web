@@ -9,6 +9,7 @@ import { useCreateCourse } from "@/hooks/admin/use-admin-courses";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import { 
   Loader2, 
   ArrowLeft, 
@@ -40,6 +41,8 @@ const courseSchema = z.object({
   description: z.string().min(20, "Description must be at least 20 characters").max(2000),
   category: z.string().min(1, "Please select a category"),
   price: z.coerce.number().min(0, "Price cannot be negative"),
+  requiresForm: z.boolean().default(false),
+  autoApproveApplications: z.boolean().default(false),
 });
 
 type CourseFormValues = z.infer<typeof courseSchema>;
@@ -70,6 +73,8 @@ export default function AdminNewCoursePage() {
       description: "",
       category: "",
       price: 0,
+      requiresForm: false,
+      autoApproveApplications: false,
     },
     mode: "onChange",
   });
@@ -228,6 +233,40 @@ export default function AdminNewCoursePage() {
                                         />
                                     </div>
                                     {errors.price && <p className="text-[10px] font-bold text-rose-500 uppercase ml-2">{errors.price.message}</p>}
+                                </div>
+                                <div className="grid gap-4 text-left">
+                                    <div className="rounded-2xl border border-slate-200 bg-white/70 p-5 flex items-center justify-between">
+                                        <div className="space-y-1">
+                                            <p className="text-sm font-[900] text-slate-900 tracking-tight">Require application form</p>
+                                            <p className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">
+                                                Gate enrollment behind the course application
+                                            </p>
+                                        </div>
+                                        <Switch
+                                            checked={form.watch("requiresForm")}
+                                            onCheckedChange={(checked) => {
+                                                form.setValue("requiresForm", checked, { shouldDirty: true });
+                                                if (!checked) {
+                                                    form.setValue("autoApproveApplications", false, { shouldDirty: true });
+                                                }
+                                            }}
+                                        />
+                                    </div>
+                                    <div className="rounded-2xl border border-slate-200 bg-white/70 p-5 flex items-center justify-between">
+                                        <div className="space-y-1">
+                                            <p className="text-sm font-[900] text-slate-900 tracking-tight">Auto-approve applications</p>
+                                            <p className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">
+                                                Free courses enroll immediately after a valid submission
+                                            </p>
+                                        </div>
+                                        <Switch
+                                            checked={form.watch("autoApproveApplications")}
+                                            disabled={!form.watch("requiresForm")}
+                                            onCheckedChange={(checked) =>
+                                                form.setValue("autoApproveApplications", checked, { shouldDirty: true })
+                                            }
+                                        />
+                                    </div>
                                 </div>
                                 <div className="p-6 rounded-2xl bg-emerald-50/50 border border-emerald-100/50 inline-flex items-center gap-3">
                                     <div className="size-2 rounded-full bg-emerald-500 animate-pulse" />

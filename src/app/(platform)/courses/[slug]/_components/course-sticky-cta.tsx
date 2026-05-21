@@ -88,7 +88,7 @@ export function CourseStickyCta({ course }: CourseStickyCtaProps) {
                     }
                     className="flex-1 sm:flex-none flex items-center justify-center px-8 py-3 rounded-full font-bold text-white bg-linear-to-r from-hero-blue to-hero-blue-dark hover:from-[#3db3ec] hover:to-[#2b90ca] shadow-lg shadow-hero-blue/20 transition-all active:scale-95"
                   >
-                    Enroll Now
+                    {course.requiresForm ? "Apply Now" : "Enroll Now"}
                   </button>
                 )}
               </div>

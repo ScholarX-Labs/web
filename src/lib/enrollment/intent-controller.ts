@@ -65,6 +65,7 @@ export function useEnrollIntentController() {
           slug: course.slug,
           title: course.title,
           requiresForm: course.requiresForm,
+          salesInquiry: course.salesInquiry,
           price: course.price,
         },
       }),

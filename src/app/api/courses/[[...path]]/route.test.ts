@@ -119,6 +119,7 @@ const createFakeDomain = (capture?: {
     enrollFree: async () => ({ success: true }),
     initPaidEnrollment: async () => ({ success: true }),
     initApplicationEnrollment: async () => ({ success: true }),
+    submitApplication: async () => ({ id: "application-1" }),
   },
 });
 
@@ -214,4 +215,72 @@ test("GET /api/courses/:id/subscription-status requires authentication", async (
   assert.equal(response.status, 401);
   const body = await response.json();
   assert.equal(body?.error?.code, "UNAUTHORIZED");
+});
+
+test("POST /api/courses/:courseId/enroll/application returns 400 when learningGoals is missing", async () => {
+  const createCoursesRouteHandlers = await loadHandlersFactory();
+  const handlers = createCoursesRouteHandlers({
+    getSession: async () => ({ user: { id: "user-3" } }),
+    createDomain: () => createFakeDomain() as never,
+  });
+
+  const request = new NextRequest(
+    "http://localhost:3000/api/courses/course-1/enroll/application",
+    {
+      method: "POST",
+      body: JSON.stringify({
+        name: "Learner",
+        age: 21,
+        email: "learner@example.com",
+        phone: "+201000000000",
+        learnerStatus: "undergraduate",
+        personalStatement: "I am motivated and ready to learn.",
+        background: "I have a solid foundation and want to go deeper.",
+      }),
+      headers: { "content-type": "application/json" },
+    },
+  );
+
+  const response = await handlers.POST(request, {
+    params: Promise.resolve({ path: ["course-1", "enroll", "application"] }),
+  });
+
+  assert.equal(response.status, 400);
+  const body = await response.json();
+  assert.equal(body?.error?.code, "BAD_REQUEST");
+  assert.equal(body?.error?.message, "Application fields are incomplete");
+});
+
+test("POST /api/courses/:courseId/enroll/application returns application id on success", async () => {
+  const createCoursesRouteHandlers = await loadHandlersFactory();
+  const handlers = createCoursesRouteHandlers({
+    getSession: async () => ({ user: { id: "user-4" } }),
+    createDomain: () => createFakeDomain() as never,
+  });
+
+  const request = new NextRequest(
+    "http://localhost:3000/api/courses/course-1/enroll/application",
+    {
+      method: "POST",
+      body: JSON.stringify({
+        name: "Learner",
+        age: 21,
+        email: "learner@example.com",
+        phone: "+201000000000",
+        learnerStatus: "undergraduate",
+        personalStatement: "I am motivated and ready to learn.",
+        learningGoals: "I want to improve my practical scholarship skills.",
+        background: "I have a solid foundation and want to go deeper.",
+      }),
+      headers: { "content-type": "application/json" },
+    },
+  );
+
+  const response = await handlers.POST(request, {
+    params: Promise.resolve({ path: ["course-1", "enroll", "application"] }),
+  });
+
+  assert.equal(response.status, 200);
+  const body = await response.json();
+  assert.equal(body?.applicationId, "application-1");
 });

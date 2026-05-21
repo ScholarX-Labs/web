@@ -71,6 +71,7 @@ const toCourse = (record: FlatCourseRecord, isSubscribed = false): Course => ({
       }
     : undefined,
   requiresForm: Boolean(record.requiresForm),
+  autoApproveApplications: Boolean(record.autoApproveApplications),
   isPublished: record.status === "active",
   isSubscribed,
   createdAt: record.createdAt ?? new Date().toISOString(),

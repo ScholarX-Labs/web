@@ -19,6 +19,8 @@ interface AdminCourse {
   createdAt?: string;
   slug?: string;
   status?: string;
+  requiresForm?: boolean;
+  autoApproveApplications?: boolean;
 }
 import Link from "next/link";
 import { useAdminCourse, useUpdateCourse, useUpdateCourseStatus } from "@/hooks/admin/use-admin-courses";
@@ -30,6 +32,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { 
   ArrowLeft, 
@@ -198,6 +201,8 @@ export default function AdminCourseDetailPage({ params }: { params: Promise<{ co
     );
   }
 
+  const editableCourse = { ...c, ...(pendingData ?? {}) } as AdminCourse;
+
   return (
     <div className="space-y-10 pb-32">
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 px-2">
@@ -277,7 +282,7 @@ export default function AdminCourseDetailPage({ params }: { params: Promise<{ co
               )}
               {activeTab === "basic" && (
                 <BasicTab key={resetKey}
-                  course={c} 
+                  course={editableCourse} 
                   onChanges={(data: Record<string, unknown>) => {
                     setHasChanges(true);
                     setPendingData({ ...pendingData, ...data });
@@ -286,7 +291,7 @@ export default function AdminCourseDetailPage({ params }: { params: Promise<{ co
               )}
               {activeTab === "pricing" && (
                 <PricingTab key={resetKey}
-                  course={c} 
+                  course={editableCourse} 
                   onChanges={(data: Record<string, unknown>) => {
                     setHasChanges(true);
                     setPendingData({ ...pendingData, ...data });
@@ -296,7 +301,11 @@ export default function AdminCourseDetailPage({ params }: { params: Promise<{ co
               {activeTab === "media" && <MediaTab />}
               {activeTab === "settings" && (
                 <SettingsTab 
-                  course={c} 
+                  course={editableCourse} 
+                  onChanges={(data: Record<string, unknown>) => {
+                    setHasChanges(true);
+                    setPendingData({ ...pendingData, ...data });
+                  }}
                   onStatusChange={(status: string) => updateStatus.mutate({ id: courseId, data: { status } })} 
                   isPending={updateStatus.isPending}
                 />
@@ -745,7 +754,17 @@ const STATUS_BADGE: Record<string, string> = {
   rose: "bg-rose-500/10 text-rose-500",
 };
 
-function SettingsTab({ course, onStatusChange, isPending }: { course: AdminCourse; onStatusChange: (status: string) => void; isPending: boolean }) {
+function SettingsTab({
+  course,
+  onChanges,
+  onStatusChange,
+  isPending,
+}: {
+  course: AdminCourse;
+  onChanges: (data: Record<string, unknown>) => void;
+  onStatusChange: (status: string) => void;
+  isPending: boolean;
+}) {
   return (
     <Card className="p-12 bg-white/70 backdrop-blur-3xl border border-white rounded-[40px] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)] space-y-12 relative overflow-hidden">
       {/* Loading Overlay */}
@@ -797,6 +816,69 @@ function SettingsTab({ course, onStatusChange, isPending }: { course: AdminCours
       </div>
 
       <div className="space-y-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <div className="rounded-[30px] border border-slate-200/80 bg-white/70 p-7 space-y-4">
+            <div className="space-y-1">
+              <Label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">
+                Enrollment Gate
+              </Label>
+              <h3 className="text-lg font-[900] text-slate-900 tracking-tight">
+                Require application form
+              </h3>
+              <p className="text-sm text-slate-500 leading-6">
+                Learners must complete the course application before they can join this course.
+              </p>
+            </div>
+            <div className="flex items-center justify-between rounded-[24px] border border-slate-100 bg-slate-50/80 px-5 py-4">
+              <div>
+                <p className="text-sm font-[900] text-slate-900">Application required</p>
+                <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-slate-400">
+                  Gate enrollment behind the form
+                </p>
+              </div>
+              <Switch
+                checked={Boolean(course.requiresForm)}
+                onCheckedChange={(checked) =>
+                  onChanges(
+                    checked
+                      ? { requiresForm: true }
+                      : { requiresForm: false, autoApproveApplications: false },
+                  )
+                }
+              />
+            </div>
+          </div>
+
+          <div className="rounded-[30px] border border-slate-200/80 bg-white/70 p-7 space-y-4">
+            <div className="space-y-1">
+              <Label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">
+                Approval Policy
+              </Label>
+              <h3 className="text-lg font-[900] text-slate-900 tracking-tight">
+                Auto-approve applications
+              </h3>
+              <p className="text-sm text-slate-500 leading-6">
+                Approve immediately on submit. Free courses also enroll instantly in the same request.
+              </p>
+            </div>
+            <div className="flex items-center justify-between rounded-[24px] border border-slate-100 bg-slate-50/80 px-5 py-4">
+              <div>
+                <p className="text-sm font-[900] text-slate-900">Instant approval</p>
+                <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-slate-400">
+                  Available only when form gating is enabled
+                </p>
+              </div>
+              <Switch
+                checked={Boolean(course.autoApproveApplications)}
+                disabled={!course.requiresForm}
+                onCheckedChange={(checked) =>
+                  onChanges({ autoApproveApplications: checked })
+                }
+              />
+            </div>
+          </div>
+        </div>
+
         <div className="flex items-center justify-between px-1">
           <div className="flex items-center gap-3">
             <div className="size-2 rounded-full bg-blue-500 animate-pulse shadow-[0_0_10px_rgba(59,130,246,0.5)]" />

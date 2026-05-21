@@ -5,6 +5,11 @@ import {
 } from "@/domain/courses/contracts";
 import { NextCoursesRepository } from "@/domain/courses/infrastructure/db/next-courses.repository";
 import { NextCourseError } from "@/domain/courses/application/next-course.errors";
+import {
+  courseApplicationInputSchema,
+  CourseApplicationInput,
+} from "@/domain/courses/application/course-application.schemas";
+import { ZodError } from "zod";
 
 interface EnrollmentContext {
   requestId?: string;
@@ -15,6 +20,12 @@ export class NextCourseEnrollmentService {
 
   private ensureRequestId(context?: EnrollmentContext): string {
     return context?.requestId ?? randomUUID();
+  }
+
+  private buildValidationDetails(error: ZodError) {
+    return {
+      fieldErrors: error.flatten().fieldErrors,
+    };
   }
 
   private async assertUserActive(userId: string) {
@@ -61,6 +72,26 @@ export class NextCourseEnrollmentService {
     }
 
     await this.assertUserActive(userId);
+
+    if (course.requiresForm) {
+      const application = await this.repository.findActiveApplication(
+        userId,
+        courseId,
+      );
+
+      if (!application || application.status !== "approved") {
+        throw new NextCourseError(
+          "COURSE_REQUIRES_APPLICATION",
+          409,
+          "This course requires an approved application before enrollment.",
+          9006,
+          {
+            courseId,
+            applicationStatus: application?.status ?? "none",
+          },
+        );
+      }
+    }
 
     if ((course.currentPrice ?? 0) > 0) {
       throw new NextCourseError(
@@ -245,5 +276,210 @@ export class NextCourseEnrollmentService {
     });
 
     return result;
+  }
+
+  async submitApplication(
+    courseId: string,
+    userId: string,
+    params: CourseApplicationInput,
+  ) {
+    const course = await this.repository.findByIdActive(courseId);
+
+    if (!course) {
+      throw new NextCourseError(
+        "COURSE_NOT_FOUND",
+        404,
+        `Course (ID: ${courseId}) not found for application submission.`,
+        1001,
+      );
+    }
+
+    await this.assertUserActive(userId);
+
+    if (!course.requiresForm) {
+      throw new NextCourseError(
+        "APPLICATION_NOT_REQUIRED",
+        409,
+        "This course does not require an application",
+        9005,
+      );
+    }
+
+    let parsed: CourseApplicationInput;
+    try {
+      parsed = courseApplicationInputSchema.parse(params);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        throw new NextCourseError(
+          "VALIDATION_FAILED",
+          400,
+          "Please correct the highlighted fields.",
+          9005,
+          this.buildValidationDetails(error),
+        );
+      }
+
+      throw error;
+    }
+
+    if (parsed.idempotencyKey) {
+      const existingByKey = await this.repository.findApplicationByIdempotencyKey(
+        userId,
+        courseId,
+        parsed.idempotencyKey,
+      );
+
+      if (existingByKey) {
+        return {
+          ...existingByKey,
+          enrolledImmediately: false,
+        };
+      }
+    }
+
+    const existingActive = await this.repository.findActiveApplication(
+      userId,
+      courseId,
+    );
+
+    if (existingActive) {
+      throw new NextCourseError(
+        "DUPLICATE_APPLICATION",
+        409,
+        "You already have an active application for this course.",
+        9007,
+        {
+          applicationId: existingActive.id,
+          status: existingActive.status,
+        },
+      );
+    }
+
+    try {
+      const shouldAutoApprove = Boolean(course.autoApproveApplications);
+      const isFreeCourse = (course.currentPrice ?? 0) <= 0;
+      const shouldEnrollImmediately = shouldAutoApprove && isFreeCourse;
+      const reviewTimestamp = shouldAutoApprove ? new Date() : null;
+
+      const application = await this.repository.createCourseApplication({
+        courseId,
+        userId,
+        fullName: parsed.name,
+        age: parsed.age,
+        email: parsed.email,
+        phone: parsed.phone,
+        learnerStatus: parsed.learnerStatus,
+        highSchoolName: parsed.highSchoolName,
+        university: parsed.university,
+        faculty: parsed.faculty,
+        graduationYear: parsed.graduationYear,
+        workField: parsed.workField,
+        yearsOfExperience: parsed.yearsOfExperience,
+        personalStatement: parsed.personalStatement,
+        learningGoals: parsed.learningGoals,
+        background: parsed.background,
+        sourceSurface: parsed.sourceSurface,
+        idempotencyKey: parsed.idempotencyKey,
+        status: shouldAutoApprove ? "approved" : "pending",
+        reviewedAt: reviewTimestamp,
+      });
+
+      if (shouldEnrollImmediately) {
+        const existingSub = await this.repository.findActiveSubscription(
+          userId,
+          courseId,
+        );
+
+        if (!existingSub) {
+          const updatedCourse = await this.repository.incrementStudents(courseId);
+          await this.repository.createFreeSubscription({
+            userId,
+            courseId,
+            idempotencyKey: parsed.idempotencyKey,
+          });
+
+          return {
+            ...application,
+            enrolledImmediately: true,
+            studentsCount:
+              updatedCourse?.studentsCount ?? (course.studentsCount ?? 0) + 1,
+          };
+        }
+
+        return {
+          ...application,
+          enrolledImmediately: true,
+          studentsCount: course.studentsCount ?? 0,
+        };
+      }
+
+      return {
+        ...application,
+        enrolledImmediately: false,
+      };
+    } catch (error) {
+      if (
+        typeof error === "object" &&
+        error !== null &&
+        "code" in error &&
+        (error as { code?: string }).code === "23505"
+      ) {
+        const existing = parsed.idempotencyKey
+          ? await this.repository.findApplicationByIdempotencyKey(
+              userId,
+              courseId,
+              parsed.idempotencyKey,
+            )
+          : await this.repository.findActiveApplication(userId, courseId);
+
+        if (existing) {
+          if (parsed.idempotencyKey) {
+            return { ...existing, enrolledImmediately: false };
+          }
+
+          throw new NextCourseError(
+            "DUPLICATE_APPLICATION",
+            409,
+            "You already have an active application for this course.",
+            9007,
+            {
+              applicationId: existing.id,
+              status: existing.status,
+            },
+          );
+        }
+      }
+
+      throw error;
+    }
+  }
+
+  async getApplicationStatus(courseId: string, userId: string) {
+    const course = await this.repository.findByIdActive(courseId);
+
+    if (!course) {
+      throw new NextCourseError(
+        "COURSE_NOT_FOUND",
+        404,
+        `Course (ID: ${courseId}) not found for application status lookup.`,
+        1001,
+      );
+    }
+
+    await this.assertUserActive(userId);
+
+    const application = await this.repository.findLatestApplication(userId, courseId);
+
+    return {
+      courseId,
+      requiresApplication: Boolean(course.requiresForm),
+      application: application
+        ? {
+            id: application.id,
+            status: application.status,
+            submittedAt: application.submittedAt.toISOString(),
+          }
+        : null,
+    };
   }
 }

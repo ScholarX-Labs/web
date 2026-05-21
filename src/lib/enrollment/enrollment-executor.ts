@@ -5,6 +5,7 @@ import {
 } from "@/lib/enrollment/types";
 import { executeFreeEnroll } from "@/lib/enrollment/strategies/free-enroll.strategy";
 import { executeFormApplicationInit } from "@/lib/enrollment/strategies/form-application.strategy";
+import { executePaidCheckoutInit } from "@/lib/enrollment/strategies/paid-checkout.strategy";
 import { emitEnrollmentEvent } from "@/lib/telemetry/enrollment-events";
 
 export const deriveEnrollmentMode = (
@@ -32,25 +33,35 @@ export const executeEnrollment = async (
 
   let result: EnrollmentExecutionResult;
 
-  if (mode === "free") {
-    result = await executeFreeEnroll(context);
-  } else if (mode === "inquiry") {
-    emitEnrollmentEvent({
-      event: "enroll_inquiry_prompted",
-      timestamp: Date.now(),
-      courseId: context.command.courseId,
-      sourceSurface: context.command.source,
-      correlationId: context.command.correlationId,
-    });
-    result = {
-      ok: true,
-      mode: "inquiry",
-      nextAction: "inquiry",
-      message: "Please fill in your contact details",
-    };
-    return result;
-  } else {
-    result = await executeFormApplicationInit(context);
+  switch (mode) {
+    case "free":
+      result = await executeFreeEnroll(context);
+      break;
+    case "inquiry":
+      emitEnrollmentEvent({
+        event: "enroll_inquiry_prompted",
+        timestamp: Date.now(),
+        courseId: context.command.courseId,
+        sourceSurface: context.command.source,
+        correlationId: context.command.correlationId,
+      });
+      result = {
+        ok: true,
+        mode: "inquiry",
+        nextAction: "inquiry",
+        message: "Please fill in your contact details",
+      };
+      return result;
+    case "paid":
+      result = await executePaidCheckoutInit(context);
+      break;
+    case "application":
+      result = await executeFormApplicationInit(context);
+      break;
+    default: {
+      const exhaustiveMode: never = mode;
+      throw new Error(`Unhandled enrollment mode: ${exhaustiveMode}`);
+    }
   }
 
   if (result.ok) {

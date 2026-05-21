@@ -14,7 +14,11 @@ import { EnrollmentContext, EnrollmentMode } from "@/lib/enrollment/types";
 import { emitEnrollmentEvent } from "@/lib/telemetry/enrollment-events";
 import { EnrollModalContent } from "./enroll-modal-content";
 import { SalesInquiryForm } from "./sales-inquiry-form";
+import { CourseApplicationForm } from "./course-application-form";
+import { CourseApplicationStatus } from "./course-application-status";
 import { agentLog } from "@/lib/debug/agent-log";
+import { coursesService } from "@/lib/api/courses.service";
+import { createEnrollmentExecutionContext } from "@/lib/enrollment/create-enrollment-execution-context";
 
 interface EnrollModalProps {
   course: Course;
@@ -25,33 +29,9 @@ interface EnrollModalProps {
 export const buildEnrollmentExecutionContext = (
   course: Course,
   context: EnrollmentContext | null,
+  reducedMotion = false,
 ): EnrollmentContext => {
-  if (context) return context;
-
-  return {
-    command: {
-      courseId: course.id,
-      source: "deep_link",
-      correlationId:
-        typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
-          ? crypto.randomUUID()
-          : `${Date.now()}-${Math.random().toString(16).slice(2)}`,
-      timestamp: Date.now(),
-      viewport:
-        typeof window !== "undefined" && window.innerWidth >= 1024
-          ? "desktop"
-          : "mobile",
-      reducedMotion: false,
-    },
-    course: {
-      id: course.id,
-      slug: course.slug,
-      title: course.title,
-      requiresForm: course.requiresForm,
-      salesInquiry: course.salesInquiry,
-      price: course.price,
-    },
-  };
+  return createEnrollmentExecutionContext(course, context, reducedMotion);
 };
 
 export function EnrollModal({
@@ -75,13 +55,23 @@ export function EnrollModal({
   const [showPriorityWindow, setShowPriorityWindow] = useState(false);
   const [isAnimatingOut, setIsAnimatingOut] = useState(false);
   const [isInquirySubmitted, setIsInquirySubmitted] = useState(false);
+  const [applicationStatus, setApplicationStatus] = useState<{
+    id: string;
+    status: "pending" | "reviewing" | "approved" | "rejected" | "waitlisted" | "withdrawn";
+    submittedAt: string;
+  } | null>(null);
   const router = useRouter();
   const pathname = usePathname();
   const shouldReduceMotion = useReducedMotion();
 
   const executionContext = useMemo(
-    () => buildEnrollmentExecutionContext(course, context),
-    [course, context],
+    () =>
+      buildEnrollmentExecutionContext(
+        course,
+        context,
+        Boolean(shouldReduceMotion),
+      ),
+    [course, context, shouldReduceMotion],
   );
 
   const enrollmentMode: EnrollmentMode = useMemo(
@@ -90,6 +80,8 @@ export function EnrollModal({
   );
 
   const isInquiry = enrollmentMode === "inquiry" && !isInquirySubmitted;
+  const isApplication = enrollmentMode === "application";
+  const courseLessonsRoute = ROUTES.COURSE_LESSONS(course.slug ?? course.id);
 
   const processingSteps = useMemo(
     () => [
@@ -227,6 +219,32 @@ export function EnrollModal({
     return () => window.clearInterval(timer);
   }, [isEnrolling, processingSteps]);
 
+  useEffect(() => {
+    let cancelled = false;
+
+    if (!isApplication || !isModalOpen) {
+      setApplicationStatus(null);
+      return;
+    }
+
+    coursesService
+      .getApplicationStatus(course.id)
+      .then((result) => {
+        if (!cancelled) {
+          setApplicationStatus(result.application);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setApplicationStatus(null);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [course.id, isApplication, isModalOpen]);
+
   const handleInquirySuccess = () => {
     setIsInquirySubmitted(true);
     setLifecycle("success");
@@ -238,11 +256,31 @@ export function EnrollModal({
     toast.error(message);
   };
 
+  const handleApplicationSuccess = (result: {
+    nextAction: "resume_learning" | "checkout" | "application" | "inquiry" | "none";
+    message?: string;
+  }) => {
+    setLifecycle("success");
+    toast.success(result.message ?? "Your application has been submitted for review.");
+    if (result.nextAction === "resume_learning") {
+      closeModal();
+      onDismiss?.();
+      router.push(courseLessonsRoute);
+      return;
+    }
+    router.refresh();
+  };
+
+  const handleApplicationError = (message: string) => {
+    setError();
+    toast.error(message);
+  };
+
   const handleEnrollFree = async () => {
     console.log("[ENROLL] handleEnrollFree clicked - courseId:", course.id);
     if (course.isSubscribed) {
       toast.info("You are already enrolled in this course.");
-      router.push(ROUTES.COURSE_DETAIL(course.slug ?? course.id));
+      router.push(courseLessonsRoute);
       return;
     }
     console.log(
@@ -320,6 +358,12 @@ export function EnrollModal({
         );
         setLifecycle("success");
         toast.success(result.message || "Enrollment successful!");
+        if (result.nextAction === "resume_learning") {
+          closeModal();
+          onDismiss?.();
+          router.push(courseLessonsRoute);
+          return;
+        }
         router.refresh();
       }, animationDelay);
 
@@ -354,7 +398,30 @@ export function EnrollModal({
               }
             }}
           >
-            {isInquiry && !isInquirySubmitted ? (
+            {isApplication ? (
+              applicationStatus ? (
+                <CourseApplicationStatus
+                  courseTitle={course.title}
+                  status={applicationStatus.status}
+                  submittedAt={applicationStatus.submittedAt}
+                  overlayClassName={overlayClassName}
+                  onContinueEnrollment={
+                    applicationStatus.status === "approved"
+                      ? handleEnrollFree
+                      : undefined
+                  }
+                />
+              ) : (
+                <CourseApplicationForm
+                  course={course}
+                  context={context}
+                  shouldReduceMotion={Boolean(shouldReduceMotion)}
+                  overlayClassName={overlayClassName}
+                  onSuccess={handleApplicationSuccess}
+                  onError={handleApplicationError}
+                />
+              )
+            ) : isInquiry && !isInquirySubmitted ? (
               <div className="z-90 sm:max-w-md p-0 overflow-hidden rounded-3xl border border-slate-200/90 bg-white/95 shadow-[0_32px_95px_rgba(2,6,23,0.28)] ring-1 ring-slate-100/80 backdrop-blur-xl gap-0 dark:border-slate-800 dark:bg-card/95 dark:ring-slate-800/80">
                 <div className="p-6 pb-2">
                   <h2 className="text-xl font-bold text-slate-900 dark:text-white">

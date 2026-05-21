@@ -33,13 +33,19 @@ const sentryVars = {
 } as const;
 const hasSentryConfig = Object.values(sentryVars).every(Boolean);
 
-export default hasSentryConfig
-  ? withSentryConfig(nextConfig, {
+const sentryBuildOptions = hasSentryConfig
+  ? {
       org: sentryVars.SENTRY_ORG!,
       project: sentryVars.SENTRY_PROJECT!,
       authToken: sentryVars.SENTRY_AUTH_TOKEN!,
       widenClientFileUpload: true,
       tunnelRoute: "/monitoring",
       silent: !process.env.CI,
-    })
-  : nextConfig;
+    }
+  : {
+      // Source map upload is disabled (build-time vars not set),
+      // but runtime instrumentation (Session Replay, tracing, etc.) still works.
+      silent: true,
+    };
+
+export default withSentryConfig(nextConfig, sentryBuildOptions);

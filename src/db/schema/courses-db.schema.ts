@@ -74,6 +74,9 @@ export const dbCourses = coursesSchema.table("courses", {
   urgencyText: varchar("urgency_text", { length: 255 }),
   tags: jsonb("tags").$type<string[] | null>(),
   requiresForm: boolean("requires_form"),
+  autoApproveApplications: boolean("auto_approve_applications")
+    .notNull()
+    .default(false),
   salesInquiry: boolean("sales_inquiry"),
   isArchived: boolean("is_archived").default(false),
   seoDescription: text("seo_description"),
@@ -332,6 +335,99 @@ export const dbInquiries = coursesSchema.table(
     ),
     inquiryCreatedAtIdx: index("inquiries_created_at_idx").on(
       inquiries.createdAt,
+    ),
+  }),
+);
+
+export type CourseApplicationStatus =
+  | "pending"
+  | "reviewing"
+  | "approved"
+  | "rejected"
+  | "waitlisted"
+  | "withdrawn";
+
+export type LearnerStatus =
+  | "high_school"
+  | "undergraduate"
+  | "graduate"
+  | "professional";
+
+export const dbCourseApplications = coursesSchema.table(
+  "course_applications",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    courseId: uuid("course_id")
+      .notNull()
+      .references(() => dbCourses.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => dbUsers.id, { onDelete: "cascade" }),
+    status: varchar("status", { length: 32 })
+      .$type<CourseApplicationStatus>()
+      .notNull()
+      .default("pending"),
+    fullName: varchar("full_name", { length: 255 }).notNull(),
+    age: integer("age").notNull(),
+    email: varchar("email", { length: 255 }).notNull(),
+    phone: varchar("phone", { length: 50 }).notNull(),
+    learnerStatus: varchar("learner_status", { length: 32 })
+      .$type<LearnerStatus>()
+      .notNull(),
+    highSchoolName: varchar("high_school_name", { length: 255 }),
+    university: varchar("university", { length: 255 }),
+    faculty: varchar("faculty", { length: 255 }),
+    graduationYear: integer("graduation_year"),
+    workField: varchar("work_field", { length: 255 }),
+    yearsOfExperience: integer("years_of_experience"),
+    personalStatement: text("personal_statement").notNull(),
+    learningGoals: text("learning_goals").notNull(),
+    background: text("background").notNull(),
+    formVersion: varchar("form_version", { length: 32 }).notNull().default("v1"),
+    extraAnswers: jsonb("extra_answers").$type<Record<string, unknown> | null>(),
+    sourceSurface: varchar("source_surface", { length: 50 }),
+    idempotencyKey: varchar("idempotency_key", { length: 255 }),
+    submittedAt: timestamp("submitted_at").defaultNow().notNull(),
+    reviewedAt: timestamp("reviewed_at"),
+    reviewedBy: text("reviewed_by").references(() => dbUsers.id, {
+      onDelete: "set null",
+    }),
+    reviewNotes: text("review_notes"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    courseApplicationsActiveUq: uniqueIndex(
+      "course_applications_active_user_course_uq",
+    )
+      .on(table.courseId, table.userId)
+      .where(
+        sql`${table.status} in ('pending','reviewing','approved','waitlisted')`,
+      ),
+    courseApplicationsLookupIdx: index(
+      "course_applications_user_course_idx",
+    ).on(table.userId, table.courseId),
+    courseApplicationsAdminCourseStatusIdx: index(
+      "course_applications_course_status_submitted_idx",
+    ).on(table.courseId, table.status, table.submittedAt),
+    courseApplicationsAdminStatusIdx: index(
+      "course_applications_status_submitted_idx",
+    ).on(table.status, table.submittedAt),
+    courseApplicationsLearnerStatusIdx: index(
+      "course_applications_learner_status_submitted_idx",
+    ).on(table.learnerStatus, table.submittedAt),
+    courseApplicationsIdempotencyIdx: uniqueIndex(
+      "course_applications_user_course_idempotency_uq",
+    )
+      .on(table.userId, table.courseId, table.idempotencyKey)
+      .where(sql`${table.idempotencyKey} is not null`),
+    courseApplicationsAgeChk: check(
+      "course_applications_age_chk",
+      sql`${table.age} between 10 and 100`,
+    ),
+    courseApplicationsExperienceChk: check(
+      "course_applications_years_of_experience_chk",
+      sql`${table.yearsOfExperience} is null or ${table.yearsOfExperience} >= 0`,
     ),
   }),
 );

@@ -9,6 +9,7 @@ export const CreateCourseSchema = z.object({
   price: z.coerce.number().min(0).optional(),
   originalPrice: z.coerce.number().min(0).optional(),
   requiresForm: z.coerce.boolean().optional(),
+  autoApproveApplications: z.coerce.boolean().optional(),
   salesInquiry: z.coerce.boolean().optional(),
   imageUrl: z.string().url().optional().or(z.literal("")),
   videoPreviewUrl: z.string().url().optional().or(z.literal("")),
