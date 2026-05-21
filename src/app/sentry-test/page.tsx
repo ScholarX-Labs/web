@@ -9,9 +9,9 @@ export const metadata: Metadata = {
 };
 
 type SentryTestPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     server?: string;
-  };
+  }>;
 };
 
 export default async function SentryTestPage({
@@ -24,7 +24,9 @@ export default async function SentryTestPage({
     await requireRole("admin");
   }
 
-  if (searchParams?.server === "1") {
+  const params = await searchParams;
+
+  if (params?.server === "1") {
     throw new Error("Sentry test server error");
   }
 
