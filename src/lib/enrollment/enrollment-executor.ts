@@ -5,6 +5,7 @@ import {
 } from "@/lib/enrollment/types";
 import { executeFreeEnroll } from "@/lib/enrollment/strategies/free-enroll.strategy";
 import { executeFormApplicationInit } from "@/lib/enrollment/strategies/form-application.strategy";
+import { executePaidCheckoutInit } from "@/lib/enrollment/strategies/paid-checkout.strategy";
 import { emitEnrollmentEvent } from "@/lib/telemetry/enrollment-events";
 
 export const deriveEnrollmentMode = (
@@ -49,6 +50,8 @@ export const executeEnrollment = async (
       message: "Please fill in your contact details",
     };
     return result;
+  } else if (mode === "paid") {
+    result = await executePaidCheckoutInit(context);
   } else {
     result = await executeFormApplicationInit(context);
   }
