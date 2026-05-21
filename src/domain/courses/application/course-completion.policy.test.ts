@@ -4,6 +4,7 @@ import {
   CourseCompletionPolicy,
   LessonCompletionPolicy,
 } from "@/domain/courses/application/course-completion.policy";
+import { LessonBelongsToCourseSpecification } from "@/domain/courses/application/course-completion.specifications";
 import type { CourseProgressSnapshot } from "@/domain/courses/contracts";
 
 const baseProgress: CourseProgressSnapshot = {
@@ -77,4 +78,17 @@ test("CourseCompletionPolicy does not complete zero-lesson courses", () => {
   assert.equal(decision.status, "not_started");
   assert.equal(decision.progressPercentage, 0);
   assert.equal(decision.completedAt, null);
+});
+
+test("LessonBelongsToCourseSpecification allows published lessons", () => {
+  const specification = new LessonBelongsToCourseSpecification();
+
+  assert.doesNotThrow(() =>
+    specification.assertSatisfiedBy({
+      id: "lesson-1",
+      courseId: "course-1",
+      status: "published",
+      isArchived: false,
+    }),
+  );
 });
