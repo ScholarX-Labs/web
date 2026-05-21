@@ -24,6 +24,7 @@ export type EnrollmentErrorCode =
   | "auth_required"
   | "already_enrolled"
   | "course_not_found"
+  | "application_required"
   | "payment_unavailable"
   | "validation_failure"
   | "network_transient"
