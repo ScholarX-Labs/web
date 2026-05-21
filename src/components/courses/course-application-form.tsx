@@ -38,6 +38,7 @@ interface CourseApplicationFormProps {
   overlayClassName: string;
   onSuccess: (result: EnrollmentExecutionSuccess) => void;
   onError: (message: string) => void;
+  onSubmittingChange?: (isSubmitting: boolean) => void;
 }
 
 type LearnerStatus =
@@ -146,6 +147,7 @@ export function CourseApplicationForm({
   overlayClassName,
   onSuccess,
   onError,
+  onSubmittingChange,
 }: CourseApplicationFormProps) {
   const { data: session } = useSession();
   const [form, setForm] = useState<FormState>(() =>
@@ -435,6 +437,7 @@ export function CourseApplicationForm({
     }
 
     setIsSubmitting(true);
+    onSubmittingChange?.(true);
     setErrors({});
 
     const result = await executeCourseApplication(buildExecutionContext(), {
@@ -454,9 +457,11 @@ export function CourseApplicationForm({
       personalStatement: form.personalStatement.trim(),
       learningGoals: form.learningGoals.trim(),
       background: form.background.trim(),
+    }).finally(() => {
+      setIsSubmitting(false);
+      onSubmittingChange?.(false);
     });
 
-    setIsSubmitting(false);
     setSubmitResult(result);
 
     if (result.ok) {
