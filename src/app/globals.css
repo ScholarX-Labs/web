@@ -33,6 +33,7 @@
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
+
   --color-destructive: var(--destructive);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
@@ -300,6 +301,23 @@
   .ai-chat-user-message-bubble-short {
     min-inline-size: clamp(4.75rem, 13vw, 6rem);
     text-align: center;
+  }
+
+  /* Ensure interactive controls show pointer cursor (except disabled) */
+  button:not(:disabled),
+  input[type="button"]:not(:disabled),
+  input[type="submit"]:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  .btn,
+  .btn-premium-hover,
+  .interactive-element {
+    cursor: pointer;
+  }
+
+  button[disabled],
+  input[disabled],
+  [aria-disabled="true"] {
+    cursor: default;
   }
 
   /* ── Premium Scrollbar ───────────────────────────────────── */
