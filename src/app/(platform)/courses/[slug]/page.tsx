@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { createNextCourseDomain } from "@/domain/courses";
 import { CourseHero } from "./_components/course-hero";
 import { CourseStickyCta } from "./_components/course-sticky-cta";
@@ -8,6 +8,7 @@ import { CourseInstructor } from "./_components/course-instructor";
 import { EnrollModal } from "@/components/courses/enroll-modal";
 
 import { getSession } from "@/lib/dal";
+import { ROUTES } from "@/lib/routes";
 
 export const dynamic = "force-dynamic";
 
@@ -50,6 +51,11 @@ export default async function CourseDetailPage({
     course = await courseDomain.catalog.getBySlug(slug, session?.user.id);
   } catch {
     notFound();
+  }
+
+  if (course.slug !== slug) {
+    const query = intent ? `?intent=${encodeURIComponent(intent)}` : "";
+    redirect(`${ROUTES.COURSE_DETAIL(course.slug)}${query}`);
   }
 
   // Determine if enrollment modal should open automatically
