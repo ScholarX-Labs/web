@@ -1,4 +1,4 @@
-import { and, count, desc, eq, sql } from "drizzle-orm";
+import { and, count, desc, eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/db";
 import {
   dbCourseProgress,
@@ -22,6 +22,7 @@ import type {
   SyncLessonProgressCommand,
 } from "@/domain/courses/contracts/course-progress.types";
 import { dateToIsoOrNull } from "@/domain/courses/application/course-progress.mapper";
+import { PUBLIC_LESSON_STATUSES } from "@/domain/courses/application/public-lesson-status";
 
 type DbClient = typeof db;
 
@@ -93,7 +94,7 @@ export class NextCourseProgressRepository
       .where(
         and(
           eq(dbLessons.courseId, courseId),
-          eq(dbLessons.status, "active"),
+          inArray(dbLessons.status, PUBLIC_LESSON_STATUSES),
           eq(dbLessons.isArchived, false),
         ),
       );
@@ -118,7 +119,14 @@ export class NextCourseProgressRepository
         isArchived: dbLessons.isArchived,
       })
       .from(dbLessons)
-      .where(and(eq(dbLessons.id, lessonId), eq(dbLessons.courseId, courseId)))
+      .where(
+        and(
+          eq(dbLessons.id, lessonId),
+          eq(dbLessons.courseId, courseId),
+          inArray(dbLessons.status, PUBLIC_LESSON_STATUSES),
+          eq(dbLessons.isArchived, false),
+        ),
+      )
       .limit(1);
 
     return rows[0] ?? null;
@@ -243,7 +251,7 @@ export class NextCourseProgressRepository
           eq(dbLessonProgress.userId, userId),
           eq(dbLessonProgress.courseId, courseId),
           eq(dbLessonProgress.completed, true),
-          eq(dbLessons.status, "active"),
+          inArray(dbLessons.status, PUBLIC_LESSON_STATUSES),
           eq(dbLessons.isArchived, false),
         ),
       );
