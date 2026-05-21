@@ -9,6 +9,7 @@ import {
   dbUsers,
 } from "@/db/schema/courses-db.schema";
 import { dbLessons } from "@/db/schema/admin-db.schema";
+import { PUBLIC_LESSON_STATUSES } from "@/domain/courses/application/public-lesson-status";
 
 export interface CourseListFilter {
   page: number;
@@ -338,7 +339,7 @@ export class NextCoursesRepository {
         and(
           eq(dbLessons.courseId, courseId),
           eq(dbLessons.isArchived, false),
-          eq(dbLessons.status, "active"),
+          inArray(dbLessons.status, PUBLIC_LESSON_STATUSES),
         ),
       )
       .orderBy(asc(dbLessons.sortIndex));
