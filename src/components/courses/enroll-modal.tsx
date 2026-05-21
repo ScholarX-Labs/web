@@ -14,6 +14,7 @@ import { EnrollmentContext, EnrollmentMode } from "@/lib/enrollment/types";
 import { emitEnrollmentEvent } from "@/lib/telemetry/enrollment-events";
 import { EnrollModalContent } from "./enroll-modal-content";
 import { SalesInquiryForm } from "./sales-inquiry-form";
+import { CourseApplicationForm } from "./course-application-form";
 import { agentLog } from "@/lib/debug/agent-log";
 
 interface EnrollModalProps {
@@ -90,6 +91,7 @@ export function EnrollModal({
   );
 
   const isInquiry = enrollmentMode === "inquiry" && !isInquirySubmitted;
+  const isApplication = enrollmentMode === "application";
 
   const processingSteps = useMemo(
     () => [
@@ -238,6 +240,17 @@ export function EnrollModal({
     toast.error(message);
   };
 
+  const handleApplicationSuccess = () => {
+    setLifecycle("modal_open");
+    toast.success("Your application has been submitted for review.");
+    router.refresh();
+  };
+
+  const handleApplicationError = (message: string) => {
+    setError();
+    toast.error(message);
+  };
+
   const handleEnrollFree = async () => {
     console.log("[ENROLL] handleEnrollFree clicked - courseId:", course.id);
     if (course.isSubscribed) {
@@ -354,7 +367,16 @@ export function EnrollModal({
               }
             }}
           >
-            {isInquiry && !isInquirySubmitted ? (
+            {isApplication ? (
+              <CourseApplicationForm
+                course={course}
+                context={context}
+                shouldReduceMotion={Boolean(shouldReduceMotion)}
+                overlayClassName={overlayClassName}
+                onSuccess={handleApplicationSuccess}
+                onError={handleApplicationError}
+              />
+            ) : isInquiry && !isInquirySubmitted ? (
               <div className="z-90 sm:max-w-md p-0 overflow-hidden rounded-3xl border border-slate-200/90 bg-white/95 shadow-[0_32px_95px_rgba(2,6,23,0.28)] ring-1 ring-slate-100/80 backdrop-blur-xl gap-0 dark:border-slate-800 dark:bg-card/95 dark:ring-slate-800/80">
                 <div className="p-6 pb-2">
                   <h2 className="text-xl font-bold text-slate-900 dark:text-white">
