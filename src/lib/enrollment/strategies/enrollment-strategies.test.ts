@@ -42,7 +42,17 @@ const createFakeApi = (overrides: Partial<ApiClient> = {}): ApiClient => ({
   initPaidEnrollment: async () => { throw new Error("not implemented"); },
   initApplicationEnrollment: async () => { throw new Error("not implemented"); },
   submitInquiry: async () => ({ inquiryId: "test", message: "ok" }),
-  submitApplication: async () => ({ applicationId: "test", message: "ok" }),
+  submitApplication: async () => ({
+    applicationId: "test",
+    status: "pending",
+    enrolledImmediately: false,
+    message: "ok",
+  }),
+  getApplicationStatus: async () => ({
+    courseId: "course-1",
+    requiresApplication: true,
+    application: null,
+  }),
   ...overrides,
 });
 
@@ -125,6 +135,8 @@ test("executeCourseApplication submits required-form application", async () => {
       assert.equal(body.learningGoals, "Build scholarship skills");
       return {
         applicationId: "application-1",
+        status: "pending",
+        enrolledImmediately: false,
         message: "application submitted",
       };
     },
@@ -137,8 +149,15 @@ test("executeCourseApplication submits required-form application", async () => {
     },
     {
       name: "Learner",
+      age: 21,
       email: "learner@example.com",
+      phone: "+201000000000",
+      learnerStatus: "undergraduate",
+      university: "Cairo University",
+      faculty: "Engineering",
+      personalStatement: "I am building my scholarship and technical profile.",
       learningGoals: "Build scholarship skills",
+      background: "I have project experience and want structured mentorship.",
     },
     fakeApi,
   );
