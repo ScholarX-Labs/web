@@ -111,11 +111,11 @@ const learnerStatusOptions: { value: LearnerStatus; label: string }[] = [
 const numericFields: (keyof FormState)[] = ["age", "graduationYear", "yearsOfExperience"];
 const currentYear = new Date().getUTCFullYear();
 
-const initialState = (name?: string, email?: string): FormState => ({
+const initialState = (name?: string, email?: string, phone?: string): FormState => ({
   name: name ?? "",
   age: "",
   email: email ?? "",
-  phone: "",
+  phone: phone ?? "",
   learnerStatus: "undergraduate",
   highSchoolName: "",
   university: "",
@@ -145,7 +145,11 @@ export function CourseApplicationForm({
 }: CourseApplicationFormProps) {
   const { data: session } = useSession();
   const [form, setForm] = useState<FormState>(() =>
-    initialState(session?.user?.name, session?.user?.email),
+    initialState(
+      session?.user?.name,
+      session?.user?.email,
+      session?.user?.phoneNumber ?? undefined,
+    ),
   );
   const [errors, setErrors] = useState<FormErrors>({});
   const [touched, setTouched] = useState<TouchedState>({});
