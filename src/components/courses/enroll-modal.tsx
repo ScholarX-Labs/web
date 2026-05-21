@@ -18,6 +18,7 @@ import { CourseApplicationForm } from "./course-application-form";
 import { CourseApplicationStatus } from "./course-application-status";
 import { agentLog } from "@/lib/debug/agent-log";
 import { coursesService } from "@/lib/api/courses.service";
+import { createEnrollmentExecutionContext } from "@/lib/enrollment/create-enrollment-execution-context";
 
 interface EnrollModalProps {
   course: Course;
@@ -28,33 +29,9 @@ interface EnrollModalProps {
 export const buildEnrollmentExecutionContext = (
   course: Course,
   context: EnrollmentContext | null,
+  reducedMotion = false,
 ): EnrollmentContext => {
-  if (context) return context;
-
-  return {
-    command: {
-      courseId: course.id,
-      source: "deep_link",
-      correlationId:
-        typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
-          ? crypto.randomUUID()
-          : `${Date.now()}-${Math.random().toString(16).slice(2)}`,
-      timestamp: Date.now(),
-      viewport:
-        typeof window !== "undefined" && window.innerWidth >= 1024
-          ? "desktop"
-          : "mobile",
-      reducedMotion: false,
-    },
-    course: {
-      id: course.id,
-      slug: course.slug,
-      title: course.title,
-      requiresForm: course.requiresForm,
-      salesInquiry: course.salesInquiry,
-      price: course.price,
-    },
-  };
+  return createEnrollmentExecutionContext(course, context, reducedMotion);
 };
 
 export function EnrollModal({
@@ -88,8 +65,13 @@ export function EnrollModal({
   const shouldReduceMotion = useReducedMotion();
 
   const executionContext = useMemo(
-    () => buildEnrollmentExecutionContext(course, context),
-    [course, context],
+    () =>
+      buildEnrollmentExecutionContext(
+        course,
+        context,
+        Boolean(shouldReduceMotion),
+      ),
+    [course, context, shouldReduceMotion],
   );
 
   const enrollmentMode: EnrollmentMode = useMemo(
@@ -278,7 +260,7 @@ export function EnrollModal({
     nextAction: "resume_learning" | "checkout" | "application" | "inquiry" | "none";
     message?: string;
   }) => {
-    setLifecycle("modal_open");
+    setLifecycle("success");
     toast.success(result.message ?? "Your application has been submitted for review.");
     if (result.nextAction === "resume_learning") {
       closeModal();
