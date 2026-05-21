@@ -1,6 +1,7 @@
 export * from "./next-course-catalog.service";
 export * from "./next-course-enrollment.service";
 export * from "./next-course.errors";
+export * from "./course-application.schemas";
 export * from "./course-completion.policy";
 export * from "./course-completion.specifications";
 export * from "./course-progress-command.service";
