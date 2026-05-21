@@ -80,6 +80,15 @@ interface InquiryBody {
 }
 
 interface ApplicationBody extends InquiryBody {
+  age?: number;
+  learnerStatus?: "high_school" | "undergraduate" | "graduate" | "professional";
+  highSchoolName?: string;
+  university?: string;
+  faculty?: string;
+  graduationYear?: number;
+  workField?: string;
+  yearsOfExperience?: number;
+  personalStatement?: string;
   learningGoals?: string;
   background?: string;
 }
@@ -295,12 +304,17 @@ export const createCoursesRouteHandlers = (deps: CoursesRouteDeps) => {
         if (
           !applicationBody?.name ||
           !applicationBody?.email ||
-          !applicationBody?.learningGoals
+          !applicationBody?.age ||
+          !applicationBody?.phone ||
+          !applicationBody?.learnerStatus ||
+          !applicationBody?.personalStatement ||
+          !applicationBody?.learningGoals ||
+          !applicationBody?.background
         ) {
           throw new NextCourseError(
             "BAD_REQUEST",
             400,
-            "Name, email, and learning goals are required",
+            "Application fields are incomplete",
             9005,
           );
         }
@@ -310,8 +324,17 @@ export const createCoursesRouteHandlers = (deps: CoursesRouteDeps) => {
           userId,
           {
             name: applicationBody.name,
+            age: applicationBody.age,
             email: applicationBody.email,
             phone: applicationBody.phone,
+            learnerStatus: applicationBody.learnerStatus,
+            highSchoolName: applicationBody.highSchoolName,
+            university: applicationBody.university,
+            faculty: applicationBody.faculty,
+            graduationYear: applicationBody.graduationYear,
+            workField: applicationBody.workField,
+            yearsOfExperience: applicationBody.yearsOfExperience,
+            personalStatement: applicationBody.personalStatement,
             learningGoals: applicationBody.learningGoals,
             background: applicationBody.background,
             sourceSurface: applicationBody.sourceSurface,
