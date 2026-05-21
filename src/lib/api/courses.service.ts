@@ -35,6 +35,7 @@ interface CourseItemResponse {
   urgencyText: string | null;
   tags: string[] | null;
   requiresForm: boolean | null;
+  autoApproveApplications: boolean | null;
   salesInquiry: boolean | null;
   createdAt: string | null;
   updatedAt: string | null;
@@ -112,8 +113,28 @@ interface InquirySubmitResponse {
 }
 
 interface ApplicationSubmitResponse {
-  applicationId: string;
-  message: string;
+  success: true;
+  requestId: string;
+  data: {
+    applicationId: string;
+    status: "pending" | "reviewing" | "approved" | "rejected" | "waitlisted" | "withdrawn";
+    enrolledImmediately: boolean;
+    message: string;
+  };
+}
+
+interface ApplicationStatusResponse {
+  success: true;
+  requestId: string;
+  data: {
+    courseId: string;
+    requiresApplication: boolean;
+    application: {
+      id: string;
+      status: "pending" | "reviewing" | "approved" | "rejected" | "waitlisted" | "withdrawn";
+      submittedAt: string;
+    } | null;
+  };
 }
 
 interface InquiryRequestBody {
@@ -127,10 +148,19 @@ interface InquiryRequestBody {
 
 interface ApplicationRequestBody {
   name: string;
+  age: number;
   email: string;
-  phone?: string;
+  phone: string;
+  learnerStatus: "high_school" | "undergraduate" | "graduate" | "professional";
+  highSchoolName?: string;
+  university?: string;
+  faculty?: string;
+  graduationYear?: number;
+  workField?: string;
+  yearsOfExperience?: number;
+  personalStatement: string;
   learningGoals: string;
-  background?: string;
+  background: string;
   sourceSurface?: EnrollmentSourceSurface;
   idempotencyKey?: string;
 }
@@ -146,6 +176,8 @@ export class ApiRequestError extends Error {
     message: string,
     readonly status: number,
     readonly code?: EnrollmentErrorCode,
+    readonly fieldErrors?: Record<string, string[]>,
+    readonly retryAfterSeconds?: number,
   ) {
     super(message);
     this.name = "ApiRequestError";
@@ -205,6 +237,7 @@ const mapCourse = (course: CourseItemResponse): Course => {
         }
       : undefined,
     requiresForm: course.requiresForm ?? false,
+    autoApproveApplications: course.autoApproveApplications ?? false,
     salesInquiry: course.salesInquiry ?? false,
     isPublished: course.isPublished,
     isSubscribed: course.isSubscribed ?? false,
@@ -319,6 +352,25 @@ const parseApiErrorCode = (error: unknown): string | undefined => {
   return undefined;
 };
 
+const parseApiFieldErrors = (
+  error: unknown,
+): Record<string, string[]> | undefined => {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "error" in error &&
+    typeof error.error === "object" &&
+    error.error !== null &&
+    "fieldErrors" in error.error &&
+    typeof error.error.fieldErrors === "object" &&
+    error.error.fieldErrors !== null
+  ) {
+    return error.error.fieldErrors as Record<string, string[]>;
+  }
+
+  return undefined;
+};
+
 const normalizeEnrollmentErrorCode = (
   code: string | undefined,
   status: number,
@@ -343,6 +395,15 @@ const normalizeEnrollmentErrorCode = (
 
   if (code === "COURSE_REQUIRES_APPLICATION") {
     return "application_required";
+  }
+
+  if (
+    code === "VALIDATION_FAILED" ||
+    code === "DUPLICATE_APPLICATION" ||
+    code === "RATE_LIMITED" ||
+    code === "APPLICATION_NOT_REQUIRED"
+  ) {
+    return "validation_failure";
   }
 
   const allowedCodes: EnrollmentErrorCode[] = [
@@ -381,12 +442,14 @@ const throwApiError = (
   error: unknown,
   fallback: string,
   status?: number,
+  retryAfterSeconds?: number,
 ): never => {
   const message = parseApiErrorMessage(error, fallback);
   const code = normalizeEnrollmentErrorCode(
     parseApiErrorCode(error),
     status ?? 500,
   );
+  const fieldErrors = parseApiFieldErrors(error);
 
   console.error("[API] throwApiError:", {
     message,
@@ -395,7 +458,13 @@ const throwApiError = (
     originalError: error,
   });
 
-  throw new ApiRequestError(message, status ?? 500, code);
+  throw new ApiRequestError(
+    message,
+    status ?? 500,
+    code,
+    fieldErrors,
+    retryAfterSeconds,
+  );
 };
 
 const createRequestUrl = (
@@ -474,7 +543,11 @@ const parseResponse = async <T>(
     : await response.text();
 
   if (!response.ok) {
-    throwApiError(payload, fallbackMessage, response.status);
+    const retryAfterHeader = response.headers.get("Retry-After");
+    const retryAfterSeconds = retryAfterHeader
+      ? Number.parseInt(retryAfterHeader, 10)
+      : undefined;
+    throwApiError(payload, fallbackMessage, response.status, retryAfterSeconds);
   }
 
   return payload as T;
@@ -821,18 +894,35 @@ export const coursesService = {
     courseId: string,
     body: ApplicationRequestBody,
     token?: string,
-  ): Promise<ApplicationSubmitResponse> => {
+  ): Promise<ApplicationSubmitResponse["data"]> => {
     try {
-      return await postJson<ApplicationSubmitResponse>(
-        `/courses/${courseId}/enroll/application`,
+      const response = await postJson<ApplicationSubmitResponse>(
+        `/v1/courses/${courseId}/enroll/application`,
         {
           token,
           body,
         },
         "Failed to submit application",
       );
+      return response.data;
     } catch (error) {
       return throwApiError(error, "Failed to submit application");
+    }
+  },
+
+  getApplicationStatus: async (
+    courseId: string,
+    token?: string,
+  ): Promise<ApplicationStatusResponse["data"]> => {
+    try {
+      const response = await getJson<ApplicationStatusResponse>(
+        `/v1/courses/${courseId}/enroll/application/status`,
+        { token },
+        "Failed to fetch application status",
+      );
+      return response.data;
+    } catch (error) {
+      return throwApiError(error, "Failed to fetch application status");
     }
   },
 };
