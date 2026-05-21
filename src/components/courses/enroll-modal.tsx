@@ -99,6 +99,7 @@ export function EnrollModal({
 
   const isInquiry = enrollmentMode === "inquiry" && !isInquirySubmitted;
   const isApplication = enrollmentMode === "application";
+  const courseLessonsRoute = ROUTES.COURSE_LESSONS(course.slug ?? course.id);
 
   const processingSteps = useMemo(
     () => [
@@ -273,9 +274,18 @@ export function EnrollModal({
     toast.error(message);
   };
 
-  const handleApplicationSuccess = (message?: string) => {
+  const handleApplicationSuccess = (result: {
+    nextAction: "resume_learning" | "checkout" | "application" | "inquiry" | "none";
+    message?: string;
+  }) => {
     setLifecycle("modal_open");
-    toast.success(message ?? "Your application has been submitted for review.");
+    toast.success(result.message ?? "Your application has been submitted for review.");
+    if (result.nextAction === "resume_learning") {
+      closeModal();
+      onDismiss?.();
+      router.push(courseLessonsRoute);
+      return;
+    }
     router.refresh();
   };
 
@@ -288,7 +298,7 @@ export function EnrollModal({
     console.log("[ENROLL] handleEnrollFree clicked - courseId:", course.id);
     if (course.isSubscribed) {
       toast.info("You are already enrolled in this course.");
-      router.push(ROUTES.COURSE_DETAIL(course.slug ?? course.id));
+      router.push(courseLessonsRoute);
       return;
     }
     console.log(
@@ -366,6 +376,12 @@ export function EnrollModal({
         );
         setLifecycle("success");
         toast.success(result.message || "Enrollment successful!");
+        if (result.nextAction === "resume_learning") {
+          closeModal();
+          onDismiss?.();
+          router.push(courseLessonsRoute);
+          return;
+        }
         router.refresh();
       }, animationDelay);
 

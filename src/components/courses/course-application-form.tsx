@@ -23,7 +23,11 @@ import {
 import { DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useSession } from "@/lib/auth-client";
 import { Course } from "@/types/course.types";
-import { EnrollmentContext, EnrollmentExecutionResult } from "@/lib/enrollment/types";
+import {
+  EnrollmentContext,
+  EnrollmentExecutionResult,
+  EnrollmentExecutionSuccess,
+} from "@/lib/enrollment/types";
 import { executeCourseApplication } from "@/lib/enrollment/strategies/course-application.strategy";
 import { learnerStatusValues } from "@/domain/courses/application/course-application.schemas";
 
@@ -32,7 +36,7 @@ interface CourseApplicationFormProps {
   context: EnrollmentContext | null;
   shouldReduceMotion: boolean;
   overlayClassName: string;
-  onSuccess: (message?: string) => void;
+  onSuccess: (result: EnrollmentExecutionSuccess) => void;
   onError: (message: string) => void;
 }
 
@@ -456,7 +460,7 @@ export function CourseApplicationForm({
     setSubmitResult(result);
 
     if (result.ok) {
-      onSuccess(result.message);
+      onSuccess(result);
       return;
     }
 

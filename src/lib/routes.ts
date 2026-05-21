@@ -16,6 +16,7 @@ export const ROUTES = {
   AI_SEARCH: "/ai-search",
   COURSES: "/courses",
   COURSE_DETAIL: (slug: string) => `/courses/${slug}`,
+  COURSE_LESSONS: (slug: string) => `/courses/${slug}/lessons`,
   LESSON: (courseSlug: string, lessonId: string) =>
     `/courses/${courseSlug}/lessons/${lessonId}`,
   MY_COURSES: "/my-courses",
