@@ -88,6 +88,7 @@ export const createAdminRepository = (): AdminRepository => {
               instructorId: dbCourses.instructorId,
               status: dbCourses.status,
               requiresForm: dbCourses.requiresForm,
+              autoApproveApplications: dbCourses.autoApproveApplications,
               createdAt: dbCourses.createdAt,
               updatedAt: dbCourses.updatedAt,
             })
@@ -117,6 +118,7 @@ export const createAdminRepository = (): AdminRepository => {
           instructorId: dbCourses.instructorId,
           status: dbCourses.status,
           requiresForm: dbCourses.requiresForm,
+          autoApproveApplications: dbCourses.autoApproveApplications,
           createdAt: dbCourses.createdAt,
           updatedAt: dbCourses.updatedAt,
         })
@@ -139,6 +141,7 @@ export const createAdminRepository = (): AdminRepository => {
           currentPrice: data.price ?? 0,
           originalPrice: data.originalPrice ?? null,
           requiresForm: data.requiresForm ?? false,
+          autoApproveApplications: data.autoApproveApplications ?? false,
           salesInquiry: data.salesInquiry ?? false,
           imageUrl: data.imageUrl ?? null,
           videoPreviewUrl: data.videoPreviewUrl ?? null,
@@ -169,6 +172,9 @@ export const createAdminRepository = (): AdminRepository => {
           ...(data.price !== undefined && { currentPrice: data.price }),
           ...(data.originalPrice !== undefined && { originalPrice: data.originalPrice }),
           ...(data.requiresForm !== undefined && { requiresForm: data.requiresForm }),
+          ...(data.autoApproveApplications !== undefined && {
+            autoApproveApplications: data.autoApproveApplications,
+          }),
           ...(data.salesInquiry !== undefined && { salesInquiry: data.salesInquiry }),
           ...(data.imageUrl !== undefined && { imageUrl: data.imageUrl }),
           ...(data.videoPreviewUrl !== undefined && { videoPreviewUrl: data.videoPreviewUrl }),
