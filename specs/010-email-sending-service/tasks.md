@@ -27,10 +27,10 @@
 - [X] T007 [P] Add Zod request/config schemas in `src/domain/email/application/email-delivery.schemas.ts`
 - [X] T008 [P] Add Drizzle email schema tables and indexes in `src/db/schema/email-db.schema.ts`
 - [X] T009 Add `src/db/schema/email-db.schema.ts` to `drizzle.config.ts`
-- [ ] T010 [P] Add fake provider, in-memory metrics, clock, logger, and repository test helpers in `src/domain/email/application/email-test-helpers.ts`
-- [ ] T011 [P] Add initial service tests for validation, primary success, fallback success, duplicate idempotency, and failure classification in `src/domain/email/application/email-delivery.service.test.ts`
-- [ ] T012 [P] Add repository contract/concurrency tests in `src/domain/email/infrastructure/db/drizzle-email-delivery.repository.test.ts`
-- [ ] T013 [P] Add worker concurrency tests in `src/worker/email-delivery-worker.test.ts`
+- [X] T010 [P] Add fake provider, in-memory metrics, clock, logger, and repository test helpers in `src/domain/email/application/email-test-helpers.ts`
+- [X] T011 [P] Add initial service tests for validation, primary success, fallback success, duplicate idempotency, and failure classification in `src/domain/email/application/email-delivery.service.test.ts`
+- [X] T012 [P] Add repository contract/concurrency tests in `src/domain/email/infrastructure/db/drizzle-email-delivery.repository.test.ts`
+- [X] T013 [P] Add worker concurrency tests in `src/worker/email-delivery-worker.test.ts`
 
 **Checkpoint**: Foundational contracts and failing tests are ready before implementation.
 
@@ -83,7 +83,7 @@
 - [X] T030 [P] [US3] Add sanitization and hashing helpers in `src/domain/email/application/email-sanitization.ts`
 - [X] T031 [US3] Wire sanitized logging and error responses through `src/domain/email/application/email-delivery.service.ts`
 - [X] T032 [US3] Enforce admin authorization and safe response DTOs in `src/app/api/admin/email-deliveries/`
-- [ ] T033 [US3] Add security-focused tests for secret redaction and unauthorized access in `src/domain/email/application/email-delivery.service.test.ts`
+- [X] T033 [US3] Add security-focused tests for secret redaction and unauthorized access in `src/domain/email/application/email-delivery.service.test.ts`
 
 **Checkpoint**: Security and privacy boundaries are enforced for delivery operations.
 
@@ -97,8 +97,8 @@
 
 - [X] T034 [US4] Complete worker retry scheduling and lease release behavior in `src/worker/email-delivery-worker.ts`
 - [X] T035 [US4] Complete manual retry behavior in `src/app/api/admin/email-deliveries/[deliveryId]/retry/route.ts`
-- [ ] T036 [US4] Add stale lease and orphan accepted-attempt repair tests in `src/domain/email/infrastructure/db/drizzle-email-delivery.repository.test.ts`
-- [ ] T037 [US4] Add 50,000-user burst simulation test scaffold in `src/domain/email/application/email-delivery.service.test.ts`
+- [X] T036 [US4] Add stale lease and orphan accepted-attempt repair tests in `src/domain/email/infrastructure/db/drizzle-email-delivery.repository.test.ts`
+- [X] T037 [US4] Add 50,000-user burst simulation test scaffold in `src/domain/email/application/email-delivery.service.test.ts`
 
 **Checkpoint**: Retry and recovery behavior is safe under concurrency.
 
@@ -108,11 +108,11 @@
 
 **Purpose**: Finish verification, operational docs, and task closure.
 
-- [ ] T038 [P] Update quickstart implementation notes in `specs/010-email-sending-service/quickstart.md`
-- [ ] T039 Run `pnpm run typecheck`
-- [ ] T040 Run `pnpm run test`
-- [ ] T041 Validate implementation against `specs/010-email-sending-service/plan.md`
-- [ ] T042 Confirm all tasks are checked complete in `specs/010-email-sending-service/tasks.md`
+- [X] T038 [P] Update quickstart implementation notes in `specs/010-email-sending-service/quickstart.md`
+- [X] T039 Run `pnpm run typecheck`
+- [X] T040 Run `pnpm run test`
+- [X] T041 Validate implementation against `specs/010-email-sending-service/plan.md`
+- [X] T042 Confirm all tasks are checked complete in `specs/010-email-sending-service/tasks.md`
 
 ---
 
