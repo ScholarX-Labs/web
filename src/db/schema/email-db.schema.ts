@@ -25,6 +25,16 @@ import type {
 
 export const emailSchema = pgSchema("email");
 
+export const dbEmailBatches = emailSchema.table("email_batches", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  category: varchar("category", { length: 64 }).$type<EmailCategory>().notNull(),
+  requestedByUserId: text("requested_by_user_id")
+    .notNull()
+    .references(() => dbUsers.id, { onDelete: "cascade" }),
+  totalCount: integer("total_count").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 export const dbEmailDeliveries = emailSchema.table(
   "email_deliveries",
   {
@@ -64,7 +74,9 @@ export const dbEmailDeliveries = emailSchema.table(
     lockedAt: timestamp("locked_at"),
     lockedUntil: timestamp("locked_until"),
     stateVersion: integer("state_version").notNull().default(0),
-    batchId: uuid("batch_id"),
+    batchId: uuid("batch_id").references(() => dbEmailBatches.id, {
+      onDelete: "set null",
+    }),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
     acceptedAt: timestamp("accepted_at"),
@@ -192,13 +204,3 @@ export const dbEmailRateLimitCounters = emailSchema.table(
     expiresIdx: index("email_rate_limit_expires_idx").on(table.expiresAt),
   }),
 );
-
-export const dbEmailBatches = emailSchema.table("email_batches", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  category: varchar("category", { length: 64 }).$type<EmailCategory>().notNull(),
-  requestedByUserId: text("requested_by_user_id")
-    .notNull()
-    .references(() => dbUsers.id, { onDelete: "cascade" }),
-  totalCount: integer("total_count").notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-});
