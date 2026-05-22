@@ -231,7 +231,7 @@ jobs:
           echo "image=${IMAGE}"               >> "$GITHUB_OUTPUT"
 
       # Poll the specific revision by name until it reaches Running state.
-      # Querying by revision name is reliable; querying by image tag is not.
+      # Fails fast if ACA reports a terminal state (Failed/Degraded/Stopped).
       - name: Wait for revision to become active
         run: |
           REVISION="${{ steps.deploy.outputs.new_revision }}"
@@ -252,19 +252,30 @@ jobs:
 
             echo "  runningState: ${RUNNING} (${ELAPSED}s elapsed)"
 
-            if [ "$RUNNING" = "Running" ]; then
-              echo "✅ Revision '${REVISION}' is Running."
-              break
-            fi
+            case "$RUNNING" in
+              Running)
+                echo "✅ Revision '${REVISION}' is Running."
+                break
+                ;;
+              Failed|Degraded|Stopped)
+                echo "❌ Revision '${REVISION}' reached terminal failure state: ${RUNNING}."
+                echo "   Check the logs below for the startup error."
+                exit 1
+                ;;
+              *)
+                # Activating / Provisioning — keep waiting
+                ;;
+            esac
 
             sleep "$INTERVAL"
             ELAPSED=$(( ELAPSED + INTERVAL ))
           done
 
           if [ "$RUNNING" != "Running" ]; then
-            echo "❌ Revision '${REVISION}' did not become Running within ${TIMEOUT}s."
+            echo "❌ Revision '${REVISION}' did not become Running within ${TIMEOUT}s (last state: ${RUNNING})."
             exit 1
           fi
+
 
       - name: Deployment summary
         if: success()

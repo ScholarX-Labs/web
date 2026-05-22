@@ -75,18 +75,6 @@ RUN chown -R worker:nodejs /app
 
 USER worker
 
-# ACA liveness/readiness probes hit this port.
-# The certificate-worker opens a minimal HTTP server on 8080.
-EXPOSE 8080
-
 # Graceful-shutdown-aware entrypoint.
 # SIGTERM → worker drains in-flight jobs then exits cleanly.
 CMD ["node", "--import", "tsx", "src/worker/certificate-worker.ts"]
-
-# ==========================================
-# Health check (used by Docker and ACA probes)
-# ==========================================
-# Polls the worker's internal health endpoint every 30 s.
-# 3 consecutive failures = container is unhealthy → ACA restarts it.
-HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:8080/health', r => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"
