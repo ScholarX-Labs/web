@@ -17,11 +17,10 @@
  */
 
 import "dotenv/config";
-import { and, eq, isNull, lt, lte, or, sql } from "drizzle-orm";
+import { and, eq, isNull, lt, lte, or } from "drizzle-orm";
 import { db } from "@/db";
 import {
   dbCanonicalCertificates,
-  dbCertificateArtifactQueue,
   dbCertificateArtifacts,
 } from "@/db/schema/certificates-db.schema";
 import { DrizzleCertificateQueueRepository } from "@/domain/certificates/infrastructure/db/drizzle-certificate-queue.repository";

@@ -25,17 +25,14 @@
  */
 
 import "dotenv/config";
-import { eq, and, isNull } from "drizzle-orm";
+import { and, isNull } from "drizzle-orm";
 import { db } from "@/db";
 import { dbCertificates } from "@/db/schema/courses-db.schema";
 import {
   dbCanonicalCertificates,
   dbCertificateArtifacts,
-  dbCertificateArtifactQueue,
   dbCertificateEvents,
 } from "@/db/schema/certificates-db.schema";
-import { generateCertificateNumber } from "@/domain/certificates/domain/certificate-number";
-
 // ---------------------------------------------------------------------------
 // Configuration
 // ---------------------------------------------------------------------------

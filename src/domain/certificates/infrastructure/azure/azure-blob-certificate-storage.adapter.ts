@@ -62,8 +62,8 @@ export class AzureBlobCertificateStorageAdapter
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore -- @azure/storage-blob is installed in the worker container, not the web bundle
     const blobSdkImport = await import("@azure/storage-blob");
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const { generateBlobSASQueryParameters, BlobSASPermissions, StorageSharedKeyCredential } = blobSdkImport;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { generateBlobSASQueryParameters, BlobSASPermissions, StorageSharedKeyCredential } = blobSdkImport as any;
 
     const accountName = client.accountName;
     const accountKey = this.connectionString

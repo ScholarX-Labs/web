@@ -2,7 +2,6 @@ import type { ICertificateRepository, CertificateRecord } from "../contracts/cer
 import type { ICertificateArtifactRepository } from "../contracts/certificate-artifact.repository";
 import type { ICertificateEventRepository } from "../contracts/certificate-event.repository";
 import type { ArtifactType } from "@/db/schema/certificates-db.schema";
-import { CertificateError } from "../domain/certificate-errors";
 
 // ---------------------------------------------------------------------------
 // Public DTO — safe to return to the browser (no internal IDs or storage keys)

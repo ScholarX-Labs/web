@@ -29,7 +29,8 @@ export class FakeCertificateRendererAdapter
   }
 
   async renderPngPreview(
-    data: CertificateRenderData,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _data: CertificateRenderData,
   ): Promise<CertificateArtifactOutput> {
     // Minimal 1x1 PNG
     const png = Buffer.from(

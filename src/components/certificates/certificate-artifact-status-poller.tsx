@@ -66,6 +66,8 @@ export function CertificateArtifactStatusPoller({
   const pollingStartRef = useRef<number | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const pollRef = useRef<() => Promise<void>>();
+
   const stopPolling = useCallback(() => {
     if (timerRef.current) {
       clearTimeout(timerRef.current);
@@ -79,7 +81,7 @@ export function CertificateArtifactStatusPoller({
         `/api/certificates/${certificateNumber}/artifact-status`,
         { cache: "no-store" },
       );
-      if (!res.ok) return; // don't crash polling on transient errors
+      if (!res.ok) return;
 
       const data: ArtifactPollResult = await res.json();
       const pdfStatus = data?.pdf?.status;
@@ -97,7 +99,6 @@ export function CertificateArtifactStatusPoller({
         return;
       }
 
-      // Check 2-minute automatic polling timeout
       const elapsed = Date.now() - (pollingStartRef.current ?? Date.now());
       if (elapsed >= MAX_POLL_DURATION_MS) {
         setPollingExpired(true);
@@ -105,23 +106,25 @@ export function CertificateArtifactStatusPoller({
         return;
       }
 
-      // Schedule next poll
       const interval = data?.pdf?.nextPollAfterMs ?? DEFAULT_POLL_INTERVAL_MS;
-      timerRef.current = setTimeout(poll, interval);
+      timerRef.current = setTimeout(pollRef.current!, interval);
     } catch {
-      // Network error — retry after default interval
-      timerRef.current = setTimeout(poll, DEFAULT_POLL_INTERVAL_MS);
+      timerRef.current = setTimeout(pollRef.current!, DEFAULT_POLL_INTERVAL_MS);
     }
   }, [certificateNumber, stopPolling]);
+
+  useEffect(() => {
+    pollRef.current = poll;
+  }, [poll]);
 
   useEffect(() => {
     if (isRevoked || status === "ready" || status === "failed") return;
 
     pollingStartRef.current = Date.now();
-    timerRef.current = setTimeout(poll, DEFAULT_POLL_INTERVAL_MS);
+    timerRef.current = setTimeout(pollRef.current!, DEFAULT_POLL_INTERVAL_MS);
 
     return () => stopPolling();
-  }, [isRevoked, status, poll, stopPolling]);
+  }, [isRevoked, status, stopPolling]);
 
   // Revoked — no download action
   if (isRevoked) return null;

@@ -21,14 +21,6 @@ import "dotenv/config";
 import type { CertificateArtifactJobMessage } from "@/domain/certificates/contracts/certificate-queue.port";
 import { createCertificateWorkerDomain } from "@/domain/certificates/factory/certificate-services.factory";
 
-// Local shape matching ServiceBusReceivedMessage fields we actually use
-// (full type is in @azure/service-bus — worker-only package)
-interface SbReceivedMessage {
-  messageId?: string | null;
-  body: unknown;
-  deliveryCount?: number;
-}
-
 // ---------------------------------------------------------------------------
 // Configuration
 // ---------------------------------------------------------------------------
@@ -44,7 +36,7 @@ let isShuttingDown = false;
 // ---------------------------------------------------------------------------
 
 async function processMessage(
-  message: any,
+  message: { messageId?: string | null },
   jobMessage: CertificateArtifactJobMessage,
 ): Promise<void> {
   const { generationService } = createCertificateWorkerDomain();
@@ -111,7 +103,7 @@ async function main() {
 
       if (!messages.length) continue;
 
-      const sbMessage = messages[0] as any;
+      const sbMessage = messages[0] as { messageId?: string | null; body: unknown; deliveryCount?: number };
 
       // Parse the job message body
       let jobMessage: CertificateArtifactJobMessage;
