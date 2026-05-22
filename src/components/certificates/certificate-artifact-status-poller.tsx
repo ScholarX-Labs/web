@@ -66,7 +66,7 @@ export function CertificateArtifactStatusPoller({
   const pollingStartRef = useRef<number | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const pollRef = useRef<() => Promise<void>>();
+  const pollRef = useRef<() => Promise<void>>(null!);
 
   const stopPolling = useCallback(() => {
     if (timerRef.current) {

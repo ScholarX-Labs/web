@@ -36,7 +36,7 @@ let isShuttingDown = false;
 // ---------------------------------------------------------------------------
 
 async function processMessage(
-  message: { messageId?: string | null },
+  message: { messageId?: unknown },
   jobMessage: CertificateArtifactJobMessage,
 ): Promise<void> {
   const { generationService } = createCertificateWorkerDomain();
@@ -103,7 +103,7 @@ async function main() {
 
       if (!messages.length) continue;
 
-      const sbMessage = messages[0] as { messageId?: string | null; body: unknown; deliveryCount?: number };
+      const sbMessage = messages[0];
 
       // Parse the job message body
       let jobMessage: CertificateArtifactJobMessage;
