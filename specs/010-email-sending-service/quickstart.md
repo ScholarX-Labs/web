@@ -62,6 +62,15 @@ Add focused test commands once email tests exist, for example:
 pnpm run test -- src/domain/email/**/*.test.ts
 ```
 
+## Implemented Surfaces
+
+- `src/lib/email.ts` remains the stable compatibility facade for Better Auth and current callers.
+- `src/domain/email/` owns typed delivery orchestration, provider adapters, policies, persistence contracts, circuit breaking, rate limiting, metrics, and test helpers.
+- `src/db/schema/email-db.schema.ts` defines delivery, attempt, event, circuit state, rate-limit, and future batch tables.
+- `src/worker/email-delivery-worker.ts` drains retryable deliveries through injected dependencies or production defaults.
+- `src/app/api/admin/email-deliveries/` exposes admin-only list, detail, and retry diagnostics.
+- `src/app/api/email/provider-events/[provider]/route.ts` accepts verified provider events for later bounce/complaint status updates.
+
 ## Manual Staging Drill
 
 1. Configure valid primary provider credentials and disabled Gmail fallback.
