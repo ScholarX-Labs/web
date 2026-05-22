@@ -5,7 +5,7 @@
 # Triggers: push to main when certificate worker source changes.
 # Auth:     Azure service principal via AZURE_CREDENTIALS secret.
 # Image:    ACR-tagged with git SHA; buildcache tag for fast rebuilds.
-# Deploy:   Zero-downtime rolling update on scholarx-worker-aca.
+# Deploy:   Zero-downtime rolling update on scholarx-worker.
 #
 # Required GitHub Secrets (repo or environment):
 #   AZURE_CREDENTIALS        — Service principal JSON (same as web pipeline)
@@ -39,7 +39,7 @@ concurrency:
 
 env:
   IMAGE_NAME: scholarx-worker
-  ACA_APP_NAME: scholarx-worker-aca
+  ACA_APP_NAME: scholarx-worker
   RESOURCE_GROUP: ScholarX_Production
   NODE_VERSION: "22"
 
@@ -186,13 +186,13 @@ jobs:
 
   # ──────────────────────────────────────────────────────────
   # 4. DEPLOY TO ACA
-  #    Updates scholarx-worker-aca to the new SHA-tagged image.
+  #    Updates scholarx-worker to the new SHA-tagged image.
   #    ACA performs a zero-downtime rolling revision swap.
   #    We then poll until the new revision is fully active
   #    before marking the job green.
   # ──────────────────────────────────────────────────────────
   deploy-worker:
-    name: "Deploy → scholarx-worker-aca"
+    name: "Deploy → scholarx-worker"
     runs-on: ubuntu-latest
     needs: migrate-production
     environment: production
