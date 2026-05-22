@@ -180,7 +180,7 @@ export function LessonClientBridge({
           setCourseCompletion({
             phase: "ready",
             certificateUrl: result.certificateUrl,
-            certificateNumber: result.certificate?.certificateNumber,
+            certificateNumber: result.certificateNumber,
           });
           certificateReadyTimerRef.current = null;
         }, 650);

@@ -4,10 +4,8 @@ import { createHash, randomUUID } from "crypto";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { createCourseProgressDomain, createNextCourseDomain } from "@/domain/courses";
-import type {
-  CertificateRecord,
-  CourseProgressResult,
-} from "@/domain/courses/contracts";
+import { createCertificateDomain } from "@/domain/certificates/factory/certificate-services.factory";
+import type { CourseProgressResult } from "@/domain/courses/contracts";
 import { ROUTES } from "@/lib/routes";
 
 const hashProgressPayload = (payload: unknown) =>
@@ -39,7 +37,6 @@ const syncLegacyLessonProgress = async (
 
 const warnAggregateSchemaUnavailable = () => {
   if (aggregateProgressSchemaWarningLogged) return;
-
   aggregateProgressSchemaWarningLogged = true;
   console.warn(
     "[syncLessonProgress] completion aggregate schema is unavailable; using lesson_progress fallback until the server restarts.",
@@ -50,9 +47,10 @@ type SyncLessonProgressActionResult =
   | {
       success: true;
       progress?: CourseProgressResult;
-      certificate?: CertificateRecord;
+      certificateNumber?: string;
       certificateUrl?: string;
       certificateAlreadyIssued?: boolean;
+      certificateArtifactStatus?: string;
       certificateError?: string;
     }
   | {
@@ -106,7 +104,6 @@ export async function syncLessonProgress(
         watchedPercentage,
         lastPosition,
       });
-
       return { success: true };
     }
 
@@ -140,6 +137,9 @@ export async function syncLessonProgress(
         requestHash: hashProgressPayload(payload),
       });
 
+      // ------------------------------------------------------------------
+      // Certificate issuance — delegates to canonical certificate domain
+      // ------------------------------------------------------------------
       if (shouldIssueCertificate(completed, progressResult)) {
         try {
           const courseDomain = createNextCourseDomain();
@@ -147,23 +147,33 @@ export async function syncLessonProgress(
             courseId,
             session.user.id,
           );
-          const certificateResult = await domain.certificate.issueCertificate({
-            userId: session.user.id,
-            courseId,
-            learnerDisplayName:
-              session.user.name ?? session.user.email ?? "ScholarX Learner",
-            courseTitle: course.title,
-            progress: progressResult.course,
-          });
+
+          const certDomain = createCertificateDomain();
+          const certificateResult =
+            await certDomain.issueService.issueForCourseCompletion({
+              userId: session.user.id,
+              courseId,
+              courseProgressId: progressResult.course.id,
+              completedAt: new Date(progressResult.course.completedAt!),
+              recipientName:
+                session.user.name ?? session.user.email ?? "ScholarX Learner",
+              recipientEmail: session.user.email ?? undefined,
+              courseTitle: course.title,
+              completionSource: progressResult.course.completedByBackfill
+                ? "backfill_approximate"
+                : "live",
+              ruleVersion: progressResult.course.ruleVersion ?? "course_completion_v1",
+            });
 
           return {
             success: true,
             progress: progressResult,
-            certificate: certificateResult.certificate,
+            certificateNumber: certificateResult.certificate.certificateNumber,
             certificateUrl: ROUTES.CERTIFICATE_DETAIL(
               certificateResult.certificate.certificateNumber,
             ),
             certificateAlreadyIssued: certificateResult.alreadyIssued,
+            certificateArtifactStatus: certificateResult.artifactStatus,
           };
         } catch (certificateError) {
           console.error(
@@ -174,7 +184,7 @@ export async function syncLessonProgress(
             success: true,
             progress: progressResult,
             certificateError:
-              "Course completed, but certificate generation failed. Please retry from your certificates page.",
+              "Course completed, but certificate generation failed. Please retry from your profile.",
           };
         }
       }
