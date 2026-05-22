@@ -31,6 +31,29 @@ const LOCK_RENEWAL_INTERVAL_MS = 60_000; // 60 seconds
 
 let isShuttingDown = false;
 
+function serializeError(error: unknown): Record<string, unknown> {
+  if (!(error instanceof Error)) {
+    return { message: String(error) };
+  }
+
+  const details: Record<string, unknown> = {
+    name: error.name,
+    message: error.message,
+  };
+
+  const cause = error.cause;
+  if (cause instanceof Error) {
+    details.cause = {
+      name: cause.name,
+      message: cause.message,
+    };
+  } else if (cause !== undefined) {
+    details.cause = String(cause);
+  }
+
+  return details;
+}
+
 // ---------------------------------------------------------------------------
 // Worker logic
 // ---------------------------------------------------------------------------
@@ -150,7 +173,7 @@ async function main() {
           console.error("[CertificateWorker] Message processing failed", {
             messageId: sbMessage.messageId,
             deliveryCount,
-            error: error instanceof Error ? error.message : String(error),
+            error: serializeError(error),
           });
 
           if (isDeadLetterEligible) {
