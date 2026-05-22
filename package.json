@@ -99,6 +99,8 @@
     ]
   },
   "devDependencies": {
+    "@azure/service-bus": "^7.9.5",
+    "@azure/storage-blob": "^12.31.0",
     "@tailwindcss/postcss": "^4",
     "@tanstack/react-query-devtools": "^5.91.3",
     "@types/json-schema": "7.0.15",
@@ -111,6 +113,7 @@
     "drizzle-kit": "^0.31.9",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "playwright": "^1.60.0",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
     "typescript": "^5"
