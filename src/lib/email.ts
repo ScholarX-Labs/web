@@ -1,6 +1,10 @@
 import "server-only";
-import { createHash } from "node:crypto";
-import nodemailer, { type Transporter } from "nodemailer";
+import {
+  createLegacyIdempotencyKey,
+  maskEmailAddress,
+} from "@/domain/email/application/email-sanitization";
+import { createDefaultEmailDeliveryService } from "@/domain/email/factory/email-service.factory";
+import type { EmailCategory } from "@/domain/email/contracts/email-types";
 
 type EmailProps = {
   to: string;
@@ -9,38 +13,18 @@ type EmailProps = {
   html?: string;
   from?: string;
   replyTo?: string;
+  category?: EmailCategory;
+  idempotencyKey?: string;
+  requestId?: string;
+  requestedByUserId?: string;
+  requestedBySystem?: string;
+  purpose?: string;
 };
 
 type SendEmailResult = {
   ok: boolean;
   messageId?: string;
 };
-
-let transporter: Transporter | null = null;
-
-function getTransporter(): Transporter {
-  if (transporter) {
-    return transporter;
-  }
-
-  const host = process.env.SMTP_HOST!;
-  const port = Number.parseInt(process.env.SMTP_PORT ?? "587", 10);
-  const user = process.env.SMTP_EMAIL!;
-  const pass = process.env.SMTP_PASSWORD!;
-  const secure = process.env.SMTP_SECURE === "true" || port === 465;
-
-  transporter = nodemailer.createTransport({
-    host,
-    port,
-    secure,
-    auth: {
-      user,
-      pass,
-    },
-  });
-
-  return transporter;
-}
 
 async function sendEmail({
   to,
@@ -49,49 +33,52 @@ async function sendEmail({
   html,
   from,
   replyTo,
+  category = "system_test",
+  idempotencyKey,
+  requestId,
+  requestedByUserId,
+  requestedBySystem,
+  purpose,
 }: EmailProps): Promise<SendEmailResult> {
-  const smtpFrom = process.env.SMTP_FROM ?? process.env.SMTP_EMAIL!;
-
-  const maskedRecipient = maskRecipient(to);
-  const subjectHash = hashSubject(subject);
-
   try {
-    const info = await getTransporter().sendMail({
-      from: from ?? smtpFrom,
+    const result = await createDefaultEmailDeliveryService().sendEmail({
       to,
       subject,
       text,
       html,
+      from,
       replyTo,
+      category,
+      requestId,
+      requestedByUserId,
+      requestedBySystem,
+      idempotencyKey:
+        idempotencyKey ??
+        createLegacyIdempotencyKey({
+          category,
+          to,
+          subject,
+          requestId,
+          purpose,
+        }),
     });
+
+    if (!result.ok) {
+      throw new Error(result.message);
+    }
 
     return {
       ok: true,
-      messageId: info.messageId,
+      messageId: result.providerMessageId,
     };
   } catch (error) {
     console.error("[sendEmail] delivery failed", {
-      recipient: maskedRecipient,
-      subjectHash,
+      recipient: maskEmailAddress(to),
+      category,
     });
 
     throw new Error("Email delivery failed", { cause: error });
   }
-}
-
-function maskRecipient(email: string): string {
-  const [localPart, domain] = email.split("@");
-
-  if (!localPart || !domain) {
-    return "***";
-  }
-
-  const firstChar = localPart[0] ?? "*";
-  return `${firstChar}***@${domain}`;
-}
-
-function hashSubject(subject: string): string {
-  return createHash("sha256").update(subject).digest("hex").slice(0, 12);
 }
 
 export { sendEmail };
