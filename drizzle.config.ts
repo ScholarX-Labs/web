@@ -23,10 +23,11 @@ export default defineConfig({
     "./src/db/schema/contact-us-schema.ts",
     "./src/db/schema/courses-db.schema.ts",
     "./src/db/schema/admin-db.schema.ts",
+    "./src/db/schema/certificates-db.schema.ts",
   ],
   dialect: "postgresql",
   dbCredentials: {
     url: dbUrl.toString(),
   },
-  schemaFilter: ["auth", "public", "courses"],
+  schemaFilter: ["auth", "public", "courses", "certificates"],
 });
