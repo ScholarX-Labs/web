@@ -21,6 +21,7 @@ export function classifyEmailError(error: unknown): ClassifiedEmailError {
       ? String((error as { code?: unknown }).code ?? "")
       : "";
 
+  const codeNormalized = code.toLowerCase();
   const normalized = `${code} ${message}`.toLowerCase();
 
   if (normalized.includes("auth") || normalized.includes("login")) {
@@ -45,7 +46,7 @@ export function classifyEmailError(error: unknown): ClassifiedEmailError {
 
   if (
     normalized.includes("timeout") ||
-    code === "etimedout" ||
+    codeNormalized === "etimedout" ||
     normalized.includes("timed out")
   ) {
     return result("timeout", message, true, true);
