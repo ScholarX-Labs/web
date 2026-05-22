@@ -223,6 +223,8 @@ jobs:
             --name "${{ env.ACA_APP_NAME }}" \
             --resource-group "${{ env.RESOURCE_GROUP }}" \
             --image "${IMAGE}" \
+            --min-replicas 1 \
+            --max-replicas 10 \
             --query "properties.latestRevisionName" \
             --output tsv)
 
@@ -273,6 +275,14 @@ jobs:
 
           if [ "$RUNNING" != "Running" ]; then
             echo "❌ Revision '${REVISION}' did not become Running within ${TIMEOUT}s (last state: ${RUNNING})."
+            echo ""
+            echo "=== Revision diagnostics ==="
+            az containerapp revision show \
+              --name "${{ env.ACA_APP_NAME }}" \
+              --resource-group "${{ env.RESOURCE_GROUP }}" \
+              --revision "${REVISION}" \
+              --query "{runningState:properties.runningState,healthState:properties.healthState,replicas:properties.replicas,minReplicas:properties.template.scale.minReplicas,probes:properties.template.containers[0].probes,image:properties.template.containers[0].image}" \
+              --output json || true
             exit 1
           fi
 
@@ -294,9 +304,10 @@ jobs:
       - name: Tail container logs on failure
         if: failure()
         run: |
+          REVISION="${{ steps.deploy.outputs.new_revision }}"
           echo "=== Last 50 log lines from ${{ env.ACA_APP_NAME }} ==="
           az containerapp logs show \
             --name "${{ env.ACA_APP_NAME }}" \
             --resource-group "${{ env.RESOURCE_GROUP }}" \
+            --revision "${REVISION}" \
             --tail 50 || true
-
