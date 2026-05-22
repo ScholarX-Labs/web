@@ -20,6 +20,7 @@
 import "dotenv/config";
 import type { CertificateArtifactJobMessage } from "@/domain/certificates/contracts/certificate-queue.port";
 import { createCertificateWorkerDomain } from "@/domain/certificates/factory/certificate-services.factory";
+import { runRepairJob } from "./certificate-repair-job";
 
 // ---------------------------------------------------------------------------
 // Configuration
@@ -28,8 +29,14 @@ import { createCertificateWorkerDomain } from "@/domain/certificates/factory/cer
 const QUEUE_NAME = process.env.CERTIFICATE_QUEUE_NAME ?? "certificate-artifact-generation";
 const MAX_CONCURRENT_JOBS = parseInt(process.env.WORKER_CONCURRENCY ?? "5", 10);
 const LOCK_RENEWAL_INTERVAL_MS = 60_000; // 60 seconds
+const REPAIR_JOB_ENABLED = process.env.CERTIFICATE_REPAIR_JOB_ENABLED !== "false";
+const REPAIR_JOB_INTERVAL_MS = Math.max(
+  parseInt(process.env.CERTIFICATE_REPAIR_JOB_INTERVAL_MS ?? "60000", 10),
+  30_000,
+);
 
 let isShuttingDown = false;
+let repairJobRunning = false;
 
 function serializeError(error: unknown): Record<string, unknown> {
   if (!(error instanceof Error)) {
@@ -75,6 +82,35 @@ async function processMessage(
   await generationService.processJob(jobMessage);
 }
 
+function startRepairJobLoop(): NodeJS.Timeout | null {
+  if (!REPAIR_JOB_ENABLED) {
+    console.info("[CertificateWorker] Repair job loop disabled");
+    return null;
+  }
+
+  const runOnce = async () => {
+    if (isShuttingDown || repairJobRunning) return;
+    repairJobRunning = true;
+    try {
+      await runRepairJob();
+    } catch (error) {
+      console.error("[CertificateWorker] Repair job pass failed", serializeError(error));
+    } finally {
+      repairJobRunning = false;
+    }
+  };
+
+  const timer = setInterval(runOnce, REPAIR_JOB_INTERVAL_MS);
+  timer.unref?.();
+  void runOnce();
+
+  console.info("[CertificateWorker] Repair job loop started", {
+    intervalMs: REPAIR_JOB_INTERVAL_MS,
+  });
+
+  return timer;
+}
+
 // ---------------------------------------------------------------------------
 // Main — connects to Azure Service Bus
 // ---------------------------------------------------------------------------
@@ -95,12 +131,14 @@ async function main() {
   });
 
   console.info(`[CertificateWorker] Listening on queue "${QUEUE_NAME}" (concurrency=${MAX_CONCURRENT_JOBS})`);
+  const repairJobTimer = startRepairJobLoop();
 
   // Graceful shutdown
   const shutdown = async () => {
     if (isShuttingDown) return;
     isShuttingDown = true;
     console.info("[CertificateWorker] Shutting down gracefully…");
+    if (repairJobTimer) clearInterval(repairJobTimer);
     await receiver.close();
     await client.close();
     process.exit(0);

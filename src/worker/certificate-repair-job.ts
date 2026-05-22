@@ -17,6 +17,8 @@
  */
 
 import "dotenv/config";
+import { randomUUID } from "node:crypto";
+import { pathToFileURL } from "node:url";
 import { and, eq, isNull, lt, lte, or } from "drizzle-orm";
 import { db } from "@/db";
 import {
@@ -239,7 +241,7 @@ async function requeueRetryableFailedArtifacts(): Promise<
 
   for (const row of rows) {
     try {
-      const messageId = `${row.id}:${row.artifactType}:${row.templateVersion}:retry-${row.attempts}`;
+      const messageId = `${row.id}:${row.artifactType}:${row.templateVersion}:retry-${Date.now()}-${randomUUID()}`;
 
       await queuePort.publish({
         messageId,
@@ -253,6 +255,13 @@ async function requeueRetryableFailedArtifacts(): Promise<
           requestedAt: new Date().toISOString(),
         },
       });
+
+      await db
+        .update(dbCertificateArtifacts)
+        .set({
+          updatedAt: new Date(),
+        })
+        .where(eq(dbCertificateArtifacts.id, row.id));
 
       metrics.failedArtifactsRequeued++;
     } catch (error) {
@@ -293,10 +302,16 @@ async function runRepairJob(): Promise<void> {
   console.info("[CertificateRepairJob] Repair pass complete", metrics);
 }
 
-// Run immediately if called directly
-runRepairJob().catch((error) => {
-  console.error("[CertificateRepairJob] Fatal error:", error);
-  process.exit(1);
-});
+function isDirectExecution(): boolean {
+  const entrypoint = process.argv[1];
+  return Boolean(entrypoint && import.meta.url === pathToFileURL(entrypoint).href);
+}
+
+if (isDirectExecution()) {
+  runRepairJob().catch((error) => {
+    console.error("[CertificateRepairJob] Fatal error:", error);
+    process.exit(1);
+  });
+}
 
 export { runRepairJob };
