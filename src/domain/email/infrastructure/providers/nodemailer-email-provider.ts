@@ -8,7 +8,7 @@ import type {
 import { classifyEmailError } from "../../application/email-error-classifier";
 
 export class NodemailerEmailProvider implements EmailProvider {
-  readonly name;
+  readonly name: EmailProviderConfig["name"];
   private transporter: Transporter | null = null;
 
   constructor(private readonly config: EmailProviderConfig) {
