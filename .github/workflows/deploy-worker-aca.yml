@@ -114,14 +114,19 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # Emit the full image reference for downstream jobs
+      # Emit the full image reference for downstream jobs.
+      # Secrets must be surfaced via env: to be readable in run: scripts.
       - name: Compute image reference
         id: image-ref
+        env:
+          REGISTRY: ${{ secrets.REGISTRY_LOGIN_SERVER }}
         run: |
-          echo "ref=${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}" >> "$GITHUB_OUTPUT"
+          echo "ref=${REGISTRY}/${{ env.IMAGE_NAME }}:${{ github.sha }}" >> "$GITHUB_OUTPUT"
 
       - name: Build & push (with layer cache)
         uses: docker/build-push-action@v6
+        env:
+          REGISTRY: ${{ secrets.REGISTRY_LOGIN_SERVER }}
         with:
           context: .
           file: Dockerfile.worker
