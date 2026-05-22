@@ -51,13 +51,21 @@ export async function drainEmailDeliveries(input?: {
   let retryScheduled = 0;
 
   for (const delivery of claimed) {
-    const result = await service.processClaimedDelivery(delivery);
-    if (result.ok) {
-      accepted += 1;
-    } else if (result.status === "retry_scheduled") {
-      retryScheduled += 1;
-    } else {
+    try {
+      const result = await service.processClaimedDelivery(delivery);
+      if (result.ok) {
+        accepted += 1;
+      } else if (result.status === "retry_scheduled") {
+        retryScheduled += 1;
+      } else {
+        failed += 1;
+      }
+    } catch (error) {
       failed += 1;
+      console.error("[EmailWorker] Delivery processing failed", {
+        deliveryId: delivery.id,
+        error: error instanceof Error ? error.name : "UnknownError",
+      });
     }
   }
 
