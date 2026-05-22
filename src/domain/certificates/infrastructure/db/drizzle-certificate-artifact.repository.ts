@@ -117,7 +117,7 @@ export class DrizzleCertificateArtifactRepository
       .update(dbCertificateArtifacts)
       .set({
         status: "generating",
-        attempts: sql`${dbCertificateArtifacts.attempts} + 1`,
+        attempts: sql`"attempts" + 1`,
         updatedAt: now,
       })
       .where(
