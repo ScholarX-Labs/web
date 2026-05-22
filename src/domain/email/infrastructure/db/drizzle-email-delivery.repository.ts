@@ -15,6 +15,8 @@ import type {
   EmailDeliveryDetail,
   EmailDeliveryEventRecord,
   EmailDeliveryRecord,
+  EmailCategory,
+  EmailDeliveryStatus,
   FinishAttemptAndMarkAcceptedInput,
   FinishAttemptInput,
   MarkFailedInput,
@@ -318,14 +320,14 @@ export class DrizzleEmailDeliveryRepository implements EmailDeliveryRepository {
   }
 
   async list(input: {
-    status?: string;
-    category?: string;
+    status?: EmailDeliveryStatus;
+    category?: EmailCategory;
     page: number;
     limit: number;
   }): Promise<{ items: EmailDeliveryRecord[]; total: number }> {
     const where = and(
-      input.status ? eq(dbEmailDeliveries.status, input.status as never) : undefined,
-      input.category ? eq(dbEmailDeliveries.category, input.category as never) : undefined,
+      input.status ? eq(dbEmailDeliveries.status, input.status) : undefined,
+      input.category ? eq(dbEmailDeliveries.category, input.category) : undefined,
     );
 
     const rows = await db
@@ -382,6 +384,19 @@ export class DrizzleEmailDeliveryRepository implements EmailDeliveryRepository {
   }
 
   async releaseExpiredLeases(input: { now: Date; limit: number }): Promise<number> {
+    const candidates = await db
+      .select({ id: dbEmailDeliveries.id })
+      .from(dbEmailDeliveries)
+      .where(
+        and(
+          eq(dbEmailDeliveries.status, "sending"),
+          lte(dbEmailDeliveries.lockedUntil, input.now),
+        ),
+      )
+      .limit(input.limit);
+
+    if (candidates.length === 0) return 0;
+
     const rows = await db
       .update(dbEmailDeliveries)
       .set({
@@ -392,19 +407,14 @@ export class DrizzleEmailDeliveryRepository implements EmailDeliveryRepository {
         updatedAt: input.now,
         stateVersion: sql`${dbEmailDeliveries.stateVersion} + 1`,
       })
-      .where(
-        and(
-          eq(dbEmailDeliveries.status, "sending"),
-          lte(dbEmailDeliveries.lockedUntil, input.now),
-        ),
-      )
+      .where(inArray(dbEmailDeliveries.id, candidates.map((row) => row.id)))
       .returning({ id: dbEmailDeliveries.id });
 
-    return rows.slice(0, input.limit).length;
+    return rows.length;
   }
 
   private async findByIdempotency(
-    category: string,
+    category: EmailCategory,
     idempotencyKey: string,
   ): Promise<EmailDeliveryRecord | null> {
     const rows = await db
@@ -412,7 +422,7 @@ export class DrizzleEmailDeliveryRepository implements EmailDeliveryRepository {
       .from(dbEmailDeliveries)
       .where(
         and(
-          eq(dbEmailDeliveries.category, category as never),
+          eq(dbEmailDeliveries.category, category),
           eq(dbEmailDeliveries.idempotencyKey, idempotencyKey),
         ),
       )
