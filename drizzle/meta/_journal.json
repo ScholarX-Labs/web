@@ -85,6 +85,13 @@
       "when": 1780002000000,
       "tag": "0011_align_course_application_age_check",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1779384114818,
+      "tag": "0012_lyrical_salo",
+      "breakpoints": true
     }
   ]
 }
