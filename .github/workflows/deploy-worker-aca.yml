@@ -193,8 +193,8 @@ jobs:
   # 4. DEPLOY TO ACA
   #    Updates scholarx-worker to the new SHA-tagged image.
   #    ACA performs a zero-downtime rolling revision swap.
-  #    We then poll until the new revision is fully active
-  #    before marking the job green.
+  #    We then poll the specific new revision by name until
+  #    it reaches Running state before marking the job green.
   # ──────────────────────────────────────────────────────────
   deploy-worker:
     name: "Deploy → scholarx-worker"
@@ -208,36 +208,52 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Deploy new revision
+      # Build the full image ref here — secrets expand correctly in env: blocks.
+      # We do NOT rely on job outputs from build-and-push because secrets used
+      # inside run: scripts in that job expand to empty strings in other jobs.
+      - name: Deploy new revision and capture revision name
+        id: deploy
+        env:
+          REGISTRY: ${{ secrets.REGISTRY_LOGIN_SERVER }}
         run: |
-          az containerapp update \
+          IMAGE="${REGISTRY}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+          echo "Deploying image: ${IMAGE}"
+
+          NEW_REVISION=$(az containerapp update \
             --name "${{ env.ACA_APP_NAME }}" \
             --resource-group "${{ env.RESOURCE_GROUP }}" \
-            --image "${{ needs.build-and-push.outputs.image }}"
+            --image "${IMAGE}" \
+            --query "properties.latestRevisionName" \
+            --output tsv)
 
-      # Wait up to 5 minutes for the new revision to reach Running state.
-      # Fails the job (and leaves the old revision active) if it never starts.
+          echo "New revision: ${NEW_REVISION}"
+          echo "new_revision=${NEW_REVISION}" >> "$GITHUB_OUTPUT"
+          echo "image=${IMAGE}"               >> "$GITHUB_OUTPUT"
+
+      # Poll the specific revision by name until it reaches Running state.
+      # Querying by revision name is reliable; querying by image tag is not.
       - name: Wait for revision to become active
         run: |
-          IMAGE="${{ needs.build-and-push.outputs.image }}"
+          REVISION="${{ steps.deploy.outputs.new_revision }}"
           TIMEOUT=300
           INTERVAL=10
           ELAPSED=0
+          RUNNING=""
 
-          echo "Waiting for revision with image $IMAGE to become Running…"
+          echo "Polling revision '${REVISION}' for Running state…"
 
           while [ "$ELAPSED" -lt "$TIMEOUT" ]; do
-            REVISION=$(az containerapp revision list \
+            RUNNING=$(az containerapp revision show \
               --name "${{ env.ACA_APP_NAME }}" \
               --resource-group "${{ env.RESOURCE_GROUP }}" \
-              --query "[?properties.template.containers[0].image=='$IMAGE'] | [0]" \
-              -o json)
+              --revision "${REVISION}" \
+              --query "properties.runningState" \
+              --output tsv 2>/dev/null || echo "Provisioning")
 
-            RUNNING=$(echo "$REVISION" | jq -r '.properties.runningState // empty')
-            echo "  runningState: $RUNNING (${ELAPSED}s elapsed)"
+            echo "  runningState: ${RUNNING} (${ELAPSED}s elapsed)"
 
             if [ "$RUNNING" = "Running" ]; then
-              echo "✅ Revision is Running."
+              echo "✅ Revision '${REVISION}' is Running."
               break
             fi
 
@@ -246,7 +262,7 @@ jobs:
           done
 
           if [ "$RUNNING" != "Running" ]; then
-            echo "❌ Revision did not become Running within ${TIMEOUT}s."
+            echo "❌ Revision '${REVISION}' did not become Running within ${TIMEOUT}s."
             exit 1
           fi
 
@@ -258,7 +274,8 @@ jobs:
           echo "| Field | Value |" >> "$GITHUB_STEP_SUMMARY"
           echo "|---|---|" >> "$GITHUB_STEP_SUMMARY"
           echo "| App | \`${{ env.ACA_APP_NAME }}\` |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Image | \`${{ needs.build-and-push.outputs.image }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Revision | \`${{ steps.deploy.outputs.new_revision }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Image | \`${{ steps.deploy.outputs.image }}\` |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Commit | \`${{ github.sha }}\` |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Triggered by | @${{ github.actor }} |" >> "$GITHUB_STEP_SUMMARY"
 
@@ -271,3 +288,4 @@ jobs:
             --name "${{ env.ACA_APP_NAME }}" \
             --resource-group "${{ env.RESOURCE_GROUP }}" \
             --tail 50 || true
+
