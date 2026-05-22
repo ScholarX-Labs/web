@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import {
-  createCourseProgressDomain,
-  createNextCourseDomain,
-  isNextCourseError,
-} from "@/domain/courses";
 import { auth } from "@/lib/auth";
 import { ROUTES } from "@/lib/routes";
+import { createCertificateDomain } from "@/domain/certificates/factory/certificate-services.factory";
+import { createCourseProgressDomain } from "@/domain/courses";
+import { createNextCourseDomain } from "@/domain/courses";
+import { isCertificateError } from "@/domain/certificates/domain/certificate-errors";
 
 export const dynamic = "force-dynamic";
 
@@ -13,14 +12,13 @@ interface RouteContext {
   params: Promise<{ courseId: string }>;
 }
 
-const errorResponse = (error: unknown) => {
-  if (isNextCourseError(error)) {
+function errorResponse(error: unknown): NextResponse {
+  if (isCertificateError(error)) {
     return NextResponse.json(
       {
         success: false,
         error: {
           code: error.code,
-          numericCode: error.numericCode,
           statusCode: error.statusCode,
           message: error.message,
           details: error.details ?? null,
@@ -30,20 +28,29 @@ const errorResponse = (error: unknown) => {
     );
   }
 
+  console.error("[POST /api/courses/[courseId]/certificate] Unhandled error:", error);
   return NextResponse.json(
     {
       success: false,
       error: {
         code: "INTERNAL_SERVER_ERROR",
-        numericCode: 9999,
         statusCode: 500,
         message: "Internal server error",
       },
     },
     { status: 500 },
   );
-};
+}
 
+/**
+ * POST /api/courses/:courseId/certificate
+ *
+ * Issues a canonical certificate for a completed course.
+ * Idempotent: returns the existing certificate if already issued.
+ *
+ * Auth: required.
+ * Response: { certificateNumber, certificateUrl, artifactStatus, alreadyIssued }
+ */
 export async function POST(request: NextRequest, context: RouteContext) {
   try {
     const session = await auth.api.getSession({ headers: request.headers });
@@ -55,7 +62,6 @@ export async function POST(request: NextRequest, context: RouteContext) {
           success: false,
           error: {
             code: "UNAUTHORIZED",
-            numericCode: 9002,
             statusCode: 401,
             message: "Authentication required",
           },
@@ -65,20 +71,25 @@ export async function POST(request: NextRequest, context: RouteContext) {
     }
 
     const { courseId } = await context.params;
-    const progressDomain = createCourseProgressDomain();
-    const courseDomain = createNextCourseDomain();
-    const [progress, course] = await Promise.all([
-      progressDomain.progressQuery.getCourseProgress(userId, courseId),
-      courseDomain.catalog.getById(courseId, userId),
-    ]);
 
-    if (!progress) {
+    // Verify course completion from the courses domain (eligibility source of truth)
+    const progressDomain = createCourseProgressDomain();
+    const progress = await progressDomain.progressQuery.getCourseProgress(
+      userId,
+      courseId,
+    );
+
+    if (
+      !progress ||
+      progress.status !== "completed" ||
+      !progress.completedAt ||
+      !progress.certificateEligibleAt
+    ) {
       return NextResponse.json(
         {
           success: false,
           error: {
             code: "CERTIFICATE_NOT_ELIGIBLE",
-            numericCode: 9201,
             statusCode: 409,
             message: "This course is not eligible for certificate issuance yet.",
           },
@@ -87,26 +98,40 @@ export async function POST(request: NextRequest, context: RouteContext) {
       );
     }
 
-    const result = await progressDomain.certificate.issueCertificate({
+    // Fetch course title for the certificate snapshot
+    const courseDomain = createNextCourseDomain();
+    const course = await courseDomain.catalog.getById(courseId, userId);
+
+    // Issue via the canonical certificate domain
+    const certDomain = createCertificateDomain();
+    const result = await certDomain.issueService.issueForCourseCompletion({
       userId,
       courseId,
-      learnerDisplayName:
+      courseProgressId: progress.id,
+      completedAt: new Date(progress.completedAt),
+      recipientName:
         session.user.name ?? session.user.email ?? "ScholarX Learner",
+      recipientEmail: session.user.email ?? undefined,
       courseTitle: course.title,
-      progress,
+      completionSource: progress.completedByBackfill
+        ? "backfill_approximate"
+        : "live",
+      ruleVersion: progress.ruleVersion ?? "course_completion_v1",
     });
 
     return NextResponse.json(
       {
-        ...result,
+        success: true,
+        certificateNumber: result.certificate.certificateNumber,
         certificateUrl: ROUTES.CERTIFICATE_DETAIL(
           result.certificate.certificateNumber,
         ),
+        artifactStatus: result.artifactStatus,
+        alreadyIssued: result.alreadyIssued,
       },
       { status: result.alreadyIssued ? 200 : 201 },
     );
   } catch (error) {
-    console.error("[course-certificate] POST failed:", error);
     return errorResponse(error);
   }
 }
