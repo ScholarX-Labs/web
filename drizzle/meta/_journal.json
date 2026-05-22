@@ -92,6 +92,13 @@
       "when": 1779384114818,
       "tag": "0012_lyrical_salo",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1780003000000,
+      "tag": "0013_abandoned_guardsmen",
+      "breakpoints": true
     }
   ]
 }
