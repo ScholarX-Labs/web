@@ -6,7 +6,6 @@ import {
   AlertCircle,
   ArrowLeft,
   ArrowRight,
-  BriefcaseBusiness,
   Check,
   CheckCircle2,
   CircleGauge,

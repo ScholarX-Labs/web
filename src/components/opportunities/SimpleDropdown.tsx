@@ -25,6 +25,7 @@ export default function SimpleDropdown({
 
   useEffect(() => {
     if (disabled) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setOpen(false);
     }
   }, [disabled]);

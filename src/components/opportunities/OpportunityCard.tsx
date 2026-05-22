@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Funding, FundingColors, Opportunity } from "@/lib/opportunities/types";
-import { Bookmark, Calendar, MapPin, ExternalLink, ArrowUpRight } from "lucide-react";
+import { Bookmark, Calendar, MapPin, ArrowUpRight } from "lucide-react";
 import OpportunityModal from "./OpportunityModal";
 import { COLOR_MAP, getBadgeColors } from "@/lib/opportunities/colors";
 import { motion, AnimatePresence } from "framer-motion";

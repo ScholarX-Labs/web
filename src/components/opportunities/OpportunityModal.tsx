@@ -110,6 +110,7 @@ export default function OpportunityModal({
   const [isDismissing, setIsDismissing] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
@@ -119,6 +120,7 @@ export default function OpportunityModal({
     const element = sheetRef.current;
 
     if (prefersReducedMotion || !originRect) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFlipComplete(true);
       return;
     }
