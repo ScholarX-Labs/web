@@ -11,10 +11,10 @@
 
 **Purpose**: Establish shared file structure and project wiring without changing behavior.
 
-- [ ] T001 Create email domain directories in `src/domain/email/`
-- [ ] T002 Create email worker directory and entry file in `src/worker/email-delivery-worker.ts`
-- [ ] T003 Add email Drizzle schema export path to `drizzle.config.ts`
-- [ ] T004 Verify ignore files cover Node, logs, build outputs, and private environment files in `.gitignore` and Docker ignore config
+- [X] T001 Create email domain directories in `src/domain/email/`
+- [X] T002 Create email worker directory and entry file in `src/worker/email-delivery-worker.ts`
+- [X] T003 Add email Drizzle schema export path to `drizzle.config.ts`
+- [X] T004 Verify ignore files cover Node, logs, build outputs, and private environment files in `.gitignore` and Docker ignore config
 
 ---
 
@@ -22,11 +22,11 @@
 
 **Purpose**: Blocking types, ports, schema, configuration, and tests required before user-story behavior.
 
-- [ ] T005 [P] Add domain types, status enums, failure categories, provider names, and DTOs in `src/domain/email/contracts/email-types.ts`
-- [ ] T006 [P] Add repository, provider, policy, rate limiter, circuit breaker, metrics, clock, and logger ports in `src/domain/email/contracts/`
-- [ ] T007 [P] Add Zod request/config schemas in `src/domain/email/application/email-delivery.schemas.ts`
-- [ ] T008 [P] Add Drizzle email schema tables and indexes in `src/db/schema/email-db.schema.ts`
-- [ ] T009 Add `src/db/schema/email-db.schema.ts` to `drizzle.config.ts`
+- [X] T005 [P] Add domain types, status enums, failure categories, provider names, and DTOs in `src/domain/email/contracts/email-types.ts`
+- [X] T006 [P] Add repository, provider, policy, rate limiter, circuit breaker, metrics, clock, and logger ports in `src/domain/email/contracts/`
+- [X] T007 [P] Add Zod request/config schemas in `src/domain/email/application/email-delivery.schemas.ts`
+- [X] T008 [P] Add Drizzle email schema tables and indexes in `src/db/schema/email-db.schema.ts`
+- [X] T009 Add `src/db/schema/email-db.schema.ts` to `drizzle.config.ts`
 - [ ] T010 [P] Add fake provider, in-memory metrics, clock, logger, and repository test helpers in `src/domain/email/application/email-test-helpers.ts`
 - [ ] T011 [P] Add initial service tests for validation, primary success, fallback success, duplicate idempotency, and failure classification in `src/domain/email/application/email-delivery.service.test.ts`
 - [ ] T012 [P] Add repository contract/concurrency tests in `src/domain/email/infrastructure/db/drizzle-email-delivery.repository.test.ts`
@@ -42,14 +42,14 @@
 
 **Independent Test**: Valid primary send is accepted once; primary temporary failure uses Gmail fallback once; full provider failure returns a safe failed result.
 
-- [ ] T014 [P] [US1] Implement email error classifier in `src/domain/email/application/email-error-classifier.ts`
-- [ ] T015 [P] [US1] Implement retry and fallback policies in `src/domain/email/application/email-policies.ts`
-- [ ] T016 [P] [US1] Implement Nodemailer provider adapter in `src/domain/email/infrastructure/providers/nodemailer-email-provider.ts`
-- [ ] T017 [P] [US1] Implement typed environment config loader in `src/domain/email/infrastructure/email-config.ts`
-- [ ] T018 [US1] Implement email delivery orchestration service in `src/domain/email/application/email-delivery.service.ts`
-- [ ] T019 [US1] Implement service factory in `src/domain/email/factory/email-service.factory.ts`
-- [ ] T020 [US1] Refactor `src/lib/email.ts` to preserve `sendEmail` facade and delegate to the new service
-- [ ] T021 [US1] Update Better Auth OTP and reset password calls in `src/lib/auth.ts` to pass category and idempotency context
+- [X] T014 [P] [US1] Implement email error classifier in `src/domain/email/application/email-error-classifier.ts`
+- [X] T015 [P] [US1] Implement retry and fallback policies in `src/domain/email/application/email-policies.ts`
+- [X] T016 [P] [US1] Implement Nodemailer provider adapter in `src/domain/email/infrastructure/providers/nodemailer-email-provider.ts`
+- [X] T017 [P] [US1] Implement typed environment config loader in `src/domain/email/infrastructure/email-config.ts`
+- [X] T018 [US1] Implement email delivery orchestration service in `src/domain/email/application/email-delivery.service.ts`
+- [X] T019 [US1] Implement service factory in `src/domain/email/factory/email-service.factory.ts`
+- [X] T020 [US1] Refactor `src/lib/email.ts` to preserve `sendEmail` facade and delegate to the new service
+- [X] T021 [US1] Update Better Auth OTP and reset password calls in `src/lib/auth.ts` to pass category and idempotency context
 
 **Checkpoint**: Primary and fallback sending paths are functional through the existing `sendEmail` facade.
 
@@ -61,14 +61,14 @@
 
 **Independent Test**: Success, fallback, validation failure, provider failure, and webhook event cases each produce queryable status and attempt history.
 
-- [ ] T022 [US2] Implement Drizzle repository with delivery, attempt, event, circuit, and rate-limit persistence in `src/domain/email/infrastructure/db/drizzle-email-delivery.repository.ts`
-- [ ] T023 [US2] Add PostgreSQL row-claiming, lease recovery, accepted-attempt repair, and transactional `finishAttemptAndMarkAccepted` to `src/domain/email/infrastructure/db/drizzle-email-delivery.repository.ts`
-- [ ] T024 [P] [US2] Implement DB-backed circuit breaker in `src/domain/email/application/provider-circuit-breaker.ts`
-- [ ] T025 [P] [US2] Implement PostgreSQL-backed rate limiter in `src/domain/email/application/email-rate-limiter.ts`
-- [ ] T026 [P] [US2] Implement telemetry metrics sink in `src/domain/email/application/email-metrics.ts`
-- [ ] T027 [US2] Implement provider webhook route in `src/app/api/email/provider-events/[provider]/route.ts`
-- [ ] T028 [US2] Implement admin list/detail/retry routes in `src/app/api/admin/email-deliveries/`
-- [ ] T029 [US2] Implement email worker drain loop in `src/worker/email-delivery-worker.ts`
+- [X] T022 [US2] Implement Drizzle repository with delivery, attempt, event, circuit, and rate-limit persistence in `src/domain/email/infrastructure/db/drizzle-email-delivery.repository.ts`
+- [X] T023 [US2] Add PostgreSQL row-claiming, lease recovery, accepted-attempt repair, and transactional `finishAttemptAndMarkAccepted` to `src/domain/email/infrastructure/db/drizzle-email-delivery.repository.ts`
+- [X] T024 [P] [US2] Implement DB-backed circuit breaker in `src/domain/email/application/provider-circuit-breaker.ts`
+- [X] T025 [P] [US2] Implement PostgreSQL-backed rate limiter in `src/domain/email/application/email-rate-limiter.ts`
+- [X] T026 [P] [US2] Implement telemetry metrics sink in `src/domain/email/application/email-metrics.ts`
+- [X] T027 [US2] Implement provider webhook route in `src/app/api/email/provider-events/[provider]/route.ts`
+- [X] T028 [US2] Implement admin list/detail/retry routes in `src/app/api/admin/email-deliveries/`
+- [X] T029 [US2] Implement email worker drain loop in `src/worker/email-delivery-worker.ts`
 
 **Checkpoint**: Delivery status, attempts, retry worker, metrics, and webhook ingestion are independently testable.
 
@@ -80,9 +80,9 @@
 
 **Independent Test**: Logs and API responses contain masked recipients/hashes only, no secrets, and admin routes enforce authorization.
 
-- [ ] T030 [P] [US3] Add sanitization and hashing helpers in `src/domain/email/application/email-sanitization.ts`
-- [ ] T031 [US3] Wire sanitized logging and error responses through `src/domain/email/application/email-delivery.service.ts`
-- [ ] T032 [US3] Enforce admin authorization and safe response DTOs in `src/app/api/admin/email-deliveries/`
+- [X] T030 [P] [US3] Add sanitization and hashing helpers in `src/domain/email/application/email-sanitization.ts`
+- [X] T031 [US3] Wire sanitized logging and error responses through `src/domain/email/application/email-delivery.service.ts`
+- [X] T032 [US3] Enforce admin authorization and safe response DTOs in `src/app/api/admin/email-deliveries/`
 - [ ] T033 [US3] Add security-focused tests for secret redaction and unauthorized access in `src/domain/email/application/email-delivery.service.test.ts`
 
 **Checkpoint**: Security and privacy boundaries are enforced for delivery operations.
@@ -95,8 +95,8 @@
 
 **Independent Test**: Multi-worker retry selection never claims the same delivery twice and stale leases recover safely.
 
-- [ ] T034 [US4] Complete worker retry scheduling and lease release behavior in `src/worker/email-delivery-worker.ts`
-- [ ] T035 [US4] Complete manual retry behavior in `src/app/api/admin/email-deliveries/[deliveryId]/retry/route.ts`
+- [X] T034 [US4] Complete worker retry scheduling and lease release behavior in `src/worker/email-delivery-worker.ts`
+- [X] T035 [US4] Complete manual retry behavior in `src/app/api/admin/email-deliveries/[deliveryId]/retry/route.ts`
 - [ ] T036 [US4] Add stale lease and orphan accepted-attempt repair tests in `src/domain/email/infrastructure/db/drizzle-email-delivery.repository.test.ts`
 - [ ] T037 [US4] Add 50,000-user burst simulation test scaffold in `src/domain/email/application/email-delivery.service.test.ts`
 
