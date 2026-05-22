@@ -99,6 +99,13 @@
       "when": 1780003000000,
       "tag": "0013_abandoned_guardsmen",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1780004000000,
+      "tag": "0014_stiff_moonstone",
+      "breakpoints": true
     }
   ]
 }
