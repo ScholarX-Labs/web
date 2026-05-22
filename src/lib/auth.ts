@@ -139,6 +139,10 @@ export const auth = betterAuth({
         to: user.email,
         subject: "Reset your ScholarX password",
         text: `Click the link to reset your ScholarX password: ${url}`,
+        category: "password_reset",
+        requestedByUserId: user.id,
+        purpose: "password_reset",
+        idempotencyKey: `password_reset:${user.id}:${url}`,
       });
     },
   },
@@ -412,6 +416,9 @@ export const auth = betterAuth({
             to: normalizedEmail,
             subject,
             text,
+            category: "auth_otp",
+            purpose: type,
+            idempotencyKey: `auth_otp:${type}:${normalizedEmail}:${otp}`,
           });
         } finally {
           await recordEmailOtpSend(normalizedEmail);
