@@ -27,7 +27,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
 
   const rawBody = await request.text();
   if (!verifyWebhook(request, rawBody)) {
-    return error("INVALID_SIGNATURE", "Webhook verification failed", 401);
+    return error("UNAUTHORIZED", "Unauthorized", 401);
   }
 
   let body: ProviderEventBody;
