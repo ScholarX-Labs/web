@@ -101,17 +101,56 @@ Retries a failed or retry-scheduled delivery when policy allows it.
 
 ### Success Response
 
+The v1 retry endpoint claims the delivery and performs a bounded synchronous retry attempt. `accepted` means the provider accepted the message for delivery; it does not mean the recipient mailbox has received it. Asynchronous implementations of this same contract may return `queued` or `sending` when the retry is scheduled for a worker instead of completed inside the request.
+
 ```json
 {
   "ok": true,
   "data": {
     "deliveryId": "delivery_123",
-    "status": "accepted",
-    "acceptedProvider": "primary",
-    "retriedAt": "2026-05-22T10:10:00.000Z"
+    "status": "retry_scheduled",
+    "requestId": "auth-otp-user-123-20260522",
+    "acceptedProvider": null,
+    "retriedAt": "2026-05-22T10:10:00.000Z",
+    "retryAfter": "2026-05-22T10:11:00.000Z"
   }
 }
 ```
+
+### Success Response Schema
+
+```json
+{
+  "type": "object",
+  "required": ["ok", "data"],
+  "properties": {
+    "ok": { "const": true },
+    "data": {
+      "type": "object",
+      "required": ["deliveryId", "status", "retriedAt"],
+      "properties": {
+        "deliveryId": { "type": "string" },
+        "requestId": { "type": "string" },
+        "status": {
+          "type": "string",
+          "enum": ["accepted", "retry_scheduled", "sending", "queued"]
+        },
+        "acceptedProvider": {
+          "type": ["string", "null"],
+          "enum": ["primary", "gmail_fallback", null]
+        },
+        "retriedAt": { "type": "string", "format": "date-time" },
+        "retryAfter": { "type": "string", "format": "date-time" }
+      },
+      "additionalProperties": true
+    }
+  }
+}
+```
+
+For the current synchronous route implementation, expected success statuses are `accepted` or `retry_scheduled`. `queued` and `sending` are reserved for an enqueue-backed retry implementation that returns before provider processing completes.
+
+`acceptedProvider` is only populated when `status` is `accepted`; async or retry-scheduled responses must return `null` or omit it.
 
 ## Error Response
 
