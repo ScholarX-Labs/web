@@ -23,7 +23,7 @@ Required checks:
 - provider event identifier extraction
 - idempotency check before appending events
 
-Requests that fail verification must return a generic unauthorized response and must not reveal expected signatures or secret names.
+Requests that fail verification must always return HTTP 401 with the single canonical error code `UNAUTHORIZED` and message `Unauthorized`. The response must not reveal whether the signature, timestamp, secret, content length, or replay check failed.
 
 ### Normalized Event
 
@@ -60,19 +60,21 @@ Duplicate provider events should return success with `accepted: false` so provid
 
 ### Error Response
 
+Verification-failure response:
+
 ```json
 {
   "ok": false,
   "error": {
-    "code": "INVALID_SIGNATURE",
-    "message": "Webhook verification failed"
+    "code": "UNAUTHORIZED",
+    "message": "Unauthorized"
   }
 }
 ```
 
 Required error codes:
 
-- `INVALID_SIGNATURE`
+- `UNAUTHORIZED`
 - `UNSUPPORTED_PROVIDER`
 - `INVALID_PAYLOAD`
 - `EVENT_NOT_LINKED`
@@ -92,3 +94,4 @@ Required error codes:
 - Signature comparison must be timing-safe.
 - Raw request bodies must not be logged.
 - Unknown provider message IDs must not reveal whether an email address exists.
+- Verification-failure responses must not disclose expected signatures, received signature validity, configured secret names, timestamp tolerance details, replay status, or which verification check failed.
