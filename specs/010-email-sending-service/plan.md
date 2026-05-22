@@ -21,17 +21,19 @@ The immediate production risk is credential hygiene: `C:\Users\dell\Documents\Sc
 **Constraints**: No secrets in source code or client bundles; no server-only imports in Client Components; no public caching of personalized email status; route handlers stay thin; no duplicate accepted sends for the same idempotent request; preserve current Better Auth email flows; retry processing must use row-level locking or optimistic concurrency  
 **Scale/Scope**: Production-safe for 50,000+ ScholarX users; transactional and operational platform emails first; no marketing campaign system in v1; supports authentication, course, scholarship, admin, and certificate workflows over time
 
+OTP and password-reset message content stays owned by the auth layer and Better Auth callbacks. The new email delivery service is the transport and durability boundary: it receives already-rendered subject/body content, records the request, applies idempotency and fallback rules, and sends through the configured providers. v1 does not introduce a separate template engine or template storage layer.
+
 ## Constitution Check
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+_GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
-| Principle | Status | Plan Response |
-|-----------|--------|---------------|
-| Proper Architecture & SOLID Patterns | PASS | Use domain service, narrow repository and provider ports, strategy/fallback channel selection, and typed factory wiring. |
-| Uncompromising Code Quality & Type Safety | PASS | Define explicit request, result, status, provider, and failure-category types; no raw provider responses leak into callers. |
-| Rigorous Testing Standards | PASS | Cover validation, idempotency, fallback ordering, provider error classification, route authorization, and Better Auth integration. |
-| Premium User Experience Consistency | PASS | Any admin diagnostics use existing admin shell and table/detail patterns rather than introducing a separate UI system. |
-| Performance, Scalability & Maintainability | PASS | Store durable records with indexed lookups, bounded retries, attempt history, and no long provider work in public rendering paths. |
+| Principle                                  | Status | Plan Response                                                                                                                      |
+| ------------------------------------------ | ------ | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Proper Architecture & SOLID Patterns       | PASS   | Use domain service, narrow repository and provider ports, strategy/fallback channel selection, and typed factory wiring.           |
+| Uncompromising Code Quality & Type Safety  | PASS   | Define explicit request, result, status, provider, and failure-category types; no raw provider responses leak into callers.        |
+| Rigorous Testing Standards                 | PASS   | Cover validation, idempotency, fallback ordering, provider error classification, route authorization, and Better Auth integration. |
+| Premium User Experience Consistency        | PASS   | Any admin diagnostics use existing admin shell and table/detail patterns rather than introducing a separate UI system.             |
+| Performance, Scalability & Maintainability | PASS   | Store durable records with indexed lookups, bounded retries, attempt history, and no long provider work in public rendering paths. |
 
 ## Project Structure
 
@@ -104,18 +106,18 @@ drizzle/
 
 Research is captured in [research.md](./research.md). Key resolved decisions:
 
-| Topic | Decision |
-|-------|----------|
-| Provider strategy | Keep Nodemailer and create two configured provider adapters: primary ScholarX mailbox first, Gmail fallback second. |
-| Send semantics | Treat provider acceptance as "sent/accepted"; model later bounce or complaint as a separate delivery event. |
-| Reliability loop | Use durable delivery records and attempt rows before and after provider calls; process pending/retryable records through a bounded loop. |
-| Worker execution | Use a managed Node.js worker or scheduled cron drain, not request-bound background work, for retry processing. |
+| Topic               | Decision                                                                                                                                             |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Provider strategy   | Keep Nodemailer and create two configured provider adapters: primary ScholarX mailbox first, Gmail fallback second.                                  |
+| Send semantics      | Treat provider acceptance as "sent/accepted"; model later bounce or complaint as a separate delivery event.                                          |
+| Reliability loop    | Use durable delivery records and attempt rows before and after provider calls; process pending/retryable records through a bounded loop.             |
+| Worker execution    | Use a managed Node.js worker or scheduled cron drain, not request-bound background work, for retry processing.                                       |
 | Concurrency control | Claim retry rows atomically with PostgreSQL row locking using `FOR UPDATE SKIP LOCKED`; keep an optimistic state/version guard on state transitions. |
-| Idempotency | Require stable idempotency keys from callers or derive deterministic keys for compatibility facade calls. |
-| Observability | Emit structured counters and latency histograms for delivery outcomes, providers, categories, retry depth, fallback usage, and circuit state. |
-| Circuit breaker | Wrap each provider with closed/open/half-open protection to avoid hammering a dead provider. |
-| Rate limiting | Use a PostgreSQL-backed sliding-window counter for v1 because PostgreSQL is already required; Redis can replace it later behind a port. |
-| Secret management | Rotate leaked mailbox credential and load all provider credentials from private environment configuration. |
+| Idempotency         | Require stable idempotency keys from callers or derive deterministic keys for compatibility facade calls.                                            |
+| Observability       | Emit structured counters and latency histograms for delivery outcomes, providers, categories, retry depth, fallback usage, and circuit state.        |
+| Circuit breaker     | Wrap each provider with closed/open/half-open protection to avoid hammering a dead provider.                                                         |
+| Rate limiting       | Use a PostgreSQL-backed sliding-window counter for v1 because PostgreSQL is already required; Redis can replace it later behind a port.              |
+| Secret management   | Rotate leaked mailbox credential and load all provider credentials from private environment configuration.                                           |
 
 ## Phase 1 Design
 
@@ -140,6 +142,12 @@ Design artifacts:
 7. If primary fails with a fallback-eligible category, Gmail fallback is attempted only when fallback policy, rate limits, and circuit state allow it.
 8. If all eligible channels fail, delivery records `failed` or `retry_scheduled` depending on retry allowance.
 9. Admin/internal status reads use normalized delivery records, not raw provider errors.
+
+### OTP And Message Content Boundary
+
+- Better Auth continues to render OTP and password-reset copy in `src/lib/auth.ts` and passes that rendered content into the delivery facade.
+- The delivery service treats OTP emails as `auth_otp` requests with category-aware idempotency keys and rate-limit context, but it does not generate the template text itself.
+- If ScholarX later needs richer branded templates, that work should land as a separate content rendering layer ahead of the delivery service, not inside the transport layer.
 
 ### Ports And Patterns
 
@@ -262,6 +270,7 @@ Required alerts:
 4. Add row-claiming repository methods with `FOR UPDATE SKIP LOCKED`, lease fields, state-version checks, and accepted-attempt repair logic.
 5. Implement repository and service with primary-first, Gmail-fallback strategy order.
 6. Refactor `src/lib/email.ts` to call the new service while preserving the existing `sendEmail` export for Better Auth.
+   - Keep OTP subject/body generation in the auth callback layer; only the transport path changes.
 7. Update Better Auth OTP and password reset callers to pass category and idempotency context where available.
 8. Add admin-only status/list/detail/retry route handlers.
 9. Add provider webhook route stubs for bounce/complaint ingestion with signature verification and idempotent event insertion.
@@ -337,29 +346,29 @@ Verification commands:
 
 ## Risk And Mitigation
 
-| Risk | Impact | Mitigation |
-|------|--------|------------|
-| Hardcoded mailbox credential is already exposed | Account compromise and sender reputation damage | Rotate immediately, remove from files, and configure providers through private environment only. |
-| Fallback sends duplicates after uncertain primary result | Users receive duplicate transactional emails | Persist attempt state, stop after provider acceptance, and require idempotency keys. |
-| Gmail fallback damages deliverability if overused | Lower sender reputation | Use fallback only for eligible failures, rate-limit by category, and alert on high fallback rate. |
-| Provider acceptance is mistaken for inbox delivery | Misleading support/debugging | Model accepted vs delivered/bounced separately in status and UI. |
-| Storing full message bodies increases privacy risk | PII exposure | Avoid body persistence in v1 unless needed for durable retries; log only hashes and safe metadata. |
-| Auth email flow regresses | Users cannot verify or reset accounts | Preserve `sendEmail` facade and add compatibility tests before replacing internals. |
-| Multiple workers claim the same retryable delivery | Duplicate OTP or password-reset emails | Use `FOR UPDATE SKIP LOCKED`, lease fields, state-version guards, and concurrency tests. |
-| Worker process is request-bound and killed mid-retry | SLA misses and stuck sending records | Use a managed Node.js worker or scheduled cron drain independent of page requests. |
-| Provider outage creates thundering herd | Database and provider pressure during incidents | Use circuit breaker state, bounded batches, provider cooldown, and backlog alerts. |
-| Metrics are ad hoc logs | Outages are hard to detect and success criteria cannot be measured | Define counters, histograms, labels, and alerts before implementation. |
-| Bounce/complaint support is only a data table | FR-011 cannot work in production | Add webhook contracts, signature verification, provider event IDs, and idempotent insertion. |
+| Risk                                                     | Impact                                                             | Mitigation                                                                                         |
+| -------------------------------------------------------- | ------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
+| Hardcoded mailbox credential is already exposed          | Account compromise and sender reputation damage                    | Rotate immediately, remove from files, and configure providers through private environment only.   |
+| Fallback sends duplicates after uncertain primary result | Users receive duplicate transactional emails                       | Persist attempt state, stop after provider acceptance, and require idempotency keys.               |
+| Gmail fallback damages deliverability if overused        | Lower sender reputation                                            | Use fallback only for eligible failures, rate-limit by category, and alert on high fallback rate.  |
+| Provider acceptance is mistaken for inbox delivery       | Misleading support/debugging                                       | Model accepted vs delivered/bounced separately in status and UI.                                   |
+| Storing full message bodies increases privacy risk       | PII exposure                                                       | Avoid body persistence in v1 unless needed for durable retries; log only hashes and safe metadata. |
+| Auth email flow regresses                                | Users cannot verify or reset accounts                              | Preserve `sendEmail` facade and add compatibility tests before replacing internals.                |
+| Multiple workers claim the same retryable delivery       | Duplicate OTP or password-reset emails                             | Use `FOR UPDATE SKIP LOCKED`, lease fields, state-version guards, and concurrency tests.           |
+| Worker process is request-bound and killed mid-retry     | SLA misses and stuck sending records                               | Use a managed Node.js worker or scheduled cron drain independent of page requests.                 |
+| Provider outage creates thundering herd                  | Database and provider pressure during incidents                    | Use circuit breaker state, bounded batches, provider cooldown, and backlog alerts.                 |
+| Metrics are ad hoc logs                                  | Outages are hard to detect and success criteria cannot be measured | Define counters, histograms, labels, and alerts before implementation.                             |
+| Bounce/complaint support is only a data table            | FR-011 cannot work in production                                   | Add webhook contracts, signature verification, provider event IDs, and idempotent insertion.       |
 
 ## Post-Design Constitution Check
 
-| Principle | Status | Design Response |
-|-----------|--------|-----------------|
-| Proper Architecture & SOLID Patterns | PASS | Provider, repository, policy, and service boundaries remain narrow and substitutable. |
-| Uncompromising Code Quality & Type Safety | PASS | Contracts require typed statuses, categories, failures, and service results. |
-| Rigorous Testing Standards | PASS | Plan includes unit, repository, route, and integration tests for critical paths. |
-| Premium User Experience Consistency | PASS | Admin diagnostics reuse existing admin shell patterns and expose clear operational outcomes. |
-| Performance, Scalability & Maintainability | PASS | Indexed storage, bounded retries, and sanitized telemetry support production operation. |
+| Principle                                  | Status | Design Response                                                                              |
+| ------------------------------------------ | ------ | -------------------------------------------------------------------------------------------- |
+| Proper Architecture & SOLID Patterns       | PASS   | Provider, repository, policy, and service boundaries remain narrow and substitutable.        |
+| Uncompromising Code Quality & Type Safety  | PASS   | Contracts require typed statuses, categories, failures, and service results.                 |
+| Rigorous Testing Standards                 | PASS   | Plan includes unit, repository, route, and integration tests for critical paths.             |
+| Premium User Experience Consistency        | PASS   | Admin diagnostics reuse existing admin shell patterns and expose clear operational outcomes. |
+| Performance, Scalability & Maintainability | PASS   | Indexed storage, bounded retries, and sanitized telemetry support production operation.      |
 
 ## Complexity Tracking
 
@@ -382,13 +391,13 @@ Implementation must not start the worker loop until these P0/P1 items are comple
 
 Target post-update dimension scores:
 
-| Dimension | Target |
-|-----------|--------|
-| SOLID principles | 9/10 |
-| Scalability | 8.5/10 |
-| Maintainability | 9/10 |
-| Performance | 8.5/10 |
-| Security & privacy | 9/10 |
-| Testability | 9/10 |
-| Observability | 8.5/10 |
-| Design patterns | 9/10 |
+| Dimension          | Target |
+| ------------------ | ------ |
+| SOLID principles   | 9/10   |
+| Scalability        | 8.5/10 |
+| Maintainability    | 9/10   |
+| Performance        | 8.5/10 |
+| Security & privacy | 9/10   |
+| Testability        | 9/10   |
+| Observability      | 8.5/10 |
+| Design patterns    | 9/10   |
