@@ -1,10 +1,56 @@
-Dockerfile
-.dockerignore
-node_modules
-npm-debug.log
-README.md
+# ── Build artifacts ─────────────────────────────────────────
 .next
+.wrangler
+temp-build
+tsconfig.tsbuildinfo
+
+# ── Dependencies (always installed inside the image) ────────
+node_modules
+.pnpm-store
+
+# ── Version control ─────────────────────────────────────────
 .git
-.env*
-*.log*
+.gitignore
+
+# ── Local environment & secrets ─────────────────────────────
+# Never let .env files leak into Docker image layers
+.env
+.env.*
+!.env.example
+
+# ── Dev tooling & IDE ────────────────────────────────────────
+.vscode
+.idea
+.cursor
+.codex
+.opencode
+.VSCodeCounter
+
+# ── Agent / AI scaffolding ───────────────────────────────────
+.agents
+.agent
+.gemini
+.specify
+
+# ── Documentation & specs (not needed at runtime) ────────────
+specs
+docs
+design-system
+legacy
+README.md
+*.md
+AGENTS.md
+
+# ── Test & coverage ──────────────────────────────────────────
 coverage
+*.test.ts
+*.spec.ts
+
+# ── Logs & debug ─────────────────────────────────────────────
+npm-debug.log
+*.log
+*.log.*
+
+# ── Scratch / build scripts ──────────────────────────────────
+commit-all.ps1
+scholarx.tar.gz

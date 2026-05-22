@@ -1,0 +1,268 @@
+# ============================================================
+# ScholarX — Certificate Worker ACA Deployment Pipeline
+# ============================================================
+#
+# Triggers: push to main when certificate worker source changes.
+# Auth:     Azure service principal via AZURE_CREDENTIALS secret.
+# Image:    ACR-tagged with git SHA; buildcache tag for fast rebuilds.
+# Deploy:   Zero-downtime rolling update on scholarx-worker-aca.
+#
+# Required GitHub Secrets (repo or environment):
+#   AZURE_CREDENTIALS        — Service principal JSON (same as web pipeline)
+#   REGISTRY_LOGIN_SERVER    — ACR login server (e.g. scholarxacr.azurecr.io)
+#   REGISTRY_USERNAME        — ACR admin username
+#   REGISTRY_PASSWORD        — ACR admin password
+#   DATABASE_URL             — PostgreSQL connection string (sslmode=verify-full)
+#   DATABASE_SSL             — SSL cert content (if required by your Postgres host)
+# ============================================================
+
+name: Deploy Certificate Worker to ACA
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      # Retrigger only on worker-relevant changes
+      - "src/worker/**"
+      - "src/domain/certificates/**"
+      - "Dockerfile.worker"
+      - "package.json"
+      - "pnpm-lock.yaml"
+  # Always allow a manual redeploy (e.g. after infra changes)
+  workflow_dispatch:
+
+# Prevent two deploys racing each other on rapid pushes
+concurrency:
+  group: deploy-worker-aca
+  cancel-in-progress: false
+
+env:
+  IMAGE_NAME: scholarx-worker
+  ACA_APP_NAME: scholarx-worker-aca
+  RESOURCE_GROUP: ScholarX_Production
+  NODE_VERSION: "22"
+
+# ─── Jobs ────────────────────────────────────────────────────
+
+jobs:
+  # ──────────────────────────────────────────────────────────
+  # 1. QUALITY GATE
+  #    Lint + typecheck + worker tests before any Docker work.
+  #    Fail fast — no image build if code is broken.
+  # ──────────────────────────────────────────────────────────
+  quality-gate:
+    name: "Quality Gate (lint · typecheck · tests)"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable Corepack (pnpm)
+        run: corepack enable
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Run worker tests
+        run: pnpm test
+
+  # ──────────────────────────────────────────────────────────
+  # 2. BUILD & PUSH WORKER IMAGE
+  #    BuildKit + registry-backed layer cache.
+  #    The heavy Playwright/Chromium layer is cached in ACR so
+  #    warm builds finish in ~90 s instead of ~8 min.
+  # ──────────────────────────────────────────────────────────
+  build-and-push:
+    name: "Build & Push Worker Image"
+    runs-on: ubuntu-latest
+    needs: quality-gate
+
+    outputs:
+      image: ${{ steps.image-ref.outputs.ref }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Log in to Azure Container Registry
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      # Enable BuildKit (required for --cache-from/--cache-to)
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Emit the full image reference for downstream jobs
+      - name: Compute image reference
+        id: image-ref
+        run: |
+          echo "ref=${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}" >> "$GITHUB_OUTPUT"
+
+      - name: Build & push (with layer cache)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.worker
+          push: true
+          # Tag by immutable SHA (deployed) and a mutable latest (cache-from only)
+          tags: |
+            ${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:latest
+          # Store build cache in ACR — survives across runner instances
+          cache-from: type=registry,ref=${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
+          build-args: |
+            NODE_ENV=production
+
+      - name: Image summary
+        run: |
+          echo "### 🐳 Worker image pushed" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "\`${{ steps.image-ref.outputs.ref }}\`" >> "$GITHUB_STEP_SUMMARY"
+
+  # ──────────────────────────────────────────────────────────
+  # 3. DATABASE MIGRATIONS
+  #    Run before the new container goes live.
+  #    Serialised — cancel-in-progress: false guarantees only
+  #    one migration process touches production DB at a time.
+  # ──────────────────────────────────────────────────────────
+  migrate-production:
+    name: "Database Migrations"
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    environment: production
+    concurrency:
+      group: production-database-migrations
+      cancel-in-progress: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable Corepack (pnpm)
+        run: corepack enable
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate production DATABASE_URL is set
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: test -n "$DATABASE_URL"
+
+      - name: Run production database migrations
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_SSL: ${{ secrets.DATABASE_SSL }}
+        run: pnpm db:migrate
+
+  # ──────────────────────────────────────────────────────────
+  # 4. DEPLOY TO ACA
+  #    Updates scholarx-worker-aca to the new SHA-tagged image.
+  #    ACA performs a zero-downtime rolling revision swap.
+  #    We then poll until the new revision is fully active
+  #    before marking the job green.
+  # ──────────────────────────────────────────────────────────
+  deploy-worker:
+    name: "Deploy → scholarx-worker-aca"
+    runs-on: ubuntu-latest
+    needs: migrate-production
+    environment: production
+
+    steps:
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy new revision
+        run: |
+          az containerapp update \
+            --name "${{ env.ACA_APP_NAME }}" \
+            --resource-group "${{ env.RESOURCE_GROUP }}" \
+            --image "${{ needs.build-and-push.outputs.image }}"
+
+      # Wait up to 5 minutes for the new revision to reach Running state.
+      # Fails the job (and leaves the old revision active) if it never starts.
+      - name: Wait for revision to become active
+        run: |
+          IMAGE="${{ needs.build-and-push.outputs.image }}"
+          TIMEOUT=300
+          INTERVAL=10
+          ELAPSED=0
+
+          echo "Waiting for revision with image $IMAGE to become Running…"
+
+          while [ "$ELAPSED" -lt "$TIMEOUT" ]; do
+            REVISION=$(az containerapp revision list \
+              --name "${{ env.ACA_APP_NAME }}" \
+              --resource-group "${{ env.RESOURCE_GROUP }}" \
+              --query "[?properties.template.containers[0].image=='$IMAGE'] | [0]" \
+              -o json)
+
+            RUNNING=$(echo "$REVISION" | jq -r '.properties.runningState // empty')
+            echo "  runningState: $RUNNING (${ELAPSED}s elapsed)"
+
+            if [ "$RUNNING" = "Running" ]; then
+              echo "✅ Revision is Running."
+              break
+            fi
+
+            sleep "$INTERVAL"
+            ELAPSED=$(( ELAPSED + INTERVAL ))
+          done
+
+          if [ "$RUNNING" != "Running" ]; then
+            echo "❌ Revision did not become Running within ${TIMEOUT}s."
+            exit 1
+          fi
+
+      - name: Deployment summary
+        if: success()
+        run: |
+          echo "### ✅ Certificate Worker Deployed" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Field | Value |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| App | \`${{ env.ACA_APP_NAME }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Image | \`${{ needs.build-and-push.outputs.image }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Commit | \`${{ github.sha }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Triggered by | @${{ github.actor }} |" >> "$GITHUB_STEP_SUMMARY"
+
+      # If the revision health-check fails, log recent worker traces for triage.
+      - name: Tail container logs on failure
+        if: failure()
+        run: |
+          echo "=== Last 50 log lines from ${{ env.ACA_APP_NAME }} ==="
+          az containerapp logs show \
+            --name "${{ env.ACA_APP_NAME }}" \
+            --resource-group "${{ env.RESOURCE_GROUP }}" \
+            --tail 50 || true
