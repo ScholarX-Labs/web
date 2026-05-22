@@ -10,6 +10,8 @@ type RouteContext = {
   params: Promise<{ deliveryId: string }>;
 };
 
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 export async function GET(_: Request, context: RouteContext) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (session?.user?.role !== "admin") {
@@ -19,7 +21,15 @@ export async function GET(_: Request, context: RouteContext) {
     );
   }
 
-  const { deliveryId } = await context.params;
+  const params = await context.params;
+  const deliveryId = typeof params.deliveryId === "string" ? params.deliveryId.trim() : "";
+  if (!UUID_PATTERN.test(deliveryId)) {
+    return NextResponse.json(
+      { ok: false, error: { code: "INVALID_REQUEST", message: "Invalid email delivery id" } },
+      { status: 400 },
+    );
+  }
+
   const detail = await new DrizzleEmailDeliveryRepository().findById(deliveryId);
   if (!detail) {
     return NextResponse.json(
