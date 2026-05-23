@@ -1,4 +1,4 @@
-import { and, eq, isNull, desc } from "drizzle-orm";
+import { and, eq, isNull, desc, sql } from "drizzle-orm";
 import { db } from "@/db";
 import {
   dbCanonicalCertificates,
@@ -90,7 +90,7 @@ export class DrizzleCertificateRepository implements ICertificateRepository {
       .where(
         and(
           eq(dbCanonicalCertificates.userId, userId),
-          eq(dbCanonicalCertificates.isPublic, true),
+          sql`${dbCanonicalCertificates.isPublic} = true`,
           isNull(dbCanonicalCertificates.revokedAt),
         ),
       )
