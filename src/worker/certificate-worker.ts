@@ -18,6 +18,7 @@
  */
 
 import "dotenv/config";
+import { createServer, type Server } from "node:http";
 import type { CertificateArtifactJobMessage } from "@/domain/certificates/contracts/certificate-queue.port";
 import { createCertificateWorkerDomain } from "@/domain/certificates/factory/certificate-services.factory";
 import { runRepairJob } from "./certificate-repair-job";
@@ -30,6 +31,7 @@ const QUEUE_NAME = process.env.CERTIFICATE_QUEUE_NAME ?? "certificate-artifact-g
 const MAX_CONCURRENT_JOBS = parseInt(process.env.WORKER_CONCURRENCY ?? "5", 10);
 const LOCK_RENEWAL_INTERVAL_MS = 60_000; // 60 seconds
 const REPAIR_JOB_ENABLED = process.env.CERTIFICATE_REPAIR_JOB_ENABLED !== "false";
+const HEALTH_PORT = parseInt(process.env.WORKER_HEALTH_PORT ?? "3001", 10);
 const REPAIR_JOB_INTERVAL_MS = Math.max(
   parseInt(process.env.CERTIFICATE_REPAIR_JOB_INTERVAL_MS ?? "60000", 10),
   30_000,
@@ -64,6 +66,34 @@ function serializeError(error: unknown): Record<string, unknown> {
 // ---------------------------------------------------------------------------
 // Worker logic
 // ---------------------------------------------------------------------------
+
+function startHealthServer(): Server {
+  const server = createServer((_req, res) => {
+    res.writeHead(isShuttingDown ? 503 : 200, {
+      "content-type": "application/json",
+      "cache-control": "no-store",
+    });
+    res.end(
+      JSON.stringify({
+        ok: !isShuttingDown,
+        worker: "certificate-artifact-generation",
+      }),
+    );
+  });
+
+  server.listen(HEALTH_PORT, "0.0.0.0", () => {
+    console.info("[CertificateWorker] Health probe server listening", {
+      port: HEALTH_PORT,
+    });
+  });
+
+  server.on("error", (error) => {
+    console.error("[CertificateWorker] Health probe server failed", serializeError(error));
+    process.exit(1);
+  });
+
+  return server;
+}
 
 async function processMessage(
   message: { messageId?: unknown },
@@ -131,6 +161,7 @@ async function main() {
   });
 
   console.info(`[CertificateWorker] Listening on queue "${QUEUE_NAME}" (concurrency=${MAX_CONCURRENT_JOBS})`);
+  const healthServer = startHealthServer();
   const repairJobTimer = startRepairJobLoop();
 
   // Graceful shutdown
@@ -139,6 +170,9 @@ async function main() {
     isShuttingDown = true;
     console.info("[CertificateWorker] Shutting down gracefully…");
     if (repairJobTimer) clearInterval(repairJobTimer);
+    await new Promise<void>((resolve) => {
+      healthServer.close(() => resolve());
+    });
     await receiver.close();
     await client.close();
     process.exit(0);
