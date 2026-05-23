@@ -270,13 +270,13 @@ const Footer = () => {
           </div>
 
           {/* Link columns with tight spacing */}
-          <div className="flex gap-1 md:gap-2 lg:gap-3 flex-1">
+          <div className="flex flex-col sm:flex-row sm:flex-wrap lg:flex-nowrap gap-4 sm:gap-3 lg:gap-6 w-full md:flex-1">
             {footerLinks
               .filter((s) => s.title !== "Contact")
               .map((section) => (
                 <div
                   key={section.title}
-                  className="flex-1 min-w-[150px] rounded-xl bg-gradient-to-br from-zinc-50 to-zinc-100/50 dark:from-zinc-900/50 dark:to-zinc-800/30 border border-zinc-200 dark:border-zinc-800/60 p-6 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10 dark:hover:shadow-blue-500/5 hover:border-blue-300 dark:hover:border-blue-700/40"
+                  className="flex-1 min-w-[150px] sm:min-w-[180px] rounded-xl bg-gradient-to-br from-zinc-50 to-zinc-100/50 dark:from-zinc-900/50 dark:to-zinc-800/30 border border-zinc-200 dark:border-zinc-800/60 p-4 sm:p-6 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10 dark:hover:shadow-blue-500/5 hover:border-blue-300 dark:hover:border-blue-700/40"
                 >
                   <h3 className="text-xs font-bold text-transparent bg-clip-text bg-gradient-to-r from-zinc-600 to-zinc-400 dark:from-zinc-300 dark:to-zinc-500 uppercase tracking-[0.15em] mb-6 pb-3 border-b border-zinc-300 dark:border-zinc-700 transition-all duration-300 text-center">
                     {section.title}
@@ -315,7 +315,7 @@ const Footer = () => {
               .map((section) => (
                 <div
                   key={section.title}
-                  className="flex-1 min-w-[150px] rounded-xl bg-gradient-to-br from-blue-50 to-cyan-50/50 dark:from-blue-950/50 dark:to-cyan-900/30 border border-blue-200 dark:border-blue-800/60 p-6 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20 dark:hover:shadow-blue-500/10 hover:border-blue-400 dark:hover:border-blue-600/50"
+                  className="flex-1 min-w-[150px] sm:min-w-[180px] rounded-xl bg-gradient-to-br from-blue-50 to-cyan-50/50 dark:from-blue-950/50 dark:to-cyan-900/30 border border-blue-200 dark:border-blue-800/60 p-4 sm:p-6 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20 dark:hover:shadow-blue-500/10 hover:border-blue-400 dark:hover:border-blue-600/50"
                 >
                   <h3 className="text-xs font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-600 dark:from-blue-300 dark:to-cyan-400 uppercase tracking-[0.15em] mb-6 pb-3 border-b border-blue-300 dark:border-blue-700/60 transition-all duration-300 text-center">
                     {section.title}
@@ -339,7 +339,7 @@ const Footer = () => {
                                 link.href,
                               )
                             }
-                            className="w-full text-center group flex items-center justify-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/40 dark:to-cyan-950/40 border border-blue-200 dark:border-blue-800/60 text-zinc-600 dark:text-zinc-400 hover:from-blue-100 hover:to-cyan-100 dark:hover:from-blue-900/50 dark:hover:to-cyan-900/50 hover:border-blue-400 dark:hover:border-blue-600 hover:text-blue-700 dark:hover:text-blue-300 transition-all duration-300 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-900 shadow-sm hover:shadow-md hover:shadow-blue-500/20 dark:hover:shadow-blue-500/10 hover:-translate-y-0.5"
+                            className="w-full text-center group flex items-center justify-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/40 dark:to-cyan-950/40 border border-blue-200 dark:border-blue-800/60 text-zinc-600 dark:text-zinc-400 hover:from-blue-100 hover:to-cyan-100 dark:hover:from-blue-900/50 dark:hover:to-cyan-900/50 hover:border-blue-400 dark:hover:border-blue-600 hover:text-blue-700 dark:hover:text-blue-300 transition-all duration-300 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-900 shadow-sm hover:shadow-md hover:shadow-blue-500/20 dark:hover:shadow-blue-500/10 hover:-translate-y-0.5"
                           >
                             {link.icon && (
                               <motion.div
