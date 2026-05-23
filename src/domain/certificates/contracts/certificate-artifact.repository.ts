@@ -60,6 +60,12 @@ export interface MarkFailedInput {
   nextAttemptAt?: Date;
 }
 
+export interface MarkPendingForRegenerationInput {
+  artifactId: string;
+  reasonCode: string;
+  reasonMessage: string;
+}
+
 // ---------------------------------------------------------------------------
 // Port interface
 // ---------------------------------------------------------------------------
@@ -73,6 +79,9 @@ export interface ICertificateArtifactRepository {
    * Returns the updated row or null if the artifact was already claimed/ready.
    */
   markGenerating(input: MarkGeneratingInput): Promise<CertificateArtifactRecord | null>;
+  markPendingForRegeneration(
+    input: MarkPendingForRegenerationInput,
+  ): Promise<CertificateArtifactRecord | null>;
   markReady(input: MarkReadyInput): Promise<void>;
   markFailed(input: MarkFailedInput): Promise<void>;
 }
