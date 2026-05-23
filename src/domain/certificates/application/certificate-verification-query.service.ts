@@ -2,6 +2,7 @@ import type { ICertificateRepository, CertificateRecord } from "../contracts/cer
 import type { ICertificateArtifactRepository } from "../contracts/certificate-artifact.repository";
 import type { ICertificateEventRepository } from "../contracts/certificate-event.repository";
 import type { ArtifactType } from "@/db/schema/certificates-db.schema";
+import { CURRENT_TEMPLATE_VERSION } from "../domain/certificate-template";
 
 // ---------------------------------------------------------------------------
 // Public DTO — safe to return to the browser (no internal IDs or storage keys)
@@ -68,7 +69,7 @@ export class CertificateVerificationQueryService {
     const artifact = await this.artifactRepo.findRequiredArtifact({
       certificateId: certificate.id,
       artifactType: "pdf" as ArtifactType,
-      templateVersion: "scholarx-v1",
+      templateVersion: CURRENT_TEMPLATE_VERSION,
     });
 
     // Record a verification event (fire-and-forget — don't block the response)
@@ -125,7 +126,7 @@ export class CertificateVerificationQueryService {
     const artifact = await this.artifactRepo.findRequiredArtifact({
       certificateId: certificate.id,
       artifactType: "pdf" as ArtifactType,
-      templateVersion: "scholarx-v1",
+      templateVersion: CURRENT_TEMPLATE_VERSION,
     });
 
     const pdfStatus = artifact?.status ?? "pending";
