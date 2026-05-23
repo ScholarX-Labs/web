@@ -6,6 +6,7 @@
  */
 export const CERTIFICATE_TEMPLATE_VERSIONS = {
   V1: "scholarx-v1",
+  V2: "scholarx-v2",
 } as const;
 
 export type CertificateTemplateVersion =
@@ -13,7 +14,7 @@ export type CertificateTemplateVersion =
 
 /** The template version used for new certificate issuances */
 export const CURRENT_TEMPLATE_VERSION: CertificateTemplateVersion =
-  CERTIFICATE_TEMPLATE_VERSIONS.V1;
+  CERTIFICATE_TEMPLATE_VERSIONS.V2;
 
 /** Input data required to render a certificate from any template version */
 export interface CertificateRenderData {
