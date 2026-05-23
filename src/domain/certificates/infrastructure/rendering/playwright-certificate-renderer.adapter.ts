@@ -6,7 +6,7 @@
  * It must NEVER be imported from Next.js pages, route handlers, or
  * Client Components — doing so would bundle Chromium into the web app.
  *
- * Template source: public/certificate-template.svg (scholarx-v1)
+ * Template source: public/certificate-template.svg
  */
 import { readFileSync } from "fs";
 import { createHash } from "crypto";
@@ -26,12 +26,13 @@ function buildHtml(data: CertificateRenderData, svgTemplate: string): string {
     day: "numeric",
   });
 
-  // Replace SVG placeholders — convention: {{FIELD_NAME}}
-  const filled = svgTemplate
-    .replace(/\{\{RECIPIENT_NAME\}\}/g, escapeXml(data.recipientName))
-    .replace(/\{\{PROGRAM_NAME\}\}/g, escapeXml(data.programName))
-    .replace(/\{\{COMPLETION_DATE\}\}/g, escapeXml(dateStr))
-    .replace(/\{\{CERTIFICATE_NUMBER\}\}/g, escapeXml(data.certificateNumber));
+  const issuedStr = data.issuedAt.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+  const filled = svgTemplate;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -42,19 +43,78 @@ function buildHtml(data: CertificateRenderData, svgTemplate: string): string {
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { width: 297mm; height: 210mm; background: white; }
-    .svg-container { width: 100%; height: 100%; }
-    svg { width: 100%; height: 100%; }
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: #141827;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .certificate {
+      position: relative;
+      width: 297mm;
+      height: 210mm;
+      overflow: hidden;
+      background: white;
+    }
+    .svg-container {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    svg { width: 100%; height: 100%; display: block; }
+    .dynamic-field {
+      position: absolute;
+      left: 14%;
+      right: 14%;
+      z-index: 5;
+      text-align: center;
+      line-height: 1.15;
+      text-wrap: balance;
+    }
+    .recipient {
+      top: 43.5%;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(30px, 4.4vw, 54px);
+      font-weight: 700;
+      color: #101827;
+    }
+    .program {
+      top: 55.5%;
+      font-size: clamp(18px, 2.3vw, 30px);
+      font-weight: 700;
+      color: #1f2937;
+    }
+    .completed {
+      top: 65.3%;
+      font-size: 16px;
+      font-weight: 600;
+      color: #5a5c6b;
+    }
+    .certificate-number {
+      top: 88.2%;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: #5a5c6b;
+    }
   </style>
 </head>
 <body>
-  <div class="svg-container">
-    ${filled}
+  <div class="certificate">
+    <div class="svg-container">
+      ${filled}
+    </div>
+    <div class="dynamic-field recipient">${escapeHtml(data.recipientName)}</div>
+    <div class="dynamic-field program">${escapeHtml(data.programName)}</div>
+    <div class="dynamic-field completed">Completed ${escapeHtml(dateStr)} · Issued ${escapeHtml(issuedStr)}</div>
+    <div class="dynamic-field certificate-number">${escapeHtml(data.certificateNumber)}</div>
   </div>
 </body>
 </html>`;
 }
 
-function escapeXml(value: string): string {
+function escapeHtml(value: string): string {
   return value
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
