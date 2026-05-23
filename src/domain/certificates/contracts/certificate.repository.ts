@@ -64,6 +64,7 @@ export interface RevokeCertificateInput {
 export interface ICertificateRepository {
   findByPublicNumber(certificateNumber: string): Promise<CertificateRecord | null>;
   findBySource(key: CertificateSourceKey): Promise<CertificateRecord | null>;
+  findByUserId(userId: string): Promise<CertificateRecord[]>;
   createIssued(input: CreateCertificateInput): Promise<CertificateRecord>;
   markRevoked(input: RevokeCertificateInput): Promise<CertificateRecord>;
 }
