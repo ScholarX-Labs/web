@@ -7,6 +7,7 @@ import type { CertificateArtifactJobMessage } from "../contracts/certificate-que
 import type { ArtifactType } from "@/db/schema/certificates-db.schema";
 import { buildArtifactStorageKey } from "../contracts/certificate-storage.port";
 import { CertificateError } from "../domain/certificate-errors";
+import type { CertificateTemplateVersion } from "../domain/certificate-template";
 
 export const ARTIFACT_STORAGE_CONTAINER = "certificates";
 
@@ -98,7 +99,7 @@ export class CertificateArtifactGenerationService {
         programName: certificate.programName,
         completionDate: new Date(certificate.completionDate),
         issuedAt: new Date(certificate.issuedAt),
-        templateVersion: message.templateVersion as "scholarx-v1",
+        templateVersion: message.templateVersion as CertificateTemplateVersion,
       });
 
       // Step 5: Upload to storage
