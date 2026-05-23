@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { createCertificateDomain } from "@/domain/certificates/factory/certificate-services.factory";
 import { CertificateArtifactStatusPoller } from "@/components/certificates/certificate-artifact-status-poller";
 import { ROUTES } from "@/lib/routes";
+import { repairCourseCompletionCertificateArtifactsByNumber } from "@/lib/certificates/course-certificate-repair";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -81,6 +82,13 @@ export default async function CertificatePage({
   params,
 }: CertificatePageProps) {
   const { certificateNumber } = await params;
+
+  try {
+    await repairCourseCompletionCertificateArtifactsByNumber(certificateNumber);
+  } catch (error) {
+    console.error("[CertificatePage] Certificate artifact repair failed:", error);
+  }
+
   const certificate = await getPublicCertificate(certificateNumber);
 
   // Unknown or private certificates → 404
