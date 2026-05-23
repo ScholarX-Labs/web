@@ -4,7 +4,9 @@ import { Suspense } from "react";
 import { LessonLayoutShell } from "./_components/lesson-layout-shell";
 import { LessonHeader } from "./_components/lesson-header";
 import { LessonClientBridge } from "./_components/lesson-client-bridge";
-import { createNextCourseDomain } from "@/domain/courses";
+import { createCourseProgressDomain, createNextCourseDomain } from "@/domain/courses";
+import { createCertificateDomain } from "@/domain/certificates/factory/certificate-services.factory";
+import type { LearnerCertificateLinkDto } from "@/domain/certificates/application/certificate-verification-query.service";
 import { isNextCourseError } from "@/domain/courses/application/next-course.errors";
 import { getSession, requireSession } from "@/lib/dal";
 
@@ -66,6 +68,31 @@ export default async function LessonPage({ params }: LessonPageProps) {
   const allLessons = lessonData.allLessons;
   const lessonIndex = allLessons.findIndex((l) => l.id === currentLesson.id);
   const canonicalCourseSlug = lessonData.course.slug;
+  let certificateLink: LearnerCertificateLinkDto | null = null;
+
+  try {
+    const progressDomain = createCourseProgressDomain();
+    const progress = await progressDomain.progressQuery.getCourseProgress(
+      session.user.id,
+      lessonData.course.id,
+    );
+
+    const courseCompleted =
+      progress?.status === "completed" &&
+      Boolean(progress.completedAt) &&
+      Boolean(progress.certificateEligibleAt);
+
+    if (courseCompleted) {
+      const certDomain = createCertificateDomain();
+      certificateLink =
+        await certDomain.verificationQuery.getCourseCompletionCertificateForUser({
+          userId: session.user.id,
+          courseProgressId: progress.id,
+        });
+    }
+  } catch (error) {
+    console.error("[LessonPage] Certificate lookup failed:", error);
+  }
 
   return (
     <LessonLayoutShell lessonKey={currentLesson.id}>
@@ -129,6 +156,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
             nextLesson={allLessons[lessonIndex + 1]}
             lessons={allLessons}
             initialIsCompleted={Boolean(currentLesson.isCompleted)}
+            certificateLink={certificateLink}
           />
         </Suspense>
       </div>
