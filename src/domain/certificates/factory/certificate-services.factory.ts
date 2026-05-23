@@ -10,6 +10,8 @@
  * - CERTIFICATE_QUEUE_ADAPTER=azure  → AzureServiceBusCertificateQueueAdapter
  * - CERTIFICATE_STORAGE_ADAPTER=memory → MemoryCertificateStorageAdapter
  * - CERTIFICATE_STORAGE_ADAPTER=azure  → AzureBlobCertificateStorageAdapter (default in prod)
+ * - CERTIFICATE_RENDERER_ADAPTER=fake       → FakeCertificateRendererAdapter (default in dev/test)
+ * - CERTIFICATE_RENDERER_ADAPTER=playwright → PlaywrightCertificateRendererAdapter (default in prod)
  */
 import { DrizzleCertificateRepository } from "../infrastructure/db/drizzle-certificate.repository";
 import { DrizzleCertificateArtifactRepository } from "../infrastructure/db/drizzle-certificate-artifact.repository";
@@ -78,7 +80,9 @@ function buildStoragePort(): ICertificateStoragePort {
 }
 
 function buildRendererPort(): ICertificateRendererPort {
-  const adapter = process.env.CERTIFICATE_RENDERER_ADAPTER ?? "fake";
+  const adapter =
+    process.env.CERTIFICATE_RENDERER_ADAPTER ??
+    (process.env.NODE_ENV === "production" ? "playwright" : "fake");
 
   if (adapter === "playwright") {
     // Only available in the worker container
