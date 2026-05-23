@@ -14,6 +14,7 @@ import type {
   MarkGeneratingInput,
   MarkReadyInput,
   MarkFailedInput,
+  MarkPendingForRegenerationInput,
 } from "../../contracts/certificate-artifact.repository";
 
 // ---------------------------------------------------------------------------
@@ -133,6 +134,31 @@ export class DrizzleCertificateArtifactRepository
           ),
         ),
       )
+      .returning();
+
+    return rows[0] ? mapRow(rows[0]) : null;
+  }
+
+  async markPendingForRegeneration(
+    input: MarkPendingForRegenerationInput,
+  ): Promise<CertificateArtifactRecord | null> {
+    const now = new Date();
+    const rows = await db
+      .update(dbCertificateArtifacts)
+      .set({
+        status: "pending",
+        storageContainer: null,
+        storageKey: null,
+        contentType: null,
+        byteSize: null,
+        checksumSha256: null,
+        generatedAt: null,
+        errorCode: input.reasonCode,
+        errorMessage: input.reasonMessage,
+        nextAttemptAt: null,
+        updatedAt: now,
+      })
+      .where(eq(dbCertificateArtifacts.id, input.artifactId))
       .returning();
 
     return rows[0] ? mapRow(rows[0]) : null;
