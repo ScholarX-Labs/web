@@ -156,7 +156,7 @@ const Footer = () => {
   return (
     <footer
       ref={containerRef}
-      className="relative z-50 w-full min-h-[500px] bg-white dark:bg-[#080808] border-t border-zinc-200 dark:border-zinc-800 transition-colors duration-500 block"
+      className="relative z-50 w-full min-h-[500px] bg-white dark:bg-[#080808] border-t border-zinc-200 dark:border-zinc-800 transition-colors duration-500 block overflow-hidden"
       style={{ display: "block", visibility: "visible", opacity: 1 }}
     >
       {/* Liquid Glass Background Accents */}
@@ -276,7 +276,7 @@ const Footer = () => {
               .map((section) => (
                 <div
                   key={section.title}
-                  className="flex-1 min-w-[150px] sm:min-w-[180px] rounded-xl bg-gradient-to-br from-zinc-50 to-zinc-100/50 dark:from-zinc-900/50 dark:to-zinc-800/30 border border-zinc-200 dark:border-zinc-800/60 p-4 sm:p-6 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10 dark:hover:shadow-blue-500/5 hover:border-blue-300 dark:hover:border-blue-700/40"
+                  className="w-full sm:w-auto sm:flex-1 min-w-[150px] sm:min-w-[180px] rounded-xl bg-gradient-to-br from-zinc-50 to-zinc-100/50 dark:from-zinc-900/50 dark:to-zinc-800/30 border border-zinc-200 dark:border-zinc-800/60 p-4 sm:p-6 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10 dark:hover:shadow-blue-500/5 hover:border-blue-300 dark:hover:border-blue-700/40"
                 >
                   <h3 className="text-xs font-bold text-transparent bg-clip-text bg-gradient-to-r from-zinc-600 to-zinc-400 dark:from-zinc-300 dark:to-zinc-500 uppercase tracking-[0.15em] mb-6 pb-3 border-b border-zinc-300 dark:border-zinc-700 transition-all duration-300 text-center">
                     {section.title}
@@ -315,7 +315,7 @@ const Footer = () => {
               .map((section) => (
                 <div
                   key={section.title}
-                  className="flex-1 min-w-[150px] sm:min-w-[180px] rounded-xl bg-gradient-to-br from-blue-50 to-cyan-50/50 dark:from-blue-950/50 dark:to-cyan-900/30 border border-blue-200 dark:border-blue-800/60 p-4 sm:p-6 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20 dark:hover:shadow-blue-500/10 hover:border-blue-400 dark:hover:border-blue-600/50"
+                  className="w-full sm:w-auto sm:flex-1 min-w-[150px] sm:min-w-[180px] rounded-xl bg-gradient-to-br from-blue-50 to-cyan-50/50 dark:from-blue-950/50 dark:to-cyan-900/30 border border-blue-200 dark:border-blue-800/60 p-4 sm:p-6 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20 dark:hover:shadow-blue-500/10 hover:border-blue-400 dark:hover:border-blue-600/50"
                 >
                   <h3 className="text-xs font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-600 dark:from-blue-300 dark:to-cyan-400 uppercase tracking-[0.15em] mb-6 pb-3 border-b border-blue-300 dark:border-blue-700/60 transition-all duration-300 text-center">
                     {section.title}
