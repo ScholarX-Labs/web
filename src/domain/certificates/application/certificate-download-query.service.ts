@@ -3,6 +3,7 @@ import type { ICertificateArtifactRepository } from "../contracts/certificate-ar
 import type { ICertificateEventRepository } from "../contracts/certificate-event.repository";
 import type { ICertificateStoragePort } from "../contracts/certificate-storage.port";
 import type { ArtifactType } from "@/db/schema/certificates-db.schema";
+import { CURRENT_TEMPLATE_VERSION } from "../domain/certificate-template";
 import { CertificateError } from "../domain/certificate-errors";
 
 // ---------------------------------------------------------------------------
@@ -55,7 +56,7 @@ export class CertificateDownloadQueryService {
     const artifact = await this.artifactRepo.findRequiredArtifact({
       certificateId: certificate.id,
       artifactType: "pdf" as ArtifactType,
-      templateVersion: "scholarx-v1",
+      templateVersion: CURRENT_TEMPLATE_VERSION,
     });
 
     if (!artifact || artifact.status !== "ready" || !artifact.storageKey || !artifact.storageContainer) {
