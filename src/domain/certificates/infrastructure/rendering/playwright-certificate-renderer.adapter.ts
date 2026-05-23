@@ -86,13 +86,14 @@ function buildHtml(data: CertificateRenderData, svgTemplate: string): string {
       color: #1f2937;
     }
     .completed {
-      top: 65.3%;
-      font-size: 16px;
+      top: 92%;
+      font-size: 12px;
       font-weight: 600;
+      letter-spacing: 0.02em;
       color: #5a5c6b;
     }
     .certificate-number {
-      top: 88.2%;
+      top: 87%;
       font-size: 11px;
       font-weight: 700;
       letter-spacing: 0.04em;
@@ -105,10 +106,10 @@ function buildHtml(data: CertificateRenderData, svgTemplate: string): string {
     <div class="svg-container">
       ${filled}
     </div>
-    <div class="dynamic-field recipient">${escapeHtml(data.recipientName)}</div>
-    <div class="dynamic-field program">${escapeHtml(data.programName)}</div>
-    <div class="dynamic-field completed">Completed ${escapeHtml(dateStr)} · Issued ${escapeHtml(issuedStr)}</div>
-    <div class="dynamic-field certificate-number">${escapeHtml(data.certificateNumber)}</div>
+     <div class="dynamic-field recipient">${escapeHtml(data.recipientName)}</div>
+     <div class="dynamic-field program">${escapeHtml(data.programName)}</div>
+     <div class="dynamic-field certificate-number">${escapeHtml(data.certificateNumber)}</div>
+     <div class="dynamic-field completed">Completed ${escapeHtml(dateStr)} · Issued ${escapeHtml(issuedStr)}</div>
   </div>
 </body>
 </html>`;
