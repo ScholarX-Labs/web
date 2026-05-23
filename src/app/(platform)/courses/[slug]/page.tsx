@@ -1,14 +1,14 @@
 import { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
-import { createCourseProgressDomain, createNextCourseDomain } from "@/domain/courses";
+import { createNextCourseDomain } from "@/domain/courses";
 import { CourseHero } from "./_components/course-hero";
 import { CourseStickyCta } from "./_components/course-sticky-cta";
 import { CourseCurriculum } from "./_components/course-curriculum";
 import { CourseInstructor } from "./_components/course-instructor";
 import { EnrollModal } from "@/components/courses/enroll-modal";
 import { CourseCertificateLinkCard } from "@/components/certificates/course-certificate-link-card";
-import { createCertificateDomain } from "@/domain/certificates/factory/certificate-services.factory";
 import type { LearnerCertificateLinkDto } from "@/domain/certificates/application/certificate-verification-query.service";
+import { ensureCourseCompletionCertificate } from "@/lib/certificates/course-certificate-repair";
 
 import { getSession } from "@/lib/dal";
 import { ROUTES } from "@/lib/routes";
@@ -65,27 +65,16 @@ export default async function CourseDetailPage({
 
   if (session?.user.id) {
     try {
-      const progressDomain = createCourseProgressDomain();
-      const progress = await progressDomain.progressQuery.getCourseProgress(
-        session.user.id,
-        course.id,
-      );
-
-      const courseCompleted =
-        progress?.status === "completed" &&
-        Boolean(progress.completedAt) &&
-        Boolean(progress.certificateEligibleAt);
-
-      if (courseCompleted) {
-        const certDomain = createCertificateDomain();
-        certificateLink =
-          await certDomain.verificationQuery.getCourseCompletionCertificateForUser({
-            userId: session.user.id,
-            courseProgressId: progress.id,
-          });
-      }
+      certificateLink = await ensureCourseCompletionCertificate({
+        userId: session.user.id,
+        courseId: course.id,
+        courseTitle: course.title,
+        recipientName:
+          session.user.name ?? session.user.email ?? "ScholarX Learner",
+        recipientEmail: session.user.email,
+      });
     } catch (error) {
-      console.error("[CourseDetailPage] Certificate lookup failed:", error);
+      console.error("[CourseDetailPage] Certificate repair guard failed:", error);
     }
   }
 

@@ -4,11 +4,11 @@ import { Suspense } from "react";
 import { LessonLayoutShell } from "./_components/lesson-layout-shell";
 import { LessonHeader } from "./_components/lesson-header";
 import { LessonClientBridge } from "./_components/lesson-client-bridge";
-import { createCourseProgressDomain, createNextCourseDomain } from "@/domain/courses";
-import { createCertificateDomain } from "@/domain/certificates/factory/certificate-services.factory";
+import { createNextCourseDomain } from "@/domain/courses";
 import type { LearnerCertificateLinkDto } from "@/domain/certificates/application/certificate-verification-query.service";
 import { isNextCourseError } from "@/domain/courses/application/next-course.errors";
 import { getSession, requireSession } from "@/lib/dal";
+import { ensureCourseCompletionCertificate } from "@/lib/certificates/course-certificate-repair";
 
 interface LessonPageProps {
   params: Promise<{ slug: string; lessonId: string }>;
@@ -71,27 +71,16 @@ export default async function LessonPage({ params }: LessonPageProps) {
   let certificateLink: LearnerCertificateLinkDto | null = null;
 
   try {
-    const progressDomain = createCourseProgressDomain();
-    const progress = await progressDomain.progressQuery.getCourseProgress(
-      session.user.id,
-      lessonData.course.id,
-    );
-
-    const courseCompleted =
-      progress?.status === "completed" &&
-      Boolean(progress.completedAt) &&
-      Boolean(progress.certificateEligibleAt);
-
-    if (courseCompleted) {
-      const certDomain = createCertificateDomain();
-      certificateLink =
-        await certDomain.verificationQuery.getCourseCompletionCertificateForUser({
-          userId: session.user.id,
-          courseProgressId: progress.id,
-        });
-    }
+    certificateLink = await ensureCourseCompletionCertificate({
+      userId: session.user.id,
+      courseId: lessonData.course.id,
+      courseTitle: lessonData.course.title,
+      recipientName:
+        session.user.name ?? session.user.email ?? "ScholarX Learner",
+      recipientEmail: session.user.email,
+    });
   } catch (error) {
-    console.error("[LessonPage] Certificate lookup failed:", error);
+    console.error("[LessonPage] Certificate repair guard failed:", error);
   }
 
   return (
