@@ -13,6 +13,7 @@ import { syncLessonProgress } from "@/actions/course.actions";
 import { toast } from "sonner";
 import type { MediaPlayerInstance } from "@vidstack/react";
 import type { LessonSummary } from "@/types/course.types";
+import { CourseCertificateLinkCard } from "@/components/certificates/course-certificate-link-card";
 import {
   CourseCompletionCelebration,
   type CourseCompletionCelebrationPhase,
@@ -30,6 +31,11 @@ interface LessonClientBridgeProps {
   nextLesson?: { id: string; title: string };
   lessons: LessonSummary[]; // The full curriculum array
   initialIsCompleted?: boolean;
+  certificateLink?: {
+    certificateNumber: string;
+    certificateUrl: string;
+    issuedAt: string;
+  } | null;
 }
 
 /**
@@ -51,6 +57,7 @@ export function LessonClientBridge({
   nextLesson,
   lessons,
   initialIsCompleted = false,
+  certificateLink,
 }: LessonClientBridgeProps) {
   const playerRef = useRef<MediaPlayerInstance>(null);
   const completionToastShownRef = useRef(false);
@@ -301,6 +308,16 @@ export function LessonClientBridge({
               />
             );
           })()}
+
+          {certificateLink && !isFocusMode ? (
+            <CourseCertificateLinkCard
+              certificateNumber={certificateLink.certificateNumber}
+              certificateUrl={certificateLink.certificateUrl}
+              courseTitle={courseTitle}
+              issuedAt={certificateLink.issuedAt}
+              variant="dark"
+            />
+          ) : null}
 
           {/* Lesson Meta */}
           <LessonMeta
