@@ -28,6 +28,14 @@ export interface PublicCertificateDto {
   pdf: PublicCertificateArtifactDto;
 }
 
+export interface LearnerCertificateLinkDto {
+  certificateNumber: string;
+  certificateUrl: string;
+  courseTitle: string;
+  issuedAt: string;
+  status: string;
+}
+
 // ---------------------------------------------------------------------------
 // Service
 // ---------------------------------------------------------------------------
@@ -143,5 +151,44 @@ export class CertificateVerificationQueryService {
    */
   async getInternalCertificate(certificateNumber: string): Promise<CertificateRecord | null> {
     return this.certificateRepo.findByPublicNumber(certificateNumber);
+  }
+
+  /**
+   * Internal learner-facing lookup used by authenticated course and lesson pages.
+   * Does not expose storage keys, internal IDs, or private auth data.
+   */
+  async getCourseCompletionCertificateForUser(input: {
+    userId: string;
+    courseProgressId: string;
+  }): Promise<LearnerCertificateLinkDto | null> {
+    const certificate = await this.certificateRepo.findBySource({
+      userId: input.userId,
+      sourceType: "course_completion",
+      sourceId: input.courseProgressId,
+    });
+
+    if (!certificate || !certificate.isPublic) return null;
+
+    return {
+      certificateNumber: certificate.certificateNumber,
+      certificateUrl: `/certificates/${certificate.certificateNumber}`,
+      courseTitle: certificate.programName,
+      issuedAt: certificate.issuedAt,
+      status: certificate.status,
+    };
+  }
+
+  /**
+   * Internal learner-facing lookup to list all public, unrevoked certificates for a user.
+   */
+  async getCertificatesForUser(userId: string): Promise<LearnerCertificateLinkDto[]> {
+    const certificates = await this.certificateRepo.findByUserId(userId);
+    return certificates.map((cert) => ({
+      certificateNumber: cert.certificateNumber,
+      certificateUrl: `/certificates/${cert.certificateNumber}`,
+      courseTitle: cert.programName,
+      issuedAt: cert.issuedAt,
+      status: cert.status,
+    }));
   }
 }
