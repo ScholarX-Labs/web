@@ -81,3 +81,33 @@ export async function ensureCourseCompletionCertificate(
     courseTitle: result.certificate.programName,
   });
 }
+
+export async function repairCourseCompletionCertificateArtifactsByNumber(
+  certificateNumber: string,
+): Promise<void> {
+  const certDomain = createCertificateDomain();
+  const certificate =
+    await certDomain.verificationQuery.getInternalCertificate(certificateNumber);
+
+  if (
+    !certificate ||
+    certificate.revokedAt ||
+    certificate.sourceType !== "course_completion" ||
+    !certificate.courseId ||
+    !certificate.courseProgressId
+  ) {
+    return;
+  }
+
+  await certDomain.issueService.issueForCourseCompletion({
+    userId: certificate.userId,
+    courseId: certificate.courseId,
+    courseProgressId: certificate.courseProgressId,
+    completedAt: new Date(certificate.completionDate),
+    recipientName: certificate.recipientName,
+    recipientEmail: certificate.recipientEmail ?? undefined,
+    courseTitle: certificate.programName,
+    completionSource: certificate.completionSource,
+    ruleVersion: certificate.ruleVersion,
+  });
+}
