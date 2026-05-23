@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createCourseProgressDomain } from "@/domain/courses";
+import { createCertificateDomain } from "@/domain/certificates/factory/certificate-services.factory";
 import { auth } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
@@ -25,10 +26,19 @@ export async function GET(request: NextRequest, context: RouteContext) {
 
   const { courseId } = await context.params;
   const domain = createCourseProgressDomain();
-  const [progress, certificate] = await Promise.all([
-    domain.progressQuery.getCourseProgress(userId, courseId),
-    domain.certificate.getCertificateByUserCourse(userId, courseId),
-  ]);
+  const progress = await domain.progressQuery.getCourseProgress(userId, courseId);
+
+  const completed =
+    progress?.status === "completed" &&
+    Boolean(progress.completedAt) &&
+    Boolean(progress.certificateEligibleAt);
+
+  const certificate = completed
+    ? await createCertificateDomain().verificationQuery.getCourseCompletionCertificateForUser({
+        userId,
+        courseProgressId: progress.id,
+      })
+    : null;
 
   if (certificate) {
     return NextResponse.json({
@@ -39,14 +49,9 @@ export async function GET(request: NextRequest, context: RouteContext) {
     });
   }
 
-  const eligible =
-    progress?.status === "completed" &&
-    Boolean(progress.completedAt) &&
-    Boolean(progress.certificateEligibleAt);
-
   return NextResponse.json({
-    eligible,
-    state: eligible ? "eligible_not_issued" : "not_eligible",
+    eligible: completed,
+    state: completed ? "eligible_not_issued" : "not_eligible",
     certificate: null,
     progress,
   });
