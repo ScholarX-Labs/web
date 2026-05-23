@@ -23,6 +23,7 @@ export const DrawerContent = forwardRef<
       )}
       {...props}
     >
+      <VaulDrawer.Title className="sr-only">Menu</VaulDrawer.Title>
       <div className="mx-auto mt-4 h-1.5 w-12 shrink-0 rounded-full bg-slate-400 dark:bg-slate-500" />
       {children}
     </VaulDrawer.Content>
