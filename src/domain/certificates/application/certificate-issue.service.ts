@@ -3,9 +3,13 @@ import type { ICertificateArtifactRepository } from "../contracts/certificate-ar
 import type { ICertificateEventRepository } from "../contracts/certificate-event.repository";
 import type { ICertificateQueueRepository } from "../contracts/certificate-queue.repository";
 import type { ICertificateQueuePort } from "../contracts/certificate-queue.port";
-import type { CertificateEligibilitySnapshot } from "../domain/certificate-source";
+import type {
+  CertificateEligibilitySnapshot,
+  CompletionSource,
+} from "../domain/certificate-source";
 import type { CertificateRecord } from "../contracts/certificate.repository";
 import type { CertificateArtifactRecord } from "../contracts/certificate-artifact.repository";
+import { randomUUID } from "crypto";
 import { generateCertificateNumber } from "../domain/certificate-number";
 import { CURRENT_TEMPLATE_VERSION } from "../domain/certificate-template";
 import { CertificateError } from "../domain/certificate-errors";
@@ -22,7 +26,7 @@ export interface IssueCourseCertificateInput {
   recipientName: string;
   recipientEmail?: string;
   courseTitle: string;
-  completionSource: "live" | "backfill_approximate" | "legacy_migration";
+  completionSource: CompletionSource;
   ruleVersion?: string;
 }
 
@@ -32,6 +36,11 @@ export interface IssueCertificateResult {
   alreadyIssued: boolean;
   artifactStatus: string;
 }
+
+const MIN_BROWSER_LOADABLE_PDF_BYTES = 500;
+const STALE_PENDING_MS = 2 * 60 * 1000;
+const STALE_GENERATING_MS = 15 * 60 * 1000;
+const MAX_ARTIFACT_REPAIR_ATTEMPTS = 5;
 
 // ---------------------------------------------------------------------------
 // Service
@@ -220,7 +229,35 @@ export class CertificateIssueService {
       templateVersion: CURRENT_TEMPLATE_VERSION,
     });
 
-    if (existing) return existing;
+    if (existing) {
+      if (this.shouldRequeueArtifact(existing)) {
+        const repaired = await this.artifactRepo.markPendingForRegeneration({
+          artifactId: existing.id,
+          reasonCode: this.getRepairReasonCode(existing),
+          reasonMessage:
+            "Artifact was repaired by course access guard and requeued for generation.",
+        });
+
+        const artifact = repaired ?? existing;
+        const messageId = `${artifact.id}:pdf:${CURRENT_TEMPLATE_VERSION}:repair-${Date.now()}-${randomUUID()}`;
+        const outboxRow = await this.queueRepo.createOutboxRow({
+          artifactId: artifact.id,
+          certificateId: certificate.id,
+          messageId,
+        });
+
+        await this.publishArtifactJob(
+          artifact,
+          certificate,
+          messageId,
+          outboxRow.id,
+        );
+
+        return artifact;
+      }
+
+      return existing;
+    }
 
     // Artifact was lost or not created; create and re-enqueue
     const artifact = await this.artifactRepo.createPending({
@@ -239,6 +276,49 @@ export class CertificateIssueService {
     await this.publishArtifactJob(artifact, certificate, messageId, outboxRow.id);
 
     return artifact;
+  }
+
+  private shouldRequeueArtifact(artifact: CertificateArtifactRecord): boolean {
+    const updatedAt = new Date(artifact.updatedAt).getTime();
+    const isUpdatedAtValid = Number.isFinite(updatedAt);
+    const ageMs = isUpdatedAtValid ? Date.now() - updatedAt : 0;
+    const nextAttemptAt = artifact.nextAttemptAt
+      ? new Date(artifact.nextAttemptAt).getTime()
+      : null;
+
+    if (
+      artifact.status === "ready" &&
+      artifact.contentType === "application/pdf" &&
+      artifact.byteSize !== null &&
+      artifact.byteSize < MIN_BROWSER_LOADABLE_PDF_BYTES
+    ) {
+      return true;
+    }
+
+    if (artifact.status === "pending" && ageMs >= STALE_PENDING_MS) {
+      return true;
+    }
+
+    if (artifact.status === "generating" && ageMs >= STALE_GENERATING_MS) {
+      return true;
+    }
+
+    if (
+      artifact.status === "failed" &&
+      artifact.attempts < MAX_ARTIFACT_REPAIR_ATTEMPTS &&
+      (nextAttemptAt === null || nextAttemptAt <= Date.now())
+    ) {
+      return true;
+    }
+
+    return false;
+  }
+
+  private getRepairReasonCode(artifact: CertificateArtifactRecord): string {
+    if (artifact.status === "ready") return "INVALID_READY_PDF_REPAIR";
+    if (artifact.status === "generating") return "STALE_GENERATING_REPAIR";
+    if (artifact.status === "failed") return "FAILED_ARTIFACT_REPAIR";
+    return "STALE_PENDING_REPAIR";
   }
 
   private async publishArtifactJob(
