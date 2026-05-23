@@ -1,4 +1,4 @@
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, isNull, desc } from "drizzle-orm";
 import { db } from "@/db";
 import {
   dbCanonicalCertificates,
@@ -81,6 +81,22 @@ export class DrizzleCertificateRepository implements ICertificateRepository {
       .limit(1);
 
     return rows[0] ? mapRow(rows[0]) : null;
+  }
+
+  async findByUserId(userId: string): Promise<CertificateRecord[]> {
+    const rows = await db
+      .select()
+      .from(dbCanonicalCertificates)
+      .where(
+        and(
+          eq(dbCanonicalCertificates.userId, userId),
+          eq(dbCanonicalCertificates.isPublic, true),
+          isNull(dbCanonicalCertificates.revokedAt),
+        ),
+      )
+      .orderBy(desc(dbCanonicalCertificates.issuedAt));
+
+    return rows.map(mapRow);
   }
 
   async createIssued(
