@@ -11,6 +11,16 @@ import {
   NextCoursesRepository,
 } from "@/domain/courses/infrastructure/db/next-courses.repository";
 import { NextCourseError } from "@/domain/courses/application/next-course.errors";
+import {
+  getCachedPublicCourseCategories,
+  getCachedPublicCourseDetailById,
+  getCachedPublicCourseDetailBySlug,
+  getCachedPublicCourseList,
+  setCachedPublicCourseCategories,
+  setCachedPublicCourseDetailById,
+  setCachedPublicCourseDetailBySlug,
+  setCachedPublicCourseList,
+} from "./course-cache";
 
 const formatDuration = (seconds?: number | null): string => {
   if (!seconds || seconds <= 0) return "0:00";
@@ -113,43 +123,17 @@ export class NextCourseCatalogService {
     query: CourseListQuery = {},
     userId?: string,
   ): Promise<PaginatedCoursesApiResponse> {
-    const page = Math.max(query.page ?? 1, 1);
-    const limit = Math.max(query.limit ?? 3, 1);
-
-    const result = await this.repository.listActive({
-      page,
-      limit,
-      category: query.category,
-    });
-
-    const items = Array.isArray(result?.items) ? result.items : [];
-    const totalCourses = result?.totalCourses ?? items.length;
-
-    const subscribedCourseIds = userId
-      ? await this.repository.findActiveSubscriptionsByUser(
-          userId,
-          items.map((item) => item.id),
-        )
-      : new Set<string>();
-
-    const mapped = items.map((item) =>
-      toCourse(item, subscribedCourseIds.has(item.id)),
-    );
-
-    // Put enrolled courses first within the returned page
-    mapped.sort((a, b) => {
-      if (a.isSubscribed === b.isSubscribed) return 0;
-      return a.isSubscribed ? -1 : 1;
-    });
-
-    return {
-      items: mapped,
-      pagination: this.toPagination(totalCourses, page, limit),
-    };
+    const publicResult = await this.getPublicList(query);
+    return this.applySubscriptionState(publicResult, userId);
   }
 
   async listCategories(): Promise<CourseCategory[]> {
-    return this.repository.listActiveCategories();
+    const cached = await getCachedPublicCourseCategories();
+    if (cached) return cached;
+
+    const categories = await this.repository.listActiveCategories();
+    await setCachedPublicCourseCategories(categories);
+    return categories;
   }
 
   getFeatured(query: CourseListQuery = {}, userId?: string) {
@@ -193,68 +177,25 @@ export class NextCourseCatalogService {
   }
 
   async getById(id: string, userId?: string): Promise<Course> {
-    const course = await this.repository.findByIdActive(id);
-    if (!course) {
-      throw new NextCourseError(
-        "COURSE_NOT_FOUND",
-        404,
-        `The requested course (ID: ${id}) was not found or is currently inactive.`,
-        1001,
-      );
+    const publicCourse = await this.getPublicCourseById(id);
+
+    if (!userId) {
+      return publicCourse;
     }
 
-    const [sub, lessons] = await Promise.all([
-      userId ? this.repository.findActiveSubscription(userId, id) : null,
-      this.repository.listLessons(id),
-    ]);
-
-    const mapped = toCourse(course, Boolean(sub));
-    mapped.lessons = lessons.map((l) => ({
-      id: l.id,
-      title: l.title,
-      description: l.description ?? undefined,
-      content: l.content ?? undefined,
-      videoUrl: l.videoUrl ?? undefined,
-      duration: l.duration ?? undefined,
-      order: l.sortIndex,
-      courseId: l.courseId,
-    }));
-
-    return mapped;
+    const sub = await this.repository.findActiveSubscription(userId, id);
+    return { ...publicCourse, isSubscribed: Boolean(sub) };
   }
 
   async getBySlug(slug: string, userId?: string): Promise<Course> {
-    const course =
-      (await this.repository.findBySlugActive(slug)) ??
-      (isUuid(slug) ? await this.repository.findByIdActive(slug) : null);
+    const publicCourse = await this.getPublicCourseBySlug(slug);
 
-    if (!course) {
-      throw new NextCourseError(
-        "COURSE_NOT_FOUND",
-        404,
-        `Course with slug '${slug}' not found.`,
-        1001,
-      );
+    if (!userId) {
+      return publicCourse;
     }
 
-    const [sub, lessons] = await Promise.all([
-      userId ? this.repository.findActiveSubscription(userId, course.id) : null,
-      this.repository.listLessons(course.id),
-    ]);
-
-    const mapped = toCourse(course, Boolean(sub));
-    mapped.lessons = lessons.map((l: any) => ({
-      id: l.id,
-      title: l.title,
-      description: l.description ?? undefined,
-      content: l.content ?? undefined,
-      videoUrl: l.videoUrl ?? undefined,
-      duration: l.duration ?? undefined,
-      order: l.sortIndex,
-      courseId: l.courseId,
-    }));
-
-    return mapped;
+    const sub = await this.repository.findActiveSubscription(userId, publicCourse.id);
+    return { ...publicCourse, isSubscribed: Boolean(sub) };
   }
 
   async getEnrollmentStatus(courseId: string, userId: string) {
@@ -364,5 +305,119 @@ export class NextCourseCatalogService {
     },
   ) {
     await this.repository.upsertLessonProgress(userId, lessonId, courseId, data);
+  }
+
+  private async getPublicList(
+    query: CourseListQuery = {},
+  ): Promise<PaginatedCoursesApiResponse> {
+    const cached = await getCachedPublicCourseList(query);
+    if (cached) return cached;
+
+    const page = Math.max(query.page ?? 1, 1);
+    const limit = Math.max(query.limit ?? 3, 1);
+
+    const result = await this.repository.listActive({
+      page,
+      limit,
+      category: query.category,
+    });
+
+    const items = Array.isArray(result?.items) ? result.items : [];
+    const totalCourses = result?.totalCourses ?? items.length;
+
+    const mapped = items.map((item) => toCourse(item, false));
+    const publicResult = {
+      items: mapped,
+      pagination: this.toPagination(totalCourses, page, limit),
+    };
+
+    await setCachedPublicCourseList(query, publicResult);
+    return publicResult;
+  }
+
+  private async applySubscriptionState(
+    publicResult: PaginatedCoursesApiResponse,
+    userId?: string,
+  ): Promise<PaginatedCoursesApiResponse> {
+    if (!userId) return publicResult;
+
+    const subscribedCourseIds = await this.repository.findActiveSubscriptionsByUser(
+      userId,
+      publicResult.items.map((item) => item.id),
+    );
+
+    const items = publicResult.items.map((item) => ({
+      ...item,
+      isSubscribed: subscribedCourseIds.has(item.id),
+    }));
+
+    return {
+      items,
+      pagination: publicResult.pagination,
+    };
+  }
+
+  private async getPublicCourseById(id: string): Promise<Course> {
+    const cached = await getCachedPublicCourseDetailById(id);
+    if (cached) return cached;
+
+    const course = await this.repository.findByIdActive(id);
+    if (!course) {
+      throw new NextCourseError(
+        "COURSE_NOT_FOUND",
+        404,
+        `The requested course (ID: ${id}) was not found or is currently inactive.`,
+        1001,
+      );
+    }
+
+    const publicCourse = await this.buildPublicCourseDetail(course);
+    await setCachedPublicCourseDetailById(id, publicCourse);
+    if (course.slug) {
+      await setCachedPublicCourseDetailBySlug(course.slug, publicCourse);
+    }
+
+    return publicCourse;
+  }
+
+  private async getPublicCourseBySlug(slug: string): Promise<Course> {
+    const cached = await getCachedPublicCourseDetailBySlug(slug);
+    if (cached) return cached;
+
+    const course =
+      (await this.repository.findBySlugActive(slug)) ??
+      (isUuid(slug) ? await this.repository.findByIdActive(slug) : null);
+
+    if (!course) {
+      throw new NextCourseError(
+        "COURSE_NOT_FOUND",
+        404,
+        `Course with slug '${slug}' not found.`,
+        1001,
+      );
+    }
+
+    const publicCourse = await this.buildPublicCourseDetail(course);
+    await setCachedPublicCourseDetailById(course.id, publicCourse);
+    await setCachedPublicCourseDetailBySlug(course.slug ?? slug, publicCourse);
+
+    return publicCourse;
+  }
+
+  private async buildPublicCourseDetail(record: FlatCourseRecord): Promise<Course> {
+    const lessons = await this.repository.listLessons(record.id);
+    const mapped = toCourse(record, false);
+    mapped.lessons = lessons.map((l: any) => ({
+      id: l.id,
+      title: l.title,
+      description: l.description ?? undefined,
+      content: l.content ?? undefined,
+      videoUrl: l.videoUrl ?? undefined,
+      duration: l.duration ?? undefined,
+      order: l.sortIndex,
+      courseId: l.courseId,
+    }));
+
+    return mapped;
   }
 }
