@@ -9,7 +9,7 @@ import {
   markSharedRedisUnavailable,
 } from "@/lib/cache/shared-redis";
 import { env } from "@/config/env";
-import { UpstashRateLimiterAdapter } from "./upstash-rate-limiter.adapter";
+import { RedisSlidingWindowRateLimiterAdapter } from "./redis-sliding-window-rate-limiter.adapter";
 import { emitCacheMetricEvent } from "@/lib/cache/cache-metrics";
 
 class FallbackDistributedRateLimiter implements DistributedRateLimiter {
@@ -47,7 +47,7 @@ function getAdapter(): DistributedRateLimiter {
   }
 
   if (!adapter) {
-    adapter = new UpstashRateLimiterAdapter(redis);
+    adapter = new RedisSlidingWindowRateLimiterAdapter(redis);
   }
 
   return adapter;
