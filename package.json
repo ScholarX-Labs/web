@@ -8,6 +8,7 @@
     "dev": "pnpm validate:env && next dev",
     "start": "next start",
     "validate:env": "tsx scripts/validate-env.ts",
+    "redis:diagnose": "tsx scripts/redis-diagnose.ts",
     "redis:smoke": "tsx scripts/redis-smoke-test.ts",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
