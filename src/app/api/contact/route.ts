@@ -2,12 +2,38 @@ import "server-only";
 
 import { db } from "@/db";
 import { contactUs } from "@/db/schema/contact-us-schema";
+import { checkDistributedRateLimit } from "@/lib/rate-limit/rate-limit.factory";
+import { buildRateLimitSubject } from "@/lib/rate-limit/rate-limit.utils";
 
 import { contactSchema } from "@/app/contact/contact.schema";
 
 const MAX_CONTACT_BODY_BYTES = 16 * 1024;
 
 export async function POST(req: Request) {
+  const forwardedFor =
+    req.headers.get("x-forwarded-for") ??
+    req.headers.get("x-real-ip") ??
+    "unknown";
+  const rateLimit = await checkDistributedRateLimit(
+    {
+      id: "contact.submit.ip.hour",
+      windowSeconds: 60 * 60,
+      maxRequests: 5,
+      failureMode: "fail-closed",
+    },
+    buildRateLimitSubject(["contact", forwardedFor]),
+  );
+
+  if (!rateLimit.allowed) {
+    return Response.json(
+      { error: "Too many contact requests. Please try again later." },
+      {
+        status: 429,
+        headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
+      },
+    );
+  }
+
   let body: unknown;
   const contentLength = req.headers.get("content-length");
   if (contentLength && Number(contentLength) > MAX_CONTACT_BODY_BYTES) {
