@@ -22,9 +22,15 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const rateLimit = await checkPublicOpportunitySearchLimit(
-    getClientIpFromHeaders(request.headers),
-  );
+  const clientIp = getClientIpFromHeaders(request.headers);
+  if (!clientIp) {
+    return NextResponse.json(
+      { error: "Unable to identify request origin" },
+      { status: 400 },
+    );
+  }
+
+  const rateLimit = await checkPublicOpportunitySearchLimit(clientIp);
   if (!rateLimit.allowed) {
     return NextResponse.json(
       { error: "Too many search requests" },
