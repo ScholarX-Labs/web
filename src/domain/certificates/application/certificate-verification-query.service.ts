@@ -3,6 +3,12 @@ import type { ICertificateArtifactRepository } from "../contracts/certificate-ar
 import type { ICertificateEventRepository } from "../contracts/certificate-event.repository";
 import type { ArtifactType } from "@/db/schema/certificates-db.schema";
 import { CURRENT_TEMPLATE_VERSION } from "../domain/certificate-template";
+import {
+  getCachedCertificateArtifactStatus,
+  getCachedPublicCertificate,
+  setCachedCertificateArtifactStatus,
+  setCachedPublicCertificate,
+} from "./certificate-cache";
 
 // ---------------------------------------------------------------------------
 // Public DTO — safe to return to the browser (no internal IDs or storage keys)
@@ -59,11 +65,31 @@ export class CertificateVerificationQueryService {
   async getPublicCertificate(
     certificateNumber: string,
   ): Promise<PublicCertificateDto | null> {
+    const cached = await getCachedPublicCertificate(certificateNumber);
+    if (cached) {
+      if (!cached.found) return null;
+
+      this.eventRepo
+        .append({
+          certificateId: cached.certificateId,
+          eventType: "certificate.verified",
+          metadata: { certificateNumber: cached.value.certificateNumber },
+        })
+        .catch(() => {
+          // Non-critical — continue even if event write fails
+        });
+
+      return cached.value;
+    }
+
     const certificate = await this.certificateRepo.findByPublicNumber(
       certificateNumber,
     );
 
-    if (!certificate || !certificate.isPublic) return null;
+    if (!certificate || !certificate.isPublic) {
+      await setCachedPublicCertificate(certificateNumber, { found: false });
+      return null;
+    }
 
     // Always include revoked certificates — spec requirement
     const artifact = await this.artifactRepo.findRequiredArtifact({
@@ -88,7 +114,7 @@ export class CertificateVerificationQueryService {
     const isPendingOrGenerating =
       pdfStatus === "pending" || pdfStatus === "generating";
 
-    return {
+    const value = {
       certificateNumber: certificate.certificateNumber,
       recipientName: certificate.recipientName,
       programName: certificate.programName,
@@ -106,6 +132,14 @@ export class CertificateVerificationQueryService {
         nextPollAfterMs: isPendingOrGenerating ? 5000 : null,
       },
     };
+
+    await setCachedPublicCertificate(certificateNumber, {
+      found: true,
+      certificateId: certificate.id,
+      value,
+    });
+
+    return value;
   }
 
   /**
@@ -118,10 +152,18 @@ export class CertificateVerificationQueryService {
     certificateNumber: string;
     pdf: PublicCertificateArtifactDto;
   } | null> {
+    const cached = await getCachedCertificateArtifactStatus(certificateNumber);
+    if (cached) {
+      return cached.found ? cached.value : null;
+    }
+
     const certificate = await this.certificateRepo.findByPublicNumber(
       certificateNumber,
     );
-    if (!certificate || !certificate.isPublic) return null;
+    if (!certificate || !certificate.isPublic) {
+      await setCachedCertificateArtifactStatus(certificateNumber, { found: false });
+      return null;
+    }
 
     const artifact = await this.artifactRepo.findRequiredArtifact({
       certificateId: certificate.id,
@@ -134,7 +176,7 @@ export class CertificateVerificationQueryService {
     const isPendingOrGenerating =
       pdfStatus === "pending" || pdfStatus === "generating";
 
-    return {
+    const value = {
       certificateNumber: certificate.certificateNumber,
       pdf: {
         status: pdfStatus,
@@ -144,6 +186,13 @@ export class CertificateVerificationQueryService {
         nextPollAfterMs: isPendingOrGenerating ? 5000 : null,
       },
     };
+
+    await setCachedCertificateArtifactStatus(certificateNumber, {
+      found: true,
+      value,
+    });
+
+    return value;
   }
 
   /**
