@@ -21,7 +21,7 @@ Every surface must have `negativeTtlSeconds` set when `fallbackMode` is `"source
 | `admin.reports.*` | admin | admin-scoped | 60s | 5m | N/A | +10s | 512 KB | XFetch | `admin:reports`, `admin:user:{userId}:reports`, report range hash | source |
 | `admin.lists.*` | admin | admin-scoped | 30s | 2m | N/A | +5s | 128 KB | XFetch | `admin:list:{entity}`, `admin:user:{userId}:lists` | source |
 | `config.runtime` | config | system | 60s | 5m | 30s | +10s | 16 KB | XFetch | `config:{key}` | source |
-| _rate limits_ | rate-limit | system | window-specific | N/A | N/A | N/A | automatic via Upstash ratelimit | fail-closed or fail-open per rule |
+| _rate limits_ | rate-limit | system | window-specific | N/A | N/A | N/A | N/A | N/A | distributed Redis limiter keys per rule | fail-closed or fail-open per rule |
 
 > **Admin Cache Scoping**: Admin surface tags include both a global tag (`admin:stats`) and a
 > user-scoped tag (`admin:user:{userId}:stats`). Cache entries for admin surfaces must be keyed
