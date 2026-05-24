@@ -2,6 +2,8 @@ import { createHash } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { createNextCourseDomain, isNextCourseError } from "@/domain/courses";
+import { checkDistributedRateLimit } from "@/lib/rate-limit/rate-limit.factory";
+import { buildRateLimitSubject } from "@/lib/rate-limit/rate-limit.utils";
 
 type ErrorEnvelope = {
   success: false;
@@ -13,15 +15,11 @@ type ErrorEnvelope = {
   };
 };
 
-const submitRateWindowMs = 10 * 60 * 1000;
+const submitRateWindowSeconds = 10 * 60;
 const submitRateLimit = 5;
-const submitRateState = new Map<string, number[]>();
 
 const getRequestId = (request: NextRequest) =>
   request.headers.get("x-request-id") ?? crypto.randomUUID();
-
-const cleanupTimestamps = (timestamps: number[], now: number) =>
-  timestamps.filter((timestamp) => now - timestamp < submitRateWindowMs);
 
 const getAbuseKey = (request: NextRequest) => {
   const forwardedFor = request.headers.get("x-forwarded-for") ?? "unknown";
@@ -72,14 +70,18 @@ export const enforceApplicationSubmitRateLimit = async (
   courseId: string,
   requestId: string,
 ) => {
-  const now = Date.now();
   const abuseKey = getAbuseKey(request);
-  const key = `${userId}:${courseId}:${abuseKey}`;
-  const timestamps = cleanupTimestamps(submitRateState.get(key) ?? [], now);
+  const result = await checkDistributedRateLimit(
+    {
+      id: "course.application.user-resource.10m",
+      windowSeconds: submitRateWindowSeconds,
+      maxRequests: submitRateLimit,
+      failureMode: "fail-closed",
+    },
+    buildRateLimitSubject(["course-application", userId, courseId, abuseKey]),
+  );
 
-  if (timestamps.length >= submitRateLimit) {
-    const retryAfterMs = submitRateWindowMs - (now - timestamps[0]);
-    const retryAfterSeconds = Math.max(1, Math.ceil(retryAfterMs / 1000));
+  if (!result.allowed) {
     return createErrorResponse(
       requestId,
       429,
@@ -87,13 +89,10 @@ export const enforceApplicationSubmitRateLimit = async (
       "Too many application attempts. Please wait before trying again.",
       undefined,
       {
-        "Retry-After": String(retryAfterSeconds),
+        "Retry-After": String(result.retryAfterSeconds),
       },
     );
   }
-
-  timestamps.push(now);
-  submitRateState.set(key, timestamps);
   return null;
 };
 

@@ -3,6 +3,10 @@ import type { AdminSession, CreateLessonInput, UpdateLessonInput } from "@/domai
 import { CreateLessonSchema, UpdateLessonSchema, ReorderLessonsSchema } from "@/domain/admin/contracts/admin-validation.schemas";
 import { AdminErrors } from "@/domain/admin/application/admin-errors";
 import type { AuditLogger } from "@/domain/admin/infrastructure/audit/audit-logger";
+import {
+  invalidatePublicCourseDetailCache,
+  invalidatePublicCourseListCache,
+} from "@/domain/courses/application/course-cache";
 
 export const createAdminLessonsService = (
   repo: AdminRepository,
@@ -21,6 +25,9 @@ export const createAdminLessonsService = (
   async create(session: AdminSession, courseId: string, data: unknown) {
     const parsed = CreateLessonSchema.parse(data);
     const lesson = await repo.createLesson(courseId, parsed as CreateLessonInput);
+    const course = await repo.getCourse(courseId);
+    await invalidatePublicCourseListCache();
+    await invalidatePublicCourseDetailCache({ courseId, slug: course?.slug });
 
     await audit.log({
       adminId: session.userId,
@@ -41,6 +48,12 @@ export const createAdminLessonsService = (
     if (!existing) throw AdminErrors.notFound("Lesson");
 
     const lesson = await repo.updateLesson(id, parsed as UpdateLessonInput, new Date(parsed.expectedVersion));
+    const course = existing.courseId ? await repo.getCourse(existing.courseId) : null;
+    await invalidatePublicCourseListCache();
+    await invalidatePublicCourseDetailCache({
+      courseId: existing.courseId,
+      slug: course?.slug,
+    });
 
     await audit.log({
       adminId: session.userId,
@@ -61,6 +74,12 @@ export const createAdminLessonsService = (
     if (!existing) throw AdminErrors.notFound("Lesson");
 
     const lesson = await repo.toggleLessonVisibility(id);
+    const course = existing.courseId ? await repo.getCourse(existing.courseId) : null;
+    await invalidatePublicCourseListCache();
+    await invalidatePublicCourseDetailCache({
+      courseId: existing.courseId,
+      slug: course?.slug,
+    });
 
     await audit.log({
       adminId: session.userId,
@@ -81,6 +100,12 @@ export const createAdminLessonsService = (
     if (!existing) throw AdminErrors.notFound("Lesson");
 
     await repo.archiveLesson(id);
+    const course = existing.courseId ? await repo.getCourse(existing.courseId) : null;
+    await invalidatePublicCourseListCache();
+    await invalidatePublicCourseDetailCache({
+      courseId: existing.courseId,
+      slug: course?.slug,
+    });
 
     await audit.log({
       adminId: session.userId,
@@ -96,6 +121,9 @@ export const createAdminLessonsService = (
   async reorder(session: AdminSession, courseId: string, data: unknown) {
     const parsed = ReorderLessonsSchema.parse(data);
     const lessons = await repo.reorderLessons(courseId, parsed.lessonIds);
+    const course = await repo.getCourse(courseId);
+    await invalidatePublicCourseListCache();
+    await invalidatePublicCourseDetailCache({ courseId, slug: course?.slug });
 
     await audit.log({
       adminId: session.userId,

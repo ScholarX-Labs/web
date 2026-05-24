@@ -4,6 +4,14 @@ import {
   RawSearchResult,
   RawOpportunity,
 } from "./types";
+import {
+  getFreshOpportunityDetail,
+  getFreshOpportunitySearch,
+  getStaleOpportunityDetail,
+  getStaleOpportunitySearch,
+  setOpportunityDetail,
+  setOpportunitySearch,
+} from "./opportunity-cache";
 
 const SEARCH_API_URL = "https://scholarx-search-api.vercel.app/api/search";
 const SEARCH_API_BASE = "https://scholarx-search-api.vercel.app/api";
@@ -111,15 +119,34 @@ function normalizeResult(raw: RawSearchResult): SearchResult | null {
 export async function searchScholarships(
   query: string,
 ): Promise<SearchResult[]> {
-  const response = await fetch(SEARCH_API_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ query, limit: LIMIT_PER_REQUEST }),
-  });
+  const normalizedQuery = query.trim();
+  const freshCached = await getFreshOpportunitySearch(normalizedQuery);
+  if (freshCached !== undefined) {
+    return freshCached;
+  }
+
+  let response: Response;
+  try {
+    response = await fetch(SEARCH_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ query: normalizedQuery, limit: LIMIT_PER_REQUEST }),
+    });
+  } catch (error) {
+    const stale = await getStaleOpportunitySearch(normalizedQuery);
+    if (stale !== null) {
+      return stale;
+    }
+    throw error;
+  }
 
   if (!response.ok) {
+    const stale = await getStaleOpportunitySearch(normalizedQuery);
+    if (stale !== null) {
+      return stale;
+    }
     throw new Error(`Search failed: ${response.status}`);
   }
 
@@ -139,9 +166,12 @@ export async function searchScholarships(
       [];
   }
 
-  return rawResults
+  const results = rawResults
     .map(normalizeResult)
     .filter((r): r is SearchResult => r !== null);
+
+  await setOpportunitySearch(normalizedQuery, results);
+  return results;
 }
 
 export async function getOpportunityById(
@@ -149,6 +179,11 @@ export async function getOpportunityById(
   lang?: string,
 ): Promise<SearchResult | null> {
   const normalizedLang = normalizeLang(lang);
+  const freshCached = await getFreshOpportunityDetail(id, normalizedLang);
+  if (freshCached !== undefined) {
+    return freshCached;
+  }
+
   const url = `${SEARCH_API_BASE}/opportunities/${encodeURIComponent(id)}?lang=${normalizedLang}`;
   let response: Response;
 
@@ -157,6 +192,10 @@ export async function getOpportunityById(
       next: { revalidate: 3600 },
     });
   } catch (error) {
+    const stale = await getStaleOpportunityDetail(id, normalizedLang);
+    if (stale !== null) {
+      return stale;
+    }
     console.error("getOpportunityById failed", {
       id,
       lang: normalizedLang,
@@ -167,12 +206,28 @@ export async function getOpportunityById(
 
   if (!response.ok) {
     if (response.status >= 500) {
+      const stale = await getStaleOpportunityDetail(id, normalizedLang);
+      if (stale !== null) {
+        return stale;
+      }
       console.error("getOpportunityById upstream error", {
         id,
         lang: normalizedLang,
         status: response.status,
       });
+      return null;
     }
+
+    if (response.status === 404) {
+      await setOpportunityDetail(id, normalizedLang, null);
+      return null;
+    }
+
+    console.error("getOpportunityById upstream non-cacheable error", {
+      id,
+      lang: normalizedLang,
+      status: response.status,
+    });
     return null;
   }
 
@@ -182,5 +237,7 @@ export async function getOpportunityById(
     opportunity: raw.data,
   };
 
-  return normalizeResult(wrapped);
+  const normalized = normalizeResult(wrapped);
+  await setOpportunityDetail(id, normalizedLang, normalized);
+  return normalized;
 }

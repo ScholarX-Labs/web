@@ -10,6 +10,10 @@ import {
   CourseApplicationInput,
 } from "@/domain/courses/application/course-application.schemas";
 import { ZodError } from "zod";
+import {
+  invalidatePublicCourseDetailCache,
+  invalidatePublicCourseListCache,
+} from "@/domain/courses/application/course-cache";
 
 interface EnrollmentContext {
   requestId?: string;
@@ -130,6 +134,8 @@ export class NextCourseEnrollmentService {
       courseId,
       idempotencyKey: body?.idempotencyKey,
     });
+    await invalidatePublicCourseListCache();
+    await invalidatePublicCourseDetailCache({ courseId, slug: course.slug });
 
     return {
       requestId,
@@ -397,6 +403,8 @@ export class NextCourseEnrollmentService {
             courseId,
             idempotencyKey: parsed.idempotencyKey,
           });
+          await invalidatePublicCourseListCache();
+          await invalidatePublicCourseDetailCache({ courseId, slug: course.slug });
 
           return {
             ...application,

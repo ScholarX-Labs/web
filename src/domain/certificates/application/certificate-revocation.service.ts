@@ -2,6 +2,7 @@ import type { ICertificateRepository } from "../contracts/certificate.repository
 import type { ICertificateEventRepository } from "../contracts/certificate-event.repository";
 import { CertificateError } from "../domain/certificate-errors";
 import { assertValidCertificateTransition } from "../domain/certificate-status";
+import { invalidatePublicCertificateCache } from "./certificate-cache";
 
 export interface RevokeCertificateCommand {
   certificateNumber: string;
@@ -52,5 +53,7 @@ export class CertificateRevocationService {
         previousStatus: certificate.status,
       },
     });
+
+    await invalidatePublicCertificateCache(certificate.certificateNumber);
   }
 }

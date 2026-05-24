@@ -8,6 +8,7 @@ import type { ArtifactType } from "@/db/schema/certificates-db.schema";
 import { buildArtifactStorageKey } from "../contracts/certificate-storage.port";
 import { CertificateError } from "../domain/certificate-errors";
 import type { CertificateTemplateVersion } from "../domain/certificate-template";
+import { invalidatePublicCertificateCache } from "./certificate-cache";
 
 export const ARTIFACT_STORAGE_CONTAINER = "certificates";
 
@@ -67,6 +68,7 @@ export class CertificateArtifactGenerationService {
 
     if (!certificate) {
       await this.failArtifact(message.artifactId, "CERTIFICATE_NOT_FOUND", "Certificate not found");
+      await invalidatePublicCertificateCache(message.certificateNumber);
       return;
     }
 
@@ -78,6 +80,7 @@ export class CertificateArtifactGenerationService {
         "Certificate is revoked; artifact generation skipped",
         undefined, // no next attempt
       );
+      await invalidatePublicCertificateCache(certificate.certificateNumber);
       return;
     }
 
@@ -90,6 +93,7 @@ export class CertificateArtifactGenerationService {
         templateVersion: message.templateVersion,
       },
     });
+    await invalidatePublicCertificateCache(certificate.certificateNumber);
 
     try {
       // Step 4: Render
@@ -138,6 +142,7 @@ export class CertificateArtifactGenerationService {
           byteSize: renderOutput.byteSize,
         },
       });
+      await invalidatePublicCertificateCache(certificate.certificateNumber);
 
       console.info("[CertificateArtifactGenerationService] Artifact ready", {
         artifactId: message.artifactId,
@@ -169,6 +174,7 @@ export class CertificateArtifactGenerationService {
           attempts: attempts + 1,
         },
       });
+      await invalidatePublicCertificateCache(certificate.certificateNumber);
 
       // Re-throw so the worker can abandon/nack the Service Bus message
       throw new CertificateError(

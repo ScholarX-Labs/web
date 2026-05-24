@@ -10,8 +10,21 @@ const envSchema = z.object({
   R2_BUCKET_NAME: z.string().optional(),
   R2_PUBLIC_URL: z.string().url().optional(),
 
-  UPSTASH_REDIS_URL: z.string().url().optional(),
-  UPSTASH_REDIS_TOKEN: z.string().optional(),
+  AZURE_REDIS_HOST: z.string().min(1).optional(),
+  AZURE_REDIS_PORT: z.string().regex(/^\d+$/).optional(),
+  AZURE_REDIS_KEY: z.string().optional(),
+  AZURE_REDIS_CLUSTER: z.enum(["true", "false"]).optional(),
+  AZURE_REDIS_TLS: z.enum(["true", "false"]).optional(),
+  REDIS_URL: z.string().url().optional(),
+  REDIS_HOST: z.string().min(1).optional(),
+  REDIS_PORT: z.string().regex(/^\d+$/).optional(),
+  REDIS_PASSWORD: z.string().optional(),
+  REDIS_CONNECT_TIMEOUT_MS: z.string().regex(/^\d+$/).optional(),
+  REDIS_COMMAND_TIMEOUT_MS: z.string().regex(/^\d+$/).optional(),
+  REDIS_MAX_RETRIES_PER_REQUEST: z.string().regex(/^\d+$/).optional(),
+  REDIS_KEY_PREFIX: z.string().min(1).optional(),
+  CACHE_ENABLED: z.enum(["true", "false"]).optional(),
+  DISTRIBUTED_RATE_LIMITS_ENABLED: z.enum(["true", "false"]).optional(),
 
   AVATAR_UPLOAD_ENABLED: z.enum(["true", "false"]).optional(),
 

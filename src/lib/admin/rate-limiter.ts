@@ -1,21 +1,5 @@
-interface RateLimitEntry {
-  count: number;
-  resetAt: number;
-}
-
-const store = new Map<string, RateLimitEntry>();
-
-const CLEANUP_INTERVAL = 60_000;
-let lastCleanup = Date.now();
-
-const cleanup = () => {
-  const now = Date.now();
-  if (now - lastCleanup < CLEANUP_INTERVAL) return;
-  lastCleanup = now;
-  for (const [key, entry] of store) {
-    if (now >= entry.resetAt) store.delete(key);
-  }
-};
+import { checkDistributedRateLimit } from "@/lib/rate-limit/rate-limit.factory";
+import { buildRateLimitSubject } from "@/lib/rate-limit/rate-limit.utils";
 
 interface RateLimitConfig {
   windowMs: number;
@@ -37,25 +21,24 @@ const getRouteConfig = (path: string): RateLimitConfig => {
   return DEFAULT_CONFIG;
 };
 
-export const checkRateLimit = (
+export const checkRateLimit = async (
   identifier: string,
   path: string,
-): { allowed: boolean; remaining: number; resetAt: number } => {
-  cleanup();
-  const now = Date.now();
+): Promise<{ allowed: boolean; remaining: number; resetAt: number }> => {
   const config = getRouteConfig(path);
-  const key = `${identifier}:${path}`;
-  const entry = store.get(key);
+  const result = await checkDistributedRateLimit(
+    {
+      id: `admin.api.${path.replace(/[^a-z0-9]+/gi, ".").replace(/^\.+|\.+$/g, "").toLowerCase() || "root"}`,
+      windowSeconds: Math.ceil(config.windowMs / 1000),
+      maxRequests: config.maxRequests,
+      failureMode: "fail-closed",
+    },
+    buildRateLimitSubject(["admin", identifier, path]),
+  );
 
-  if (!entry || now >= entry.resetAt) {
-    store.set(key, { count: 1, resetAt: now + config.windowMs });
-    return { allowed: true, remaining: config.maxRequests - 1, resetAt: now + config.windowMs };
-  }
-
-  if (entry.count >= config.maxRequests) {
-    return { allowed: false, remaining: 0, resetAt: entry.resetAt };
-  }
-
-  entry.count++;
-  return { allowed: true, remaining: config.maxRequests - entry.count, resetAt: entry.resetAt };
+  return {
+    allowed: result.allowed,
+    remaining: result.remaining,
+    resetAt: result.resetAt,
+  };
 };

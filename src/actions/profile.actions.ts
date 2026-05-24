@@ -8,6 +8,7 @@ import { z } from "zod";
 import { db } from "@/db";
 import { user } from "@/db/schema/auth-schema";
 import { auth } from "@/lib/auth";
+import { invalidatePublicProfileCache } from "@/actions/public-profile.actions";
 import type { ActionResponse } from "@/types/profile.types";
 
 type ProfileData = Record<string, unknown>;
@@ -128,22 +129,23 @@ export async function updateProfile(
       return { success: false, error: "No fields to update" };
     }
 
+    const [current] = await db
+      .select({ username: user.username })
+      .from(user)
+      .where(eq(user.id, session.user.id))
+      .limit(1);
+
     await db.update(user).set(updateData).where(eq(user.id, session.user.id));
 
     if (parsed.data.firstName || parsed.data.lastName) {
-      const [current] = await db
-        .select({ username: user.username })
-        .from(user)
-        .where(eq(user.id, session.user.id))
-        .limit(1);
-
       await db.update(user).set({
         name: sql`concat_ws(' ', ${user.firstName}, ${user.lastName})`,
       }).where(eq(user.id, session.user.id));
+    }
 
-      if (current?.username) {
-        revalidatePath(`/scholar/${current.username}`);
-      }
+    if (current?.username) {
+      await invalidatePublicProfileCache(current.username);
+      revalidatePath(`/scholar/${current.username}`);
     }
 
     revalidatePath("/profile");
@@ -179,8 +181,18 @@ export async function updateSocialLinks(
       updateData[key] = value || null;
     }
 
+    const [current] = await db
+      .select({ username: user.username })
+      .from(user)
+      .where(eq(user.id, session.user.id))
+      .limit(1);
+
     await db.update(user).set(updateData).where(eq(user.id, session.user.id));
 
+    await invalidatePublicProfileCache(current?.username);
+    if (current?.username) {
+      revalidatePath(`/scholar/${current.username}`);
+    }
     revalidatePath("/profile");
     return { success: true };
   } catch (error) {
@@ -215,6 +227,7 @@ export async function deleteAccount(): Promise<ActionResponse> {
 
     await db.delete(user).where(eq(user.id, session.user.id));
 
+    await invalidatePublicProfileCache(current?.username);
     revalidatePath("/scholar/" + (current?.username ?? ""));
     revalidatePath("/profile");
 
@@ -236,7 +249,7 @@ export async function toggleProfilePrivacy(): Promise<ActionResponse<PrivacyData
     }
 
     const [current] = await db
-      .select({ isProfilePublic: user.isProfilePublic })
+      .select({ isProfilePublic: user.isProfilePublic, username: user.username })
       .from(user)
       .where(eq(user.id, session.user.id))
       .limit(1);
@@ -250,6 +263,10 @@ export async function toggleProfilePrivacy(): Promise<ActionResponse<PrivacyData
       .set({ isProfilePublic: !current.isProfilePublic })
       .where(eq(user.id, session.user.id));
 
+    await invalidatePublicProfileCache(current.username);
+    if (current.username) {
+      revalidatePath(`/scholar/${current.username}`);
+    }
     revalidatePath("/profile");
     return { success: true, data: { isProfilePublic: !current.isProfilePublic } };
   } catch (error) {
