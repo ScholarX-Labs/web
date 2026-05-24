@@ -3,6 +3,10 @@ import type { AdminSession, CreateCourseInput, UpdateCourseInput } from "@/domai
 import { CreateCourseSchema, CourseStatusSchema, EnrollUserSchema, UpdateCourseSchema } from "@/domain/admin/contracts/admin-validation.schemas";
 import { AdminErrors } from "@/domain/admin/application/admin-errors";
 import type { AuditLogger } from "@/domain/admin/infrastructure/audit/audit-logger";
+import {
+  invalidatePublicCourseDetailCache,
+  invalidatePublicCourseListCache,
+} from "@/domain/courses/application/course-cache";
 
 export const createAdminCoursesService = (
   repo: AdminRepository,
@@ -21,6 +25,8 @@ export const createAdminCoursesService = (
   async create(session: AdminSession, data: unknown) {
     const parsed = CreateCourseSchema.parse(data);
     const course = await repo.createCourse(parsed as CreateCourseInput);
+    await invalidatePublicCourseListCache();
+    await invalidatePublicCourseDetailCache({ courseId: course.id, slug: course.slug });
 
     await audit.log({
       adminId: session.userId,
@@ -41,6 +47,15 @@ export const createAdminCoursesService = (
     if (!existing) throw AdminErrors.notFound("Course");
 
     const course = await repo.updateCourse(id, parsed as UpdateCourseInput, new Date(parsed.expectedVersion));
+    await invalidatePublicCourseListCache();
+    await invalidatePublicCourseDetailCache({
+      courseId: id,
+      slug: existing.slug,
+    });
+    await invalidatePublicCourseDetailCache({
+      courseId: id,
+      slug: course?.slug,
+    });
 
     await audit.log({
       adminId: session.userId,
@@ -62,6 +77,9 @@ export const createAdminCoursesService = (
     if (!existing) throw AdminErrors.notFound("Course");
 
     const course = await repo.updateCourseStatus(id, parsed.status);
+    await invalidatePublicCourseListCache();
+    await invalidatePublicCourseDetailCache({ courseId: id, slug: existing.slug });
+    await invalidatePublicCourseDetailCache({ courseId: id, slug: course?.slug });
 
     await audit.log({
       adminId: session.userId,
@@ -82,6 +100,8 @@ export const createAdminCoursesService = (
     if (!existing) throw AdminErrors.notFound("Course");
 
     await repo.archiveCourse(id);
+    await invalidatePublicCourseListCache();
+    await invalidatePublicCourseDetailCache({ courseId: id, slug: existing.slug });
 
     await audit.log({
       adminId: session.userId,
@@ -101,6 +121,8 @@ export const createAdminCoursesService = (
     if (!course) throw AdminErrors.notFound("Course");
 
     await repo.enrollUser(courseId, parsed.email);
+    await invalidatePublicCourseListCache();
+    await invalidatePublicCourseDetailCache({ courseId, slug: course.slug });
 
     await audit.log({
       adminId: session.userId,
@@ -119,6 +141,8 @@ export const createAdminCoursesService = (
     if (!course) throw AdminErrors.notFound("Course");
 
     await repo.revokeUser(courseId, parsed.email);
+    await invalidatePublicCourseListCache();
+    await invalidatePublicCourseDetailCache({ courseId, slug: course.slug });
 
     await audit.log({
       adminId: session.userId,
