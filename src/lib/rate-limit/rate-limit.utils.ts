@@ -6,7 +6,13 @@ export function hashRateLimitSubject(value: string): string {
 }
 
 export function buildRateLimitSubject(parts: Array<string | null | undefined>): string {
-  return hashRateLimitSubject(parts.map((part) => part ?? "").join(":"));
+  return hashRateLimitSubject(JSON.stringify(parts.map(encodeSubjectPart)));
+}
+
+function encodeSubjectPart(part: string | null | undefined) {
+  if (part === null) return { type: "null" as const };
+  if (part === undefined) return { type: "undefined" as const };
+  return { type: "string" as const, value: part };
 }
 
 export function buildRateLimitPrefix(ruleId: string): string {
