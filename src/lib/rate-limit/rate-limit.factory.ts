@@ -16,8 +16,9 @@ import { emitCacheMetricEvent } from "@/lib/cache/cache-metrics";
 class FallbackDistributedRateLimiter implements DistributedRateLimiter {
   async check(
     rule: DistributedRateLimitRule,
-    _subject: string,
+    subject: string,
   ): Promise<RateLimitDecision> {
+    void subject;
     return createFallbackDecision(rule.failureMode, rule.windowSeconds) as RateLimitDecision;
   }
 }

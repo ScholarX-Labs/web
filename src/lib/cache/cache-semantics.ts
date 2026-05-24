@@ -2,7 +2,9 @@ import { randomUUID } from "node:crypto";
 import type { CachePort } from "./cache.port";
 import { markSharedRedisUnavailable } from "./shared-redis";
 
-export type PresenceCachedValue<TValue, TExtra extends object = {}> =
+type EmptyObject = Record<never, never>;
+
+export type PresenceCachedValue<TValue, TExtra extends object = EmptyObject> =
   | ({ found: true } & TExtra & { value: TValue })
   | { found: false };
 
