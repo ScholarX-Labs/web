@@ -70,6 +70,12 @@ function getRedisPassword(): string | undefined {
   return env.AZURE_REDIS_KEY ?? env.REDIS_PASSWORD;
 }
 
+function numberFromEnv(value: string | undefined, fallback: number): number {
+  if (!value) return fallback;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
 function shouldUseTls(host: string, port: number): boolean {
   if (env.AZURE_REDIS_TLS === "true") return true;
   if (env.AZURE_REDIS_TLS === "false") return false;
@@ -94,10 +100,10 @@ function createRedisOptions(host: string, port: number): RedisOptions {
         }
       : undefined,
     connectionName: `scholarx-v2-web-${process.env.NODE_ENV ?? "development"}`,
-    connectTimeout: 10_000,
-    commandTimeout: 5_000,
+    connectTimeout: numberFromEnv(env.REDIS_CONNECT_TIMEOUT_MS, 10_000),
+    commandTimeout: numberFromEnv(env.REDIS_COMMAND_TIMEOUT_MS, 5_000),
     keepAlive: 30_000,
-    maxRetriesPerRequest: 2,
+    maxRetriesPerRequest: numberFromEnv(env.REDIS_MAX_RETRIES_PER_REQUEST, 2),
     enableReadyCheck: true,
     enableOfflineQueue: false,
     retryStrategy(times) {
