@@ -96,7 +96,7 @@ const createAdminRouteHandlers = (deps: AdminRouteDeps) => {
   const GET = async (request: NextRequest, context: RouteContext) => {
     try {
       const { path = [] } = await context.params;
-      await resolveAdmin(deps, request);
+      await resolveAdmin(deps, request, path, "GET");
       const domain = deps.createDomain();
 
       // /api/admin/stats
@@ -225,7 +225,7 @@ const createAdminRouteHandlers = (deps: AdminRouteDeps) => {
   const POST = async (request: NextRequest, context: RouteContext) => {
     try {
       const { path = [] } = await context.params;
-      const admin = await resolveAdmin(deps, request);
+      const admin = await resolveAdmin(deps, request, path, "POST");
       const domain = deps.createDomain();
       const body = await safeJson<Record<string, unknown>>(request);
 
@@ -281,7 +281,7 @@ const createAdminRouteHandlers = (deps: AdminRouteDeps) => {
   const PUT = async (request: NextRequest, context: RouteContext) => {
     try {
       const { path = [] } = await context.params;
-      const admin = await resolveAdmin(deps, request);
+      const admin = await resolveAdmin(deps, request, path, "PUT");
       const domain = deps.createDomain();
       const body = await safeJson<Record<string, unknown>>(request);
 
@@ -339,7 +339,7 @@ const createAdminRouteHandlers = (deps: AdminRouteDeps) => {
   const PATCH = async (request: NextRequest, context: RouteContext) => {
     try {
       const { path = [] } = await context.params;
-      const admin = await resolveAdmin(deps, request);
+      const admin = await resolveAdmin(deps, request, path, "PATCH");
       const domain = deps.createDomain();
       const body = await safeJson<Record<string, unknown>>(request);
 
@@ -367,7 +367,7 @@ const createAdminRouteHandlers = (deps: AdminRouteDeps) => {
   const DELETE = async (request: NextRequest, context: RouteContext) => {
     try {
       const { path = [] } = await context.params;
-      const admin = await resolveAdmin(deps, request);
+      const admin = await resolveAdmin(deps, request, path, "DELETE");
       const domain = deps.createDomain();
 
       // /api/admin/courses/:id (archive)
