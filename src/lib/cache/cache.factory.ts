@@ -2,7 +2,7 @@ import type { CachePort } from "./cache.port";
 import { MemoryCacheAdapter } from "./memory-cache.adapter";
 import { NamespacedCacheAdapter } from "./namespaced-cache.adapter";
 import { getSharedRedisClient, getSharedRedisStatus } from "./shared-redis";
-import { UpstashCacheAdapter } from "./upstash-cache.adapter";
+import { RedisCacheAdapter } from "./redis-cache.adapter";
 import { emitCacheMetricEvent } from "./cache-metrics";
 
 const memoryFallback = new NamespacedCacheAdapter(new MemoryCacheAdapter());
@@ -21,7 +21,7 @@ class DynamicServerCache implements CachePort {
       return memoryFallback.getJson<T>(key);
     }
 
-    return new NamespacedCacheAdapter(new UpstashCacheAdapter(redis)).getJson<T>(key);
+    return new NamespacedCacheAdapter(new RedisCacheAdapter(redis)).getJson<T>(key);
   }
 
   async setJson<T>(key: string, value: T, ttlSeconds: number): Promise<void> {
@@ -38,7 +38,7 @@ class DynamicServerCache implements CachePort {
       return;
     }
 
-    await new NamespacedCacheAdapter(new UpstashCacheAdapter(redis)).setJson(
+    await new NamespacedCacheAdapter(new RedisCacheAdapter(redis)).setJson(
       key,
       value,
       ttlSeconds,
@@ -59,7 +59,7 @@ class DynamicServerCache implements CachePort {
       return;
     }
 
-    await new NamespacedCacheAdapter(new UpstashCacheAdapter(redis)).delete(key);
+    await new NamespacedCacheAdapter(new RedisCacheAdapter(redis)).delete(key);
   }
 }
 
