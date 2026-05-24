@@ -4,9 +4,11 @@
   "private": true,
   "packageManager": "pnpm@10.33.0",
   "scripts": {
-    "build": "next build",
-    "dev": "next dev",
+    "build": "pnpm validate:env && next build",
+    "dev": "pnpm validate:env && next dev",
     "start": "next start",
+    "validate:env": "tsx scripts/validate-env.ts",
+    "redis:smoke": "tsx scripts/redis-smoke-test.ts",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "node --import tsx --test src/**/*.test.ts",
