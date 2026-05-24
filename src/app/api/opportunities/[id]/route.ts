@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getOpportunityById } from "@/lib/ai-search/api";
+import { checkPublicOpportunityDetailLimit } from "@/lib/rate-limiter";
+import { getClientIpFromHeaders } from "@/lib/request-ip";
 
 const normalizeLang = (lang?: string): "en" | "ar" =>
   lang === "ar" ? "ar" : "en";
@@ -8,6 +10,24 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const rateLimit = await checkPublicOpportunityDetailLimit(
+    getClientIpFromHeaders(request.headers),
+  );
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Too many requests" },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": Math.max(
+            1,
+            Math.ceil((rateLimit.reset - Date.now()) / 1000),
+          ).toString(),
+        },
+      },
+    );
+  }
+
   const { id } = await params;
   const lang = normalizeLang(
     request.nextUrl.searchParams.get("lang") ?? undefined,
@@ -34,6 +54,7 @@ export async function GET(
     headers: {
       "Cache-Control":
         "public, max-age=300, s-maxage=3600, stale-while-revalidate=86400, stale-if-error=86400",
+      "X-RateLimit-Remaining": String(rateLimit.remaining),
     },
   });
 }
