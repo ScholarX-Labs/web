@@ -120,3 +120,37 @@ test("getLesson resolves UUID course params when no slug record exists", async (
   assert.equal(result.course.id, activeCourse.id);
   assert.equal(result.currentLesson.id, "lesson-id-1");
 });
+
+test("list preserves repository ordering when applying subscription state", async () => {
+  const firstCourse = {
+    ...activeCourse,
+    id: "00000000-0000-0000-0000-000000000010",
+    slug: "first-course",
+    title: "First Course",
+  };
+  const secondCourse = {
+    ...activeCourse,
+    id: "00000000-0000-0000-0000-000000000011",
+    slug: "second-course",
+    title: "Second Course",
+  };
+
+  const service = new NextCourseCatalogService(
+    ({
+      listActive: async () => ({
+        items: [firstCourse, secondCourse],
+        totalCourses: 2,
+      }),
+      findActiveSubscriptionsByUser: async () => new Set([secondCourse.id]),
+    }) as never,
+  );
+
+  const result = await service.list({ page: 1, limit: 2 }, "user-1");
+
+  assert.deepEqual(
+    result.items.map((item) => item.id),
+    [firstCourse.id, secondCourse.id],
+  );
+  assert.equal(result.items[0]?.isSubscribed, false);
+  assert.equal(result.items[1]?.isSubscribed, true);
+});
