@@ -2,7 +2,7 @@
 
 **Scope**: On-call reference for ScholarX cache/rate-limit production incidents.  
 **Quick links**: [quickstart.md](./quickstart.md) — environment variables and rollback commands.  
-**Escalation path**: Cache Layer → Platform Lead → Redis Provider (Upstash support).
+**Escalation path**: Cache Layer → Platform Lead → Azure Cache for Redis support.
 
 ---
 
@@ -25,25 +25,25 @@ Users are not blocked, but DB load has increased and latency may be elevated.
 **Severity**: P1 if DB cannot absorb the additional load; P2 if DB is stable.
 
 **Diagnosis steps**:
-1. Check Upstash dashboard for Redis availability, error rate, and memory usage.
-2. Verify `UPSTASH_REDIS_URL` and `UPSTASH_REDIS_TOKEN` are correct and not rotated.
+1. Check Azure Monitor for Redis availability, error rate, connection count, server load, and memory usage.
+2. Verify `AZURE_REDIS_HOST`, `AZURE_REDIS_PORT`, `AZURE_REDIS_KEY`, and `REDIS_KEY_PREFIX` are correct and not rotated.
 3. Check if Redis memory usage exceeds 90% (memory exhaustion causes errors even if Redis is "up").
-4. Check network latency between the app's region and the Upstash instance region.
+4. Check network latency between the app's region and the Azure Cache region.
 5. Look for `redis_connection`, `redis_timeout`, or `decode_failure` in error category logs.
 
 **Actions**:
 - **If Redis is down**: Fallback is already active. Monitor user error rate. If DB error rate rises,
-  set `CACHE_ENABLED=false` to eliminate Redis connection noise. Notify Upstash support.
-- **If token expired or rotated**: Update `UPSTASH_REDIS_URL` and `UPSTASH_REDIS_TOKEN` in the
+  set `CACHE_ENABLED=false` to eliminate Redis connection noise. Notify Azure support.
+- **If key expired or rotated**: Update `AZURE_REDIS_KEY` in the
   deployment environment and trigger a redeployment. Circuit will close automatically after `CACHE_CIRCUIT_RECOVERY_WINDOW_SECONDS`.
 - **If memory exhausted** (usage > 90%): Run targeted cleanup on low-priority namespaces first:
   ```
-  SCAN 0 MATCH "sx:v1:opportunities:search:*" COUNT 100  → DEL
-  SCAN 0 MATCH "sx:v1:admin:*" COUNT 100  → DEL
+  SCAN 0 MATCH "scholarx:v2:web:opportunities:search:*" COUNT 100  -> DEL
+  SCAN 0 MATCH "scholarx:v2:web:admin:*" COUNT 100  -> DEL
   ```
   Then check eviction policy is set to `volatile-lru` (not `noeviction`).
-- **If cross-region latency**: Migrate the Upstash instance to the same region as the app (or
-  increase `CACHE_REDIS_READ_TIMEOUT_MS` temporarily as a bridge).
+- **If cross-region latency**: Use an Azure Cache instance in the same region as the app (or
+  increase `REDIS_COMMAND_TIMEOUT_MS` temporarily as a bridge).
 
 **Recovery verification**: Watch for `cache.circuit.closed` metric to confirm Redis is healthy
 and the circuit has closed. Confirm cache hit rate is recovering.
@@ -69,7 +69,7 @@ blocked with reason `limiter_unavailable`.
   (process-local) limits, losing cross-instance consistency but restoring user access.
   > ⚠️ **Warning**: Process-local limits mean rate limits are now per-instance, not global.
   > Re-enable distributed limits as soon as Redis recovers.
-- **If Redis is slow (timeout)**: Temporarily increase `CACHE_REDIS_READ_TIMEOUT_MS=3000` to
+- **If Redis is slow (timeout)**: Temporarily increase `REDIS_COMMAND_TIMEOUT_MS=8000` to
   give the limiter more time. Monitor user latency — this trades user-facing latency for availability.
 - **If it is a specific rule only**: Review if a recent deployment changed the rule ID or actor key
   format. A renamed rule creates a "miss" that falls through to fail-closed behavior incorrectly.
@@ -88,7 +88,7 @@ purged after mutations. Stale data may be served.
 1. Check `failedKeys` count in `cache.invalidate.failure` events. Partial failures (some keys deleted,
    some not) indicate tag index inconsistency. Full failures indicate Redis connectivity issues.
 2. Check if the Lua script eval is being rejected (some Redis proxy configurations disable EVAL).
-   If so, fall back to MULTI/EXEC pipeline mode (update `upstash-cache.adapter.ts` config).
+   If so, fall back to a MULTI/EXEC or fixed-window limiter mode in the Redis adapter.
 3. Check if affected tag index keys have expired (index TTL too short relative to entry TTL).
 
 **Actions**:
@@ -99,9 +99,9 @@ purged after mutations. Stale data may be served.
   ```
 - **Manual cache clear for affected entity**:
   ```
-  SMEMBERS sx:v1:tag:{tag-name}     → get all keys for the tag
-  DEL {each key}                     → purge entries
-  DEL sx:v1:tag:{tag-name}           → clear the index itself
+  SMEMBERS scholarx:v2:web:tag:{tag-name}     -> get all keys for the tag
+  DEL {each key}                             -> purge entries
+  DEL scholarx:v2:web:tag:{tag-name}          -> clear the index itself
   ```
 - **If privacy-sensitive**: Treat as P1. Clear the affected namespace immediately. Set surface
   flag to `false` until invalidation is verified fixed.
@@ -122,7 +122,7 @@ security scan detects PII in a cached response.
 
 **Investigation** (within 30 minutes):
 1. Identify the affected surface (which route/API returned the suspected data).
-2. In Upstash console, inspect the raw cache entry for that surface:
+2. In Azure Redis tooling or `redis-cli`, inspect the raw cache entry for that surface:
    - Check `surfaceId` in the envelope — does it match the route?
    - Check `payload` for private fields (email, session data, enrollment state).
 3. Trace back to the DTO normalization function used at cache write time.
@@ -135,7 +135,7 @@ security scan detects PII in a cached response.
    only the declared public fields and no private fields.
 3. Clear the affected namespace:
    ```
-   SCAN 0 MATCH "sx:v1:{affected-surface}:*" COUNT 100 → DEL all keys
+   SCAN 0 MATCH "scholarx:v2:web:{affected-surface}:*" COUNT 100 -> DEL all keys
    ```
 4. Re-enable the surface only after the normalization fix is deployed and tested.
 5. File a post-mortem documenting the root cause and remediation.
@@ -176,7 +176,7 @@ a miss. This indicates the key being read does not match the key being written.
 **Severity**: P3 initially; escalates to P2 if > 85%, P1 if > 95% (errors imminent).
 
 **Diagnosis steps**:
-1. Identify the largest key namespace via Upstash dashboard or SCAN analysis.
+1. Identify the largest key namespace via Azure Monitor, Redis insight tooling, or SCAN analysis.
 2. Check if opportunity search cardinality has exceeded the 10,000-key warning threshold.
 3. Check if any surface has abnormally large payloads (admin reports > 512 KB?).
 
@@ -195,13 +195,13 @@ a miss. This indicates the key being read does not match the key being written.
 - Review whether TTLs are too long and should be reduced.
 
 **Actions (P1 — > 95%, errors imminent)**:
-- Verify Upstash eviction policy is `volatile-lru`. If set to `noeviction`, change it immediately.
+- Verify Azure Cache eviction policy is `volatile-lru` or another TTL-aware volatile policy. If set to `noeviction`, change it immediately.
 - If `volatile-lru` is set and memory is still critically high, purge the lowest-priority namespaces:
   ```
-  SCAN 0 MATCH "sx:v1:opportunities:search:*" COUNT 500 → DEL (search is lowest-priority)
-  SCAN 0 MATCH "sx:v1:admin:reports:*" COUNT 500 → DEL
+  SCAN 0 MATCH "scholarx:v2:web:opportunities:search:*" COUNT 500 -> DEL (search is lowest-priority)
+  SCAN 0 MATCH "scholarx:v2:web:admin:reports:*" COUNT 500 -> DEL
   ```
-- Consider upgrading Upstash plan to a higher memory tier.
+- Consider scaling Azure Cache to a higher memory tier.
 
 ---
 
@@ -214,20 +214,20 @@ a miss. This indicates the key being read does not match the key being written.
 # Disable distributed rate limits (fallback to in-memory)
 # → Set in deployment env: DISTRIBUTED_RATE_LIMITS_ENABLED=false → trigger redeployment
 
-# Clear a specific surface namespace (Redis CLI or Upstash console)
-SCAN 0 MATCH "sx:v1:profiles:public:*" COUNT 100
+# Clear a specific surface namespace (Redis CLI)
+SCAN 0 MATCH "scholarx:v2:web:public-profile:*" COUNT 100
 # → DEL each returned key manually, or use UNLINK for async deletion
 
 # Clear a specific tag index and all its associated keys
-SMEMBERS sx:v1:tag:profile:{username}
-# → DEL each key, then DEL sx:v1:tag:profile:{username}
+SMEMBERS scholarx:v2:web:tag:profile:{username}
+# -> DEL each key, then DEL scholarx:v2:web:tag:profile:{username}
 
 # Check circuit breaker state (from application logs)
 # → Look for cache.circuit.* metric events in your telemetry tool
 # → Or call getStatus() from the cache factory if a debug endpoint is available
 
 # Check Redis memory usage
-INFO memory   # via redis-cli or Upstash REST API
+INFO memory   # via redis-cli or Azure Redis tooling
 ```
 
 ---
