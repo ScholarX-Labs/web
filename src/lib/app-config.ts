@@ -1,12 +1,20 @@
 import { db } from "@/db";
 import { appConfig } from "@/db/schema/app-config-schema";
 import { eq } from "drizzle-orm";
+import { createServerCache } from "@/lib/cache/cache.factory";
+import { cachePolicy } from "@/lib/cache/cache-policy";
+import { markSharedRedisUnavailable } from "@/lib/cache/shared-redis";
 
-const CACHE_TTL_MS = 60_000;
-const cache = new Map<string, { value: string; timestamp: number }>();
+const cache = createServerCache();
 
-export function clearConfigCache(): void {
-  cache.clear();
+export async function clearConfigCache(key?: string): Promise<void> {
+  if (!key) return;
+
+  try {
+    await cache.delete(cachePolicy.config.key(key));
+  } catch (error) {
+    markSharedRedisUnavailable(`config-clear:${key}`, error);
+  }
 }
 
 /**
@@ -29,9 +37,13 @@ export async function getConfig(key: string): Promise<string | null> {
   const envOverride = process.env[envKey];
   if (envOverride !== undefined) return envOverride;
 
-  const cached = cache.get(key);
-  if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
-    return cached.value;
+  try {
+    const cached = await cache.getJson<string>(cachePolicy.config.key(key));
+    if (cached !== null) {
+      return cached;
+    }
+  } catch (error) {
+    markSharedRedisUnavailable(`config-get:${key}`, error);
   }
 
   try {
@@ -42,7 +54,11 @@ export async function getConfig(key: string): Promise<string | null> {
       .limit(1);
 
     if (row.length > 0) {
-      cache.set(key, { value: row[0].value, timestamp: Date.now() });
+      try {
+        await cache.setJson(cachePolicy.config.key(key), row[0].value, cachePolicy.config.ttlSeconds);
+      } catch (error) {
+        markSharedRedisUnavailable(`config-set:${key}`, error);
+      }
       return row[0].value;
     }
   } catch (error) {
@@ -75,5 +91,9 @@ export async function setConfig(
       },
     });
 
-  cache.delete(key);
+  try {
+    await cache.setJson(cachePolicy.config.key(key), value, cachePolicy.config.ttlSeconds);
+  } catch (error) {
+    markSharedRedisUnavailable(`config-write-through:${key}`, error);
+  }
 }
