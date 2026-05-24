@@ -7,6 +7,7 @@ import { auth } from "@/lib/auth";
 import { uploadAvatar, deleteAvatar, getAvatarKeyFromUrl, UploadError } from "@/lib/upload";
 import { isAvatarUploadEnabled } from "@/lib/app-config";
 import { checkAvatarUploadLimit } from "@/lib/rate-limiter";
+import { invalidatePublicProfileCache } from "@/actions/public-profile.actions";
 
 const MAX_FILE_SIZE = 1 * 1024 * 1024;
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -88,7 +89,7 @@ export async function POST(request: NextRequest) {
     }
 
     const [current] = await db
-      .select({ image: user.image })
+      .select({ image: user.image, username: user.username })
       .from(user)
       .where(eq(user.id, session.user.id))
       .limit(1);
@@ -105,6 +106,7 @@ export async function POST(request: NextRequest) {
       .set({ image: url })
       .where(eq(user.id, session.user.id));
 
+    await invalidatePublicProfileCache(current?.username);
     return NextResponse.json({ success: true, data: { url } });
   } catch (error) {
     console.error("[upload/avatar] Error:", error);
