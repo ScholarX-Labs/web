@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { env } from "@/config/env";
 import { getServerCacheStatus } from "@/lib/cache/cache.factory";
+import { isSharedRedisConfigured } from "@/lib/cache/shared-redis";
 import { checkDistributedRateLimit } from "@/lib/rate-limit/rate-limit.factory";
 import { buildRateLimitSubject } from "@/lib/rate-limit/rate-limit.utils";
 
@@ -56,7 +57,7 @@ export function createAdminCacheStatusRouteHandlers(
           cacheEnabled: env.CACHE_ENABLED !== "false",
           distributedRateLimitsEnabled:
             env.DISTRIBUTED_RATE_LIMITS_ENABLED !== "false",
-          redisConfigured: Boolean(env.UPSTASH_REDIS_URL && env.UPSTASH_REDIS_TOKEN),
+          redisConfigured: isSharedRedisConfigured(),
         },
         redis: deps.getCacheStatus(),
       },
