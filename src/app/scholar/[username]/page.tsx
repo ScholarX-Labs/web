@@ -9,28 +9,50 @@ import { Separator } from "@/components/ui/separator";
 import { SocialIconLink } from "@/components/profile/social-icon-link";
 import { checkPublicProfileLimit } from "@/lib/rate-limiter";
 import { getClientIpFromHeaders } from "@/lib/request-ip";
-import type { SocialPlatform } from "@/types/profile.types";
+import type { PublicProfile, SocialPlatform } from "@/types/profile.types";
 import { GraduationCap, Building2, Bookmark } from "lucide-react";
 
 interface Props {
   params: Promise<{ username: string }>;
 }
 
-const getProfilePageData = cache(async (username: string, callerIp: string) => {
-  const rateLimit = await checkPublicProfileLimit(callerIp);
-  if (!rateLimit.allowed) {
-    return null;
+type ProfilePageData =
+  | { kind: "ok"; profile: PublicProfile }
+  | { kind: "not_found" }
+  | { kind: "rate_limited"; retryAfter: number };
+
+const getProfilePageData = cache(async (username: string, callerIp: string | null) => {
+  if (callerIp) {
+    const rateLimit = await checkPublicProfileLimit(callerIp);
+    if (!rateLimit.allowed) {
+      return {
+        kind: "rate_limited",
+        retryAfter: Math.max(1, Math.ceil((rateLimit.reset - Date.now()) / 1000)),
+      } satisfies ProfilePageData;
+    }
   }
 
-  return getPublicProfile(username);
+  const profile = await getPublicProfile(username);
+  return profile
+    ? ({ kind: "ok", profile } satisfies ProfilePageData)
+    : ({ kind: "not_found" } satisfies ProfilePageData);
 });
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { username } = await params;
   const callerIp = getClientIpFromHeaders(await headers());
-  const profile = await getProfilePageData(username, callerIp);
+  const result = await getProfilePageData(username, callerIp);
 
-  if (!profile) return {};
+  if (result.kind === "rate_limited") {
+    return {
+      title: "Too many requests - ScholarX Profile",
+      robots: { index: false, follow: false },
+    };
+  }
+
+  if (result.kind === "not_found") return {};
+
+  const { profile } = result;
 
   const fullName = `${profile.firstName} ${profile.lastName}`;
 
@@ -49,12 +71,26 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function PublicProfilePage({ params }: Props) {
   const { username } = await params;
   const callerIp = getClientIpFromHeaders(await headers());
-  const profile = await getProfilePageData(username, callerIp);
+  const result = await getProfilePageData(username, callerIp);
 
-  if (!profile) {
+  if (result.kind === "rate_limited") {
+    return (
+      <div className="mx-auto flex max-w-2xl flex-col gap-3 px-4 py-16 md:px-8">
+        <h1 className="text-2xl font-semibold text-foreground">
+          Too many profile requests
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          Please retry in {result.retryAfter} seconds.
+        </p>
+      </div>
+    );
+  }
+
+  if (result.kind === "not_found") {
     notFound();
   }
 
+  const { profile } = result;
   const initials = `${profile.firstName?.charAt(0) ?? ""}${profile.lastName?.charAt(0) ?? ""}`.toUpperCase();
   const fullName = `${profile.firstName} ${profile.lastName}`;
 
