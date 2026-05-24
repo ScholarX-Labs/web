@@ -3,6 +3,8 @@ import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { calculateR2Usage } from "@/lib/upload";
 import { clearConfigCache, setConfig } from "@/lib/app-config";
+import { checkDistributedRateLimit } from "@/lib/rate-limit/rate-limit.factory";
+import { buildRateLimitSubject } from "@/lib/rate-limit/rate-limit.utils";
 
 const FREE_TIER_GB = 10;
 
@@ -17,6 +19,24 @@ async function sendAlert(message: string): Promise<void> {
 
 export async function GET(request: NextRequest) {
   try {
+    const callerIp =
+      request.headers.get("x-forwarded-for") ??
+      request.headers.get("x-real-ip") ??
+      "unknown";
+    const rateLimit = await checkDistributedRateLimit(
+      {
+        id: "admin.storage-check.ip.minute",
+        windowSeconds: 60,
+        maxRequests: 20,
+        failureMode: "fail-closed",
+      },
+      buildRateLimitSubject(["storage-check", callerIp]),
+    );
+
+    if (!rateLimit.allowed) {
+      return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+    }
+
     const session = await auth.api.getSession({
       headers: await headers(),
     });
@@ -38,7 +58,7 @@ export async function GET(request: NextRequest) {
       if (usagePercent >= tier.threshold * 100) {
         if (tier.action === "disable") {
           await setConfig("avatar_upload_enabled", "false", "system:storage-check");
-          clearConfigCache();
+          await clearConfigCache("avatar_upload_enabled");
           await sendAlert(
             `R2 storage at ${totalGB.toFixed(1)}GB (${tier.label}) — auto-disabled uploads`
           );
