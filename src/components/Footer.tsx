@@ -163,7 +163,7 @@ const Footer = () => {
       <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-orange-500/5 blur-[120px] rounded-full pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-6 py-16 relative z-20">
+      <div className="max-w-7xl mx-auto px-6 pt-16 pb-24 md:pb-16 relative z-20">
         {/* Top: Stunning Animated Title */}
         <div className="mb-12 flex justify-center items-center relative border-b border-zinc-100 dark:border-zinc-900 pb-12">
           <div className="absolute inset-0 flex justify-center">

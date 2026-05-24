@@ -33,9 +33,9 @@ export default async function RootLayout({
   return (
     <html lang="en" className={inter.variable}>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-dvh`}
       >
-        <div vaul-drawer-wrapper="" className="min-h-screen flex flex-col">
+        <div vaul-drawer-wrapper="" className="min-h-dvh flex flex-col">
           <GlobalShellExclusions>
             <PremiumHeader />
           </GlobalShellExclusions>
