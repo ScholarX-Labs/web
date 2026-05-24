@@ -24,10 +24,17 @@ export async function invalidatePublicProfileCache(
 ): Promise<void> {
   if (!username) return;
 
-  await invalidateCacheKeys(cache, {
-    keys: [cachePolicy.profile.key(username)],
-    context: `public-profile-invalidate:${username}`,
-  });
+  try {
+    await invalidateCacheKeys(cache, {
+      keys: [cachePolicy.profile.key(username)],
+      context: `public-profile-invalidate:${username}`,
+    });
+  } catch (error) {
+    console.error("[invalidatePublicProfileCache] Cache invalidation failed", {
+      username,
+      error,
+    });
+  }
 }
 
 export async function getPublicProfile(
