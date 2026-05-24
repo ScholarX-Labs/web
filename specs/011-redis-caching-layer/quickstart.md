@@ -5,19 +5,23 @@
 ### Required (Production Cache Behavior)
 
 ```text
-UPSTASH_REDIS_URL=https://your-instance.upstash.io
-UPSTASH_REDIS_TOKEN=your-token-here
+AZURE_REDIS_HOST=your-cache.redis.cache.windows.net
+AZURE_REDIS_PORT=6380
+AZURE_REDIS_KEY=your-access-key
+AZURE_REDIS_TLS=true
+REDIS_KEY_PREFIX=scholarx:v2:web
+CACHE_ENABLED=true
+DISTRIBUTED_RATE_LIMITS_ENABLED=true
 ```
 
-> **Tier requirement**: Upstash **Pro** or **Pay-As-You-Go** tier is required for production.
-> The free tier is limited to ~100 requests/second and will return rate-limit errors under
-> normal production traffic. Using the free tier in production will cause circuit-breaker
-> trips and cascading fallbacks.
+> **Provider requirement**: V2 uses Azure Cache for Redis through `ioredis`.
+> Use the same Azure host/key pattern as the V1 API, but keep V2 isolated with
+> `REDIS_KEY_PREFIX=scholarx:v2:web`.
 
-> **Eviction policy**: The Upstash instance must be configured with `maxmemory-policy = volatile-lru`.
-> `noeviction` (the Upstash default) is **prohibited** in production — it converts memory exhaustion
+> **Eviction policy**: The Azure Cache for Redis instance should use a volatile eviction policy
+> such as `volatile-lru` when cache keys have TTLs. `noeviction` is **prohibited** in production
+> for the cache database — it converts memory exhaustion
 > into Redis errors that trigger the circuit breaker and cascade into DB reads or user-facing failures.
-> Set this in the Upstash console under "Database Settings → Eviction Policy" before enabling any surface.
 
 ### Estimated Redis Memory Footprint
 
@@ -32,8 +36,8 @@ UPSTASH_REDIS_TOKEN=your-token-here
 | Rate limit counters | ~100,000 | 50 B | ~5 MB |
 | **Total estimate** | | | **~87 MB** |
 
-Recommended minimum Upstash allocation: **256 MB**. Alert at 70% utilization (~179 MB).
-Monitor via Upstash dashboard → Memory Usage or emit `redis.memory.used_bytes` via the adapter.
+Recommended minimum Azure Cache allocation: **256 MB**. Alert at 70% utilization (~179 MB).
+Monitor via Azure Monitor memory metrics and the in-app cache diagnostics page.
 
 ### Internal / Worker Requests
 INTERNAL_REQUEST_SECRET=<32-byte-random-hex>   # NEVER expose in client bundles or logs
@@ -81,8 +85,9 @@ CACHE_SURFACE_ADMIN_LISTS_ENABLED=true
 ### Connection Tuning (optional overrides)
 
 ```text
-CACHE_REDIS_READ_TIMEOUT_MS=1500     # default: 1500ms
-CACHE_REDIS_CONNECT_TIMEOUT_MS=500   # default: 500ms
+REDIS_COMMAND_TIMEOUT_MS=5000             # default: 5000ms
+REDIS_CONNECT_TIMEOUT_MS=10000            # default: 10000ms
+REDIS_MAX_RETRIES_PER_REQUEST=2           # default: 2
 ```
 
 ### Circuit Breaker Tuning (optional overrides)
@@ -99,11 +104,11 @@ CACHE_CIRCUIT_PROBE_INTERVAL_SECONDS=5     # default: 5s between half-open probe
 
 1. Install dependencies from the existing lockfile: `pnpm install`.
 2. Configure `DATABASE_URL` as usual.
-3. Leave `UPSTASH_REDIS_URL` and `UPSTASH_REDIS_TOKEN` unset — the factory will use the
+3. Leave `AZURE_REDIS_HOST`, `AZURE_REDIS_KEY`, and `REDIS_URL` unset — the factory will use the
    in-memory adapter automatically when Redis credentials are absent.
 4. Leave all surface flags disabled (`CACHE_ENABLED=false` or simply absent).
 5. Run baseline checks: `pnpm run typecheck && pnpm run test`.
-6. To test a specific surface with the real adapter, configure Upstash credentials and
+6. To test a specific surface with the real adapter, configure Azure Redis credentials and
    set only the relevant surface flag.
 
 ---
@@ -149,7 +154,7 @@ node --import tsx --test src/app/api/**/*.test.ts
 
 1. Request the same opportunity detail with `lang=en` twice.
 2. Confirm the second request records a cache hit.
-3. Simulate upstream failure (e.g., temporarily set an invalid Upstash URL for the opportunity provider).
+3. Simulate upstream failure (e.g., temporarily set an invalid opportunity API URL).
 4. Confirm a previously cached opportunity is served as safe stale and `cache.get.stale_hit` is emitted.
 
 ### 3. Public Profile Cache
@@ -285,8 +290,8 @@ If stale data persists after a flag disable (e.g., a surface was re-enabled with
 clear the affected namespace from Redis:
 
 ```powershell
-# Using Upstash console or redis-cli
-SCAN 0 MATCH "sx:v1:opportunities:*" COUNT 100   # find affected keys
+# Using redis-cli against Azure Cache for Redis
+SCAN 0 MATCH "scholarx:v2:web:opportunities:*" COUNT 100   # find affected keys
 # Then DEL each matching key, or use FLUSHDB only in non-production
 ```
 
@@ -315,4 +320,4 @@ Before moving each surface from canary to 100%:
 - [ ] No private fields (email, session, enrollment state) found in cached envelopes
 - [ ] `pnpm run typecheck` passes
 - [ ] `pnpm run test` passes (all cache/domain/route tests)
-- [ ] Redis memory growth is within expected bounds (monitor via Upstash dashboard)
+- [ ] Redis memory growth is within expected bounds (monitor via Azure Monitor)
