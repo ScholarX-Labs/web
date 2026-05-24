@@ -57,7 +57,7 @@ export async function PUT(request: NextRequest, { params }: Props) {
     }
 
     await setConfig(key, parsed.data.value, session.user.id);
-    clearConfigCache();
+    await clearConfigCache(key);
 
     const updatedValue = await getConfig(key);
 
