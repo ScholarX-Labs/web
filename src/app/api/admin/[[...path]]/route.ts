@@ -34,8 +34,8 @@ const rateLimitPath = (path: string[], method: string) => {
   return method === "GET" ? base : base;
 };
 
-const enforceRateLimit = (identifier: string, path: string) => {
-  const result = checkRateLimit(identifier, path);
+const enforceRateLimit = async (identifier: string, path: string) => {
+  const result = await checkRateLimit(identifier, path);
   if (!result.allowed) {
     throw new AdminError("RATE_LIMITED", 429, "Too many requests. Please wait before retrying.");
   }
@@ -78,7 +78,7 @@ const resolveAdmin = async (
     throw new AdminError("ADMIN_UNAUTHORIZED", 403, "Admin role required");
   }
 
-  enforceRateLimit(session.user.id, rateLimitPath(path, method));
+  await enforceRateLimit(session.user.id, rateLimitPath(path, method));
 
   return {
     userId: session.user.id,
