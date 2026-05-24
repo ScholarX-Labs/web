@@ -9,6 +9,7 @@ import {
   markSharedRedisUnavailable,
 } from "@/lib/cache/shared-redis";
 import { env } from "@/config/env";
+import type { RedisClient } from "@/lib/cache/redis-cache.adapter";
 import { RedisSlidingWindowRateLimiterAdapter } from "./redis-sliding-window-rate-limiter.adapter";
 import { emitCacheMetricEvent } from "@/lib/cache/cache-metrics";
 
@@ -22,10 +23,13 @@ class FallbackDistributedRateLimiter implements DistributedRateLimiter {
 }
 
 let adapter: DistributedRateLimiter | null = null;
+let cachedRedis: RedisClient | null = null;
 const fallbackLimiter = new FallbackDistributedRateLimiter();
 
 function getAdapter(): DistributedRateLimiter {
   if (env.DISTRIBUTED_RATE_LIMITS_ENABLED === "false") {
+    adapter = null;
+    cachedRedis = null;
     emitCacheMetricEvent({
       source: "rate-limit",
       operation: "check",
@@ -37,6 +41,8 @@ function getAdapter(): DistributedRateLimiter {
 
   const redis = getSharedRedisClient();
   if (!redis) {
+    adapter = null;
+    cachedRedis = null;
     emitCacheMetricEvent({
       source: "rate-limit",
       operation: "check",
@@ -46,8 +52,9 @@ function getAdapter(): DistributedRateLimiter {
     return fallbackLimiter;
   }
 
-  if (!adapter) {
+  if (!adapter || redis !== cachedRedis) {
     adapter = new RedisSlidingWindowRateLimiterAdapter(redis);
+    cachedRedis = redis;
   }
 
   return adapter;
