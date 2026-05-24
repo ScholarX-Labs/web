@@ -10,6 +10,11 @@ export class RedisCacheAdapter implements CachePort {
 
   async getJson<T>(key: string): Promise<T | null> {
     const startedAt = Date.now();
+    if (!isRedisReady(this.redis)) {
+      emitRedisNotReadyMetric("get", key, startedAt, this.redis.status);
+      return null;
+    }
+
     try {
       const result = await this.redis.get(key);
       markSharedRedisHealthy(`cache:get:${key}`);
@@ -49,6 +54,13 @@ export class RedisCacheAdapter implements CachePort {
 
   async setJson<T>(key: string, value: T, ttlSeconds: number): Promise<void> {
     const startedAt = Date.now();
+    if (!isRedisReady(this.redis)) {
+      emitRedisNotReadyMetric("set", key, startedAt, this.redis.status, {
+        ttlSeconds,
+      });
+      return;
+    }
+
     try {
       await this.redis.set(key, JSON.stringify(value), "EX", ttlSeconds);
       markSharedRedisHealthy(`cache:set:${key}`);
@@ -75,6 +87,11 @@ export class RedisCacheAdapter implements CachePort {
 
   async delete(key: string): Promise<void> {
     const startedAt = Date.now();
+    if (!isRedisReady(this.redis)) {
+      emitRedisNotReadyMetric("delete", key, startedAt, this.redis.status);
+      return;
+    }
+
     try {
       await this.redis.del(key);
       markSharedRedisHealthy(`cache:delete:${key}`);
@@ -97,6 +114,31 @@ export class RedisCacheAdapter implements CachePort {
       });
     }
   }
+}
+
+function isRedisReady(redis: RedisClient): boolean {
+  return redis.status === "ready";
+}
+
+function emitRedisNotReadyMetric(
+  operation: "get" | "set" | "delete",
+  key: string,
+  startedAt: number,
+  status: string,
+  metadata: Record<string, string | number | boolean | null> = {},
+): void {
+  emitCacheMetricEvent({
+    source: "cache",
+    operation,
+    outcome: "fallback",
+    durationMs: Date.now() - startedAt,
+    context: key,
+    metadata: {
+      ...metadata,
+      reason: "redis-not-ready",
+      redisStatus: status,
+    },
+  });
 }
 
 function errorMetadata(error: unknown): Record<string, string | number | boolean | null> {

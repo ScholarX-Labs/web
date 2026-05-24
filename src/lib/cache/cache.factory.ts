@@ -1,7 +1,11 @@
 import type { CachePort } from "./cache.port";
 import { MemoryCacheAdapter } from "./memory-cache.adapter";
 import { NamespacedCacheAdapter } from "./namespaced-cache.adapter";
-import { getSharedRedisClient, getSharedRedisStatus } from "./shared-redis";
+import {
+  getSharedRedisClient,
+  getSharedRedisStatus,
+  isSharedCacheEnabled,
+} from "./shared-redis";
 import { RedisCacheAdapter } from "./redis-cache.adapter";
 import { emitCacheMetricEvent } from "./cache-metrics";
 
@@ -9,6 +13,17 @@ const memoryFallback = new NamespacedCacheAdapter(new MemoryCacheAdapter());
 
 class DynamicServerCache implements CachePort {
   async getJson<T>(key: string): Promise<T | null> {
+    if (!isSharedCacheEnabled()) {
+      emitCacheMetricEvent({
+        source: "cache",
+        operation: "get",
+        outcome: "fallback",
+        context: key,
+        metadata: { backend: "memory", reason: "cache-disabled" },
+      });
+      return memoryFallback.getJson<T>(key);
+    }
+
     const redis = getSharedRedisClient();
     if (!redis) {
       emitCacheMetricEvent({
@@ -25,6 +40,18 @@ class DynamicServerCache implements CachePort {
   }
 
   async setJson<T>(key: string, value: T, ttlSeconds: number): Promise<void> {
+    if (!isSharedCacheEnabled()) {
+      emitCacheMetricEvent({
+        source: "cache",
+        operation: "set",
+        outcome: "fallback",
+        context: key,
+        metadata: { backend: "memory", reason: "cache-disabled", ttlSeconds },
+      });
+      await memoryFallback.setJson(key, value, ttlSeconds);
+      return;
+    }
+
     const redis = getSharedRedisClient();
     if (!redis) {
       emitCacheMetricEvent({
@@ -46,6 +73,18 @@ class DynamicServerCache implements CachePort {
   }
 
   async delete(key: string): Promise<void> {
+    if (!isSharedCacheEnabled()) {
+      emitCacheMetricEvent({
+        source: "cache",
+        operation: "delete",
+        outcome: "fallback",
+        context: key,
+        metadata: { backend: "memory", reason: "cache-disabled" },
+      });
+      await memoryFallback.delete(key);
+      return;
+    }
+
     const redis = getSharedRedisClient();
     if (!redis) {
       emitCacheMetricEvent({

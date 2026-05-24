@@ -17,6 +17,7 @@ let lastFailureAt: string | null = null;
 
 export interface SharedRedisStatus {
   enabled: boolean;
+  cacheEnabled: boolean;
   configured: boolean;
   provider: "azure" | "generic" | "unconfigured";
   circuitOpen: boolean;
@@ -44,8 +45,25 @@ function isCircuitOpen(): boolean {
   return true;
 }
 
+function closeRedisClient(client: RedisClient | null): void {
+  if (!client) return;
+  try {
+    client.disconnect();
+  } catch {
+    // Best-effort cleanup. The caller already moved the process to fallback.
+  }
+}
+
+function isRedisClientReady(client: RedisClient): boolean {
+  return client.status === "ready";
+}
+
 export function isSharedRedisEnabled(): boolean {
-  return env.CACHE_ENABLED !== "false" && isSharedRedisConfigured();
+  return isSharedRedisConfigured();
+}
+
+export function isSharedCacheEnabled(): boolean {
+  return env.CACHE_ENABLED !== "false";
 }
 
 export function isSharedRedisConfigured(): boolean {
@@ -119,9 +137,11 @@ function createRedisOptions(host: string, port: number): RedisOptions {
 
 export function markSharedRedisUnavailable(context: string, error?: unknown): void {
   const wasOpen = redisDown;
+  const failedClient = redis;
   redisDown = true;
   redisDownSince = Date.now();
   redis = null;
+  closeRedisClient(failedClient);
   consecutiveFailures += 1;
   lastFailureContext = context;
   lastFailureAt = new Date(redisDownSince).toISOString();
@@ -186,42 +206,76 @@ export function getSharedRedisClient(): RedisClient | null {
     redis = createSharedRedisClient();
   }
 
+  if (!isRedisClientReady(redis)) {
+    emitCacheMetricEvent({
+      source: "redis",
+      operation: "availability",
+      outcome: "fallback",
+      context: "redis-not-ready",
+      metadata: { status: redis.status },
+    });
+    return null;
+  }
+
   return redis;
 }
 
 function createSharedRedisClient(): RedisClient {
+  const registerClient = (client: RedisClient): RedisClient => {
+    client.on("ready", () => {
+      markSharedRedisHealthy("redis:ready");
+    });
+    client.on("error", (error) => {
+      markSharedRedisUnavailable("redis:error", error);
+    });
+    client.on("end", () => {
+      if (redis === client) {
+        redis = null;
+      }
+    });
+    return client;
+  };
+
   if (env.AZURE_REDIS_CLUSTER === "true") {
     const host = getRedisHost();
     const port = getRedisPort();
-    return new Cluster(
-      [{ host, port }],
-      {
-        redisOptions: createRedisOptions(host, port),
-        enableReadyCheck: true,
-        maxRedirections: 16,
-        retryDelayOnFailover: 100,
-        retryDelayOnClusterDown: 300,
-        clusterRetryStrategy(times) {
-          if (times > 5) return null;
-          return Math.min(times * 100, 2_000);
+    return registerClient(
+      new Cluster(
+        [{ host, port }],
+        {
+          redisOptions: createRedisOptions(host, port),
+          enableReadyCheck: true,
+          maxRedirections: 16,
+          retryDelayOnFailover: 100,
+          retryDelayOnClusterDown: 300,
+          clusterRetryStrategy(times) {
+            if (times > 5) return null;
+            return Math.min(times * 100, 2_000);
+          },
         },
-      },
+      ),
     );
   }
 
   if (env.REDIS_URL) {
     const parsed = new URL(env.REDIS_URL);
-    return new Redis(env.REDIS_URL, createRedisOptions(parsed.hostname, Number(parsed.port || "6379")));
+    return registerClient(
+      new Redis(
+        env.REDIS_URL,
+        createRedisOptions(parsed.hostname, Number(parsed.port || "6379")),
+      ),
+    );
   }
 
   const host = getRedisHost();
   const port = getRedisPort();
-  return new Redis(createRedisOptions(host, port));
+  return registerClient(new Redis(createRedisOptions(host, port)));
 }
 
 export function getSharedRedisStatus(): SharedRedisStatus {
   return {
     enabled: isSharedRedisEnabled(),
+    cacheEnabled: isSharedCacheEnabled(),
     configured: isSharedRedisConfigured(),
     provider: getRedisProvider(),
     circuitOpen: redisDown && isCircuitOpen(),
@@ -234,6 +288,7 @@ export function getSharedRedisStatus(): SharedRedisStatus {
 }
 
 export function resetSharedRedisStateForTests(): void {
+  closeRedisClient(redis);
   redis = null;
   redisDown = false;
   redisDownSince = 0;
