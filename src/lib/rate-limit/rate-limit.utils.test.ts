@@ -20,6 +20,12 @@ test("buildRateLimitSubject changes when parts change", () => {
   assert.notEqual(a, b);
 });
 
+test("buildRateLimitSubject avoids delimiter collisions", () => {
+  const a = buildRateLimitSubject(["a", "b:c"]);
+  const b = buildRateLimitSubject(["a:b", "c"]);
+  assert.notEqual(a, b);
+});
+
 test("buildRateLimitPrefix applies the app Redis namespace", () => {
   assert.equal(
     buildRateLimitPrefix("public.profile.ip.minute"),
