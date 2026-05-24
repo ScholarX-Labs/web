@@ -10,9 +10,15 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const rateLimit = await checkPublicOpportunityDetailLimit(
-    getClientIpFromHeaders(request.headers),
-  );
+  const clientIp = getClientIpFromHeaders(request.headers);
+  if (!clientIp) {
+    return NextResponse.json(
+      { error: "Unable to identify request origin" },
+      { status: 400 },
+    );
+  }
+
+  const rateLimit = await checkPublicOpportunityDetailLimit(clientIp);
   if (!rateLimit.allowed) {
     return NextResponse.json(
       { error: "Too many requests" },
