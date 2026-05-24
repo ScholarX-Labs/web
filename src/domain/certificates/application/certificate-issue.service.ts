@@ -13,6 +13,7 @@ import { randomUUID } from "crypto";
 import { generateCertificateNumber } from "../domain/certificate-number";
 import { CURRENT_TEMPLATE_VERSION } from "../domain/certificate-template";
 import { CertificateError } from "../domain/certificate-errors";
+import { invalidatePublicCertificateCache } from "./certificate-cache";
 
 // ---------------------------------------------------------------------------
 // Command input / output types
@@ -83,6 +84,7 @@ export class CertificateIssueService {
 
     if (existing) {
       const artifact = await this.ensureArtifactExists(existing);
+      await invalidatePublicCertificateCache(existing.certificateNumber);
       return {
         certificate: existing,
         artifact,
@@ -211,6 +213,7 @@ export class CertificateIssueService {
     // If this fails, the outbox row allows the repair job to re-enqueue.
     // -------------------------------------------------------------------------
     await this.publishArtifactJob(artifact, certificate, messageId, outboxRow.id);
+    await invalidatePublicCertificateCache(certificate.certificateNumber);
 
     return {
       certificate,
