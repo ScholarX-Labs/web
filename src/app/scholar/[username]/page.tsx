@@ -1,3 +1,5 @@
+import { cache } from "react";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getPublicProfile } from "@/actions/public-profile.actions";
@@ -5,6 +7,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { SocialIconLink } from "@/components/profile/social-icon-link";
+import { checkPublicProfileLimit } from "@/lib/rate-limiter";
+import { getClientIpFromHeaders } from "@/lib/request-ip";
 import type { SocialPlatform } from "@/types/profile.types";
 import { GraduationCap, Building2, Bookmark } from "lucide-react";
 
@@ -12,9 +16,19 @@ interface Props {
   params: Promise<{ username: string }>;
 }
 
+const getProfilePageData = cache(async (username: string, callerIp: string) => {
+  const rateLimit = await checkPublicProfileLimit(callerIp);
+  if (!rateLimit.allowed) {
+    return null;
+  }
+
+  return getPublicProfile(username);
+});
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { username } = await params;
-  const profile = await getPublicProfile(username);
+  const callerIp = getClientIpFromHeaders(await headers());
+  const profile = await getProfilePageData(username, callerIp);
 
   if (!profile) return {};
 
@@ -34,7 +48,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PublicProfilePage({ params }: Props) {
   const { username } = await params;
-  const profile = await getPublicProfile(username);
+  const callerIp = getClientIpFromHeaders(await headers());
+  const profile = await getProfilePageData(username, callerIp);
 
   if (!profile) {
     notFound();
