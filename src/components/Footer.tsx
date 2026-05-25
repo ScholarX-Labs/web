@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Scholarx_vertical_logo from "@/../public/ScholarX-Logo-vertical-Blue-White-Solid-Small_ScholarX.png";
+import Scholarx_vertical_logo from "../../public/ScholarX-Logo-vertical-Blue-White-Solid-Small_ScholarX.png";
 import Link from "next/link";
 import { Rubik } from "next/font/google";
 import { Mail, Phone } from "lucide-react";
