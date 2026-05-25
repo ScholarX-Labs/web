@@ -4,7 +4,7 @@ import type {
   ExecutivePageId,
   ExecutiveSectionState,
 } from "./executive-types";
-// @ts-expect-error: the schema exists in the repo, but this import path is not resolving in the production build.
+// @ts-ignore: the schema exists in the repo, but this import path is not resolving in the production build.
 import type { ActionCenterUpdateInput } from "./executive-query.schemas";
 
 export type ExecutiveActionEntityType =
