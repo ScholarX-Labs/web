@@ -77,6 +77,7 @@ export function useFlipAnimation(): FlipAnimationApi {
           element.style.transform = "";
           element.style.transformOrigin = "";
           element.style.borderRadius = "";
+          animation.cancel();
           onComplete?.();
           resolve();
         };
@@ -127,6 +128,7 @@ export function useFlipAnimation(): FlipAnimationApi {
 
         animation.onfinish = () => {
           element.style.willChange = "auto";
+          animation.cancel();
           onComplete?.();
           resolve();
         };

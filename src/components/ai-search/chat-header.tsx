@@ -8,7 +8,7 @@ export function ChatHeader() {
         <BotAvatar showOnlineBadge />
         <div className="min-w-0">
           <p className="truncate text-sm font-semibold text-foreground">
-            AI Opportunity Assistant
+            ScholarX AI Assistant
           </p>
           <p className="text-xs text-emerald-600">Online • Ready to help</p>
         </div>

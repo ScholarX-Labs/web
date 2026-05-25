@@ -22,7 +22,7 @@ const HOW_IT_WORKS_STEPS = [
     color: "bg-sky-100 text-sky-700 group-hover:bg-sky-500",
   },
   {
-    text: "AI scans the database",
+    text: "ScholarX AI scans the database",
     color: "bg-violet-100 text-violet-700 group-hover:bg-violet-500",
   },
   {
@@ -62,7 +62,7 @@ function AiSearchHeroCard() {
       </CardHeader>
       <CardContent className="relative z-10 px-4">
         <p className="text-xs leading-5 text-sky-100/90">
-          Our AI analyzes your profile and matches you with high-fit
+          ScholarX AI analyzes your profile and matches you with high-fit
           scholarships, internships, and conferences.
         </p>
       </CardContent>
@@ -150,7 +150,7 @@ export function AiSearchSidebar({ onClearConversation }: AiSearchSidebarProps) {
       <div className="rounded-xl border border-white/5 bg-transparent p-3 text-[11px] text-muted-foreground/80">
         <p className="inline-flex items-start gap-1.5 leading-relaxed">
           <BarChart3 className="size-3.5 shrink-0 mt-0.5" />
-          Scores are AI estimates and should be verified with official sources.
+          Scores are ScholarX AI estimates and should be verified with official sources.
         </p>
       </div>
     </aside>

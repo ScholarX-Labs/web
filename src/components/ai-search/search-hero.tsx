@@ -54,9 +54,8 @@ export function SearchHero({ onSearch, isLoading }: SearchHeroProps) {
             className="font-extrabold"
             style={{ color: "var(--scholar-blue)" }}
           >
-            AI-powered
-          </span>{" "}
-          search
+            ScholarX AI
+          </span>
         </h1>
         <p className="text-muted-foreground text-lg">
           The premium discovery engine for global scholarships and academic
@@ -166,7 +165,7 @@ export function SearchHero({ onSearch, isLoading }: SearchHeroProps) {
             className="size-3"
             style={{ color: "var(--scholar-blue)" }}
           />
-          <span>AI Search · Powered by ScholarX AI</span>
+          <span>AI Search · By ScholarX AI</span>
         </div>
       </div>
 

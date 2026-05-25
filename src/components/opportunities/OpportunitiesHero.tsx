@@ -26,8 +26,8 @@ export default function OpportunitiesHero() {
       />
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black/20 dark:from-black/80 dark:via-black/50 dark:to-slate-950/20" aria-hidden="true" />
       
-      <div className="relative z-10 w-full flex-1 container mx-auto px-6 md:px-12 flex flex-col justify-center items-center text-center md:items-start md:text-start pt-12 pb-12">
-        <div className="space-y-6 max-w-4xl">
+      <div className="relative z-10 w-full flex-1 container mx-auto px-6 sm:px-8 lg:px-12 flex flex-col justify-center items-center text-center md:items-start md:text-start pt-16 pb-16">
+        <div className="space-y-6 max-w-4xl w-full">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -73,7 +73,7 @@ export default function OpportunitiesHero() {
                 <Sparkles size={18} className="text-blue-300 animate-pulse relative z-10" />
                 <div className="absolute inset-0 bg-blue-400/40 blur-md animate-pulse" />
               </div>
-              <span className="text-sm tracking-tight">Powered by intelligent matching algorithms</span>
+              <span className="text-sm tracking-tight">Powered By ScholarX AI</span>
             </div>
           </motion.div>
         </div>
