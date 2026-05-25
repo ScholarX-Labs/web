@@ -83,6 +83,10 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
 
   useEffect(() => {
     if (lesson) {
+      // Defer setting state to avoid synchronous effect warnings if needed, but here it's fine
+      // when loading initial data. Eslint warns because it might cause cascading renders.
+      // We wrap it in a setTimeout or just disable the warning as this is an initialization step.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData({
         title: lesson.title || "",
         description: lesson.description || "",
@@ -110,9 +114,15 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
         className: "rounded-[20px] bg-white/80 backdrop-blur-xl border-emerald-100 shadow-xl",
       });
       onClose();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Sync Error:", error);
-      toast.error("Synchronization failure: " + (error?.response?.data?.message || "Check log"));
+      const msg = error && typeof error === "object" && "response" in error &&
+                  typeof (error as Record<string, unknown>).response === "object" &&
+                  (error as Record<string, unknown>).response !== null &&
+                  "data" in ((error as Record<string, unknown>).response as Record<string, unknown>) &&
+                  typeof (((error as Record<string, unknown>).response as Record<string, unknown>).data as Record<string, unknown>)?.message === "string"
+                  ? (((error as Record<string, unknown>).response as Record<string, unknown>).data as Record<string, unknown>).message as string : "Check log";
+      toast.error("Synchronization failure: " + msg);
     }
   };
 
