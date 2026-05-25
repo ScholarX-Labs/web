@@ -33,6 +33,6 @@ export const INITIAL_MESSAGES: AiChatMessage[] = [
   {
     id: "welcome",
     role: "assistant",
-    text: "Hi! I'm your AI opportunity assistant. Ask me about scholarships, internships, fellowships, or conferences matching your profile.",
+    text: "Hi! I'm your ScholarX AI assistant. Ask me about scholarships, internships, fellowships, or conferences matching your profile.",
   },
 ];

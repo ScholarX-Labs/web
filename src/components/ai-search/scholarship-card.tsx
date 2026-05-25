@@ -47,10 +47,12 @@ export function ScholarshipCard({
       }}
       role="button"
       tabIndex={0}
-      className="bg-white rounded-xl border border-gray-200 flex flex-col h-full min-h-[280px] overflow-hidden hover:shadow-md hover:cursor-pointer hover:-translate-y-0.5 transition-shadow transition-transform duration-200"
+      className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-[20px] sm:rounded-2xl border border-slate-200/60 dark:border-white/10 flex flex-col h-full min-h-[280px] overflow-hidden shadow-sm hover:shadow-xl hover:cursor-pointer hover:-translate-y-1 transition-all duration-300 group"
     >
+      {/* Top Accent Line */}
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-scholar-blue/40 via-scholar-blue to-purple-500/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
       {/* Top: category badge + match % */}
-      <div className="flex items-start justify-between px-5 pt-5 pb-3">
+      <div className="relative flex items-start justify-between px-4 sm:px-5 pt-4 sm:pt-5 pb-3">
         <div className="flex flex-wrap gap-1.5">
           {category && (
             <Badge
@@ -82,33 +84,33 @@ export function ScholarshipCard({
       </div>
 
       {/* Content */}
-      <div className="px-5 flex-1 flex flex-col gap-3">
+      <div className="px-4 sm:px-5 flex-1 flex flex-col gap-3">
         <div>
           <motion.h3
             layoutId={`${cardId}-title`}
-            className="font-bold text-base text-foreground leading-snug mb-1.5"
+            className="font-bold text-lg sm:text-xl text-slate-900 dark:text-white leading-tight mb-2 group-hover:text-scholar-blue transition-colors line-clamp-2 min-h-[3.5rem]"
           >
             {result.title}
           </motion.h3>
-          <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
+          <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-3">
             {result.description}
           </p>
         </div>
 
-        <div className="flex flex-col gap-1.5 text-sm">
+        <div className="flex flex-col gap-1.5 text-sm pt-2">
           {(result.fundingLevel || result.funding) && (
-            <div className="flex items-center gap-2 text-foreground/80">
+            <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300 font-medium">
               <DollarSign
                 className="size-4 shrink-0"
                 style={{ color: "var(--scholar-blue)" }}
               />
-              <span className="font-medium">
+              <span>
                 {result.fundingLevel || result.funding}
               </span>
             </div>
           )}
           {result.deadline && (
-            <div className="flex items-center gap-2 text-foreground/80">
+            <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300 font-medium">
               <Calendar
                 className="size-4 shrink-0"
                 style={{ color: "var(--scholar-blue)" }}
@@ -120,14 +122,19 @@ export function ScholarshipCard({
       </div>
 
       {/* CTA — text link style */}
-      <div className="px-5 pb-5 pt-4">
-        <button
-          className="inline-flex items-center gap-1.5 text-sm font-semibold transition-all hover:gap-2.5"
-          style={{ color: "var(--scholar-blue)" }}
-        >
-          View Details
-          <ArrowRight className="size-4" />
-        </button>
+      <div className="px-4 sm:px-5 pb-4 sm:pb-5 pt-4 mt-2 border-t border-slate-100 dark:border-slate-800/50">
+        <div className="flex justify-between items-center">
+          <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+            Explore
+          </span>
+          <button
+            className="inline-flex items-center gap-1.5 text-sm font-bold transition-all hover:gap-2.5"
+            style={{ color: "var(--scholar-blue)" }}
+          >
+            View Details
+            <ArrowRight className="size-4" />
+          </button>
+        </div>
       </div>
     </motion.div>
   );

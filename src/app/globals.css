@@ -398,6 +398,30 @@
   .custom-scrollbar::-webkit-scrollbar-thumb {
     animation: scrollbar-reveal 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
   }
+
+  /* ── Scholar Blue Colorful Scrollbar ───────────────────────── */
+  .scholar-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #3399cc transparent;
+  }
+
+  .scholar-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scholar-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scholar-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #3399cc 0%, #7c3aed 100%);
+    border-radius: 100px;
+  }
+
+  .scholar-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #40b5d8 0%, #8e49ff 100%);
+  }
 }
 
 @keyframes user-bubble-enter {
