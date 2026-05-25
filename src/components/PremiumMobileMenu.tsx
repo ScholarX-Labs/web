@@ -7,7 +7,7 @@ import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { usePathname } from "next/navigation";
 import SignoutButton from "@/app/auth/_components/SignoutButton";
 import Image from "next/image";
-import Scholarx_horizontal_logo from "../../public/ScholarX-Logo-horizontal-Blue-Solid-Small_ScholarX.png";
+import Scholarx_horizontal_logo from "@/../public/ScholarX-Logo-horizontal-Blue-Solid-Small_ScholarX.png";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 
