@@ -126,7 +126,7 @@ function OpportiuntyCard({ Opportunity }: { Opportunity: Opportunity }) {
             )}
           </div>
 
-          <div className="flex flex-row justify-between items-center pt-2">
+          <div className="flex flex-row flex-wrap justify-between items-center pt-2 gap-y-3">
             <div className="flex flex-wrap gap-1.5">
               {Opportunity.fundType &&
                 Opportunity.fundType.map((type) => {
@@ -154,7 +154,7 @@ function OpportiuntyCard({ Opportunity }: { Opportunity: Opportunity }) {
             
             <motion.div
               animate={isHovered ? { x: 5 } : { x: 0 }}
-              className="flex items-center gap-1 text-primary font-bold text-sm"
+              className="flex items-center gap-1 text-primary font-bold text-sm shrink-0"
             >
               <span>View Details</span>
               <ArrowUpRight size={16} />

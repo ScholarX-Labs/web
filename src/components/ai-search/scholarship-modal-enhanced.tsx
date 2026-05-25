@@ -304,7 +304,7 @@ export function ScholarshipModal({
                   <div className="relative z-10 flex items-center justify-between">
                     <div>
                       <p className="text-scholar-blue-light/80 text-sm font-medium uppercase tracking-wider mb-1">
-                        AI Match Score
+                        ScholarX AI Match Score
                       </p>
                       <h4 className="text-5xl font-black tracking-tighter">
                         {Math.round(result.match_percentage)}%

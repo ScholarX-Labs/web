@@ -50,15 +50,15 @@ export default function OpportunitiesSearchInput() {
       <motion.div
         animate={isFocused ? { scale: 1.01, boxShadow: "0 10px 40px rgba(0,0,0,0.15)" } : { scale: 1, boxShadow: "0 4px 20px rgba(0,0,0,0.05)" }}
         className={cn(
-          "flex items-center w-full bg-white dark:bg-slate-900 rounded-full border-2 transition-colors duration-300 px-6 py-2",
+          "flex items-center w-full bg-white dark:bg-slate-900 rounded-full border-2 transition-colors duration-300 px-4 py-1.5 sm:px-6 sm:py-2",
           isFocused ? "border-primary" : "border-slate-200 dark:border-slate-800"
         )}
       >
-        <Search className={cn("shrink-0 transition-colors", isFocused ? "text-primary" : "text-slate-400")} size={22} />
+        <Search className={cn("shrink-0 transition-colors hidden sm:block", isFocused ? "text-primary" : "text-slate-400")} size={22} />
         <input
           type="text"
           role="searchbox"
-          className="flex-1 bg-transparent p-3 text-lg text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none"
+          className="flex-1 bg-transparent p-2 sm:p-3 text-sm sm:text-lg text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none"
           maxLength={200}
           placeholder="Search for scholarships, grants..."
           value={searchQuery}
@@ -80,14 +80,15 @@ export default function OpportunitiesSearchInput() {
             </motion.button>
           )}
         </AnimatePresence>
-        <div className="h-8 w-[1px] bg-slate-200 dark:bg-slate-800 mx-2" />
+        <div className="h-8 w-[1px] bg-slate-200 dark:bg-slate-800 mx-2 hidden sm:block" />
         <button
           type="button"
           aria-label="Search"
-          className="shrink-0 px-4 py-2 bg-primary text-white rounded-full font-bold hover:bg-primary/90 transition-all active:scale-95 cursor-pointer shadow-md hover:shadow-lg"
+          className="shrink-0 px-3 py-1.5 sm:px-5 sm:py-2 bg-primary text-white rounded-full font-bold text-xs sm:text-sm hover:bg-primary/90 transition-all active:scale-95 cursor-pointer shadow-md hover:shadow-lg flex items-center justify-center"
           onClick={handleSearch}
         >
-          Search
+          <span className="hidden sm:inline">Search</span>
+          <Search className="block sm:hidden size-4" />
         </button>
       </motion.div>
     </motion.div>

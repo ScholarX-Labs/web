@@ -13,15 +13,15 @@ async function opportunities() {
         <OpportunitiesHero />
 
         {/* filters section */}
-        <section className="sticky top-0 z-30 shrink-0 px-4 py-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 shadow-sm">
-          <div className="container mx-auto">
+        <section className="sticky top-0 z-30 shrink-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 shadow-sm">
+          <div className="container mx-auto px-6 sm:px-8 lg:px-12 py-4">
             <Filters />
           </div>
         </section>
 
         {/* opportunities section */}
         <main className="flex-1 bg-slate-50 dark:bg-slate-950">
-          <div className="container mx-auto">
+          <div className="container mx-auto px-6 sm:px-8 lg:px-12">
             <OpprtunitySection />
           </div>
         </main>

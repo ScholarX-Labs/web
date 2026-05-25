@@ -83,7 +83,7 @@ export function SearchHero({ onSearch, isLoading, indicatorConfig }: SearchHeroP
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/50 dark:bg-white/10 backdrop-blur-md border border-white/20 shadow-lg mb-8">
             <Sparkles className="w-4 h-4 text-scholar-blue" />
             <span className="text-sm font-semibold text-foreground">
-              Powered by Advanced AI
+              By ScholarX AI
             </span>
           </div>
         </motion.div>
@@ -96,7 +96,7 @@ export function SearchHero({ onSearch, isLoading, indicatorConfig }: SearchHeroP
           <h1 className="text-5xl md:text-7xl font-extrabold text-foreground leading-tight mb-6 tracking-tight">
             Find your future with{" "}
             <span className="bg-gradient-to-r from-scholar-blue via-purple-600 to-scholar-blue bg-clip-text text-transparent">
-              AI-powered search
+              ScholarX AI
             </span>
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">

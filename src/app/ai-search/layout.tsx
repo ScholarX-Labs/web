@@ -4,7 +4,7 @@ import { Providers } from "@/components/ai-search/providers";
 import { requireSession } from "@/lib/dal";
 
 export const metadata: Metadata = {
-  title: "ScholarAI — AI-Powered Scholarship Search",
+  title: "ScholarX AI — AI-Powered Scholarship Search",
   description:
     "The premium discovery engine for global scholarships and academic opportunities.",
 };

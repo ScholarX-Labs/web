@@ -37,44 +37,32 @@ function CopyButton({ url }: { url: string }) {
 
   return (
     <div className="relative">
-      <p className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-2 ml-1">
+      <p className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1.5 ml-1">
         Application Link
       </p>
       <div
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
         className={cn(
-          "flex items-center px-4 py-3 rounded-2xl border transition-all duration-300",
+          "flex items-center px-3 py-2 sm:px-4 sm:py-3 rounded-xl sm:rounded-2xl border transition-all duration-300",
           "bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700/50",
-          hovered && "border-primary/30 bg-white dark:bg-slate-800 shadow-sm",
         )}
       >
-        <p className="flex-1 min-w-0 text-sm text-slate-600 dark:text-slate-300 truncate font-mono">
+        <p className="flex-1 min-w-0 text-xs sm:text-sm text-slate-600 dark:text-slate-300 truncate font-mono">
           {url}
         </p>
-        <AnimatePresence>
-          {(hovered || copied) && (
-            <motion.div
-              initial={{ opacity: 0, x: 10 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 10 }}
-              className="ml-2"
-            >
-              <button
-                onClick={handleCopy}
-                className={cn(
-                  "p-2 rounded-xl transition-all",
-                  copied
-                    ? "bg-green-500 text-white shadow-lg"
-                    : "bg-primary text-white hover:shadow-md active:scale-95"
-                )}
-                aria-label={copied ? "Link copied" : "Copy link"}
-              >
-                {copied ? <Check size={16} /> : <Copy size={16} />}
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        <div className="ml-2">
+          <button
+            onClick={handleCopy}
+            className={cn(
+              "p-1.5 sm:p-2 rounded-lg sm:rounded-xl transition-all cursor-pointer",
+              copied
+                ? "bg-green-500 text-white shadow-lg"
+                : "bg-primary text-white hover:shadow-md active:scale-95"
+            )}
+            aria-label={copied ? "Link copied" : "Copy link"}
+          >
+            {copied ? <Check size={14} /> : <Copy size={14} />}
+          </button>
+        </div>
       </div>
 
       <AnimatePresence>
@@ -83,11 +71,11 @@ function CopyButton({ url }: { url: string }) {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
-            className="absolute -top-10 left-1/2 -translate-x-1/2 z-10"
+            className="absolute -top-8 left-1/2 -translate-x-1/2 z-10"
           >
-            <div className="bg-green-500 text-white text-xs font-bold px-4 py-2 rounded-full shadow-xl flex items-center gap-2">
-              <Check size={14} />
-              Copied to clipboard
+            <div className="bg-green-500 text-white text-[10px] sm:text-xs font-bold px-3 py-1.5 rounded-full shadow-xl flex items-center gap-1.5">
+              <Check size={12} />
+              Copied
             </div>
           </motion.div>
         )}
@@ -198,7 +186,7 @@ export default function OpportunityModal({
     <motion.div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-100 flex items-start justify-center px-4 py-4 sm:px-6 sm:py-6 overflow-hidden"
+      className="fixed inset-0 z-100 flex items-center justify-center px-4 py-4 sm:px-6 sm:py-6 overflow-hidden"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1, transition: { duration: 0.22 } }}
       exit={{ opacity: 0, transition: { duration: 0.16 } }}
@@ -212,40 +200,39 @@ export default function OpportunityModal({
       <div
         ref={sheetRef}
         className={cn(
-          "relative w-full max-w-2xl overflow-hidden rounded-[32px] border border-white/30 bg-white/95 shadow-[0_48px_140px_rgba(15,23,42,0.4)] ring-1 ring-slate-100/80 dark:border-slate-800/70 dark:bg-slate-950/95 dark:ring-slate-800/80",
-          "max-h-[min(850px,90vh)] flex flex-col z-10"
+          "relative w-full max-w-[calc(100vw-32px)] sm:max-w-2xl mx-auto overflow-hidden rounded-[24px] sm:rounded-[32px] border border-white/30 bg-white/95 shadow-[0_48px_140px_rgba(15,23,42,0.4)] ring-1 ring-slate-100/80 dark:border-slate-800/70 dark:bg-slate-950/95 dark:ring-slate-800/80",
+          "h-[85vh] sm:h-auto max-h-[85vh] flex flex-col z-[100]"
         )}
       >
-        <div className="flex flex-col flex-1 min-h-0">
-          {/* Header */}
+        {/* Header */}
           <motion.div 
             {...reveal(0)}
-            className="flex justify-between items-start p-8 pb-4 flex-shrink-0"
+            className="flex justify-between items-start p-5 pb-3 sm:p-8 sm:pb-4 flex-shrink-0"
           >
-            <div className="p-0">
-              <h2 className="text-3xl font-black text-slate-900 dark:text-white leading-tight">
+            <div className="p-0 pr-4">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 dark:text-white leading-tight break-words">
                 {opportunity.title}
               </h2>
             </div>
             <button
               onClick={handleDismiss}
-              className="p-3 bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white rounded-full transition-all hover:scale-110 active:scale-90 cursor-pointer"
+              className="p-2 sm:p-3 bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white rounded-full transition-all hover:scale-110 active:scale-90 cursor-pointer flex-shrink-0"
               aria-label="Close dialog"
             >
-              <X size={20} />
+              <X className="size-4 sm:size-5" />
             </button>
           </motion.div>
 
           {/* Body */}
-          <div className="relative flex-1 min-h-0 flex flex-col">
+          <div className="relative flex-1 min-h-0 overflow-hidden flex flex-col">
             {/* Top Fade Indicator */}
-            <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-white/95 dark:from-slate-950/95 to-transparent z-20 pointer-events-none" />
+            <div className="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-white/95 dark:from-slate-950/95 to-transparent z-20 pointer-events-none" />
             
-            <div className="flex-1 overflow-y-auto custom-scrollbar px-8 pb-8 flex flex-col gap-8 scroll-smooth">
+            <div className="flex-1 overflow-y-auto overscroll-contain custom-scrollbar px-5 pb-5 sm:px-8 sm:pb-8 flex flex-col gap-5 sm:gap-8 scroll-smooth">
               {/* Badges and Quick Info */}
             <motion.div 
               {...reveal(1)}
-              className="flex flex-wrap gap-4 text-sm bg-slate-50/50 dark:bg-slate-800/30 p-5 rounded-[24px] border border-slate-100 dark:border-slate-800/50"
+              className="flex flex-wrap gap-3 sm:gap-4 text-xs sm:text-sm bg-slate-50/50 dark:bg-slate-800/30 p-4 sm:p-5 rounded-[20px] sm:rounded-[24px] border border-slate-100 dark:border-slate-800/50"
             >
               {opportunity.location && (
                 <div className="flex gap-2.5 items-center font-bold text-slate-600 dark:text-slate-300">
@@ -288,7 +275,7 @@ export default function OpportunityModal({
 
             <motion.div 
               {...reveal(2)}
-              className="grid grid-cols-1 sm:grid-cols-2 gap-8"
+              className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-8"
             >
               {opportunity.fundType && opportunity.fundType.length > 0 && (
                 <div className="space-y-3">
@@ -348,20 +335,20 @@ export default function OpportunityModal({
             {/* Description sections */}
             <motion.div {...reveal(3)} className="space-y-4">
               <div>
-                <h3 className="font-black text-lg text-slate-900 dark:text-white mb-3">
+                <h3 className="font-black text-base sm:text-lg text-slate-900 dark:text-white mb-2 sm:mb-3">
                   Description
                 </h3>
-                <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+                <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed">
                   {opportunity.description}
                 </p>
               </div>
 
               {opportunity.eligibility && (
                 <div>
-                  <h3 className="font-black text-lg text-slate-900 dark:text-white mb-3">
+                  <h3 className="font-black text-base sm:text-lg text-slate-900 dark:text-white mb-2 sm:mb-3">
                     Eligibility & Requirements
                   </h3>
-                  <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+                  <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed">
                     {opportunity.eligibility}
                   </p>
                 </div>
@@ -369,12 +356,12 @@ export default function OpportunityModal({
 
               {opportunity.benefits && opportunity.benefits.length > 0 && (
                 <div>
-                  <h3 className="font-black text-lg text-slate-900 dark:text-white mb-3">
+                  <h3 className="font-black text-base sm:text-lg text-slate-900 dark:text-white mb-2 sm:mb-3">
                     Benefits
                   </h3>
                   <ul className="space-y-2.5">
                     {opportunity.benefits.map((benefit, i) => (
-                      <li key={i} className="flex gap-3 text-slate-600 dark:text-slate-400 leading-relaxed">
+                      <li key={i} className="flex gap-3 text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed">
                         <div className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
                         {benefit}
                       </li>
@@ -388,21 +375,21 @@ export default function OpportunityModal({
             {(opportunity.gpa ||
               (opportunity.documentsRequired &&
                 opportunity.documentsRequired.length > 0)) && (
-              <motion.div {...reveal(4)} className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <motion.div {...reveal(4)} className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 {opportunity.gpa && (
-                  <div className="bg-slate-50 dark:bg-slate-800/30 p-5 rounded-[24px] border border-slate-100 dark:border-slate-800/50">
-                    <span className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">
+                  <div className="bg-slate-50 dark:bg-slate-800/30 p-4 sm:p-5 rounded-[20px] sm:rounded-[24px] border border-slate-100 dark:border-slate-800/50">
+                    <span className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1.5 sm:mb-2">
                       Minimum GPA
                     </span>
-                    <span className="text-xl font-black text-slate-900 dark:text-white">
+                    <span className="text-lg sm:text-xl font-black text-slate-900 dark:text-white">
                       {opportunity.gpa}
                     </span>
                   </div>
                 )}
                 {opportunity.documentsRequired &&
                   opportunity.documentsRequired.length > 0 && (
-                    <div className="bg-slate-50 dark:bg-slate-800/30 p-5 rounded-[24px] border border-slate-100 dark:border-slate-800/50">
-                      <span className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">
+                    <div className="bg-slate-50 dark:bg-slate-800/30 p-4 sm:p-5 rounded-[20px] sm:rounded-[24px] border border-slate-100 dark:border-slate-800/50">
+                      <span className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1.5 sm:mb-2">
                         Required Documents
                       </span>
                       <div className="flex flex-wrap gap-2">
@@ -422,15 +409,15 @@ export default function OpportunityModal({
           </div>
 
             {/* Bottom Fade Indicator */}
-            <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white/95 dark:from-slate-950/95 to-transparent z-10 pointer-events-none" />
+            <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white/95 dark:from-slate-950/95 to-transparent z-10 pointer-events-none" />
           </div>
 
           {/* Footer */}
           <motion.div 
             {...reveal(5)}
-            className="p-8 border-t border-slate-100 dark:border-slate-800/50 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md flex-shrink-0"
+            className="p-5 sm:p-8 border-t border-slate-100 dark:border-slate-800/50 bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-md flex-shrink-0"
           >
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-6 min-w-0">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-6 min-w-0">
               <div className="flex-1 min-w-0">
                 <CopyButton url={opportunity.applicationLink} />
               </div>
@@ -440,14 +427,13 @@ export default function OpportunityModal({
                 href={opportunity.applicationLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-8 py-4 bg-primary text-white rounded-2xl font-black shadow-[0_10px_25px_-5px_rgba(30,64,175,0.4)] hover:shadow-[0_20px_40px_-5px_rgba(30,64,175,0.5)] transition-all flex items-center justify-center gap-3"
+                className="px-6 py-3 sm:px-8 sm:py-4 bg-primary text-white rounded-xl sm:rounded-2xl font-black text-sm sm:text-base shadow-[0_10px_25px_-5px_rgba(30,64,175,0.4)] hover:shadow-[0_20px_40px_-5px_rgba(30,64,175,0.5)] transition-all flex items-center justify-center gap-2 sm:gap-3"
               >
                 <span>Apply Now</span>
-                <ArrowUpRight size={20} strokeWidth={3} />
+                <ArrowUpRight size={18} strokeWidth={3} className="sm:size-5" />
               </motion.a>
             </div>
           </motion.div>
-        </div>
       </div>
     </motion.div>,
     document.body
