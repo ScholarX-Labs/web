@@ -22,12 +22,32 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   const session = await getSession();
+  const isProduction = process.env.NODE_ENV === "production";
+
+  if (isProduction) {
+    console.info("[admin/layout] session-check", {
+      hasUser: Boolean(session?.user),
+      userId: session?.user?.id ?? null,
+      role: session?.user?.role ?? null,
+    });
+  }
 
   if (!session?.user) {
+    if (isProduction) {
+      console.warn("[admin/layout] redirect-signin", {
+        reason: "missing-session-user",
+      });
+    }
     redirect("/auth/signin");
   }
 
   if (session.user.role !== "admin") {
+    if (isProduction) {
+      console.warn("[admin/layout] redirect-home", {
+        reason: "non-admin-role",
+        role: session.user.role ?? null,
+      });
+    }
     redirect("/");
   }
 

@@ -10,11 +10,41 @@ export default function ExecutiveLayout({
 }: {
   children: React.ReactNode;
 }) {
-  if (!isExecutiveDashboardEnabled()) {
+  const isProduction = process.env.NODE_ENV === "production";
+  const flags = getExecutiveFlags();
+
+  if (isProduction) {
+    console.info("[admin/executive/layout] feature-flags", {
+      pathname: "/admin/executive",
+      dashboardEnabled: flags.EXECUTIVE_DASHBOARD_ENABLED,
+      teamOperationsEnabled: flags.EXECUTIVE_TEAM_OPERATIONS_ENABLED,
+      financeEnabled: flags.EXECUTIVE_FINANCE_ENABLED,
+      governanceEnabled: flags.PUBLIC_IMPACT_GOVERNANCE_ENABLED,
+      aiHeatmapEnabled: flags.EXECUTIVE_AI_HEATMAP_ENABLED,
+      rawEnv: {
+        SCHOLARX_EXECUTIVE_DASHBOARD_ENABLED:
+          process.env.SCHOLARX_EXECUTIVE_DASHBOARD_ENABLED ?? null,
+        SCHOLARX_EXECUTIVE_TEAM_OPS_ENABLED:
+          process.env.SCHOLARX_EXECUTIVE_TEAM_OPS_ENABLED ?? null,
+        SCHOLARX_EXECUTIVE_FINANCE_ENABLED:
+          process.env.SCHOLARX_EXECUTIVE_FINANCE_ENABLED ?? null,
+        SCHOLARX_EXECUTIVE_GOVERNANCE_ENABLED:
+          process.env.SCHOLARX_EXECUTIVE_GOVERNANCE_ENABLED ?? null,
+        SCHOLARX_EXECUTIVE_AI_HEATMAP_ENABLED:
+          process.env.SCHOLARX_EXECUTIVE_AI_HEATMAP_ENABLED ?? null,
+      },
+    });
+  }
+
+  if (!flags.EXECUTIVE_DASHBOARD_ENABLED) {
+    if (isProduction) {
+      console.warn("[admin/executive/layout] not-found", {
+        reason: "executive-dashboard-flag-disabled",
+      });
+    }
     notFound();
   }
 
-  const flags = getExecutiveFlags();
   const navigationItems = [
     { label: "Overview", href: EXECUTIVE_ADMIN_ROUTES.OVERVIEW },
     { label: "Users", href: EXECUTIVE_ADMIN_ROUTES.USERS },
