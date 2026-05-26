@@ -21,6 +21,7 @@ function makeDomain(): ExecutiveDomain {
   const usersService = new ExecutiveDashboardService();
   const technicalService = new ExecutiveDashboardService();
   const coursesService = new ExecutiveDashboardService();
+  const financeService = new ExecutiveDashboardService();
   const publicGrowthService = new ExecutiveDashboardService();
   const opportunitiesService = new ExecutiveDashboardService();
   const teamOperationsService = new ExecutiveDashboardService();
@@ -178,7 +179,34 @@ function makeDomain(): ExecutiveDomain {
               inquiries: [],
             }),
           ),
-        getFinance: (query) => page("finance", query),
+        getFinance: (query) =>
+          Promise.resolve(
+            financeService.buildFinanceReadModel({
+              query,
+              generatedAt: new Date("2026-05-25T12:00:00.000Z"),
+              current: {
+                grossRevenue: 0,
+                refundedRevenue: 0,
+                enrollments: 0,
+                paidEnrollments: 0,
+                manualEnrollments: 0,
+                activeLearners: 0,
+                completions: 0,
+                supportInquiries: 0,
+              },
+              previous: {
+                grossRevenue: 0,
+                refundedRevenue: 0,
+                enrollments: 0,
+                paidEnrollments: 0,
+                manualEnrollments: 0,
+                activeLearners: 0,
+                completions: 0,
+                supportInquiries: 0,
+              },
+              courses: [],
+            }),
+          ),
       },
       actionCenter: {
         listOpenItems: async () => [],

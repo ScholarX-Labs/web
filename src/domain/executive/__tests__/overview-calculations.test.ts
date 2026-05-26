@@ -1,45 +1,21 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { ExecutiveDashboardService } from "../application/executive-dashboard.service";
-import type { ExecutivePageQuery } from "../contracts/executive-query.schemas";
+import { createOverviewFixture, executiveBaseQuery } from "./fixtures/executive-fixtures";
 
-const query: ExecutivePageQuery = {
-  from: "2026-05-01",
-  to: "2026-05-25",
-  page: 1,
-  pageSize: 25,
-  direction: "desc",
-};
+const query = executiveBaseQuery;
 
 test("overview read model calculates KPI deltas, rates, funnel, and chart summaries", () => {
   const service = new ExecutiveDashboardService();
   const generatedAt = new Date("2026-05-25T12:00:00.000Z");
+  const fixture = createOverviewFixture();
 
   const model = service.buildOverviewReadModel({
     query,
     generatedAt,
-    current: {
-      grossRevenue: 12_000,
-      subscriptions: 100,
-      activeSubscriptions: 82,
-      cancelledSubscriptions: 8,
-      users: 140,
-      courseCompletions: 35,
-      activeCourses: 12,
-    },
-    previous: {
-      grossRevenue: 10_000,
-      subscriptions: 80,
-      activeSubscriptions: 72,
-      cancelledSubscriptions: 4,
-      users: 120,
-      courseCompletions: 20,
-      activeCourses: 10,
-    },
-    trends: [
-      { date: "2026-05-01", revenue: 500, completions: 2 },
-      { date: "2026-05-02", revenue: 700, completions: 4 },
-    ],
+    current: fixture.current,
+    previous: fixture.previous,
+    trends: fixture.trends,
   });
 
   assert.equal(model.pageId, "overview");

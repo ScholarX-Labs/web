@@ -48,7 +48,7 @@ test("opportunity quality read model marks missing instrumentation as data gap",
   });
 
   assert.equal(model.sections.opportunityCleanupQueue.state.status, "data_gap");
-  assert.equal(model.freshnessSummary.unavailable, 7);
+  assert.equal(model.freshnessSummary.unavailable, 9);
 });
 
 test("opportunity quality action-center rule creates durable source key", () => {

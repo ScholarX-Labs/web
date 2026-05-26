@@ -63,5 +63,5 @@ test("AI search read model marks absent instrumentation as data gap", () => {
   assert.equal(model.sections.aiQualitySummary.state.status, "data_gap");
   assert.equal(model.sections.aiSearchTrend.state.status, "data_gap");
   assert.equal(model.sections.aiUsageByUser.state.status, "data_gap");
-  assert.equal(model.freshnessSummary.unavailable, 7);
+  assert.equal(model.freshnessSummary.unavailable, 9);
 });

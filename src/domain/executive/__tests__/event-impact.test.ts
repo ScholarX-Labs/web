@@ -1,40 +1,15 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { ExecutiveDashboardService } from "../application/executive-dashboard.service";
-import type { ExecutivePageQuery } from "../contracts/executive-query.schemas";
+import { createRegisteredEventsFixture, executiveBaseQuery } from "./fixtures/executive-fixtures";
 
-const query: ExecutivePageQuery = {
-  from: "2026-05-01",
-  to: "2026-05-25",
-  page: 1,
-  pageSize: 25,
-  direction: "desc",
-};
+const query = executiveBaseQuery;
 
 // ---------------------------------------------------------------------------
 // Fixtures
 // ---------------------------------------------------------------------------
 
-const twoRegisteredEvents = [
-  {
-    eventId: "evt-1",
-    title: "ScholarX Mentorship Kickoff",
-    registrations: 120,
-    attendanceTracked: false,
-    attendees: null,
-    postEventSignups: null,
-    postEventEnrollments: null,
-  },
-  {
-    eventId: "evt-2",
-    title: "AI for Students Workshop",
-    registrations: 45,
-    attendanceTracked: true,
-    attendees: 30,
-    postEventSignups: 8,
-    postEventEnrollments: 3,
-  },
-] as const;
+const twoRegisteredEvents = createRegisteredEventsFixture();
 
 // ---------------------------------------------------------------------------
 // Test: read model builds registered events summary correctly
