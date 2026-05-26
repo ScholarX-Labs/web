@@ -195,7 +195,7 @@ export function UsersTable({
       <DataTable
         columns={columns}
         data={items}
-        loading={isLoading}
+        loading={isLoading && items.length === 0}
         error={error ? "Failed to load users." : null}
         searchable
         searchPlaceholder="Search by name, email, role, phone, or user ID..."
