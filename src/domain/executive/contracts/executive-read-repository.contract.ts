@@ -242,6 +242,43 @@ export type LessonDrilldownReadModel =
 export type LearnerProgressReadModel =
   ExecutivePageResponse<EmptyExecutiveSections>;
 
+export type FinanceCoursePerformanceRow = {
+  courseId: string;
+  title: string;
+  category: string;
+  grossRevenue: number;
+  refundedRevenue: number;
+  netRevenue: number;
+  enrollments: number;
+  completions: number;
+  completionRate: number | null;
+  refundRate: number | null;
+  supportInquiryCount: number;
+  profitabilityProxy: number;
+  highRefundRate: boolean;
+  adminHref: string;
+};
+
+export type FinanceSummary = {
+  grossRevenue: number;
+  netRevenue: number;
+  refundedRevenue: number;
+  refundRate: number | null;
+  averageRevenuePerActiveLearner: number | null;
+  paidEnrollments: number;
+  manualEnrollments: number;
+  activeLearners: number;
+  supportInquiries: number;
+  completionRate: number | null;
+};
+
+export type FinanceSections = {
+  kpis: readonly ExecutiveMetricValue[];
+  financeSummary: FinanceSummary;
+  courseBusinessPerformance: ExecutiveTableModel<FinanceCoursePerformanceRow>;
+  selectedCourseDetail: FinanceCoursePerformanceRow | null;
+};
+
 export type OpportunityQualityIssueType =
   | "expired"
   | "broken_link"
@@ -561,7 +598,7 @@ export type TeamOperationsSections = {
 
 export type TeamOperationsReadModel =
   ExecutivePageResponse<TeamOperationsSections>;
-export type FinanceReadModel = ExecutivePageResponse<EmptyExecutiveSections>;
+export type FinanceReadModel = ExecutivePageResponse<FinanceSections>;
 
 export interface ExecutiveReadRepository {
   getOverview(query: ExecutivePageQuery): Promise<OverviewReadModel>;

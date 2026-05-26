@@ -15,8 +15,11 @@ export type ExecutiveExportActor = {
 
 export type ExecutiveExportPayload = {
   pageId: ExecutivePageId;
+  pageTitle: string;
   format: ExecutiveExportFormat;
   query: ExecutivePageQuery;
+  sections: Record<string, unknown>;
+  freshnessSummary: Record<string, number>;
   sectionIds?: readonly string[];
   generatedAt: string;
   redactionNotes: readonly string[];
