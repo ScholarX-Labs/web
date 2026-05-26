@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { useAdminUsers, useBlockUser, useUnblockUser } from "@/hooks/admin/use-admin-users";
 import { formatDate, statusLabel } from "@/lib/admin/admin-utils";
@@ -37,9 +37,20 @@ export function UsersTable({
   initialPagination: { page: number; pages: number; total: number };
 }) {
   const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setDebouncedSearch(search.trim());
+    }, 300);
+
+    return () => clearTimeout(timeout);
+  }, [search]);
+
   const { data, isLoading, error } = useAdminUsers(
-    { page, search: "", limit: 20 },
-    page === 1
+    { page, search: debouncedSearch || undefined, limit: 20 },
+    page === 1 && !debouncedSearch
       ? { items: initialItems as unknown[], pagination: initialPagination }
       : undefined,
   );
@@ -184,10 +195,15 @@ export function UsersTable({
       <DataTable
         columns={columns}
         data={items}
-        loading={isLoading}
+        loading={isLoading && items.length === 0}
         error={error ? "Failed to load users." : null}
         searchable
-        searchPlaceholder="Search users..."
+        searchPlaceholder="Search by name, email, role, phone, or user ID..."
+        searchValue={search}
+        onSearchChange={(value) => {
+          setSearch(value);
+          setPage(1);
+        }}
         emptyMessage="No users found."
         page={pagination.page}
         pageCount={pagination.pages}

@@ -419,13 +419,29 @@ export const createAdminRepository = (): AdminRepository => {
       const conditions: unknown[] = [];
 
       if (query.search) {
-        conditions.push(
-          or(
-            like(dbUsers.firstName, sanitizeSearch(query.search)),
-            like(dbUsers.lastName, sanitizeSearch(query.search)),
-            like(dbUsers.email, sanitizeSearch(query.search)),
-          ),
-        );
+        const terms = query.search
+          .trim()
+          .split(/\s+/)
+          .filter(Boolean);
+
+        if (terms.length > 0) {
+          const termConditions = terms.map((term) => {
+            const pattern = sanitizeSearch(term);
+            return or(
+              like(dbUsers.firstName, pattern),
+              like(dbUsers.lastName, pattern),
+              like(dbUsers.email, pattern),
+              like(dbUsers.role, pattern),
+              like(dbUsers.id, pattern),
+              like(dbUsers.phoneNumber, pattern),
+              like(
+                sql<string>`COALESCE(${dbUsers.firstName}, '') || ' ' || COALESCE(${dbUsers.lastName}, '')`,
+                pattern,
+              ),
+            );
+          });
+          conditions.push(and(...termConditions));
+        }
       }
       if (query.role) {
         conditions.push(eq(dbUsers.role, query.role));
