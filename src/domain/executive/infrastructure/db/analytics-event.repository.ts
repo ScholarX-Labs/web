@@ -170,15 +170,37 @@ export async function getAiSearchAnalyticsSnapshot(
   from: Date,
   to: Date,
 ): Promise<AiSearchAnalyticsSnapshot> {
+  const resultCountInt = sql<number>`
+    case
+      when (${dbExecutiveAnalyticsEvents.metadata}->>'resultCount') ~ '^-?[0-9]+$'
+        then (${dbExecutiveAnalyticsEvents.metadata}->>'resultCount')::int
+      else null
+    end
+  `;
+  const latencyNumeric = sql<number>`
+    case
+      when (${dbExecutiveAnalyticsEvents.metadata}->>'latencyMs') ~ '^-?[0-9]+(\\.[0-9]+)?$'
+        then (${dbExecutiveAnalyticsEvents.metadata}->>'latencyMs')::numeric
+      else null
+    end
+  `;
+  const estimatedCostNumeric = sql<number>`
+    case
+      when (${dbExecutiveAnalyticsEvents.metadata}->>'estimatedCost') ~ '^-?[0-9]+(\\.[0-9]+)?$'
+        then (${dbExecutiveAnalyticsEvents.metadata}->>'estimatedCost')::numeric
+      else null
+    end
+  `;
+
   const [aggregateRows, trendRows, usageRows] = await Promise.all([
     db
       .select({
         eventType: dbExecutiveAnalyticsEvents.eventType,
         value: count(),
-        zeroResults: sql<number>`coalesce(sum(case when nullif(${dbExecutiveAnalyticsEvents.metadata}->>'resultCount', '')::int = 0 or ${dbExecutiveAnalyticsEvents.metadata}->>'zeroResults' = 'true' then 1 else 0 end), 0)`,
+        zeroResults: sql<number>`coalesce(sum(case when coalesce(${resultCountInt}, -1) = 0 or ${dbExecutiveAnalyticsEvents.metadata}->>'zeroResults' = 'true' then 1 else 0 end), 0)`,
         errors: sql<number>`coalesce(sum(case when ${dbExecutiveAnalyticsEvents.metadata}->>'status' in ('error', 'failed') or ${dbExecutiveAnalyticsEvents.metadata}->>'ok' = 'false' then 1 else 0 end), 0)`,
-        latency: sql<number>`avg(nullif(${dbExecutiveAnalyticsEvents.metadata}->>'latencyMs', '')::numeric)`,
-        estimatedCost: sql<number>`coalesce(sum(coalesce(nullif(${dbExecutiveAnalyticsEvents.metadata}->>'estimatedCost', '')::numeric, 0)), 0)`,
+        latency: sql<number>`avg(${latencyNumeric})`,
+        estimatedCost: sql<number>`coalesce(sum(coalesce(${estimatedCostNumeric}, 0)), 0)`,
       })
       .from(dbExecutiveAnalyticsEvents)
       .where(
@@ -193,7 +215,7 @@ export async function getAiSearchAnalyticsSnapshot(
       .select({
         date: sql<string>`date_trunc('day', ${dbExecutiveAnalyticsEvents.occurredAt})::date::text`,
         searches: count(),
-        zeroResultSearches: sql<number>`coalesce(sum(case when nullif(${dbExecutiveAnalyticsEvents.metadata}->>'resultCount', '')::int = 0 or ${dbExecutiveAnalyticsEvents.metadata}->>'zeroResults' = 'true' then 1 else 0 end), 0)`,
+        zeroResultSearches: sql<number>`coalesce(sum(case when coalesce(${resultCountInt}, -1) = 0 or ${dbExecutiveAnalyticsEvents.metadata}->>'zeroResults' = 'true' then 1 else 0 end), 0)`,
         errorSearches: sql<number>`coalesce(sum(case when ${dbExecutiveAnalyticsEvents.metadata}->>'status' in ('error', 'failed') or ${dbExecutiveAnalyticsEvents.metadata}->>'ok' = 'false' then 1 else 0 end), 0)`,
       })
       .from(dbExecutiveAnalyticsEvents)
@@ -210,10 +232,10 @@ export async function getAiSearchAnalyticsSnapshot(
       .select({
         userId: dbExecutiveAnalyticsEvents.userId,
         searches: count(),
-        zeroResultSearches: sql<number>`coalesce(sum(case when nullif(${dbExecutiveAnalyticsEvents.metadata}->>'resultCount', '')::int = 0 or ${dbExecutiveAnalyticsEvents.metadata}->>'zeroResults' = 'true' then 1 else 0 end), 0)`,
+        zeroResultSearches: sql<number>`coalesce(sum(case when coalesce(${resultCountInt}, -1) = 0 or ${dbExecutiveAnalyticsEvents.metadata}->>'zeroResults' = 'true' then 1 else 0 end), 0)`,
         errorSearches: sql<number>`coalesce(sum(case when ${dbExecutiveAnalyticsEvents.metadata}->>'status' in ('error', 'failed') or ${dbExecutiveAnalyticsEvents.metadata}->>'ok' = 'false' then 1 else 0 end), 0)`,
-        averageLatencyMs: sql<number>`avg(nullif(${dbExecutiveAnalyticsEvents.metadata}->>'latencyMs', '')::numeric)`,
-        estimatedCost: sql<number>`coalesce(sum(coalesce(nullif(${dbExecutiveAnalyticsEvents.metadata}->>'estimatedCost', '')::numeric, 0)), 0)`,
+        averageLatencyMs: sql<number>`avg(${latencyNumeric})`,
+        estimatedCost: sql<number>`coalesce(sum(coalesce(${estimatedCostNumeric}, 0)), 0)`,
       })
       .from(dbExecutiveAnalyticsEvents)
       .where(
