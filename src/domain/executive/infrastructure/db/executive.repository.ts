@@ -814,7 +814,7 @@ export class DrizzleExecutiveReadRepository implements ExecutiveReadRepository {
     const [opportunities, aiSearch, registeredEvents] = await Promise.all([
       this.getOpportunityQualitySnapshots(from, to),
       getAiSearchAnalyticsSnapshot(from, to),
-      this.getRegisteredEventSnapshots(),
+      this.getRegisteredEventSnapshots(from, to),
     ]);
     return this.dashboard.buildOpportunitiesAiReadModel({
       query,
@@ -954,7 +954,18 @@ export class DrizzleExecutiveReadRepository implements ExecutiveReadRepository {
    * Because `registered_events` has no registration timestamp, we cannot
    * reliably apply date-range filtering at this boundary.
    */
-  private async getRegisteredEventSnapshots(): Promise<readonly RegisteredEventSnapshot[]> {
+  private async getRegisteredEventSnapshots(
+    _from?: Date,
+    _to?: Date,
+  ): Promise<readonly RegisteredEventSnapshot[]> {
+    // `auth.user.registered_events` has no per-registration timestamp, so
+    // date-scoped requests cannot be answered correctly at this layer.
+    // Return an explicit unsupported-period representation instead of
+    // misleading all-time counts.
+    if (_from || _to) {
+      return [];
+    }
+
     const rows = await executeRows<{
       event_id: string;
       registration_count: string | number;
