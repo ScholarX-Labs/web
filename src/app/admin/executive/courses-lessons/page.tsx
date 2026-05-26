@@ -11,6 +11,8 @@ import { BarChart } from "@/components/executive/charts/bar-chart";
 import { FunnelChart } from "@/components/executive/charts/funnel-chart";
 import { CourseLeaderboardTable } from "@/components/executive/tables/course-leaderboard-table";
 import { LessonAnalyticsTable } from "@/components/executive/tables/lesson-analytics-table";
+import { CourseManagementTable } from "@/components/executive/tables/course-management-table";
+import { ContentQualityChecklist } from "@/components/executive/sections/content-quality-checklist";
 
 export const dynamic = "force-dynamic";
 
@@ -63,6 +65,20 @@ async function readPage(searchParams: PageProps["searchParams"]): Promise<{
 
 export default async function CoursesLessonsPage({ searchParams }: PageProps) {
   const { courses, drilldown } = await readPage(searchParams);
+  const leaderboardRows =
+    drilldown && courses.query.courseId
+      ? courses.sections.courseLeaderboard.rows.map((row) => {
+          if (row.courseId !== courses.query.courseId) return row;
+          const qualityFlags = new Set(row.qualityFlags);
+          if (drilldown.sections.criticalDropFlags.length > 0) {
+            qualityFlags.add("critical_drop");
+          }
+          return {
+            ...row,
+            qualityFlags: Array.from(qualityFlags),
+          };
+        })
+      : courses.sections.courseLeaderboard.rows;
 
   return (
     <main className="space-y-6 pb-16">
@@ -105,7 +121,7 @@ export default async function CoursesLessonsPage({ searchParams }: PageProps) {
       </section>
 
       <section className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(320px,0.65fr)]">
-        <CourseLeaderboardTable rows={courses.sections.courseLeaderboard.rows} />
+        <CourseLeaderboardTable rows={leaderboardRows} />
         <BarChart
           chart={{
             ...courses.sections.categoryDistribution,
@@ -148,11 +164,16 @@ export default async function CoursesLessonsPage({ searchParams }: PageProps) {
       </section>
 
       {drilldown ? (
-        <section className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(320px,0.65fr)]">
+        <section className="space-y-4">
+          <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(320px,0.65fr)]">
           <LessonAnalyticsTable rows={drilldown.sections.lessonTable.rows} />
           <FunnelChart chart={drilldown.sections.completionFunnel} />
+          </div>
+          <ContentQualityChecklist rows={drilldown.sections.contentQualityChecklist.rows} />
         </section>
       ) : null}
+
+      <CourseManagementTable rows={courses.sections.managementTable.rows} />
     </main>
   );
 }

@@ -7,6 +7,7 @@ import { MetricCard } from "@/components/executive/sections/metric-card";
 import { AiQualitySection } from "@/components/executive/sections/ai-quality-section";
 import { AiUsageTable } from "@/components/executive/tables/ai-usage-table";
 import { OpportunityCleanupTable } from "@/components/executive/tables/opportunity-cleanup-table";
+import { EventImpactTable } from "@/components/executive/tables/event-impact-table";
 
 export const dynamic = "force-dynamic";
 
@@ -139,6 +140,29 @@ export default async function OpportunitiesAiPage({ searchParams }: PageProps) {
       <AiUsageTable rows={opportunities.sections.aiUsageByUser.rows} />
 
       <OpportunityCleanupTable rows={opportunities.sections.opportunityCleanupQueue.rows} />
+
+      {opportunities.sections.registeredEventsSummary.state.status !== "data_gap" ? (
+        <EventImpactTable
+          rows={opportunities.sections.registeredEventsTable.rows}
+          totalRegistrations={opportunities.sections.registeredEventsSummary.totalRegistrations}
+        />
+      ) : (
+        <section
+          className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm"
+          aria-labelledby="registered-events-unavailable"
+        >
+          <h2
+            id="registered-events-unavailable"
+            className="text-sm font-semibold text-slate-950"
+          >
+            Registered events
+          </h2>
+          <p className="mt-2 text-sm text-slate-500">
+            {opportunities.sections.registeredEventsSummary.state.message ??
+              "Event registration data is not yet available for this period."}
+          </p>
+        </section>
+      )}
     </main>
   );
 }

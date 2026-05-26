@@ -7,6 +7,7 @@ import { FreshnessBadge } from "@/components/executive/sections/freshness-badge"
 import { SectionState } from "@/components/executive/sections/section-state";
 import { BarChart } from "@/components/executive/charts/bar-chart";
 import { Heatmap } from "@/components/executive/charts/heatmap";
+import { UserManagementTable } from "@/components/executive/tables/user-management-table";
 
 export const dynamic = "force-dynamic";
 
@@ -181,6 +182,8 @@ export default async function ExecutiveUsersPage({ searchParams }: PageProps) {
           <BarChart chart={users.sections.registrationTimeline} />
         </SectionState>
       </section>
+
+      <UserManagementTable rows={users.sections.managementTable.rows} />
     </main>
   );
 }
