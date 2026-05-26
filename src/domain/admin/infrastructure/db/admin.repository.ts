@@ -424,6 +424,9 @@ export const createAdminRepository = (): AdminRepository => {
             like(dbUsers.firstName, sanitizeSearch(query.search)),
             like(dbUsers.lastName, sanitizeSearch(query.search)),
             like(dbUsers.email, sanitizeSearch(query.search)),
+            like(dbUsers.role, sanitizeSearch(query.search)),
+            like(dbUsers.id, sanitizeSearch(query.search)),
+            like(dbUsers.phoneNumber, sanitizeSearch(query.search)),
           ),
         );
       }
