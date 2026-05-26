@@ -65,6 +65,12 @@ interface ExecutiveExportResponse {
 }
 ```
 
+## Overflow Response
+
+Phase 1 does not support asynchronous export jobs. Requests over 50,000 rows or date ranges longer
+than 365 days return `413 Payload Too Large` with the standard error envelope and no export file.
+`202 Accepted` export jobs and `/api/admin/executive/export/status/:jobId` are Phase 2.
+
 ## Redaction Rules
 
 - Overview exports must not include raw names, emails, phone numbers, payment ids, or full audit diffs.
