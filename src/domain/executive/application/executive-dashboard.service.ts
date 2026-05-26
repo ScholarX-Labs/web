@@ -591,6 +591,55 @@ export class ExecutiveDashboardService {
     private readonly freshnessService = new FreshnessService(),
   ) {}
 
+  private sortFinancePerformanceRows(
+    rows: readonly FinanceCoursePerformanceRow[],
+    sort: string | undefined,
+    direction: "asc" | "desc",
+  ): FinanceCoursePerformanceRow[] {
+    if (!sort) {
+      return [...rows].sort((left, right) =>
+        right.profitabilityProxy - left.profitabilityProxy
+        || right.grossRevenue - left.grossRevenue);
+    }
+
+    const compare = (left: FinanceCoursePerformanceRow, right: FinanceCoursePerformanceRow): number => {
+      const byField = (() => {
+        switch (sort) {
+          case "title":
+            return left.title.localeCompare(right.title);
+          case "category":
+            return left.category.localeCompare(right.category);
+          case "grossRevenue":
+            return left.grossRevenue - right.grossRevenue;
+          case "refundedRevenue":
+            return left.refundedRevenue - right.refundedRevenue;
+          case "netRevenue":
+            return left.netRevenue - right.netRevenue;
+          case "enrollments":
+            return left.enrollments - right.enrollments;
+          case "completions":
+            return left.completions - right.completions;
+          case "completionRate":
+            return (left.completionRate ?? -1) - (right.completionRate ?? -1);
+          case "refundRate":
+            return (left.refundRate ?? -1) - (right.refundRate ?? -1);
+          case "supportInquiryCount":
+            return left.supportInquiryCount - right.supportInquiryCount;
+          case "profitabilityProxy":
+            return left.profitabilityProxy - right.profitabilityProxy;
+          default:
+            return 0;
+        }
+      })();
+
+      if (byField !== 0) return byField;
+      return left.courseId.localeCompare(right.courseId);
+    };
+
+    const factor = direction === "asc" ? 1 : -1;
+    return [...rows].sort((left, right) => compare(left, right) * factor);
+  }
+
   buildOverviewReadModel({
     query,
     current,
@@ -1276,9 +1325,11 @@ export class ExecutiveDashboardService {
       };
     };
 
-    const courseRows: FinanceCoursePerformanceRow[] = courses
-      .map(toPerformanceRow)
-      .sort((left, right) => right.profitabilityProxy - left.profitabilityProxy || right.grossRevenue - left.grossRevenue);
+    const courseRows: FinanceCoursePerformanceRow[] = this.sortFinancePerformanceRows(
+      courses.map(toPerformanceRow),
+      query.sort,
+      query.direction,
+    );
 
     const selectedRow =
       selectedCourse
