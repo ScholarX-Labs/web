@@ -174,6 +174,27 @@ export const createCoursesRouteHandlers = (deps: CoursesRouteDeps) => {
         return NextResponse.json(result, { status: 200 });
       }
 
+      if (
+        path.length === 4 &&
+        path[1] === "enroll" &&
+        path[2] === "application" &&
+        path[3] === "status"
+      ) {
+        const authUserId = await resolveUserId(request);
+        const result = await domain.enrollment.getApplicationStatus(
+          path[0],
+          authUserId,
+        );
+        return NextResponse.json(
+          {
+            success: true,
+            requestId: request.headers.get("x-request-id") ?? randomUUID(),
+            data: result,
+          },
+          { status: 200 },
+        );
+      }
+
       if (path.length === 1) {
         const result = await domain.catalog.getById(path[0], userId);
         return NextResponse.json(result, { status: 200 });

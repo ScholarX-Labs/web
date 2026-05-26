@@ -922,6 +922,40 @@ export const coursesService = {
       );
       return response.data;
     } catch (error) {
+      const status =
+        error instanceof ApiRequestError
+          ? error.status
+          : typeof error === "object" && error !== null && "status" in error
+            ? Number((error as { status?: unknown }).status)
+            : undefined;
+      const code =
+        error instanceof ApiRequestError
+          ? error.code
+          : parseApiErrorCode(error);
+      const message = parseApiErrorMessage(
+        error,
+        "Failed to fetch application status",
+      );
+
+      if (
+        typeof status === "number" &&
+        isRouteNotFoundError(status, code, message)
+      ) {
+        try {
+          const fallbackResponse = await getJson<ApplicationStatusResponse>(
+            `/courses/${courseId}/enroll/application/status`,
+            { token },
+            "Failed to fetch application status",
+          );
+          return fallbackResponse.data;
+        } catch (fallbackError) {
+          return throwApiError(
+            fallbackError,
+            "Failed to fetch application status",
+          );
+        }
+      }
+
       return throwApiError(error, "Failed to fetch application status");
     }
   },
