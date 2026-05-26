@@ -1,19 +1,50 @@
 "use client";
 
 import { use } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useAdminUser } from "@/hooks/admin/use-admin-users";
+import { useAdminUser, useSetUserRole } from "@/hooks/admin/use-admin-users";
+import { ROLE_OPTIONS } from "@/lib/admin/admin-constants";
 import { formatDate, statusLabel } from "@/lib/admin/admin-utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { toast } from "sonner";
 import { ArrowLeft, Mail, Calendar, Shield, User } from "lucide-react";
 
 export default function AdminUserDetailPage({ params }: { params: Promise<{ userId: string }> }) {
   const { userId } = use(params);
   const { data: user, isLoading } = useAdminUser(userId);
+  const setUserRole = useSetUserRole();
   const u = user as Record<string, unknown> | undefined;
+  const currentRole = String(u?.role ?? "user");
+  const [selectedRole, setSelectedRole] = useState(currentRole);
+
+  useEffect(() => {
+    setSelectedRole(currentRole);
+  }, [currentRole]);
+
+  const handleRoleUpdate = async () => {
+    try {
+      await setUserRole.mutateAsync({
+        id: userId,
+        data: { role: selectedRole },
+      });
+      toast.success(`Role updated to ${statusLabel(selectedRole)}.`);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Failed to update user role.";
+      toast.error(message);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -119,6 +150,33 @@ export default function AdminUserDetailPage({ params }: { params: Promise<{ user
         </div>
 
         <div>
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle>Role Management</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Select value={selectedRole} onValueChange={setSelectedRole}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select role" />
+                </SelectTrigger>
+                <SelectContent>
+                  {ROLE_OPTIONS.map((role) => (
+                    <SelectItem key={role.value} value={role.value}>
+                      {role.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button
+                onClick={handleRoleUpdate}
+                disabled={setUserRole.isPending || selectedRole === currentRole}
+                className="w-full"
+              >
+                {setUserRole.isPending ? "Saving..." : "Save Role"}
+              </Button>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle>Activity</CardTitle>
