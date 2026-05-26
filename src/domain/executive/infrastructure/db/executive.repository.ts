@@ -7,7 +7,6 @@ import {
   dbCourseProgress,
   dbCourses,
   dbInquiries,
-  dbLessonProgress,
   dbProgressSyncEvents,
   dbSubscriptions,
 } from "@/db/schema/courses-db.schema";
@@ -33,6 +32,8 @@ import { createExecutiveDashboardService } from "@/domain/executive/application/
 import type {
   OverviewAggregateSnapshot,
   CoursesLessonsAggregateSnapshot,
+  FinanceAggregateSnapshot,
+  FinanceCourseSnapshot,
   GrowthFunnelSnapshot,
   InquiryPipelineSnapshot,
   OpportunityQualitySnapshot,
@@ -813,7 +814,7 @@ export class DrizzleExecutiveReadRepository implements ExecutiveReadRepository {
     const [opportunities, aiSearch, registeredEvents] = await Promise.all([
       this.getOpportunityQualitySnapshots(from, to),
       getAiSearchAnalyticsSnapshot(from, to),
-      this.getRegisteredEventSnapshots(from, to),
+      this.getRegisteredEventSnapshots(),
     ]);
     return this.dashboard.buildOpportunitiesAiReadModel({
       query,
@@ -953,10 +954,7 @@ export class DrizzleExecutiveReadRepository implements ExecutiveReadRepository {
    * Because `registered_events` has no registration timestamp, we cannot
    * reliably apply date-range filtering at this boundary.
    */
-  private async getRegisteredEventSnapshots(
-    _from: Date,
-    _to: Date,
-  ): Promise<readonly RegisteredEventSnapshot[]> {
+  private async getRegisteredEventSnapshots(): Promise<readonly RegisteredEventSnapshot[]> {
     const rows = await executeRows<{
       event_id: string;
       registration_count: string | number;
@@ -1318,7 +1316,198 @@ export class DrizzleExecutiveReadRepository implements ExecutiveReadRepository {
   }
 
   async getFinance(query: ExecutivePageQuery): Promise<FinanceReadModel> {
-    return emptyPageResponse("finance", query);
+    const from = toDate(query.from);
+    const to = toDateEnd(query.to);
+    const dayMs = 86_400_000;
+    const periodDays =
+      Math.max(1, Math.floor((toDate(query.to).getTime() - from.getTime()) / dayMs) + 1);
+    const previousTo = new Date(from.getTime() - 1);
+    const previousFrom = new Date(previousTo.getTime() - (periodDays - 1) * dayMs);
+
+    const [current, previous, courses, selectedCourse] = await Promise.all([
+      this.getFinanceAggregate(from, to),
+      this.getFinanceAggregate(previousFrom, previousTo),
+      this.getFinanceCourseRows(from, to, query),
+      query.courseId ? this.getFinanceCourseDetail(from, to, query.courseId) : Promise.resolve(null),
+    ]);
+
+    return this.dashboard.buildFinanceReadModel({
+      query,
+      current,
+      previous,
+      courses,
+      selectedCourse,
+    });
+  }
+
+  private async getFinanceAggregate(
+    from: Date,
+    to: Date,
+  ): Promise<FinanceAggregateSnapshot> {
+    const [
+      revenueRows,
+      refundRows,
+      enrollmentRows,
+      paidRows,
+      manualRows,
+      activeLearnerRows,
+      completionRows,
+      supportRows,
+    ] = await Promise.all([
+      executeRows<{ value: string | number }>(sql`
+        select coalesce(sum(amount), 0) as value
+        from courses.subscriptions
+        where enrolled_at between ${from} and ${to}
+      `),
+      executeRows<{ value: string | number }>(sql`
+        select coalesce(sum(amount), 0) as value
+        from courses.subscriptions
+        where enrolled_at between ${from} and ${to}
+          and status in ('cancelled', 'refunded')
+      `),
+      executeRows<{ value: string | number }>(sql`
+        select count(*) as value
+        from courses.subscriptions
+        where enrolled_at between ${from} and ${to}
+      `),
+      executeRows<{ value: string | number }>(sql`
+        select count(*) as value
+        from courses.subscriptions
+        where enrolled_at between ${from} and ${to}
+          and coalesce(amount, 0) > 0
+      `),
+      executeRows<{ value: string | number }>(sql`
+        select count(*) as value
+        from courses.subscriptions
+        where enrolled_at between ${from} and ${to}
+          and coalesce(amount, 0) <= 0
+      `),
+      executeRows<{ value: string | number }>(sql`
+        select count(distinct user_id) as value
+        from courses.subscriptions
+        where enrolled_at between ${from} and ${to}
+          and is_active = true
+      `),
+      executeRows<{ value: string | number }>(sql`
+        select count(*) as value
+        from courses.course_progress
+        where completed_at between ${from} and ${to}
+          and status = 'completed'
+      `),
+      executeRows<{ value: string | number }>(sql`
+        select count(*) as value
+        from courses.inquiries
+        where created_at between ${from} and ${to}
+      `),
+    ]);
+
+    return {
+      grossRevenue: numeric(revenueRows[0]?.value),
+      refundedRevenue: numeric(refundRows[0]?.value),
+      enrollments: numeric(enrollmentRows[0]?.value),
+      paidEnrollments: numeric(paidRows[0]?.value),
+      manualEnrollments: numeric(manualRows[0]?.value),
+      activeLearners: numeric(activeLearnerRows[0]?.value),
+      completions: numeric(completionRows[0]?.value),
+      supportInquiries: numeric(supportRows[0]?.value),
+    };
+  }
+
+  private async getFinanceCourseRows(
+    from: Date,
+    to: Date,
+    query: ExecutivePageQuery,
+  ): Promise<readonly FinanceCourseSnapshot[]> {
+    const rows = await executeRows<{
+      course_id: string;
+      title: string;
+      category: string;
+      gross_revenue: string | number;
+      refunded_revenue: string | number;
+      enrollments: string | number;
+      completions: string | number;
+      support_inquiries: string | number;
+    }>(sql`
+      select c.id::text as course_id,
+             c.title,
+             c.category,
+             coalesce(sum(s.amount), 0) as gross_revenue,
+             coalesce(sum(s.amount) filter (where s.status in ('cancelled', 'refunded')), 0) as refunded_revenue,
+             count(distinct s.id) as enrollments,
+             count(distinct cp.id) filter (where cp.status = 'completed') as completions,
+             count(distinct i.id) as support_inquiries
+      from courses.courses c
+      left join courses.subscriptions s
+        on s.course_id = c.id and s.enrolled_at between ${from} and ${to}
+      left join courses.course_progress cp
+        on cp.course_id = c.id and cp.completed_at between ${from} and ${to}
+      left join courses.inquiries i
+        on i.course_id = c.id and i.created_at between ${from} and ${to}
+      where (${query.courseCategory ?? null}::text is null or c.category = ${query.courseCategory ?? null})
+      group by c.id, c.title, c.category
+      order by gross_revenue desc, enrollments desc
+      limit ${query.pageSize}
+      offset ${(query.page - 1) * query.pageSize}
+    `);
+
+    return rows.map((row) => ({
+      courseId: row.course_id,
+      title: row.title,
+      category: row.category,
+      grossRevenue: numeric(row.gross_revenue),
+      refundedRevenue: numeric(row.refunded_revenue),
+      enrollments: numeric(row.enrollments),
+      completions: numeric(row.completions),
+      supportInquiryCount: numeric(row.support_inquiries),
+    }));
+  }
+
+  private async getFinanceCourseDetail(
+    from: Date,
+    to: Date,
+    courseId: string,
+  ): Promise<FinanceCourseSnapshot | null> {
+    const rows = await executeRows<{
+      course_id: string;
+      title: string;
+      category: string;
+      gross_revenue: string | number;
+      refunded_revenue: string | number;
+      enrollments: string | number;
+      completions: string | number;
+      support_inquiries: string | number;
+    }>(sql`
+      select c.id::text as course_id,
+             c.title,
+             c.category,
+             coalesce(sum(s.amount), 0) as gross_revenue,
+             coalesce(sum(s.amount) filter (where s.status in ('cancelled', 'refunded')), 0) as refunded_revenue,
+             count(distinct s.id) as enrollments,
+             count(distinct cp.id) filter (where cp.status = 'completed') as completions,
+             count(distinct i.id) as support_inquiries
+      from courses.courses c
+      left join courses.subscriptions s
+        on s.course_id = c.id and s.enrolled_at between ${from} and ${to}
+      left join courses.course_progress cp
+        on cp.course_id = c.id and cp.completed_at between ${from} and ${to}
+      left join courses.inquiries i
+        on i.course_id = c.id and i.created_at between ${from} and ${to}
+      where c.id = ${courseId}::uuid
+      group by c.id, c.title, c.category
+      limit 1
+    `);
+    const row = rows[0];
+    if (!row) return null;
+    return {
+      courseId: row.course_id,
+      title: row.title,
+      category: row.category,
+      grossRevenue: numeric(row.gross_revenue),
+      refundedRevenue: numeric(row.refunded_revenue),
+      enrollments: numeric(row.enrollments),
+      completions: numeric(row.completions),
+      supportInquiryCount: numeric(row.support_inquiries),
+    };
   }
 }
 
