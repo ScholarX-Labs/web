@@ -115,7 +115,9 @@ function useExecutiveFilterState(): ExecutiveFilterContextValue {
       commit(next);
     },
     buildHref: (href) => {
-      const serialized = query.toString();
+      const next = new URLSearchParams(query.toString());
+      next.delete("page");
+      const serialized = next.toString();
       return serialized ? `${href}?${serialized}` : href;
     },
     activeFilters,
