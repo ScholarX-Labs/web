@@ -79,7 +79,6 @@ export function SearchResults({
     if (match && (!selectedResult || selectedResult.id !== opportunityIdFromUrl)) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedResult(match);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsModalOpen(true);
     }
   }, [opportunityIdFromUrl, results, selectedResult]);
@@ -89,7 +88,6 @@ export function SearchResults({
     if (isModalOpen) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsModalOpen(false);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedResult(null);
     }
   }, [opportunityIdFromUrl, isModalOpen]);

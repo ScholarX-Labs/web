@@ -6,7 +6,6 @@ import {
   AlertCircle,
   ArrowLeft,
   ArrowRight,
-  Check,
   CheckCircle2,
   CircleGauge,
   Compass,

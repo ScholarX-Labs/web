@@ -23,7 +23,6 @@ const FUNDING_DISPLAY_NAME: Record<string, string> = {
 
 function CopyButton({ url }: { url: string }) {
   const [copied, setCopied] = useState(false);
-  const [hovered, setHovered] = useState(false);
 
   const handleCopy = async () => {
     try {
