@@ -1,0 +1,7 @@
+[model_providers.openai-chat-completions]
+name = "OpenAI using Chat Completions"
+base_url = "https://agentrouter.org/v1"
+env_key = "AGENT_ROUTER_TOKEN"
+wire_api = "chat"
+query_params = {}
+stream_idle_timeout_ms = 300000
