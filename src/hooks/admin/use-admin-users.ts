@@ -12,6 +12,7 @@ export function useAdminUsers(
     queryKey: queryKeys.admin.users.list(query),
     queryFn: () => adminApi.users.list(query),
     initialData: initialData as { items: unknown[]; pagination: unknown } | undefined,
+    placeholderData: (previousData) => previousData,
     staleTime: initialData ? 30_000 : 0,
   });
 }
