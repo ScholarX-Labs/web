@@ -13,15 +13,6 @@ CREATE INDEX IF NOT EXISTS "exec_analytics_events_session_occurred_idx"
   ON "executive"."analytics_events" ("session_id_hash", "occurred_at" DESC)
   WHERE "session_id_hash" IS NOT NULL;
 
-CREATE INDEX IF NOT EXISTS "idx_pse_user_created"
-  ON "courses"."progress_sync_events" ("user_id", "created_at" DESC);
-
-CREATE INDEX IF NOT EXISTS "idx_pse_lesson_created"
-  ON "courses"."progress_sync_events" ("lesson_id", "created_at" DESC);
-
-CREATE INDEX IF NOT EXISTS "idx_pse_course_created"
-  ON "courses"."progress_sync_events" ("course_id", "created_at" DESC);
-
 CREATE UNIQUE INDEX IF NOT EXISTS "exec_action_item_states_source_key_uq"
   ON "executive"."action_item_states" ("source_key");
 
