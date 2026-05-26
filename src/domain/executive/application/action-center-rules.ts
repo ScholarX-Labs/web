@@ -47,6 +47,14 @@ export type InquirySlaSignalInput = {
   nextFollowUpDueAt: Date | string;
 };
 
+export type CourseHealthSignalInput = {
+  courseId: string;
+  title: string;
+  issueType: "missing_thumbnail" | "no_owner" | "problem_course" | "draft_lessons" | "stale_lessons" | "broken_media";
+  severity?: ExecutiveActionSeverity;
+  lessonId?: string | null;
+};
+
 const defaultState = (now: Date): ExecutiveSectionState => ({
   status: "ready",
   freshness: "current",
@@ -171,6 +179,37 @@ export class ActionCenterRules {
       sourceSection: "salesSupportPipeline",
       severity,
       dueAt: input.nextFollowUpDueAt,
+    };
+  }
+
+  courseHealth(input: CourseHealthSignalInput): ActionCenterRuleSignal {
+    const labels: Record<CourseHealthSignalInput["issueType"], string> = {
+      missing_thumbnail: "is missing a thumbnail",
+      no_owner: "has no owner attribution",
+      problem_course: "has high enrollment and low completion",
+      draft_lessons: "contains draft lessons",
+      stale_lessons: "contains stale lessons",
+      broken_media: "contains broken media",
+    };
+    const recommendations: Record<CourseHealthSignalInput["issueType"], string> = {
+      missing_thumbnail: "Upload a thumbnail before promoting the course.",
+      no_owner: "Assign a content owner to keep the course accountable.",
+      problem_course: "Review the lesson sequence and improve the completion path.",
+      draft_lessons: "Publish or archive draft lessons before pushing the course.",
+      stale_lessons: "Refresh outdated lessons and verify the content is current.",
+      broken_media: "Replace or repair broken lesson media assets.",
+    };
+
+    return {
+      ruleId: "course-health",
+      entityType: "course",
+      entityId: input.lessonId ? `${input.courseId}:${input.lessonId}` : input.courseId,
+      title: `${input.title} ${labels[input.issueType]}`,
+      recommendedAction: recommendations[input.issueType],
+      sourcePage: "courses_lessons",
+      sourceSection: "contentQualityChecklist",
+      severity: input.severity ?? (input.issueType === "problem_course" ? "high" : "medium"),
+      version: input.issueType,
     };
   }
 }
