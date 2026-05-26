@@ -146,6 +146,15 @@ export class DrizzleActionCenterRepository implements ActionCenterRepository {
 
   async upsertDerivedItem(item: ActionCenterItem): Promise<ActionCenterItem> {
     const now = new Date();
+    const reopenedStatusCase = sql`
+      case
+        when ${dbExecutiveActionItemStates.status} = 'dismissed' then 'open'
+        when ${dbExecutiveActionItemStates.status} = 'resolved'
+          and ${dbExecutiveActionItemStates.resolvedAt} > ${new Date(now.getTime() - 30 * 86_400_000)}
+          then 'open'
+        else ${dbExecutiveActionItemStates.status}
+      end
+    `;
     const rows = await db
       .insert(dbExecutiveActionItemStates)
       .values({
@@ -173,15 +182,7 @@ export class DrizzleActionCenterRepository implements ActionCenterRepository {
         set: {
           severity: item.severity,
           lastSeenAt: new Date(item.lastSeenAt),
-          status: sql`
-            case
-              when ${dbExecutiveActionItemStates.status} = 'dismissed' then 'open'
-              when ${dbExecutiveActionItemStates.status} = 'resolved'
-                and ${dbExecutiveActionItemStates.resolvedAt} > ${new Date(now.getTime() - 30 * 86_400_000)}
-                then 'open'
-              else ${dbExecutiveActionItemStates.status}
-            end
-          `,
+          status: reopenedStatusCase,
           dismissedAt: sql`
             case
               when ${dbExecutiveActionItemStates.status} = 'dismissed' then null
@@ -190,8 +191,16 @@ export class DrizzleActionCenterRepository implements ActionCenterRepository {
           `,
           reopenedCount: sql`
             case
-              when ${dbExecutiveActionItemStates.status} in ('dismissed', 'resolved') then ${dbExecutiveActionItemStates.reopenedCount} + 1
+              when ${dbExecutiveActionItemStates.status} in ('dismissed', 'resolved')
+                and ${reopenedStatusCase} = 'open'
+                then ${dbExecutiveActionItemStates.reopenedCount} + 1
               else ${dbExecutiveActionItemStates.reopenedCount}
+            end
+          `,
+          resolvedAt: sql`
+            case
+              when ${reopenedStatusCase} = 'open' then null
+              else ${dbExecutiveActionItemStates.resolvedAt}
             end
           `,
           updatedAt: now,
@@ -261,7 +270,7 @@ export class DrizzleActionCenterRepository implements ActionCenterRepository {
           status: rows[0].status,
           assignedOwnerId: rows[0].assignedOwnerId,
           dueAt: rows[0].dueAt?.toISOString() ?? null,
-          resolutionNote: input.resolutionNote ?? null,
+          resolutionNote: rows[0].resolutionNote ?? null,
         },
         ipAddress: actor.ipAddress ?? null,
         userAgent: actor.userAgent ?? null,
