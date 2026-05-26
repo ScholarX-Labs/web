@@ -1,6 +1,7 @@
 import { AlertTriangle, BookOpen } from "lucide-react";
 import { createExecutiveDomain } from "@/domain/executive";
 import { executivePageQuerySchema } from "@/domain/executive/contracts/executive-query.schemas";
+import type { ExecutivePageQuery } from "@/domain/executive/contracts/executive-query.schemas";
 import type {
   CoursesLessonsReadModel,
   LessonDrilldownReadModel,
@@ -37,11 +38,15 @@ function isoDate(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
 
-function defaultQuery() {
+function defaultQuery(): ExecutivePageQuery {
   const to = new Date();
   const from = new Date(to);
   from.setUTCDate(to.getUTCDate() - 29);
-  return { from: isoDate(from), to: isoDate(to), preset: "last_30_days" };
+  return executivePageQuerySchema.parse({
+    from: isoDate(from),
+    to: isoDate(to),
+    preset: "last_30_days",
+  });
 }
 
 function firstValue(value: string | string[] | undefined): string | undefined {
