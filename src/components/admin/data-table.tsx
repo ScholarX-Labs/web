@@ -139,6 +139,7 @@ export function DataTable<TData>({
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
   const [localPagination, setLocalPagination] = useState({ pageIndex: 0, pageSize });
+  const isExternallyControlledSearch = typeof onSearchChange === "function";
 
   const pagination = useMemo(
     () => (page !== undefined ? { pageIndex: page - 1, pageSize } : { pageIndex: 0, pageSize }),
@@ -149,10 +150,15 @@ export function DataTable<TData>({
   const table = useReactTable({
     data,
     columns,
-    state: { sorting, columnFilters, globalFilter, pagination: page !== undefined ? pagination : localPagination },
+    state: {
+      sorting,
+      columnFilters,
+      globalFilter: isExternallyControlledSearch ? "" : globalFilter,
+      pagination: page !== undefined ? pagination : localPagination,
+    },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
-    onGlobalFilterChange: setGlobalFilter,
+    onGlobalFilterChange: isExternallyControlledSearch ? undefined : setGlobalFilter,
     onPaginationChange: page !== undefined ? undefined : setLocalPagination,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -179,7 +185,9 @@ export function DataTable<TData>({
               value={effectiveSearchValue}
               onChange={(e) => {
                 const value = e.target.value;
-                setGlobalFilter(value);
+                if (!isExternallyControlledSearch) {
+                  setGlobalFilter(value);
+                }
                 onSearchChange?.(value);
               }}
               className="pl-12 h-14 bg-white/50 border-slate-200/80 focus:bg-white focus:ring-[12px] focus:ring-blue-500/5 rounded-[22px] transition-all font-bold text-[15px] shadow-sm shadow-slate-100/50"
