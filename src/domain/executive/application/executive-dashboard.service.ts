@@ -63,6 +63,19 @@ import { MetricCalculationPolicy } from "./metric-calculation.policy";
 import { ChartSeriesMapper } from "./chart-series.mapper";
 import { FreshnessService } from "./freshness.service";
 
+type FinanceCourseSortKey =
+  | "title"
+  | "category"
+  | "grossRevenue"
+  | "refundedRevenue"
+  | "netRevenue"
+  | "enrollments"
+  | "completions"
+  | "completionRate"
+  | "refundRate"
+  | "supportInquiryCount"
+  | "profitabilityProxy";
+
 export type OverviewAggregateSnapshot = {
   grossRevenue: number;
   subscriptions: number;
@@ -585,6 +598,27 @@ function toIsoOrNull(value: Date | string | null | undefined): string | null {
 }
 
 export class ExecutiveDashboardService {
+  private readonly financeSortKeys = new Set([
+    "title",
+    "category",
+    "grossRevenue",
+    "refundedRevenue",
+    "netRevenue",
+    "enrollments",
+    "completions",
+    "completionRate",
+    "refundRate",
+    "supportInquiryCount",
+    "profitabilityProxy",
+  ] as const);
+
+  private normalizeFinanceSort(sort: string | undefined): FinanceCourseSortKey {
+    if (sort && this.financeSortKeys.has(sort as FinanceCourseSortKey)) {
+      return sort as FinanceCourseSortKey;
+    }
+    return "profitabilityProxy";
+  }
+
   constructor(
     private readonly calculations = new MetricCalculationPolicy(),
     private readonly charts = new ChartSeriesMapper(),
@@ -593,10 +627,10 @@ export class ExecutiveDashboardService {
 
   private sortFinancePerformanceRows(
     rows: readonly FinanceCoursePerformanceRow[],
-    sort: string | undefined,
+    sort: FinanceCourseSortKey,
     direction: "asc" | "desc",
   ): FinanceCoursePerformanceRow[] {
-    if (!sort) {
+    if (sort === "profitabilityProxy") {
       return [...rows].sort((left, right) =>
         right.profitabilityProxy - left.profitabilityProxy
         || right.grossRevenue - left.grossRevenue);
@@ -627,8 +661,6 @@ export class ExecutiveDashboardService {
             return left.supportInquiryCount - right.supportInquiryCount;
           case "profitabilityProxy":
             return left.profitabilityProxy - right.profitabilityProxy;
-          default:
-            return 0;
         }
       })();
 
@@ -1325,9 +1357,10 @@ export class ExecutiveDashboardService {
       };
     };
 
+    const normalizedSort = this.normalizeFinanceSort(query.sort);
     const courseRows: FinanceCoursePerformanceRow[] = this.sortFinancePerformanceRows(
       courses.map(toPerformanceRow),
-      query.sort,
+      normalizedSort,
       query.direction,
     );
 
@@ -1410,7 +1443,7 @@ export class ExecutiveDashboardService {
         page: query.page,
         pageSize: query.pageSize,
         totalRows: courseRows.length,
-        sort: query.sort ?? "profitabilityProxy",
+        sort: normalizedSort,
         direction: query.direction,
         state: courseRows.length === 0
           ? { ...sectionState, status: "empty", message: "No course finance data found." }
