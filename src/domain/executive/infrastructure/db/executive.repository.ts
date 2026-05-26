@@ -47,6 +47,9 @@ import type {
   UsersRoleSnapshot,
   UsersTrendSnapshot,
   CoursesManagementSnapshot,
+  CourseQualitySnapshot,
+  LessonQualitySnapshot,
+  RegisteredEventSnapshot,
 } from "@/domain/executive/application/executive-dashboard.service";
 import type {
   CourseLeaderboardRow,
@@ -498,6 +501,10 @@ export class DrizzleExecutiveReadRepository implements ExecutiveReadRepository {
       this.getCourseCategoryDistribution(query.courseCategory),
       this.getCourseManagementRows(from, to, query),
     ]);
+    const contentQualityRows = await this.getCourseQualitySnapshots(
+      leaderboard.map((row) => row.courseId),
+      query.courseCategory,
+    );
 
     return this.dashboard.buildCoursesLessonsReadModel({
       query,
@@ -505,6 +512,7 @@ export class DrizzleExecutiveReadRepository implements ExecutiveReadRepository {
       previous,
       leaderboard,
       categoryDistribution,
+      contentQualityRows,
       managementRows,
     });
   }
@@ -513,11 +521,12 @@ export class DrizzleExecutiveReadRepository implements ExecutiveReadRepository {
     query: ExecutivePageQuery,
     courseId: string,
   ): Promise<LessonDrilldownReadModel> {
-    const lessons = await this.getLessonAnalytics(courseId);
+    const { lessons, contentQualityLessons } = await this.getLessonAnalytics(courseId);
     return this.dashboard.buildLessonDrilldownReadModel({
       query,
       courseId,
       lessons,
+      contentQualityLessons,
     });
   }
 
@@ -610,6 +619,7 @@ export class DrizzleExecutiveReadRepository implements ExecutiveReadRepository {
         completions,
         completionRate: enrollments > 0 ? completions / enrollments : null,
         revenue: numeric(row.revenue),
+        qualityFlags: [],
       };
     });
   }
@@ -626,6 +636,52 @@ export class DrizzleExecutiveReadRepository implements ExecutiveReadRepository {
     return rows.map((row) => ({
       category: row.category,
       value: numeric(row.value),
+    }));
+  }
+
+  private async getCourseQualitySnapshots(
+    courseIds: readonly string[],
+    category?: string,
+  ): Promise<CourseQualitySnapshot[]> {
+    if (courseIds.length === 0) return [];
+    const rows = await executeRows<{
+      course_id: string;
+      owner_id: string | null;
+      created_at: Date | string | null;
+      updated_at: Date | string | null;
+      lesson_count: string | number;
+      draft_lesson_count: string | number;
+      stale_lesson_count: string | number;
+      broken_media_count: string | number;
+      has_thumbnail: boolean | null;
+    }>(sql`
+      select c.id::text as course_id,
+             c.instructor_id as owner_id,
+             c.created_at,
+             c.updated_at,
+             count(distinct l.id) as lesson_count,
+             count(distinct l.id) filter (where l.status = 'draft') as draft_lesson_count,
+             count(distinct l.id) filter (where l.updated_at < now() - interval '30 days') as stale_lesson_count,
+             count(distinct l.id) filter (where l.video_url is null or l.video_url = '') as broken_media_count,
+             (c.image_url is not null and c.image_url <> '') as has_thumbnail
+      from courses.courses c
+      left join courses.lessons l
+        on l.course_id = c.id and l.is_archived = false
+      where c.id in (${sql.join(courseIds.map((courseId) => sql`${courseId}::uuid`), sql`, `)})
+        and (${category ?? null}::text is null or c.category = ${category ?? null})
+      group by c.id, c.instructor_id, c.created_at, c.updated_at, c.image_url
+    `);
+
+    return rows.map((row) => ({
+      courseId: row.course_id,
+      ownerId: row.owner_id,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+      hasThumbnail: Boolean(row.has_thumbnail),
+      lessonCount: numeric(row.lesson_count),
+      draftLessonCount: numeric(row.draft_lesson_count),
+      staleLessonCount: numeric(row.stale_lesson_count),
+      brokenMediaCount: numeric(row.broken_media_count),
     }));
   }
 
@@ -686,7 +742,10 @@ export class DrizzleExecutiveReadRepository implements ExecutiveReadRepository {
 
   private async getLessonAnalytics(
     courseId: string,
-  ): Promise<readonly Omit<LessonAnalyticsRow, "completionRate" | "state">[]> {
+  ): Promise<{
+    lessons: readonly Omit<LessonAnalyticsRow, "completionRate" | "state">[];
+    contentQualityLessons: readonly LessonQualitySnapshot[];
+  }> {
     const rows = await executeRows<{
       lesson_id: string;
       title: string;
@@ -694,32 +753,50 @@ export class DrizzleExecutiveReadRepository implements ExecutiveReadRepository {
       viewers: string | number;
       completions: string | number;
       average_watched_percentage: string | number | null;
+      status: string;
+      video_url: string | null;
+      updated_at: Date | string;
+      is_archived: boolean | null;
     }>(sql`
       select l.id::text as lesson_id,
              l.title,
              l.sort_index,
              count(distinct lp.user_id) as viewers,
              count(distinct lp.user_id) filter (where lp.completed = true) as completions,
-             avg(lp.watched_percentage) as average_watched_percentage
+             avg(lp.watched_percentage) as average_watched_percentage,
+             l.status,
+             l.video_url,
+             l.updated_at,
+             l.is_archived
       from courses.lessons l
       left join courses.lesson_progress lp on lp.lesson_id = l.id
       where l.course_id = ${courseId}::uuid
         and l.is_archived = false
-      group by l.id, l.title, l.sort_index
+      group by l.id, l.title, l.sort_index, l.status, l.video_url, l.updated_at, l.is_archived
       order by l.sort_index asc
     `);
 
-    return rows.map((row) => ({
-      lessonId: row.lesson_id,
-      title: row.title,
-      sortIndex: numeric(row.sort_index),
-      viewers: numeric(row.viewers),
-      completions: numeric(row.completions),
-      averageWatchedPercentage:
-        row.average_watched_percentage === null
-          ? null
-          : numeric(row.average_watched_percentage),
-    }));
+    return {
+      lessons: rows.map((row) => ({
+        lessonId: row.lesson_id,
+        title: row.title,
+        sortIndex: numeric(row.sort_index),
+        viewers: numeric(row.viewers),
+        completions: numeric(row.completions),
+        averageWatchedPercentage:
+          row.average_watched_percentage === null
+            ? null
+            : numeric(row.average_watched_percentage),
+      })),
+      contentQualityLessons: rows.map((row) => ({
+        lessonId: row.lesson_id,
+        title: row.title,
+        status: row.status,
+        videoUrl: row.video_url,
+        updatedAt: row.updated_at,
+        isArchived: Boolean(row.is_archived),
+      })),
+    };
   }
 
   async getLearnerProgress(
@@ -733,14 +810,16 @@ export class DrizzleExecutiveReadRepository implements ExecutiveReadRepository {
   ): Promise<OpportunitiesAiReadModel> {
     const from = toDate(query.from);
     const to = toDateEnd(query.to);
-    const [opportunities, aiSearch] = await Promise.all([
+    const [opportunities, aiSearch, registeredEvents] = await Promise.all([
       this.getOpportunityQualitySnapshots(from, to),
       getAiSearchAnalyticsSnapshot(from, to),
+      this.getRegisteredEventSnapshots(from, to),
     ]);
     return this.dashboard.buildOpportunitiesAiReadModel({
       query,
       opportunities,
       aiSearch,
+      registeredEvents,
     });
   }
 
@@ -857,6 +936,55 @@ export class DrizzleExecutiveReadRepository implements ExecutiveReadRepository {
     }
 
     return Array.from(snapshots.values());
+  }
+
+  /**
+   * T148 — Event registration query.
+   *
+   * `auth.user.registered_events` is a `text[]` column holding raw event IDs.
+   * We unnest all users' arrays and group by event_id to get a registration
+   * count per event.
+   *
+   * Attendance tracking (attendees, post-event conversions) is not yet
+   * instrumented at the DB level; all those fields default to the
+   * "not tracked" sentinel so the service renders a data_gap state for them
+   * rather than displaying zero.
+   *
+   * Because `registered_events` has no registration timestamp, we cannot
+   * reliably apply date-range filtering at this boundary.
+   */
+  private async getRegisteredEventSnapshots(
+    _from: Date,
+    _to: Date,
+  ): Promise<readonly RegisteredEventSnapshot[]> {
+    const rows = await executeRows<{
+      event_id: string;
+      registration_count: string | number;
+    }>(sql`
+      select
+        ev.event_id,
+        count(*) as registration_count
+      from auth.user u
+      cross join lateral unnest(coalesce(u.registered_events, '{}'::text[])) as ev(event_id)
+      where ev.event_id is not null
+        and ev.event_id <> ''
+      group by ev.event_id
+      order by registration_count desc
+    `);
+
+    return rows.map((row): RegisteredEventSnapshot => ({
+      eventId: row.event_id,
+      // Event titles are not stored in the DB — the event_id itself is the
+      // stable identifier. Admins see the raw ID; a future task can join
+      // against an events table once one exists.
+      title: row.event_id,
+      registrations: numeric(row.registration_count),
+      // Attendance is not yet tracked at the DB level.
+      attendanceTracked: false,
+      attendees: null,
+      postEventSignups: null,
+      postEventEnrollments: null,
+    }));
   }
 
   async getTechnicalHealth(
