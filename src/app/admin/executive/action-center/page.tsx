@@ -4,6 +4,7 @@ import { createExecutiveDomain } from "@/domain/executive";
 import { executivePageQuerySchema } from "@/domain/executive/contracts/executive-query.schemas";
 import type { ActionCenterReadModel } from "@/domain/executive/contracts/action-center-repository.contract";
 import type { TeamOperationsReadModel } from "@/domain/executive/contracts/executive-read-repository.contract";
+import type { ExecutivePageQuery } from "@/domain/executive/contracts/executive-query.schemas";
 import type { ExecutiveFreshnessStatus } from "@/domain/executive/contracts/executive-types";
 import { ActionItemsTable } from "@/components/executive/tables/action-items-table";
 import { FreshnessBadge } from "@/components/executive/sections/freshness-badge";
@@ -20,11 +21,15 @@ function isoDate(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
 
-function defaultQuery() {
+function defaultQuery(): ExecutivePageQuery {
   const to = new Date();
   const from = new Date(to);
   from.setUTCDate(to.getUTCDate() - 29);
-  return { from: isoDate(from), to: isoDate(to), preset: "last_30_days" };
+  return executivePageQuerySchema.parse({
+    from: isoDate(from),
+    to: isoDate(to),
+    preset: "last_30_days",
+  });
 }
 
 function firstValue(value: string | string[] | undefined): string | undefined {
