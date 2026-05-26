@@ -13,7 +13,6 @@ import type {
   UsersActivityHeatmapPoint,
   UsersMonthlyActivityPoint,
   UsersPeakActivity,
-  UserManagementRow,
   UsersReadModel,
   UsersRoleDistributionPoint,
   UsersSections,
@@ -30,8 +29,6 @@ import type {
   CourseCategoryDistributionPoint,
   CourseLeaderboardRow,
   CourseManagementLink,
-  CourseManagementRow,
-  ContentQualityChecklistRow,
   CoursesLessonsReadModel,
   CoursesLessonsSections,
   CriticalDropFlag,
@@ -40,6 +37,10 @@ import type {
   LessonDrilldownReadModel,
   LessonDrilldownSections,
   ProblemCourseSignal,
+  FinanceCoursePerformanceRow,
+  FinanceReadModel,
+  FinanceSections,
+  FinanceSummary,
   GrowthCohortRetentionPoint,
   GrowthFunnelPoint,
   OpportunitiesAiReadModel,
@@ -213,6 +214,38 @@ export type BuildLessonDrilldownReadModelInput = {
   courseId: string;
   lessons: readonly Omit<LessonAnalyticsRow, "completionRate" | "state">[];
   contentQualityLessons?: readonly LessonQualitySnapshot[];
+  generatedAt?: Date;
+  sectionState?: ExecutiveSectionState;
+};
+
+export type FinanceCourseSnapshot = {
+  courseId: string;
+  title: string;
+  category: string;
+  grossRevenue: number;
+  refundedRevenue: number;
+  enrollments: number;
+  completions: number;
+  supportInquiryCount: number;
+};
+
+export type FinanceAggregateSnapshot = {
+  grossRevenue: number;
+  refundedRevenue: number;
+  enrollments: number;
+  paidEnrollments: number;
+  manualEnrollments: number;
+  activeLearners: number;
+  completions: number;
+  supportInquiries: number;
+};
+
+export type BuildFinanceReadModelInput = {
+  query: ExecutivePageQuery;
+  current: FinanceAggregateSnapshot;
+  previous: FinanceAggregateSnapshot;
+  courses: readonly FinanceCourseSnapshot[];
+  selectedCourse?: FinanceCourseSnapshot | null;
   generatedAt?: Date;
   sectionState?: ExecutiveSectionState;
 };
@@ -476,6 +509,7 @@ const defaultInquirySlaHours = 48;
 const lowCompletionThreshold = 0.25;
 const highEnrollmentThreshold = 15;
 const staleLessonDays = 30;
+const highRefundThreshold = 0.2;
 
 function dayDifference(later: Date, earlier: Date): number {
   return Math.max(0, Math.floor((later.getTime() - earlier.getTime()) / 86_400_000));
@@ -512,8 +546,6 @@ function lessonQualityFlags(input: {
   if (input.dropOff) flags.add("critical_drop");
   return Array.from(flags);
 }
-
-
 function opportunityIssue(input: {
   opportunity: OpportunityQualitySnapshot;
   issueType: OpportunityQualityIssueType;
@@ -1199,6 +1231,153 @@ export class ExecutiveDashboardService {
     } satisfies ExecutivePageResponse<CoursesLessonsSections>;
   }
 
+  buildFinanceReadModel({
+    query,
+    current,
+    previous,
+    courses,
+    selectedCourse = null,
+    generatedAt = new Date(),
+    sectionState = defaultReadyState(generatedAt),
+  }: BuildFinanceReadModelInput): FinanceReadModel {
+    const refundRate = this.calculations.calculateRate(current.refundedRevenue, current.grossRevenue) ?? null;
+    const previousRefundRate = this.calculations.calculateRate(
+      previous.refundedRevenue,
+      previous.grossRevenue,
+    ) ?? null;
+    const completionRate = this.calculations.calculateRate(current.completions, current.enrollments) ?? null;
+    const averageRevenuePerActiveLearner = current.activeLearners > 0
+      ? current.grossRevenue / current.activeLearners
+      : null;
+    const previousAverageRevenuePerActiveLearner = previous.activeLearners > 0
+      ? previous.grossRevenue / previous.activeLearners
+      : null;
+    const toPerformanceRow = (course: FinanceCourseSnapshot): FinanceCoursePerformanceRow => {
+      const netRevenue = Math.max(0, course.grossRevenue - course.refundedRevenue);
+      const courseRefundRate = this.calculations.calculateRate(course.refundedRevenue, course.grossRevenue);
+      const courseCompletionRate = this.calculations.calculateRate(course.completions, course.enrollments);
+      const profitabilityProxy =
+        netRevenue + (course.completions * 50) - (course.supportInquiryCount * 25);
+      return {
+        courseId: course.courseId,
+        title: course.title,
+        category: course.category,
+        grossRevenue: course.grossRevenue,
+        refundedRevenue: course.refundedRevenue,
+        netRevenue,
+        enrollments: course.enrollments,
+        completions: course.completions,
+        completionRate: courseCompletionRate,
+        refundRate: courseRefundRate,
+        supportInquiryCount: course.supportInquiryCount,
+        profitabilityProxy,
+        highRefundRate: (courseRefundRate ?? 0) >= highRefundThreshold,
+        adminHref: `/admin/courses/${course.courseId}`,
+      };
+    };
+
+    const courseRows: FinanceCoursePerformanceRow[] = courses
+      .map(toPerformanceRow)
+      .sort((left, right) => right.profitabilityProxy - left.profitabilityProxy || right.grossRevenue - left.grossRevenue);
+
+    const selectedRow =
+      selectedCourse
+        ? toPerformanceRow(selectedCourse)
+        : query.courseId
+          ? courseRows.find((row) => row.courseId === query.courseId) ?? null
+          : null;
+    const selectedCourseDetail = selectedRow;
+
+    const summary: FinanceSummary = {
+      grossRevenue: current.grossRevenue,
+      netRevenue: Math.max(0, current.grossRevenue - current.refundedRevenue),
+      refundedRevenue: current.refundedRevenue,
+      refundRate,
+      averageRevenuePerActiveLearner,
+      paidEnrollments: current.paidEnrollments,
+      manualEnrollments: current.manualEnrollments,
+      activeLearners: current.activeLearners,
+      supportInquiries: current.supportInquiries,
+      completionRate,
+    };
+
+    const sections: FinanceSections = {
+      kpis: [
+        {
+          definitionId: "finance.gross_revenue",
+          value: current.grossRevenue,
+          previousValue: previous.grossRevenue,
+          ...this.calculations.calculateDelta(current.grossRevenue, previous.grossRevenue),
+          state: sectionState,
+        },
+        {
+          definitionId: "finance.net_revenue",
+          value: summary.netRevenue,
+          previousValue: Math.max(0, previous.grossRevenue - previous.refundedRevenue),
+          ...this.calculations.calculateDelta(
+            summary.netRevenue,
+            Math.max(0, previous.grossRevenue - previous.refundedRevenue),
+          ),
+          state: sectionState,
+        },
+        {
+          definitionId: "finance.refund_rate",
+          value: refundRate,
+          previousValue: previousRefundRate,
+          ...this.calculations.calculateDelta(refundRate, previousRefundRate),
+          state: sectionState,
+        },
+        {
+          definitionId: "finance.avg_revenue_per_active_learner",
+          value: averageRevenuePerActiveLearner,
+          previousValue: previousAverageRevenuePerActiveLearner,
+          ...this.calculations.calculateDelta(
+            averageRevenuePerActiveLearner,
+            previousAverageRevenuePerActiveLearner,
+          ),
+          state: sectionState,
+        },
+        {
+          definitionId: "finance.paid_enrollments",
+          value: current.paidEnrollments,
+          previousValue: previous.paidEnrollments,
+          ...this.calculations.calculateDelta(current.paidEnrollments, previous.paidEnrollments),
+          state: sectionState,
+        },
+        {
+          definitionId: "finance.manual_enrollments",
+          value: current.manualEnrollments,
+          previousValue: previous.manualEnrollments,
+          ...this.calculations.calculateDelta(current.manualEnrollments, previous.manualEnrollments),
+          state: sectionState,
+        },
+      ],
+      financeSummary: summary,
+      courseBusinessPerformance: {
+        id: "finance.course_business_performance",
+        rows: courseRows.slice((query.page - 1) * query.pageSize, query.page * query.pageSize),
+        page: query.page,
+        pageSize: query.pageSize,
+        totalRows: courseRows.length,
+        sort: query.sort ?? "profitabilityProxy",
+        direction: query.direction,
+        state: courseRows.length === 0
+          ? { ...sectionState, status: "empty", message: "No course finance data found." }
+          : sectionState,
+      },
+      selectedCourseDetail,
+    };
+
+    return {
+      pageId: "finance",
+      query,
+      generatedAt: generatedAt.toISOString(),
+      sections,
+      freshnessSummary: { current: 6, stale: 0, very_stale: 0, unavailable: 0 },
+      redactionNotes: [],
+    } satisfies ExecutivePageResponse<FinanceSections>;
+  }
+
   buildLessonRows(
     lessons: readonly Omit<LessonAnalyticsRow, "completionRate" | "state">[],
     state: ExecutiveSectionState,
@@ -1235,7 +1414,6 @@ export class ExecutiveDashboardService {
 
   buildLessonDrilldownReadModel({
     query,
-    courseId,
     lessons,
     contentQualityLessons = [],
     generatedAt = new Date(),
