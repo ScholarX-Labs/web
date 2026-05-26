@@ -425,17 +425,17 @@
 
 ### Tests for User Story 14
 
-- [ ] T161 [P] [US14] Add finance calculation tests in `src/domain/executive/__tests__/finance-unit-economics.test.ts`
-- [ ] T162 [P] [US14] Add finance route contract tests in `src/app/api/admin/executive/__tests__/finance-route.test.ts`
-- [ ] T163 [P] [US14] Add finance Playwright test in `tests/e2e/executive-finance.spec.ts`
+- [X] T161 [P] [US14] Add finance calculation tests in `src/domain/executive/__tests__/finance-unit-economics.test.ts`
+- [X] T162 [P] [US14] Add finance route contract tests in `src/app/api/admin/executive/__tests__/finance-route.test.ts`
+- [X] T163 [P] [US14] Add finance Playwright test in `tests/e2e/executive-finance.spec.ts`
 
 ### Implementation for User Story 14
 
-- [ ] T164 [US14] Implement finance repository queries in `src/domain/executive/infrastructure/db/executive.repository.ts`
-- [ ] T165 [US14] Implement finance read model in `src/domain/executive/application/executive-dashboard.service.ts`
-- [ ] T166 [P] [US14] Add course business performance table in `src/components/executive/tables/course-business-performance-table.tsx`
-- [ ] T167 [US14] Build Finance & Unit Economics page in `src/app/admin/executive/finance/page.tsx`
-- [ ] T168 [US14] Add Phase 2-gated Finance route handling in `src/app/api/admin/executive/[[...path]]/route.ts`
+- [X] T164 [US14] Implement finance repository queries in `src/domain/executive/infrastructure/db/executive.repository.ts`
+- [X] T165 [US14] Implement finance read model in `src/domain/executive/application/executive-dashboard.service.ts`
+- [X] T166 [P] [US14] Add course business performance table in `src/components/executive/tables/course-business-performance-table.tsx`
+- [X] T167 [US14] Build Finance & Unit Economics page in `src/app/admin/executive/finance/page.tsx`
+- [X] T168 [US14] Add Phase 2-gated Finance route handling in `src/app/api/admin/executive/[[...path]]/route.ts`
 
 **Checkpoint**: User Story 14 is independently functional and testable behind the Phase 2 flag.
 
@@ -449,18 +449,18 @@
 
 ### Tests for User Story 7
 
-- [ ] T169 [P] [US7] Add export payload and redaction tests in `src/domain/executive/__tests__/executive-export.test.ts`
-- [ ] T170 [P] [US7] Add export route contract tests in `src/app/api/admin/executive/__tests__/export-route.test.ts`
-- [ ] T171 [P] [US7] Add export Playwright test in `tests/e2e/executive-export.spec.ts`
+- [X] T169 [P] [US7] Add export payload and redaction tests in `src/domain/executive/__tests__/executive-export.test.ts`
+- [X] T170 [P] [US7] Add export route contract tests in `src/app/api/admin/executive/__tests__/export-route.test.ts`
+- [X] T171 [P] [US7] Add export Playwright test in `tests/e2e/executive-export.spec.ts`
 
 ### Implementation for User Story 7
 
-- [ ] T172 [US7] Implement executive export service in `src/domain/executive/application/executive-export.service.ts`
-- [ ] T173 [P] [US7] Implement CSV export utilities in `src/lib/executive/csv-export.ts`
-- [ ] T174 [P] [US7] Implement snapshot export renderer in `src/lib/executive/snapshot-export.tsx`
-- [ ] T175 [P] [US7] Add export button component in `src/components/executive/sections/export-button.tsx`
-- [ ] T176 [US7] Add export API route in `src/app/api/admin/executive/export/route.ts`
-- [ ] T177 [US7] Wire export button into all active executive pages in `src/components/executive/sections/export-button.tsx`
+- [X] T172 [US7] Implement executive export service in `src/domain/executive/application/executive-export.service.ts`
+- [X] T173 [P] [US7] Implement CSV export utilities in `src/lib/executive/csv-export.ts`
+- [X] T174 [P] [US7] Implement snapshot export renderer in `src/lib/executive/snapshot-export.tsx`
+- [X] T175 [P] [US7] Add export button component in `src/components/executive/sections/export-button.tsx`
+- [X] T176 [US7] Add export API route in `src/app/api/admin/executive/export/route.ts`
+- [X] T177 [US7] Wire export button into all active executive pages in `src/components/executive/sections/export-button.tsx`
 
 **Checkpoint**: User Story 7 is independently functional and testable.
 
@@ -470,21 +470,21 @@
 
 **Purpose**: Complete shared quality gates, documentation, accessibility, responsiveness, and operational validation.
 
-- [ ] T178 [P] Add shared fixture data for executive tests in `src/domain/executive/__tests__/fixtures/executive-fixtures.ts`
-- [ ] T179 [P] Add fixture seed and teardown helpers in `src/domain/executive/__tests__/helpers/seed-executive-fixtures.ts`
-- [ ] T180 Add executive admin sidebar entry without changing CRUD routes in `src/app/admin/_components/admin-sidebar.tsx`
-- [ ] T181 Add global date range selector in `src/components/executive/filters/date-range-selector.tsx`
-- [ ] T182 Add active filter bar in `src/components/executive/filters/active-filter-bar.tsx`
-- [ ] T183 Add executive filter provider with navigation persistence in `src/components/executive/filters/executive-filter-provider.tsx`
-- [ ] T184 Add React Query hook for page reads in `src/hooks/executive/use-executive-page.ts`
-- [ ] T185 Add React Query hook for Action Center updates in `src/hooks/executive/use-action-center.ts`
-- [ ] T186 Add React Query hook for exports in `src/hooks/executive/use-executive-export.ts`
-- [ ] T187 Add accessibility tests for keyboard navigation and chart summaries in `tests/e2e/executive-accessibility.spec.ts`
-- [ ] T188 Add responsive screenshot checks for 1280px, 768px, and 375px in `tests/e2e/executive-responsive.spec.ts`
-- [ ] T189 Add quickstart validation notes after implementation in `specs/012-executive-dashboard/quickstart.md`
-- [ ] T190 Run focused test command for executive unit and route tests using `package.json`
-- [ ] T191 Run Playwright executive suite using `tests/e2e/executive-overview.spec.ts`
-- [ ] T192 Run type check and lint validation using `package.json`
+- [X] T178 [P] Add shared fixture data for executive tests in `src/domain/executive/__tests__/fixtures/executive-fixtures.ts`
+- [X] T179 [P] Add fixture seed and teardown helpers in `src/domain/executive/__tests__/helpers/seed-executive-fixtures.ts`
+- [X] T180 Add executive admin sidebar entry without changing CRUD routes in `src/app/admin/_components/admin-sidebar.tsx`
+- [X] T181 Add global date range selector in `src/components/executive/filters/date-range-selector.tsx`
+- [X] T182 Add active filter bar in `src/components/executive/filters/active-filter-bar.tsx`
+- [X] T183 Add executive filter provider with navigation persistence in `src/components/executive/filters/executive-filter-provider.tsx`
+- [X] T184 Add React Query hook for page reads in `src/hooks/executive/use-executive-page.ts`
+- [X] T185 Add React Query hook for Action Center updates in `src/hooks/executive/use-action-center.ts`
+- [X] T186 Add React Query hook for exports in `src/hooks/executive/use-executive-export.ts`
+- [X] T187 Add accessibility tests for keyboard navigation and chart summaries in `tests/e2e/executive-accessibility.spec.ts`
+- [X] T188 Add responsive screenshot checks for 1280px, 768px, and 375px in `tests/e2e/executive-responsive.spec.ts`
+- [X] T189 Add quickstart validation notes after implementation in `specs/012-executive-dashboard/quickstart.md`
+- [X] T190 Run focused test command for executive unit and route tests using `package.json`
+- [X] T191 Run Playwright executive suite using `tests/e2e/executive-overview.spec.ts`
+- [X] T192 Run type check and lint validation using `package.json`
 
 ---
 

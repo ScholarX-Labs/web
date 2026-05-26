@@ -83,3 +83,16 @@ Verify:
 - Keep API routes inaccessible through role/config gate.
 - No operational admin CRUD is changed by rollback.
 - Action Center state and analytics event tables can remain inert for forensic review.
+
+## Implementation Validation Notes (2026-05-26)
+
+- Type safety validation passed:
+  - `pnpm exec tsc --noEmit --pretty false`
+- Focused executive slice tests passed incrementally during implementation:
+  - Management tables, event impact, content quality, finance, export, and fixture-backed unit suites.
+  - Route contract suites for the same slices passed with admin/auth/flag/error-path checks.
+- Browser coverage files are present for executive paths, including:
+  - Overview, users, technical health, courses/lessons, opportunities/AI, action center, growth, finance, and export.
+  - Accessibility and responsive smoke specs are included and guard on `EXECUTIVE_E2E_BASE_URL`.
+- Environment caveat:
+  - Without `EXECUTIVE_E2E_BASE_URL`, executive browser tests are intentionally skipped by design.
