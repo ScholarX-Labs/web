@@ -44,14 +44,35 @@ export function proxy(request: NextRequest) {
     isAuthenticated &&
     !ALLOWED_AUTH_ROUTES_FOR_AUTHENTICATED.has(pathname)
   ) {
+    if (process.env.NODE_ENV === "production") {
+      console.info("[proxy] redirect", {
+        pathname,
+        target: "/",
+        reason: "authenticated-user-on-auth-route",
+      });
+    }
     return NextResponse.redirect(new URL("/", request.url));
   }
 
   if (isAdminRoute && !isAuthenticated) {
+    if (process.env.NODE_ENV === "production") {
+      console.info("[proxy] redirect", {
+        pathname,
+        target: ROUTES.SIGNIN,
+        reason: "admin-route-without-session-cookie",
+      });
+    }
     return NextResponse.redirect(new URL(ROUTES.SIGNIN, request.url));
   }
 
   if (!isPublicRoute && !isAuthenticated && !isAuthRoute && !isAdminRoute) {
+    if (process.env.NODE_ENV === "production") {
+      console.info("[proxy] redirect", {
+        pathname,
+        target: ROUTES.SIGNIN,
+        reason: "protected-route-without-session-cookie",
+      });
+    }
     return NextResponse.redirect(new URL(ROUTES.SIGNIN, request.url));
   }
 
