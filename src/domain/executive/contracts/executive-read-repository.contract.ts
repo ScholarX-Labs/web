@@ -142,6 +142,7 @@ export type CourseLeaderboardRow = {
   completions: number;
   completionRate: number | null;
   revenue: number;
+  qualityFlags: readonly string[];
 };
 
 export type CourseCategoryDistributionPoint = {
@@ -156,6 +157,17 @@ export type ProblemCourseSignal = {
   severity: "critical" | "high" | "medium" | "low";
   message: string;
   value: number | null;
+  state: ExecutiveSectionState;
+};
+
+export type ContentQualityChecklistRow = {
+  lessonId: string;
+  title: string;
+  status: string;
+  hasVideo: boolean;
+  updatedAt: string;
+  issueFlags: readonly string[];
+  dropOffLabel: string | null;
   state: ExecutiveSectionState;
 };
 
@@ -220,6 +232,7 @@ export type LessonDrilldownSections = {
   lessonTable: ExecutiveTableModel<LessonAnalyticsRow>;
   completionFunnel: ExecutiveChartModel<LessonCompletionFunnelPoint>;
   criticalDropFlags: readonly CriticalDropFlag[];
+  contentQualityChecklist: ExecutiveTableModel<ContentQualityChecklistRow>;
 };
 
 export type CoursesLessonsReadModel =
@@ -295,6 +308,31 @@ export type AiQualitySignal = {
   state: ExecutiveSectionState;
 };
 
+export type RegisteredEventRow = {
+  eventId: string;
+  title: string;
+  registrations: number;
+  /** null means attendance tracking was not instrumented for this event. */
+  attendees: number | null;
+  /**
+   * "ready" when attendanceTracked is true, "data_gap" otherwise.
+   * This must never be shown as 0 when tracking is absent.
+   */
+  attendanceState: "ready" | "data_gap";
+  /** null when attendanceTracked is false. */
+  noShowRate: number | null;
+  /** null when postEventSignups is not tracked. */
+  postEventSignupConversionRate: number | null;
+  /** null when postEventEnrollments is not tracked. */
+  postEventEnrollmentConversionRate: number | null;
+};
+
+export type RegisteredEventsSummary = {
+  totalRegistrations: number;
+  uniqueEventsWithRegistrations: number;
+  state: ExecutiveSectionState;
+};
+
 export type OpportunitiesAiSections = {
   kpis: readonly ExecutiveMetricValue[];
   aiQualitySummary: AiQualitySummary;
@@ -303,6 +341,8 @@ export type OpportunitiesAiSections = {
   aiQualitySignals: readonly AiQualitySignal[];
   opportunityQualitySummary: OpportunityQualitySummary;
   opportunityCleanupQueue: ExecutiveTableModel<OpportunityQualityQueueRow>;
+  registeredEventsSummary: RegisteredEventsSummary;
+  registeredEventsTable: ExecutiveTableModel<RegisteredEventRow>;
 };
 
 export type OpportunitiesAiReadModel =
