@@ -865,7 +865,20 @@ export class DrizzleExecutiveReadRepository implements ExecutiveReadRepository {
           order by entity_id, occurred_at desc
         )
         select * from latest_checks
-      `),
+      `).catch((error) => {
+        console.warn(
+          "executive.getOpportunityQualitySnapshots: link-check metadata query failed; returning empty link rows",
+          error,
+        );
+        return [] as {
+          opportunity_id: string;
+          title: string | null;
+          broken_link: boolean | null;
+          expired: boolean | null;
+          missing_metadata_fields: string[] | null;
+          last_checked_at: Date | string | null;
+        }[];
+      }),
       executeRows<{
         opportunity_id: string;
         apply_clicks: string | number;
