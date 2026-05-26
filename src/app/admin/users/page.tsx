@@ -1,3 +1,7 @@
+export const dynamic = "force-dynamic";
+
+
+
 import { createAdminDomain } from "@/domain/admin";
 import { UsersTable } from "./_components/users-table";
 
