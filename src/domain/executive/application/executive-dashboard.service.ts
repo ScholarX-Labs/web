@@ -31,6 +31,7 @@ import type {
   CourseLeaderboardRow,
   CourseManagementLink,
   CourseManagementRow,
+  ContentQualityChecklistRow,
   CoursesLessonsReadModel,
   CoursesLessonsSections,
   CriticalDropFlag,
@@ -49,6 +50,8 @@ import type {
   PublicGrowthSections,
   PublicImpactAuditEntry,
   PublicImpactMetricGovernanceRow,
+  RegisteredEventRow,
+  RegisteredEventsSummary,
   WebsiteAnalyticsPoint,
   WebsiteCtaPoint,
   TeamOperationsReadModel,
@@ -173,12 +176,33 @@ export type CoursesManagementSnapshot = {
   completions: number;
 };
 
+export type CourseQualitySnapshot = {
+  courseId: string;
+  hasThumbnail: boolean;
+  ownerId: string | null;
+  updatedAt: Date | string | null;
+  lessonCount: number;
+  draftLessonCount: number;
+  staleLessonCount: number;
+  brokenMediaCount: number;
+};
+
+export type LessonQualitySnapshot = {
+  lessonId: string;
+  title: string;
+  status: string;
+  videoUrl: string | null;
+  updatedAt: Date | string;
+  isArchived: boolean;
+};
+
 export type BuildCoursesLessonsReadModelInput = {
   query: ExecutivePageQuery;
   current: CoursesLessonsAggregateSnapshot;
   previous: CoursesLessonsAggregateSnapshot;
   leaderboard: readonly CourseLeaderboardRow[];
   categoryDistribution: readonly { category: string; value: number }[];
+  contentQualityRows?: readonly CourseQualitySnapshot[];
   managementRows?: readonly CoursesManagementSnapshot[];
   generatedAt?: Date;
   sectionState?: ExecutiveSectionState;
@@ -188,6 +212,7 @@ export type BuildLessonDrilldownReadModelInput = {
   query: ExecutivePageQuery;
   courseId: string;
   lessons: readonly Omit<LessonAnalyticsRow, "completionRate" | "state">[];
+  contentQualityLessons?: readonly LessonQualitySnapshot[];
   generatedAt?: Date;
   sectionState?: ExecutiveSectionState;
 };
@@ -250,10 +275,25 @@ export type OpportunityQualitySnapshot = {
   lastCheckedAt: Date | string | null;
 };
 
+export type RegisteredEventSnapshot = {
+  eventId: string;
+  title: string;
+  registrations: number;
+  attendanceTracked: boolean;
+  /** Actual attendee count. Only meaningful when attendanceTracked is true. */
+  attendees: number | null;
+  /** Users who signed up after attending. null when not tracked. */
+  postEventSignups: number | null;
+  /** Users who enrolled in a course after attending. null when not tracked. */
+  postEventEnrollments: number | null;
+};
+
 export type BuildOpportunitiesAiReadModelInput = {
   query: ExecutivePageQuery;
   opportunities: readonly OpportunityQualitySnapshot[];
   aiSearch?: AiSearchAnalyticsSnapshot;
+  /** Pass undefined to indicate event data is unavailable (renders data_gap). */
+  registeredEvents?: readonly RegisteredEventSnapshot[];
   generatedAt?: Date;
   sectionState?: ExecutiveSectionState;
 };
@@ -433,6 +473,46 @@ function distributionPoints(
 const highSaveThreshold = 10;
 const lowApplyRateThreshold = 0.1;
 const defaultInquirySlaHours = 48;
+const lowCompletionThreshold = 0.25;
+const highEnrollmentThreshold = 15;
+const staleLessonDays = 30;
+
+function dayDifference(later: Date, earlier: Date): number {
+  return Math.max(0, Math.floor((later.getTime() - earlier.getTime()) / 86_400_000));
+}
+
+function courseQualityFlags(input: {
+  course: CourseLeaderboardRow;
+  quality?: CourseQualitySnapshot;
+}): readonly string[] {
+  const flags = new Set<string>();
+  const quality = input.quality;
+  if (quality && !quality.hasThumbnail) flags.add("missing_thumbnail");
+  if (quality && !quality.ownerId) flags.add("no_owner");
+  if (input.course.enrollments >= highEnrollmentThreshold && (input.course.completionRate ?? 0) < lowCompletionThreshold) {
+    flags.add("problem_course");
+  }
+  if (quality && quality.draftLessonCount > 0) flags.add("draft_lessons");
+  if (quality && quality.staleLessonCount > 0) flags.add("stale_lessons");
+  if (quality && quality.brokenMediaCount > 0) flags.add("broken_media");
+  return Array.from(flags);
+}
+
+function lessonQualityFlags(input: {
+  lesson: LessonQualitySnapshot;
+  dropOff: CriticalDropFlag | null;
+  now: Date;
+}): readonly string[] {
+  const flags = new Set<string>();
+  if (!input.lesson.videoUrl) flags.add("missing_video");
+  if (input.lesson.status === "draft") flags.add("draft");
+  if (dayDifference(input.now, toDate(input.lesson.updatedAt)) >= staleLessonDays) {
+    flags.add("stale");
+  }
+  if (input.dropOff) flags.add("critical_drop");
+  return Array.from(flags);
+}
+
 
 function opportunityIssue(input: {
   opportunity: OpportunityQualitySnapshot;
@@ -953,10 +1033,15 @@ export class ExecutiveDashboardService {
 
   buildCourseSignals(input: {
     leaderboard: readonly CourseLeaderboardRow[];
+    qualityRows?: readonly CourseQualitySnapshot[];
     state: ExecutiveSectionState;
   }): ProblemCourseSignal[] {
+    const qualityByCourseId = new Map(
+      (input.qualityRows ?? []).map((row) => [row.courseId, row] as const),
+    );
     return input.leaderboard.flatMap((course) => {
       const signals: ProblemCourseSignal[] = [];
+      const quality = qualityByCourseId.get(course.courseId);
       if (course.enrollments >= 10 && (course.completionRate ?? 0) < 0.2) {
         signals.push({
           courseId: course.courseId,
@@ -977,6 +1062,26 @@ export class ExecutiveDashboardService {
           state: input.state,
         });
       }
+      if (quality && !quality.hasThumbnail) {
+        signals.push({
+          courseId: course.courseId,
+          title: course.title,
+          severity: "medium",
+          message: "Course is missing a thumbnail.",
+          value: null,
+          state: input.state,
+        });
+      }
+      if (quality && !quality.ownerId) {
+        signals.push({
+          courseId: course.courseId,
+          title: course.title,
+          severity: "medium",
+          message: "Course has no owner attribution.",
+          value: null,
+          state: input.state,
+        });
+      }
       return signals;
     });
   }
@@ -987,6 +1092,7 @@ export class ExecutiveDashboardService {
     previous,
     leaderboard,
     categoryDistribution,
+    contentQualityRows = [],
     managementRows = [],
     generatedAt = new Date(),
     sectionState = defaultReadyState(generatedAt),
@@ -1005,7 +1111,19 @@ export class ExecutiveDashboardService {
         rate: this.calculations.calculateRate(item.value, categoryTotal),
       }),
     );
-    const signals = this.buildCourseSignals({ leaderboard, state: sectionState });
+    const qualityByCourseId = new Map(contentQualityRows.map((row) => [row.courseId, row] as const));
+    const leaderboardRows: CourseLeaderboardRow[] = leaderboard.map((course) => ({
+      ...course,
+      qualityFlags: courseQualityFlags({
+        course,
+        quality: qualityByCourseId.get(course.courseId),
+      }),
+    }));
+    const signals = this.buildCourseSignals({
+      leaderboard: leaderboardRows,
+      qualityRows: contentQualityRows,
+      state: sectionState,
+    });
     const sections: CoursesLessonsSections = {
       kpis: [
         metric("courses.total_courses", current.totalCourses, previous.totalCourses, sectionState, this.calculations),
@@ -1021,10 +1139,10 @@ export class ExecutiveDashboardService {
       ],
       courseLeaderboard: {
         id: "courses.course_leaderboard",
-        rows: leaderboard,
+        rows: leaderboardRows,
         page: query.page,
         pageSize: query.pageSize,
-        totalRows: leaderboard.length,
+        totalRows: leaderboardRows.length,
         sort: query.sort ?? "enrollments",
         direction: query.direction,
         state: sectionState,
@@ -1038,8 +1156,8 @@ export class ExecutiveDashboardService {
         state: sectionState,
       }),
       problemCourseSignals: signals,
-      contentQualityIndicators: signals.filter((signal) => signal.severity === "low"),
-      courseManagementLinks: leaderboard.map((course): CourseManagementLink => ({
+      contentQualityIndicators: signals.filter((signal) => signal.message.includes("thumbnail") || signal.message.includes("owner")),
+      courseManagementLinks: leaderboardRows.map((course): CourseManagementLink => ({
         courseId: course.courseId,
         title: course.title,
         href: `/admin/courses/${course.courseId}`,
@@ -1119,6 +1237,7 @@ export class ExecutiveDashboardService {
     query,
     courseId,
     lessons,
+    contentQualityLessons = [],
     generatedAt = new Date(),
     sectionState = defaultReadyState(generatedAt),
   }: BuildLessonDrilldownReadModelInput): LessonDrilldownReadModel {
@@ -1131,6 +1250,27 @@ export class ExecutiveDashboardService {
       value: lesson.completions,
       rate: this.calculations.calculateRate(lesson.completions, firstViewers),
     }));
+    const dropFlags = this.findCriticalDropFlags(rows);
+    const dropByLessonId = new Map(dropFlags.map((flag) => [flag.lessonId, flag] as const));
+    const qualityRows = contentQualityLessons.map((lesson) => {
+      const drop = dropByLessonId.get(lesson.lessonId) ?? null;
+      const updatedAt = toDate(lesson.updatedAt);
+      const flags = lessonQualityFlags({
+        lesson,
+        dropOff: drop ?? null,
+        now: generatedAt,
+      });
+      return {
+        lessonId: lesson.lessonId,
+        title: lesson.title,
+        status: lesson.status,
+        hasVideo: Boolean(lesson.videoUrl),
+        updatedAt: updatedAt.toISOString(),
+        issueFlags: flags,
+        dropOffLabel: drop ? `${Math.round(drop.dropPercentagePoints * 100)}% drop` : null,
+        state: flags.length === 0 ? sectionState : { ...sectionState, message: "Content review checklist contains flagged lessons." },
+      };
+    });
     const sections: LessonDrilldownSections = {
       lessonTable: {
         id: "courses.lesson_table",
@@ -1150,7 +1290,19 @@ export class ExecutiveDashboardService {
         a11ySummary: `${rows.length} lessons are represented in the completion funnel.`,
         state: sectionState,
       }),
-      criticalDropFlags: this.findCriticalDropFlags(rows),
+      criticalDropFlags: dropFlags,
+      contentQualityChecklist: {
+        id: "courses.content_quality_checklist",
+        rows: qualityRows,
+        page: query.page,
+        pageSize: query.pageSize,
+        totalRows: qualityRows.length,
+        sort: "updatedAt",
+        direction: "desc",
+        state: qualityRows.length === 0
+          ? { ...sectionState, status: "empty", message: "No content quality checklist data available." }
+          : sectionState,
+      },
     };
 
     return {
@@ -1167,6 +1319,7 @@ export class ExecutiveDashboardService {
     query,
     opportunities,
     aiSearch,
+    registeredEvents,
     generatedAt = new Date(),
     sectionState = defaultReadyState(generatedAt),
   }: BuildOpportunitiesAiReadModelInput): OpportunitiesAiReadModel {
@@ -1296,6 +1449,69 @@ export class ExecutiveDashboardService {
     const missingMetadata = rows.filter((row) => row.issueType === "missing_metadata").length;
     const highSaveLowApply = rows.filter((row) => row.issueType === "high_save_low_apply").length;
 
+    // -----------------------------------------------------------------------
+    // Registered events (US12)
+    // -----------------------------------------------------------------------
+    const eventDataGapState: ExecutiveSectionState = {
+      ...sectionState,
+      status: "data_gap",
+      freshness: "unavailable",
+      message:
+        "Event registration data is not available. Connect registeredEvents to enable this section.",
+    };
+    const hasEventData = registeredEvents !== undefined;
+    const eventSectionState: ExecutiveSectionState = hasEventData
+      ? registeredEvents.length === 0
+        ? { ...sectionState, status: "empty", message: "No events with registrations in this period." }
+        : sectionState
+      : eventDataGapState;
+
+    const eventRows: RegisteredEventRow[] = [...(registeredEvents ?? [])]
+      .sort((a: RegisteredEventSnapshot, b: RegisteredEventSnapshot) => b.registrations - a.registrations)
+      .map((ev: RegisteredEventSnapshot): RegisteredEventRow => {
+        const attended = ev.attendanceTracked ? (ev.attendees ?? 0) : null;
+        const noShowRate =
+          ev.attendanceTracked && attended !== null
+            ? this.calculations.calculateRate(
+              Math.max(0, ev.registrations - attended),
+              ev.registrations,
+            )
+            : null;
+        const signupConvRate =
+          ev.postEventSignups !== null
+            ? this.calculations.calculateRate(ev.postEventSignups, ev.registrations)
+            : null;
+        const enrollConvRate =
+          ev.postEventEnrollments !== null
+            ? this.calculations.calculateRate(ev.postEventEnrollments, ev.registrations)
+            : null;
+        return {
+          eventId: ev.eventId,
+          title: ev.title,
+          registrations: ev.registrations,
+          attendees: ev.attendanceTracked ? ev.attendees : null,
+          attendanceState: ev.attendanceTracked ? "ready" : "data_gap",
+          noShowRate,
+          postEventSignupConversionRate: signupConvRate,
+          postEventEnrollmentConversionRate: enrollConvRate,
+        };
+      });
+
+    const totalRegistrations = eventRows.reduce((sum, r) => sum + r.registrations, 0);
+    const scopedEventRows = eventRows.slice(
+      (query.page - 1) * query.pageSize,
+      query.page * query.pageSize,
+    );
+
+    const registeredEventsSummary: RegisteredEventsSummary = {
+      totalRegistrations,
+      uniqueEventsWithRegistrations: eventRows.filter((r) => r.registrations > 0).length,
+      state: eventSectionState,
+    };
+
+    // -----------------------------------------------------------------------
+    // KPIs and sections
+    // -----------------------------------------------------------------------
     const kpis: ExecutiveMetricValue[] = [
       {
         definitionId: "ai.total_searches",
@@ -1413,7 +1629,21 @@ export class ExecutiveDashboardService {
         direction: "desc",
         state: queueState,
       },
+      registeredEventsSummary,
+      registeredEventsTable: {
+        id: "events.registered_events_table",
+        rows: scopedEventRows,
+        page: query.page,
+        pageSize: query.pageSize,
+        totalRows: eventRows.length,
+        sort: "registrations",
+        direction: "desc",
+        state: eventSectionState,
+      },
     };
+
+    const eventFreshAvailable = hasEventData ? 2 : 0;
+    const eventFreshUnavailable = hasEventData ? 0 : 2;
 
     return {
       pageId: "opportunities_ai",
@@ -1421,10 +1651,16 @@ export class ExecutiveDashboardService {
       generatedAt: generatedAt.toISOString(),
       sections,
       freshnessSummary: {
-        current: (queueState.status === "data_gap" ? 0 : 3) + (aiState.status === "data_gap" ? 0 : 4),
+        current:
+          (queueState.status === "data_gap" ? 0 : 3) +
+          (aiState.status === "data_gap" ? 0 : 4) +
+          eventFreshAvailable,
         stale: 0,
         very_stale: 0,
-        unavailable: (queueState.status === "data_gap" ? 3 : 0) + (aiState.status === "data_gap" ? 4 : 0),
+        unavailable:
+          (queueState.status === "data_gap" ? 3 : 0) +
+          (aiState.status === "data_gap" ? 4 : 0) +
+          eventFreshUnavailable,
       },
       redactionNotes: [],
     } satisfies ExecutivePageResponse<OpportunitiesAiSections>;
