@@ -1,0 +1,4 @@
+## 2024-05-26 - [Use timingSafeEqual for sensitive string comparison]
+**Vulnerability:** A timing attack vulnerability was identified in `src/app/api/admin/storage-check/route.ts` where `request.headers.get("x-internal-key")` was compared to `process.env.INTERNAL_API_KEY` using strict equality (`===`).
+**Learning:** Comparing sensitive strings like API keys or secrets using standard comparison operators can expose the application to timing attacks, where an attacker can determine the expected value by measuring the time it takes for the comparison to fail. `timingSafeEqual` from the `crypto` module should be used instead. Additionally, `timingSafeEqual` requires the inputs to be Buffers of the exact same byte length.
+**Prevention:** Always use `crypto.timingSafeEqual` for sensitive string comparisons, ensure inputs are converted to Buffers, and verify their byte lengths match beforehand to avoid exceptions.

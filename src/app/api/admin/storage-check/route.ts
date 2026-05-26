@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { db } from "@/db";
+import { timingSafeEqual } from "crypto";
 import { appConfig } from "@/db/schema/app-config-schema";
 import { auth } from "@/lib/auth";
 import { calculateR2Usage } from "@/lib/upload";
@@ -17,6 +18,14 @@ async function sendAlert(message: string): Promise<void> {
   console.error(`[storage-check] ALERT: ${message}`);
 }
 
+function secureCompare(a: string | null | undefined, b: string | null | undefined): boolean {
+  if (!a || !b) return false;
+  const bufferA = Buffer.from(a);
+  const bufferB = Buffer.from(b);
+  if (bufferA.length !== bufferB.length) return false;
+  return timingSafeEqual(bufferA, bufferB);
+}
+
 export async function GET(request: NextRequest) {
   try {
     const session = await auth.api.getSession({
@@ -24,7 +33,7 @@ export async function GET(request: NextRequest) {
     });
 
     const isAdmin = session?.user?.role === "admin";
-    const isInternal = request.headers.get("x-internal-key") === process.env.INTERNAL_API_KEY;
+    const isInternal = secureCompare(request.headers.get("x-internal-key"), process.env.INTERNAL_API_KEY);
 
     if (!isAdmin && !isInternal) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });

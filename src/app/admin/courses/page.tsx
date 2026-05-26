@@ -1,5 +1,9 @@
+export const dynamic = "force-dynamic";
+
 import { createAdminDomain } from "@/domain/admin";
 import { CoursesTable } from "./_components/courses-table";
+
+
 
 export default async function AdminCoursesPage() {
   const domain = createAdminDomain();
