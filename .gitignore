@@ -59,3 +59,4 @@ Desktop.ini
 
 containerapp.yaml
 *.txt
+.codex/auth.json
