@@ -352,18 +352,18 @@
 
 ### Tests for User Story 6
 
-- [ ] T136 [P] [US6] Add management table query tests in `src/domain/executive/__tests__/management-tables.test.ts`
-- [ ] T137 [P] [US6] Add management table route tests in `src/app/api/admin/executive/__tests__/management-tables-route.test.ts`
-- [ ] T138 [P] [US6] Add management table Playwright test in `tests/e2e/executive-management-tables.spec.ts`
+- [X] T136 [P] [US6] Add management table query tests in `src/domain/executive/__tests__/management-tables.test.ts`
+- [X] T137 [P] [US6] Add management table route tests in `src/app/api/admin/executive/__tests__/management-tables-route.test.ts`
+- [X] T138 [P] [US6] Add management table Playwright test in `tests/e2e/executive-management-tables.spec.ts`
 
 ### Implementation for User Story 6
 
-- [ ] T139 [US6] Implement user and course management repository queries in `src/domain/executive/infrastructure/db/executive.repository.ts`
-- [ ] T140 [US6] Implement management table read models in `src/domain/executive/application/executive-dashboard.service.ts`
-- [ ] T141 [P] [US6] Add user management table in `src/components/executive/tables/user-management-table.tsx`
-- [ ] T142 [P] [US6] Add course management table in `src/components/executive/tables/course-management-table.tsx`
-- [ ] T143 [US6] Extend Users page with management table in `src/app/admin/executive/users/page.tsx`
-- [ ] T144 [US6] Extend Courses & Lessons page with management table in `src/app/admin/executive/courses-lessons/page.tsx`
+- [X] T139 [US6] Implement user and course management repository queries in `src/domain/executive/infrastructure/db/executive.repository.ts`
+- [X] T140 [US6] Implement management table read models in `src/domain/executive/application/executive-dashboard.service.ts`
+- [X] T141 [P] [US6] Add user management table in `src/components/executive/tables/user-management-table.tsx`
+- [X] T142 [P] [US6] Add course management table in `src/components/executive/tables/course-management-table.tsx`
+- [X] T143 [US6] Extend Users page with management table in `src/app/admin/executive/users/page.tsx`
+- [X] T144 [US6] Extend Courses & Lessons page with management table in `src/app/admin/executive/courses-lessons/page.tsx`
 
 **Checkpoint**: User Story 6 is independently functional and testable.
 
@@ -377,17 +377,17 @@
 
 ### Tests for User Story 12
 
-- [ ] T145 [P] [US12] Add event impact calculation tests in `src/domain/executive/__tests__/event-impact.test.ts`
-- [ ] T146 [P] [US12] Add event impact route tests in `src/app/api/admin/executive/__tests__/event-impact-route.test.ts`
-- [ ] T147 [P] [US12] Add event impact Playwright test in `tests/e2e/executive-event-impact.spec.ts`
+- [X] T145 [P] [US12] Add event impact calculation tests in `src/domain/executive/__tests__/event-impact.test.ts`
+- [X] T146 [P] [US12] Add event impact route tests in `src/app/api/admin/executive/__tests__/event-impact-route.test.ts`
+- [X] T147 [P] [US12] Add event impact Playwright test in `tests/e2e/executive-event-impact.spec.ts`
 
 ### Implementation for User Story 12
 
-- [ ] T148 [US12] Implement event registration queries from `auth.user.registeredEvents` in `src/domain/executive/infrastructure/db/executive.repository.ts`
-- [ ] T149 [US12] Implement event impact read model in `src/domain/executive/application/executive-dashboard.service.ts`
-- [ ] T150 [P] [US12] Add event impact table in `src/components/executive/tables/event-impact-table.tsx`
-- [ ] T151 [US12] Extend Opportunities & AI page with registered events section in `src/app/admin/executive/opportunities-ai/page.tsx`
-- [ ] T152 [US12] Add registered events response section in `src/app/api/admin/executive/[[...path]]/route.ts`
+- [X] T148 [US12] Implement event registration queries from `auth.user.registeredEvents` in `src/domain/executive/infrastructure/db/executive.repository.ts`
+- [X] T149 [US12] Implement event impact read model in `src/domain/executive/application/executive-dashboard.service.ts`
+- [X] T150 [P] [US12] Add event impact table in `src/components/executive/tables/event-impact-table.tsx`
+- [X] T151 [US12] Extend Opportunities & AI page with registered events section in `src/app/admin/executive/opportunities-ai/page.tsx`
+- [X] T152 [US12] Add registered events response section in `src/app/api/admin/executive/[[...path]]/route.ts`
 
 **Checkpoint**: User Story 12 is independently functional and testable.
 
@@ -401,17 +401,17 @@
 
 ### Tests for User Story 13
 
-- [ ] T153 [P] [US13] Add content quality rule tests in `src/domain/executive/__tests__/content-quality.test.ts`
-- [ ] T154 [P] [US13] Add content quality route tests in `src/app/api/admin/executive/__tests__/content-quality-route.test.ts`
-- [ ] T155 [P] [US13] Add content quality Playwright test in `tests/e2e/executive-content-quality.spec.ts`
+- [X] T153 [P] [US13] Add content quality rule tests in `src/domain/executive/__tests__/content-quality.test.ts`
+- [X] T154 [P] [US13] Add content quality route tests in `src/app/api/admin/executive/__tests__/content-quality-route.test.ts`
+- [X] T155 [P] [US13] Add content quality Playwright test in `tests/e2e/executive-content-quality.spec.ts`
 
 ### Implementation for User Story 13
 
-- [ ] T156 [US13] Implement content quality repository queries in `src/domain/executive/infrastructure/db/executive.repository.ts`
-- [ ] T157 [US13] Implement content quality read model in `src/domain/executive/application/executive-dashboard.service.ts`
-- [ ] T158 [P] [US13] Add content quality checklist component in `src/components/executive/sections/content-quality-checklist.tsx`
-- [ ] T159 [US13] Extend Courses & Lessons page with content quality indicators in `src/app/admin/executive/courses-lessons/page.tsx`
-- [ ] T160 [US13] Extend Action Center rules for course health alerts in `src/domain/executive/application/action-center-rules.ts`
+- [X] T156 [US13] Implement content quality repository queries in `src/domain/executive/infrastructure/db/executive.repository.ts`
+- [X] T157 [US13] Implement content quality read model in `src/domain/executive/application/executive-dashboard.service.ts`
+- [X] T158 [P] [US13] Add content quality checklist component in `src/components/executive/sections/content-quality-checklist.tsx`
+- [X] T159 [US13] Extend Courses & Lessons page with content quality indicators in `src/app/admin/executive/courses-lessons/page.tsx`
+- [X] T160 [US13] Extend Action Center rules for course health alerts in `src/domain/executive/application/action-center-rules.ts`
 
 **Checkpoint**: User Story 13 is independently functional and testable.
 
