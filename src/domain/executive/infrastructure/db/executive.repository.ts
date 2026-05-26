@@ -714,7 +714,7 @@ export class DrizzleExecutiveReadRepository implements ExecutiveReadRepository {
              coalesce(count(distinct s.id), 0) as enrollments,
              coalesce(count(distinct cp.id) filter (where cp.status = 'completed'), 0) as completions
       from courses.courses c
-      left join admin.lessons l
+      left join courses.lessons l
         on l.course_id = c.id and l.is_archived = false
       left join courses.subscriptions s
         on s.course_id = c.id and s.enrolled_at between ${from} and ${to}
