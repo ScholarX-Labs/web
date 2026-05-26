@@ -22,6 +22,32 @@ const SENSITIVE_KEYS = new Set([
 ]);
 
 export class ExecutiveRedactionPolicy {
+  private isPlainObject(value: unknown): value is Record<string, unknown> {
+    return (
+      Boolean(value) &&
+      typeof value === "object" &&
+      !Array.isArray(value) &&
+      (value as { constructor?: unknown }).constructor === Object
+    );
+  }
+
+  private redactValue(
+    value: unknown,
+    hasPiiDrilldownAccess: boolean,
+  ): unknown {
+    if (Array.isArray(value)) {
+      return value.map((entry) =>
+        this.redactValue(entry, hasPiiDrilldownAccess),
+      );
+    }
+
+    if (this.isPlainObject(value)) {
+      return this.redactRecord(value, hasPiiDrilldownAccess);
+    }
+
+    return value;
+  }
+
   canViewSensitivity(
     sensitivity: ExecutiveMetricSensitivity,
     level: RedactionLevel,
@@ -54,14 +80,7 @@ export class ExecutiveRedactionPolicy {
           acc[key] = null;
           return acc;
         }
-        if (value && typeof value === "object" && !Array.isArray(value)) {
-          acc[key] = this.redactRecord(
-            value as Record<string, unknown>,
-            hasPiiDrilldownAccess,
-          );
-          return acc;
-        }
-        acc[key] = value;
+        acc[key] = this.redactValue(value, hasPiiDrilldownAccess);
         return acc;
       },
       {},
