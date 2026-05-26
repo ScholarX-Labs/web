@@ -182,10 +182,10 @@ export class PublicImpactGovernanceService {
 
     const updated = await this.repository.updateReview(metricId, {
       approvalStatus: input.status,
-      approvedBy: input.status === "approved" ? actorId : existing.approvedBy,
-      approvedAt: input.status === "approved" ? now : existing.approvedAt,
-      rejectedBy: input.status === "rejected" ? actorId : existing.rejectedBy,
-      rejectedAt: input.status === "rejected" ? now : existing.rejectedAt,
+      approvedBy: input.status === "approved" ? actorId : null,
+      approvedAt: input.status === "approved" ? now : null,
+      rejectedBy: input.status === "rejected" ? actorId : null,
+      rejectedAt: input.status === "rejected" ? now : null,
       rejectionReason: input.status === "rejected" ? input.reason ?? null : null,
       auditTrail: trail,
       updatedAt: now,
