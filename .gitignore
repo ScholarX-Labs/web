@@ -41,6 +41,9 @@ next-env.d.ts
 
 # IDEs
 .vscode/
+
+# VSCode counter stats
+.VSCodeCounter/
 .idea/
 *.swp
 *.swo
@@ -59,3 +62,4 @@ Desktop.ini
 
 containerapp.yaml
 *.txt
+.codex/auth.json

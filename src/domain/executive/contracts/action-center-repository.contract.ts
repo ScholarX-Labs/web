@@ -4,7 +4,6 @@ import type {
   ExecutivePageId,
   ExecutiveSectionState,
 } from "./executive-types";
-// @ts-ignore: the schema exists in the repo, but this import path is not resolving in the production build.
 import type { ActionCenterUpdateInput } from "./executive-query.schemas";
 
 export type ExecutiveActionEntityType =
@@ -40,6 +39,30 @@ export type ActionCenterItem = {
   reopenedCount: number;
   updatedAt: string;
   state: ExecutiveSectionState;
+};
+
+export type ActionCenterSeveritySummary = Record<ExecutiveActionSeverity, number>;
+
+export type ActionCenterReadModel = {
+  pageId: "action_center";
+  query: unknown;
+  generatedAt: string;
+  sections: {
+    actionItems: readonly ActionCenterItem[];
+    severitySummary: ActionCenterSeveritySummary;
+    salesSupportPipeline: readonly ActionCenterItem[];
+    workloadByOwner: readonly {
+      ownerId: string | null;
+      openItems: number;
+    }[];
+  };
+  freshnessSummary: {
+    current: number;
+    stale: number;
+    very_stale: number;
+    unavailable: number;
+  };
+  redactionNotes: readonly string[];
 };
 
 export type ActionCenterAuditActor = {

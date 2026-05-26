@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth";
 import { ROUTES } from "@/lib/routes";
 import { createCertificateDomain } from "@/domain/certificates/factory/certificate-services.factory";
 import { CourseCertificateLinkCard } from "@/components/certificates/course-certificate-link-card";
-import { Award, GraduationCap } from "lucide-react";
+import { GraduationCap } from "lucide-react";
 import Link from "next/link";
 import { Metadata } from "next";
 

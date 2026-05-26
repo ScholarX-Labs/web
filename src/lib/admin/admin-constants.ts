@@ -12,6 +12,7 @@ export const ADMIN_ROUTES = {
   SUBSCRIPTIONS: "/admin/subscriptions",
   INQUIRIES: "/admin/inquiries",
   REPORTS: "/admin/reports",
+  EXECUTIVE: "/admin/executive",
   SETTINGS: "/admin/settings",
 } as const;
 
@@ -58,5 +59,6 @@ export const SIDEBAR_NAV = [
   { label: "Subscriptions", href: ADMIN_ROUTES.SUBSCRIPTIONS, icon: "CreditCard" },
   { label: "Inquiries", href: ADMIN_ROUTES.INQUIRIES, icon: "MessageSquare" },
   { label: "Reports", href: ADMIN_ROUTES.REPORTS, icon: "BarChart" },
+  { label: "Executive", href: ADMIN_ROUTES.EXECUTIVE, icon: "Gauge" },
   { label: "Settings", href: ADMIN_ROUTES.SETTINGS, icon: "Settings" },
 ] as const;

@@ -106,6 +106,41 @@
       "when": 1780005000000,
       "tag": "0015_certificates_schema",
       "breakpoints": false
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1780006000000,
+      "tag": "0016_executive_analytics_events",
+      "breakpoints": false
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1780007000000,
+      "tag": "0017_executive_action_item_states",
+      "breakpoints": false
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1780008000000,
+      "tag": "0018_executive_metric_freshness",
+      "breakpoints": false
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1780009000000,
+      "tag": "0019_executive_public_impact_metrics",
+      "breakpoints": false
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1780010000000,
+      "tag": "0020_executive_indexes",
+      "breakpoints": false
     }
   ]
 }

@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useCreateCourse } from "@/hooks/admin/use-admin-courses";
@@ -80,6 +80,14 @@ export default function AdminNewCoursePage() {
   });
 
   const { formState: { errors } } = form;
+  const requiresForm = useWatch({
+    control: form.control,
+    name: "requiresForm",
+  });
+  const autoApproveApplications = useWatch({
+    control: form.control,
+    name: "autoApproveApplications",
+  });
 
   const nextStep = async () => {
     const fields = currentStep === 0 
@@ -243,7 +251,7 @@ export default function AdminNewCoursePage() {
                                             </p>
                                         </div>
                                         <Switch
-                                            checked={form.watch("requiresForm")}
+                                            checked={requiresForm}
                                             onCheckedChange={(checked) => {
                                                 form.setValue("requiresForm", checked, { shouldDirty: true });
                                                 if (!checked) {
@@ -260,8 +268,8 @@ export default function AdminNewCoursePage() {
                                             </p>
                                         </div>
                                         <Switch
-                                            checked={form.watch("autoApproveApplications")}
-                                            disabled={!form.watch("requiresForm")}
+                                            checked={autoApproveApplications}
+                                            disabled={!requiresForm}
                                             onCheckedChange={(checked) =>
                                                 form.setValue("autoApproveApplications", checked, { shouldDirty: true })
                                             }

@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import { signIn, signUp } from "@/lib/auth-client";
 import { GoogleIcon } from "@/components/icons/GoogleIcon";
-import { useRouter } from "next/navigation";
 import { ROUTES } from "@/lib/routes";
 import { springSnappy, tapScale } from "@/lib/motion-variants";
 
@@ -86,7 +85,6 @@ export default function Page() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
-  const router = useRouter();
 
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -178,7 +176,9 @@ export default function Page() {
       return;
     }
 
-    router.replace("/");
+    // Force a full navigation so server-rendered auth state is rebuilt
+    // with the newly issued session cookie instead of stale prefetched data.
+    window.location.assign("/");
   };
 
   const onGoogleSignIn = async () => {

@@ -6,7 +6,6 @@ import {
   AlertCircle,
   ArrowLeft,
   ArrowRight,
-  Check,
   CheckCircle2,
   CircleGauge,
   Compass,
@@ -408,6 +407,11 @@ export function CourseApplicationForm({
         ...Object.fromEntries(Object.keys(stepErrors).map((key) => [key, true])),
       }));
       setErrors((prev) => ({ ...prev, ...stepErrors }));
+      
+      const firstErrorField = Object.keys(stepErrors)[0];
+      if (firstErrorField) {
+        document.getElementById(`field-${firstErrorField}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
       return;
     }
     setCurrentStepIndex((prev) => Math.min(prev + 1, steps.length - 1));
@@ -431,6 +435,19 @@ export function CourseApplicationForm({
       );
       if (firstInvalidStepIndex >= 0) {
         setCurrentStepIndex(firstInvalidStepIndex);
+        
+        // Wait a tick for the step to render, then scroll to the first error
+        setTimeout(() => {
+          const firstErrorField = Object.keys(mergedErrors)[0];
+          if (firstErrorField) {
+            document.getElementById(`field-${firstErrorField}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+          }
+        }, 100);
+      } else {
+        const firstErrorField = Object.keys(mergedErrors)[0];
+        if (firstErrorField) {
+          document.getElementById(`field-${firstErrorField}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
       }
       return;
     }
@@ -500,7 +517,7 @@ export function CourseApplicationForm({
   return (
     <DialogContent
       overlayClassName={overlayClassName}
-      className="z-90 overflow-hidden rounded-[30px] border border-white/60 bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.16),_transparent_30%),linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,250,252,0.94))] p-0 shadow-[0_40px_120px_rgba(15,23,42,0.28)] backdrop-blur-2xl dark:border-white/10 dark:bg-[radial-gradient(circle_at_top,_rgba(14,165,233,0.16),_transparent_28%),linear-gradient(180deg,rgba(2,6,23,0.94),rgba(15,23,42,0.96))] sm:max-w-5xl"
+      className="z-90 overflow-hidden rounded-[24px] sm:rounded-[30px] border border-white/60 bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.16),_transparent_30%),linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,250,252,0.94))] p-0 shadow-[0_40px_120px_rgba(15,23,42,0.28)] backdrop-blur-2xl dark:border-white/10 dark:bg-[radial-gradient(circle_at_top,_rgba(14,165,233,0.16),_transparent_28%),linear-gradient(180deg,rgba(2,6,23,0.94),rgba(15,23,42,0.96))] w-[calc(100vw-24px)] max-w-none sm:w-[90vw] sm:max-w-5xl h-[96vh] sm:h-auto sm:max-h-[90vh] flex flex-col"
     >
       <DialogTitle className="sr-only">Apply for {course.title}</DialogTitle>
 
@@ -526,8 +543,8 @@ export function CourseApplicationForm({
           </motion.div>
         </div>
       ) : (
-        <div className="grid min-h-[620px] lg:grid-cols-[280px_minmax(0,1fr)]">
-          <aside className="relative overflow-hidden border-b border-white/50 bg-[linear-gradient(180deg,rgba(14,165,233,0.12),rgba(249,115,22,0.08),rgba(255,255,255,0.4))] p-6 dark:border-white/10 dark:bg-[linear-gradient(180deg,rgba(14,165,233,0.16),rgba(249,115,22,0.08),rgba(15,23,42,0.12))] lg:border-b-0 lg:border-r">
+        <div className="flex flex-col lg:grid flex-1 min-h-0 lg:min-h-[620px] lg:grid-cols-[280px_minmax(0,1fr)]">
+          <aside className="relative flex-none overflow-hidden border-b border-white/50 bg-[linear-gradient(180deg,rgba(14,165,233,0.12),rgba(249,115,22,0.08),rgba(255,255,255,0.4))] p-5 sm:p-6 dark:border-white/10 dark:bg-[linear-gradient(180deg,rgba(14,165,233,0.16),rgba(249,115,22,0.08),rgba(15,23,42,0.12))] lg:border-b-0 lg:border-r">
             <div className="absolute inset-x-5 top-0 h-24 rounded-b-full bg-cyan-400/15 blur-3xl dark:bg-cyan-400/10" />
             <div className="mb-6 flex items-start gap-3">
               <div className="rounded-2xl border border-white/50 bg-white/80 p-3 text-cyan-600 shadow-sm dark:border-white/10 dark:bg-slate-950/70 dark:text-cyan-400">
@@ -563,11 +580,10 @@ export function CourseApplicationForm({
               <div className="mt-4 flex flex-wrap gap-2 text-xs">
                 <Badge icon={Sparkles} label="Secure review" tone="cyan" />
                 <Badge icon={Compass} label="Guided steps" tone="orange" />
-                <Badge icon={Check} label="Live checks" tone="emerald" />
               </div>
             </div>
 
-            <div className="space-y-3">
+            <div className="hidden lg:block space-y-3">
               {steps.map((step, index) => {
                 const Icon = step.icon;
                 const isActive = index === currentStepIndex;
@@ -609,25 +625,25 @@ export function CourseApplicationForm({
             </div>
           </aside>
 
-          <form onSubmit={handleSubmit} className="flex min-h-0 flex-col">
-            <div className="border-b border-white/50 bg-[linear-gradient(90deg,rgba(14,165,233,0.08),rgba(255,255,255,0.4),rgba(249,115,22,0.08))] px-6 py-6 dark:border-white/10 dark:bg-[linear-gradient(90deg,rgba(14,165,233,0.08),rgba(255,255,255,0.01),rgba(249,115,22,0.06))] sm:px-8">
+          <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col bg-white dark:bg-slate-950/50">
+            <div className="flex-none border-b border-white/50 bg-[linear-gradient(90deg,rgba(14,165,233,0.08),rgba(255,255,255,0.4),rgba(249,115,22,0.08))] px-5 py-5 dark:border-white/10 dark:bg-[linear-gradient(90deg,rgba(14,165,233,0.08),rgba(255,255,255,0.01),rgba(249,115,22,0.06))] sm:px-8">
               <div className="flex items-center gap-3 text-cyan-600 dark:text-cyan-400">
                 <div className="rounded-xl border border-current/20 bg-current/10 p-2">
                   <CurrentStepIcon className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium">{currentStep.label}</p>
-                  <h3 className="text-2xl font-semibold text-slate-950 dark:text-white">
+                  <p className="text-xs sm:text-sm font-medium">{currentStep.label}</p>
+                  <h3 className="text-lg sm:text-2xl font-semibold text-slate-950 dark:text-white">
                     {currentStep.title}
                   </h3>
-                  <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                  <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-slate-600 dark:text-slate-300">
                     {currentStep.description}
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="min-h-0 flex-1 overflow-y-auto px-6 py-6 sm:px-8">
+            <div className="min-h-0 flex-1 overflow-y-auto scholar-scrollbar px-5 py-6 sm:px-8 relative">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={currentStep.key}
@@ -640,34 +656,34 @@ export function CourseApplicationForm({
                   {currentStep.key === "identity" ? (
                     <div className="grid gap-5 md:grid-cols-2">
                       <div className="md:col-span-2">
-                        <label className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                        <label className="text-sm font-medium text-slate-700 dark:text-slate-200" htmlFor="field-name">
                           Full name
                         </label>
-                        <input className={inputClassName(errors.name)} value={form.name} onChange={(e) => setField("name", e.target.value)} onBlur={() => markTouched("name")} />
+                        <input id="field-name" className={inputClassName(errors.name)} value={form.name} onChange={(e) => setField("name", e.target.value)} onBlur={() => markTouched("name")} />
                         {renderError(errors.name)}
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                        <label className="text-sm font-medium text-slate-700 dark:text-slate-200" htmlFor="field-age">
                           Age
                         </label>
-                        <input className={inputClassName(errors.age)} inputMode="numeric" value={form.age} onChange={(e) => setField("age", e.target.value)} onBlur={() => markTouched("age")} />
+                        <input id="field-age" className={inputClassName(errors.age)} inputMode="numeric" value={form.age} onChange={(e) => setField("age", e.target.value)} onBlur={() => markTouched("age")} />
                         <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
                           Whole number only. Allowed range: 13 to 80.
                         </p>
                         {renderError(errors.age)}
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                        <label className="text-sm font-medium text-slate-700 dark:text-slate-200" htmlFor="field-phone">
                           Phone number
                         </label>
-                        <input className={inputClassName(errors.phone)} value={form.phone} onChange={(e) => setField("phone", e.target.value)} onBlur={() => markTouched("phone")} />
+                        <input id="field-phone" className={inputClassName(errors.phone)} value={form.phone} onChange={(e) => setField("phone", e.target.value)} onBlur={() => markTouched("phone")} />
                         {renderError(errors.phone)}
                       </div>
                       <div className="md:col-span-2">
-                        <label className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                        <label className="text-sm font-medium text-slate-700 dark:text-slate-200" htmlFor="field-email">
                           Email address
                         </label>
-                        <input className={inputClassName(errors.email)} type="email" value={form.email} onChange={(e) => setField("email", e.target.value)} onBlur={() => markTouched("email")} />
+                        <input id="field-email" className={inputClassName(errors.email)} type="email" value={form.email} onChange={(e) => setField("email", e.target.value)} onBlur={() => markTouched("email")} />
                         {renderError(errors.email)}
                       </div>
                     </div>
@@ -679,8 +695,13 @@ export function CourseApplicationForm({
                         {learnerStatusOptions.map((option) => (
                           <button
                             key={option.value}
+                            id={`field-learnerStatus-${option.value}`}
                             type="button"
-                            onClick={() => setField("learnerStatus", option.value)}
+                            onClick={() => {
+                              setField("learnerStatus", option.value);
+                              // Keep a generic anchor for scrolling
+                              document.getElementById("field-learnerStatus")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+                            }}
                             className={`rounded-2xl border px-4 py-4 text-left transition ${
                               form.learnerStatus === option.value
                                 ? "border-cyan-400 bg-gradient-to-br from-cyan-50 via-white to-orange-50 text-slate-950 shadow-lg shadow-cyan-100/60 dark:border-cyan-500 dark:bg-[linear-gradient(135deg,rgba(6,182,212,0.12),rgba(249,115,22,0.08))] dark:text-white"
@@ -691,13 +712,15 @@ export function CourseApplicationForm({
                           </button>
                         ))}
                       </div>
+                      {/* Hidden anchor for scrolling to learner status errors */}
+                      <div id="field-learnerStatus" />
 
                       {form.learnerStatus === "high_school" ? (
                         <div>
-                          <label className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                          <label className="text-sm font-medium text-slate-700 dark:text-slate-200" htmlFor="field-highSchoolName">
                             High school name
                           </label>
-                          <input className={inputClassName(errors.highSchoolName)} value={form.highSchoolName} onChange={(e) => setField("highSchoolName", e.target.value)} onBlur={() => markTouched("highSchoolName")} />
+                          <input id="field-highSchoolName" className={inputClassName(errors.highSchoolName)} value={form.highSchoolName} onChange={(e) => setField("highSchoolName", e.target.value)} onBlur={() => markTouched("highSchoolName")} />
                           {renderError(errors.highSchoolName)}
                         </div>
                       ) : null}
@@ -705,25 +728,25 @@ export function CourseApplicationForm({
                       {(form.learnerStatus === "undergraduate" || form.learnerStatus === "graduate") ? (
                         <div className="grid gap-5 md:grid-cols-2">
                           <div>
-                            <label className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                            <label className="text-sm font-medium text-slate-700 dark:text-slate-200" htmlFor="field-university">
                               University
                             </label>
-                            <input className={inputClassName(errors.university)} value={form.university} onChange={(e) => setField("university", e.target.value)} onBlur={() => markTouched("university")} />
+                            <input id="field-university" className={inputClassName(errors.university)} value={form.university} onChange={(e) => setField("university", e.target.value)} onBlur={() => markTouched("university")} />
                             {renderError(errors.university)}
                           </div>
                           <div>
-                            <label className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                            <label className="text-sm font-medium text-slate-700 dark:text-slate-200" htmlFor="field-faculty">
                               Faculty
                             </label>
-                            <input className={inputClassName(errors.faculty)} value={form.faculty} onChange={(e) => setField("faculty", e.target.value)} onBlur={() => markTouched("faculty")} />
+                            <input id="field-faculty" className={inputClassName(errors.faculty)} value={form.faculty} onChange={(e) => setField("faculty", e.target.value)} onBlur={() => markTouched("faculty")} />
                             {renderError(errors.faculty)}
                           </div>
                           {form.learnerStatus === "graduate" ? (
                             <div>
-                              <label className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                              <label className="text-sm font-medium text-slate-700 dark:text-slate-200" htmlFor="field-graduationYear">
                                 Graduation year
                               </label>
-                              <input className={inputClassName(errors.graduationYear)} inputMode="numeric" value={form.graduationYear} onChange={(e) => setField("graduationYear", e.target.value)} onBlur={() => markTouched("graduationYear")} />
+                              <input id="field-graduationYear" className={inputClassName(errors.graduationYear)} inputMode="numeric" value={form.graduationYear} onChange={(e) => setField("graduationYear", e.target.value)} onBlur={() => markTouched("graduationYear")} />
                               <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
                                 Four digits only. Allowed range: {currentYear - 60} to {currentYear + 1}.
                               </p>
@@ -736,17 +759,17 @@ export function CourseApplicationForm({
                       {form.learnerStatus === "professional" ? (
                         <div className="grid gap-5 md:grid-cols-2">
                           <div>
-                            <label className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                            <label className="text-sm font-medium text-slate-700 dark:text-slate-200" htmlFor="field-workField">
                               Work field
                             </label>
-                            <input className={inputClassName(errors.workField)} value={form.workField} onChange={(e) => setField("workField", e.target.value)} onBlur={() => markTouched("workField")} />
+                            <input id="field-workField" className={inputClassName(errors.workField)} value={form.workField} onChange={(e) => setField("workField", e.target.value)} onBlur={() => markTouched("workField")} />
                             {renderError(errors.workField)}
                           </div>
                           <div>
-                            <label className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                            <label className="text-sm font-medium text-slate-700 dark:text-slate-200" htmlFor="field-yearsOfExperience">
                               Years of experience
                             </label>
-                            <input className={inputClassName(errors.yearsOfExperience)} inputMode="numeric" value={form.yearsOfExperience} onChange={(e) => setField("yearsOfExperience", e.target.value)} onBlur={() => markTouched("yearsOfExperience")} />
+                            <input id="field-yearsOfExperience" className={inputClassName(errors.yearsOfExperience)} inputMode="numeric" value={form.yearsOfExperience} onChange={(e) => setField("yearsOfExperience", e.target.value)} onBlur={() => markTouched("yearsOfExperience")} />
                             <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
                               Whole number only. Checked live against the entered age.
                             </p>
@@ -760,18 +783,18 @@ export function CourseApplicationForm({
                   {currentStep.key === "story" ? (
                     <div className="space-y-5">
                       <div>
-                        <label className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                        <label className="text-sm font-medium text-slate-700 dark:text-slate-200" htmlFor="field-personalStatement">
                           Some words about you
                         </label>
-                        <textarea rows={5} className={inputClassName(errors.personalStatement)} value={form.personalStatement} onChange={(e) => setField("personalStatement", e.target.value)} onBlur={() => markTouched("personalStatement")} />
+                        <textarea id="field-personalStatement" rows={5} className={inputClassName(errors.personalStatement)} value={form.personalStatement} onChange={(e) => setField("personalStatement", e.target.value)} onBlur={() => markTouched("personalStatement")} />
                         <CharacterMeter value={form.personalStatement} minimum={30} />
                         {renderError(errors.personalStatement)}
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                        <label className="text-sm font-medium text-slate-700 dark:text-slate-200" htmlFor="field-background">
                           Background
                         </label>
-                        <textarea rows={5} className={inputClassName(errors.background)} value={form.background} onChange={(e) => setField("background", e.target.value)} onBlur={() => markTouched("background")} />
+                        <textarea id="field-background" rows={5} className={inputClassName(errors.background)} value={form.background} onChange={(e) => setField("background", e.target.value)} onBlur={() => markTouched("background")} />
                         <CharacterMeter value={form.background} minimum={30} />
                         {renderError(errors.background)}
                       </div>
@@ -781,10 +804,10 @@ export function CourseApplicationForm({
                   {currentStep.key === "review" ? (
                     <div className="space-y-5">
                       <div>
-                        <label className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                        <label className="text-sm font-medium text-slate-700 dark:text-slate-200" htmlFor="field-learningGoals">
                           Learning goals
                         </label>
-                        <textarea rows={5} className={inputClassName(errors.learningGoals)} value={form.learningGoals} onChange={(e) => setField("learningGoals", e.target.value)} onBlur={() => markTouched("learningGoals")} />
+                        <textarea id="field-learningGoals" rows={5} className={inputClassName(errors.learningGoals)} value={form.learningGoals} onChange={(e) => setField("learningGoals", e.target.value)} onBlur={() => markTouched("learningGoals")} />
                         <CharacterMeter value={form.learningGoals} minimum={30} />
                         {renderError(errors.learningGoals)}
                       </div>
@@ -813,7 +836,7 @@ export function CourseApplicationForm({
               </AnimatePresence>
             </div>
 
-            <div className="flex items-center justify-between border-t border-white/50 px-6 py-5 dark:border-white/10 sm:px-8">
+            <div className="flex-none flex items-center justify-between border-t border-white/50 bg-white dark:bg-slate-950 px-5 py-4 sm:px-8 dark:border-white/10">
               <button
                 type="button"
                 onClick={() => setCurrentStepIndex((prev) => Math.max(prev - 1, 0))}
