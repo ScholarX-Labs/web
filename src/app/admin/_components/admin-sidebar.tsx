@@ -24,6 +24,7 @@ import {
   CreditCard,
   MessageSquare,
   BarChart,
+  Gauge,
   Settings,
   LogOut,
   Sparkles,
@@ -38,6 +39,7 @@ const iconMap: Record<string, React.ReactNode> = {
   CreditCard: <CreditCard className="size-4.5" />,
   MessageSquare: <MessageSquare className="size-4.5" />,
   BarChart: <BarChart className="size-4.5" />,
+  Gauge: <Gauge className="size-4.5" />,
   Settings: <Settings className="size-4.5" />,
 };
 
@@ -46,7 +48,7 @@ const sectionGroups = [
   { label: "People", items: ["Users"] },
   { label: "Commerce", items: ["Subscriptions"] },
   { label: "Operations", items: ["Inquiries"] },
-  { label: "Analytics", items: ["Reports"] },
+  { label: "Analytics", items: ["Reports", "Executive"] },
   { label: "System", items: ["Settings"] },
 ];
 
