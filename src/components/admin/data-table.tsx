@@ -38,6 +38,8 @@ interface DataTableProps<TData> {
   pageSize?: number;
   searchable?: boolean;
   searchPlaceholder?: string;
+  searchValue?: string;
+  onSearchChange?: (value: string) => void;
   emptyMessage?: string;
   emptyDescription?: string;
   page?: number;
@@ -123,6 +125,8 @@ export function DataTable<TData>({
   pageSize = 20,
   searchable = false,
   searchPlaceholder = "Search records...",
+  searchValue,
+  onSearchChange,
   emptyMessage = "Registry Empty",
   emptyDescription,
   page,
@@ -160,8 +164,9 @@ export function DataTable<TData>({
 
   if (loading) return <TableSkeleton rows={8} />;
   if (error) return <TableError message={error} onRetry={onRetry} />;
-  
-  const hasNoData = data.length === 0 && globalFilter === "";
+
+  const effectiveSearchValue = searchValue ?? globalFilter;
+  const hasNoData = data.length === 0 && effectiveSearchValue === "";
 
   return (
     <div className="space-y-8">
@@ -171,8 +176,12 @@ export function DataTable<TData>({
             <Search className="absolute left-4.5 top-1/2 -translate-y-1/2 size-4.5 text-slate-400 group-focus-within:text-blue-600 transition-colors pointer-events-none stroke-[2.5]" />
             <Input
               placeholder={searchPlaceholder}
-              value={globalFilter}
-              onChange={(e) => setGlobalFilter(e.target.value)}
+              value={effectiveSearchValue}
+              onChange={(e) => {
+                const value = e.target.value;
+                setGlobalFilter(value);
+                onSearchChange?.(value);
+              }}
               className="pl-12 h-14 bg-white/50 border-slate-200/80 focus:bg-white focus:ring-[12px] focus:ring-blue-500/5 rounded-[22px] transition-all font-bold text-[15px] shadow-sm shadow-slate-100/50"
             />
           </div>
