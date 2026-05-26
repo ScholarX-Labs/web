@@ -83,6 +83,7 @@ test("courses read model builds leaderboard, category chart, links, and course s
         completions: 3,
         completionRate: 0.15,
         revenue: 1000,
+        qualityFlags: [],
       },
     ],
     categoryDistribution: [{ category: "STEM", value: 2 }],

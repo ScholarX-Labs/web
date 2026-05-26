@@ -54,6 +54,7 @@ function makeCoursesDomain(): ExecutiveDomain {
                 completions: 8,
                 completionRate: 0.4,
                 revenue: 1200,
+                qualityFlags: ["problem_course"],
               },
             ],
             categoryDistribution: [{ category: "STEM", value: 1 }],
