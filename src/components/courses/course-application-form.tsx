@@ -500,7 +500,7 @@ export function CourseApplicationForm({
   return (
     <DialogContent
       overlayClassName={overlayClassName}
-      className="z-90 overflow-hidden rounded-[30px] border border-white/60 bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.16),_transparent_30%),linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,250,252,0.94))] p-0 shadow-[0_40px_120px_rgba(15,23,42,0.28)] backdrop-blur-2xl dark:border-white/10 dark:bg-[radial-gradient(circle_at_top,_rgba(14,165,233,0.16),_transparent_28%),linear-gradient(180deg,rgba(2,6,23,0.94),rgba(15,23,42,0.96))] sm:max-w-5xl"
+      className="z-90 overflow-hidden rounded-[24px] sm:rounded-[30px] border border-white/60 bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.16),_transparent_30%),linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,250,252,0.94))] p-0 shadow-[0_40px_120px_rgba(15,23,42,0.28)] backdrop-blur-2xl dark:border-white/10 dark:bg-[radial-gradient(circle_at_top,_rgba(14,165,233,0.16),_transparent_28%),linear-gradient(180deg,rgba(2,6,23,0.94),rgba(15,23,42,0.96))] w-[calc(100vw-24px)] max-w-none sm:w-[90vw] sm:max-w-5xl h-[92vh] sm:h-auto sm:max-h-[90vh] flex flex-col"
     >
       <DialogTitle className="sr-only">Apply for {course.title}</DialogTitle>
 
@@ -526,8 +526,8 @@ export function CourseApplicationForm({
           </motion.div>
         </div>
       ) : (
-        <div className="grid min-h-[620px] lg:grid-cols-[280px_minmax(0,1fr)]">
-          <aside className="relative overflow-hidden border-b border-white/50 bg-[linear-gradient(180deg,rgba(14,165,233,0.12),rgba(249,115,22,0.08),rgba(255,255,255,0.4))] p-6 dark:border-white/10 dark:bg-[linear-gradient(180deg,rgba(14,165,233,0.16),rgba(249,115,22,0.08),rgba(15,23,42,0.12))] lg:border-b-0 lg:border-r">
+        <div className="flex flex-col lg:grid flex-1 min-h-0 lg:min-h-[620px] lg:grid-cols-[280px_minmax(0,1fr)]">
+          <aside className="relative flex-none overflow-hidden border-b border-white/50 bg-[linear-gradient(180deg,rgba(14,165,233,0.12),rgba(249,115,22,0.08),rgba(255,255,255,0.4))] p-5 sm:p-6 dark:border-white/10 dark:bg-[linear-gradient(180deg,rgba(14,165,233,0.16),rgba(249,115,22,0.08),rgba(15,23,42,0.12))] lg:border-b-0 lg:border-r">
             <div className="absolute inset-x-5 top-0 h-24 rounded-b-full bg-cyan-400/15 blur-3xl dark:bg-cyan-400/10" />
             <div className="mb-6 flex items-start gap-3">
               <div className="rounded-2xl border border-white/50 bg-white/80 p-3 text-cyan-600 shadow-sm dark:border-white/10 dark:bg-slate-950/70 dark:text-cyan-400">
@@ -563,11 +563,10 @@ export function CourseApplicationForm({
               <div className="mt-4 flex flex-wrap gap-2 text-xs">
                 <Badge icon={Sparkles} label="Secure review" tone="cyan" />
                 <Badge icon={Compass} label="Guided steps" tone="orange" />
-                <Badge icon={Check} label="Live checks" tone="emerald" />
               </div>
             </div>
 
-            <div className="space-y-3">
+            <div className="hidden lg:block space-y-3">
               {steps.map((step, index) => {
                 const Icon = step.icon;
                 const isActive = index === currentStepIndex;
@@ -609,25 +608,25 @@ export function CourseApplicationForm({
             </div>
           </aside>
 
-          <form onSubmit={handleSubmit} className="flex min-h-0 flex-col">
-            <div className="border-b border-white/50 bg-[linear-gradient(90deg,rgba(14,165,233,0.08),rgba(255,255,255,0.4),rgba(249,115,22,0.08))] px-6 py-6 dark:border-white/10 dark:bg-[linear-gradient(90deg,rgba(14,165,233,0.08),rgba(255,255,255,0.01),rgba(249,115,22,0.06))] sm:px-8">
+          <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col bg-white dark:bg-slate-950/50">
+            <div className="flex-none border-b border-white/50 bg-[linear-gradient(90deg,rgba(14,165,233,0.08),rgba(255,255,255,0.4),rgba(249,115,22,0.08))] px-5 py-5 dark:border-white/10 dark:bg-[linear-gradient(90deg,rgba(14,165,233,0.08),rgba(255,255,255,0.01),rgba(249,115,22,0.06))] sm:px-8">
               <div className="flex items-center gap-3 text-cyan-600 dark:text-cyan-400">
                 <div className="rounded-xl border border-current/20 bg-current/10 p-2">
                   <CurrentStepIcon className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium">{currentStep.label}</p>
-                  <h3 className="text-2xl font-semibold text-slate-950 dark:text-white">
+                  <p className="text-xs sm:text-sm font-medium">{currentStep.label}</p>
+                  <h3 className="text-lg sm:text-2xl font-semibold text-slate-950 dark:text-white">
                     {currentStep.title}
                   </h3>
-                  <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                  <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-slate-600 dark:text-slate-300">
                     {currentStep.description}
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="min-h-0 flex-1 overflow-y-auto px-6 py-6 sm:px-8">
+            <div className="min-h-0 flex-1 overflow-y-auto scholar-scrollbar px-5 py-6 sm:px-8 relative">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={currentStep.key}
@@ -813,7 +812,7 @@ export function CourseApplicationForm({
               </AnimatePresence>
             </div>
 
-            <div className="flex items-center justify-between border-t border-white/50 px-6 py-5 dark:border-white/10 sm:px-8">
+            <div className="flex-none flex items-center justify-between border-t border-white/50 bg-white dark:bg-slate-950 px-5 py-4 sm:px-8 dark:border-white/10">
               <button
                 type="button"
                 onClick={() => setCurrentStepIndex((prev) => Math.max(prev - 1, 0))}

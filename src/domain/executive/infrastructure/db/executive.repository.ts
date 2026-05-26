@@ -43,8 +43,10 @@ import type {
   UsersActivityEventSnapshot,
   UsersAggregateSnapshot,
   UsersMonthlyActivitySnapshot,
+  UsersManagementSnapshot,
   UsersRoleSnapshot,
   UsersTrendSnapshot,
+  CoursesManagementSnapshot,
 } from "@/domain/executive/application/executive-dashboard.service";
 import type {
   CourseLeaderboardRow,
@@ -283,7 +285,15 @@ export class DrizzleExecutiveReadRepository implements ExecutiveReadRepository {
     const previousTo = new Date(from.getTime() - 1);
     const previousFrom = new Date(previousTo.getTime() - (periodDays - 1) * dayMs);
 
-    const [current, previous, registrationTrend, roleDistribution, activityEvents, monthlyActivity] =
+    const [
+      current,
+      previous,
+      registrationTrend,
+      roleDistribution,
+      activityEvents,
+      monthlyActivity,
+      managementRows,
+    ] =
       await Promise.all([
         this.getUsersAggregate(from, to, query.userRole),
         this.getUsersAggregate(previousFrom, previousTo, query.userRole),
@@ -291,6 +301,7 @@ export class DrizzleExecutiveReadRepository implements ExecutiveReadRepository {
         this.getUserRoleDistribution(query.userRole),
         this.getUserActivityEvents(from, to, query.userRole),
         this.getMonthlyActivity(from, to, query.userRole),
+        this.getUserManagementRows(query),
       ]);
 
     return this.dashboard.buildUsersReadModel({
@@ -301,6 +312,7 @@ export class DrizzleExecutiveReadRepository implements ExecutiveReadRepository {
       roleDistribution,
       activityEvents,
       monthlyActivity,
+      managementRows,
     });
   }
 
@@ -439,6 +451,36 @@ export class DrizzleExecutiveReadRepository implements ExecutiveReadRepository {
     }));
   }
 
+  private async getUserManagementRows(
+    query: ExecutivePageQuery,
+  ): Promise<UsersManagementSnapshot[]> {
+    const rows = await db
+      .select({
+        userId: dbUsers.id,
+        email: dbUsers.email,
+        name: dbUsers.name,
+        role: dbUsers.role,
+        createdAt: dbUsers.createdAt,
+        isEmailVerified: dbUsers.emailVerified,
+        isBanned: dbUsers.banned,
+      })
+      .from(dbUsers)
+      .where(query.userRole ? eq(dbUsers.role, query.userRole) : undefined)
+      .orderBy(desc(dbUsers.createdAt))
+      .limit(query.pageSize)
+      .offset((query.page - 1) * query.pageSize);
+
+    return rows.map((row) => ({
+      userId: row.userId,
+      email: row.email,
+      name: row.name,
+      role: row.role,
+      createdAt: row.createdAt,
+      isEmailVerified: row.isEmailVerified,
+      isBanned: row.isBanned ?? false,
+    }));
+  }
+
   async getCoursesLessons(
     query: ExecutivePageQuery,
   ): Promise<CoursesLessonsReadModel> {
@@ -449,11 +491,12 @@ export class DrizzleExecutiveReadRepository implements ExecutiveReadRepository {
       Math.max(1, Math.floor((toDate(query.to).getTime() - from.getTime()) / dayMs) + 1);
     const previousTo = new Date(from.getTime() - 1);
     const previousFrom = new Date(previousTo.getTime() - (periodDays - 1) * dayMs);
-    const [current, previous, leaderboard, categoryDistribution] = await Promise.all([
+    const [current, previous, leaderboard, categoryDistribution, managementRows] = await Promise.all([
       this.getCoursesLessonsAggregate(from, to, query.courseCategory),
       this.getCoursesLessonsAggregate(previousFrom, previousTo, query.courseCategory),
       this.getCourseLeaderboard(from, to, query),
       this.getCourseCategoryDistribution(query.courseCategory),
+      this.getCourseManagementRows(from, to, query),
     ]);
 
     return this.dashboard.buildCoursesLessonsReadModel({
@@ -462,6 +505,7 @@ export class DrizzleExecutiveReadRepository implements ExecutiveReadRepository {
       previous,
       leaderboard,
       categoryDistribution,
+      managementRows,
     });
   }
 
@@ -582,6 +626,61 @@ export class DrizzleExecutiveReadRepository implements ExecutiveReadRepository {
     return rows.map((row) => ({
       category: row.category,
       value: numeric(row.value),
+    }));
+  }
+
+  private async getCourseManagementRows(
+    from: Date,
+    to: Date,
+    query: ExecutivePageQuery,
+  ): Promise<CoursesManagementSnapshot[]> {
+    const rows = await executeRows<{
+      course_id: string;
+      title: string;
+      category: string;
+      status: string;
+      owner_id: string | null;
+      created_at: Date | string | null;
+      updated_at: Date | string | null;
+      lessons: string | number;
+      enrollments: string | number;
+      completions: string | number;
+    }>(sql`
+      select c.id::text as course_id,
+             c.title,
+             c.category,
+             c.status,
+             c.instructor_id as owner_id,
+             c.created_at,
+             c.updated_at,
+             coalesce(count(distinct l.id), 0) as lessons,
+             coalesce(count(distinct s.id), 0) as enrollments,
+             coalesce(count(distinct cp.id) filter (where cp.status = 'completed'), 0) as completions
+      from courses.courses c
+      left join admin.lessons l
+        on l.course_id = c.id and l.is_archived = false
+      left join courses.subscriptions s
+        on s.course_id = c.id and s.enrolled_at between ${from} and ${to}
+      left join courses.course_progress cp
+        on cp.course_id = c.id and cp.completed_at between ${from} and ${to}
+      where (${query.courseCategory ?? null}::text is null or c.category = ${query.courseCategory ?? null})
+      group by c.id, c.title, c.category, c.status, c.instructor_id, c.created_at, c.updated_at
+      order by c.updated_at desc nulls last, c.created_at desc nulls last
+      limit ${query.pageSize}
+      offset ${(query.page - 1) * query.pageSize}
+    `);
+
+    return rows.map((row) => ({
+      courseId: row.course_id,
+      title: row.title,
+      category: row.category,
+      status: row.status,
+      ownerId: row.owner_id,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+      lessons: numeric(row.lessons),
+      enrollments: numeric(row.enrollments),
+      completions: numeric(row.completions),
     }));
   }
 

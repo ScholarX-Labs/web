@@ -109,6 +109,17 @@ export type UsersMonthlyActivityPoint = {
   value: number;
 };
 
+export type UserManagementRow = {
+  userId: string;
+  email: string | null;
+  name: string | null;
+  role: string;
+  createdAt: string;
+  isEmailVerified: boolean;
+  isBanned: boolean;
+  adminHref: string;
+};
+
 export type UsersSections = {
   kpis: readonly ExecutiveMetricValue[];
   growthTrend: ExecutiveChartModel<UsersTrendPoint>;
@@ -117,6 +128,7 @@ export type UsersSections = {
   peakActivity: UsersPeakActivity;
   monthlyActivity: ExecutiveChartModel<UsersMonthlyActivityPoint>;
   registrationTimeline: ExecutiveChartModel<UsersTrendPoint>;
+  managementTable: ExecutiveTableModel<UserManagementRow>;
 };
 
 export type UsersReadModel = ExecutivePageResponse<UsersSections>;
@@ -154,6 +166,20 @@ export type CourseManagementLink = {
   status: string;
 };
 
+export type CourseManagementRow = {
+  courseId: string;
+  title: string;
+  category: string;
+  status: string;
+  ownerId: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  lessons: number;
+  enrollments: number;
+  completionRate: number | null;
+  adminHref: string;
+};
+
 export type CoursesLessonsSections = {
   kpis: readonly ExecutiveMetricValue[];
   courseLeaderboard: ExecutiveTableModel<CourseLeaderboardRow>;
@@ -161,6 +187,7 @@ export type CoursesLessonsSections = {
   problemCourseSignals: readonly ProblemCourseSignal[];
   contentQualityIndicators: readonly ProblemCourseSignal[];
   courseManagementLinks: readonly CourseManagementLink[];
+  managementTable: ExecutiveTableModel<CourseManagementRow>;
 };
 
 export type LessonAnalyticsRow = {

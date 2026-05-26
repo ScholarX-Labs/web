@@ -13,6 +13,7 @@ import type {
   UsersActivityHeatmapPoint,
   UsersMonthlyActivityPoint,
   UsersPeakActivity,
+  UserManagementRow,
   UsersReadModel,
   UsersRoleDistributionPoint,
   UsersSections,
@@ -29,6 +30,7 @@ import type {
   CourseCategoryDistributionPoint,
   CourseLeaderboardRow,
   CourseManagementLink,
+  CourseManagementRow,
   CoursesLessonsReadModel,
   CoursesLessonsSections,
   CriticalDropFlag,
@@ -100,6 +102,16 @@ export type UsersMonthlyActivitySnapshot = {
   value: number;
 };
 
+export type UsersManagementSnapshot = {
+  userId: string;
+  email: string | null;
+  name: string | null;
+  role: string | null;
+  createdAt: Date | string;
+  isEmailVerified: boolean;
+  isBanned: boolean;
+};
+
 export type TechnicalFreshnessSnapshot = {
   sectionId: string;
   sourceKey: string;
@@ -148,12 +160,26 @@ export type CoursesLessonsAggregateSnapshot = {
   totalCompletions: number;
 };
 
+export type CoursesManagementSnapshot = {
+  courseId: string;
+  title: string;
+  category: string;
+  status: string;
+  ownerId: string | null;
+  createdAt: Date | string | null;
+  updatedAt: Date | string | null;
+  lessons: number;
+  enrollments: number;
+  completions: number;
+};
+
 export type BuildCoursesLessonsReadModelInput = {
   query: ExecutivePageQuery;
   current: CoursesLessonsAggregateSnapshot;
   previous: CoursesLessonsAggregateSnapshot;
   leaderboard: readonly CourseLeaderboardRow[];
   categoryDistribution: readonly { category: string; value: number }[];
+  managementRows?: readonly CoursesManagementSnapshot[];
   generatedAt?: Date;
   sectionState?: ExecutiveSectionState;
 };
@@ -279,6 +305,7 @@ export type BuildUsersReadModelInput = {
   roleDistribution: readonly UsersRoleSnapshot[];
   activityEvents: readonly UsersActivityEventSnapshot[];
   monthlyActivity?: readonly UsersMonthlyActivitySnapshot[];
+  managementRows?: readonly UsersManagementSnapshot[];
   generatedAt?: Date;
   sectionState?: ExecutiveSectionState;
 };
@@ -629,6 +656,7 @@ export class ExecutiveDashboardService {
     roleDistribution,
     activityEvents,
     monthlyActivity,
+    managementRows = [],
     generatedAt = new Date(),
     sectionState = defaultReadyState(generatedAt),
   }: BuildUsersReadModelInput): UsersReadModel {
@@ -738,6 +766,27 @@ export class ExecutiveDashboardService {
         a11ySummary: `${growthPoints.length} registration buckets are available.`,
         state: sectionState,
       }),
+      managementTable: {
+        id: "users.management_table",
+        rows: managementRows.map((row) => ({
+          userId: row.userId,
+          email: row.email,
+          name: row.name,
+          role: normalizeRole(row.role),
+          createdAt: toDate(row.createdAt).toISOString(),
+          isEmailVerified: row.isEmailVerified,
+          isBanned: row.isBanned,
+          adminHref: `/admin/users/${row.userId}`,
+        })),
+        page: query.page,
+        pageSize: query.pageSize,
+        totalRows: managementRows.length,
+        sort: query.sort ?? "createdAt",
+        direction: query.direction,
+        state: managementRows.length === 0
+          ? { ...sectionState, status: "empty", message: "No users found for this filter." }
+          : sectionState,
+      },
     };
 
     return {
@@ -938,6 +987,7 @@ export class ExecutiveDashboardService {
     previous,
     leaderboard,
     categoryDistribution,
+    managementRows = [],
     generatedAt = new Date(),
     sectionState = defaultReadyState(generatedAt),
   }: BuildCoursesLessonsReadModelInput): CoursesLessonsReadModel {
@@ -995,6 +1045,30 @@ export class ExecutiveDashboardService {
         href: `/admin/courses/${course.courseId}`,
         status: course.status,
       })),
+      managementTable: {
+        id: "courses.management_table",
+        rows: managementRows.map((row) => ({
+          courseId: row.courseId,
+          title: row.title,
+          category: row.category,
+          status: row.status,
+          ownerId: row.ownerId,
+          createdAt: row.createdAt ? toDate(row.createdAt).toISOString() : null,
+          updatedAt: row.updatedAt ? toDate(row.updatedAt).toISOString() : null,
+          lessons: row.lessons,
+          enrollments: row.enrollments,
+          completionRate: this.calculations.calculateRate(row.completions, row.enrollments),
+          adminHref: `/admin/courses/${row.courseId}`,
+        })),
+        page: query.page,
+        pageSize: query.pageSize,
+        totalRows: managementRows.length,
+        sort: query.sort ?? "updatedAt",
+        direction: query.direction,
+        state: managementRows.length === 0
+          ? { ...sectionState, status: "empty", message: "No courses found for this filter." }
+          : sectionState,
+      },
     };
 
     return {
