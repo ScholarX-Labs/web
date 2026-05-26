@@ -51,6 +51,12 @@ const envSchema = z.object({
 
   AVATAR_UPLOAD_ENABLED: optionalBooleanString,
 
+  SCHOLARX_EXECUTIVE_DASHBOARD_ENABLED: optionalBooleanString,
+  SCHOLARX_EXECUTIVE_TEAM_OPS_ENABLED: optionalBooleanString,
+  SCHOLARX_EXECUTIVE_FINANCE_ENABLED: optionalBooleanString,
+  SCHOLARX_EXECUTIVE_GOVERNANCE_ENABLED: optionalBooleanString,
+  SCHOLARX_EXECUTIVE_AI_HEATMAP_ENABLED: optionalBooleanString,
+
   BETTER_AUTH_URL: optionalUrl,
   BETTER_AUTH_SECRET: z.preprocess(
     normalizeOptionalString,
