@@ -659,8 +659,6 @@ export class ExecutiveDashboardService {
             return (left.refundRate ?? -1) - (right.refundRate ?? -1);
           case "supportInquiryCount":
             return left.supportInquiryCount - right.supportInquiryCount;
-          case "profitabilityProxy":
-            return left.profitabilityProxy - right.profitabilityProxy;
         }
       })();
 
