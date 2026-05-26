@@ -21,6 +21,11 @@ const metricPresentation = {
   "finance.paid_enrollments": { label: "Paid enrollments", format: "number", favorableDirection: "up" },
   "finance.manual_enrollments": { label: "Manual enrollments", format: "number", favorableDirection: "neutral" },
 } as const;
+type MetricPresentationKey = keyof typeof metricPresentation;
+
+function isMetricPresentationKey(id: string): id is MetricPresentationKey {
+  return id in metricPresentation;
+}
 
 function isoDate(date: Date): string {
   return date.toISOString().slice(0, 10);
@@ -82,7 +87,9 @@ export default async function FinancePage({ searchParams }: PageProps) {
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4" aria-label="Finance metrics">
         {finance.sections.kpis.map((metric) => {
-          const presentation = metricPresentation[metric.definitionId as keyof typeof metricPresentation];
+          const presentation = isMetricPresentationKey(metric.definitionId)
+            ? metricPresentation[metric.definitionId]
+            : undefined;
           return (
             <MetricCard
               key={metric.definitionId}

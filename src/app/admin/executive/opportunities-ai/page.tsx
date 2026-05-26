@@ -58,6 +58,11 @@ const metricPresentation = {
     favorableDirection: "down",
   },
 } as const;
+type MetricPresentationKey = keyof typeof metricPresentation;
+
+function isMetricPresentationKey(id: string): id is MetricPresentationKey {
+  return id in metricPresentation;
+}
 
 function isoDate(date: Date): string {
   return date.toISOString().slice(0, 10);
@@ -119,8 +124,9 @@ export default async function OpportunitiesAiPage({ searchParams }: PageProps) {
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4" aria-label="Opportunity and AI metrics">
         {opportunities.sections.kpis.map((metric) => {
-          const presentation =
-            metricPresentation[metric.definitionId as keyof typeof metricPresentation];
+          const presentation = isMetricPresentationKey(metric.definitionId)
+            ? metricPresentation[metric.definitionId]
+            : undefined;
           return (
             <MetricCard
               key={metric.definitionId}

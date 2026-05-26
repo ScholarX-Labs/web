@@ -27,6 +27,11 @@ const metricPresentation = {
   "courses.total_enrollments": { label: "Enrollments", format: "number", favorableDirection: "up" },
   "courses.completion_rate": { label: "Completion rate", format: "percent", favorableDirection: "up" },
 } as const;
+type MetricPresentationKey = keyof typeof metricPresentation;
+
+function isMetricPresentationKey(id: string): id is MetricPresentationKey {
+  return id in metricPresentation;
+}
 
 function isoDate(date: Date): string {
   return date.toISOString().slice(0, 10);
@@ -48,7 +53,7 @@ async function readPage(searchParams: PageProps["searchParams"]): Promise<{
   drilldown: LessonDrilldownReadModel | null;
 }> {
   const params = (await searchParams) ?? {};
-  const query = executivePageQuerySchema.parse({
+  const parsedQuery = executivePageQuerySchema.safeParse({
     ...defaultQuery(),
     ...Object.fromEntries(
       Object.entries(params)
@@ -56,6 +61,7 @@ async function readPage(searchParams: PageProps["searchParams"]): Promise<{
         .filter((entry): entry is [string, string] => Boolean(entry[1])),
     ),
   });
+  const query = parsedQuery.success ? parsedQuery.data : defaultQuery();
   const domain = createExecutiveDomain();
   const courses = await domain.repositories.read.getCoursesLessons(query);
   const drilldown = query.courseId
@@ -108,8 +114,9 @@ export default async function CoursesLessonsPage({ searchParams }: PageProps) {
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4" aria-label="Course analytics key metrics">
         {courses.sections.kpis.map((kpi) => {
-          const presentation =
-            metricPresentation[kpi.definitionId as keyof typeof metricPresentation];
+          const presentation = isMetricPresentationKey(kpi.definitionId)
+            ? metricPresentation[kpi.definitionId]
+            : undefined;
           return (
             <MetricCard
               key={kpi.definitionId}

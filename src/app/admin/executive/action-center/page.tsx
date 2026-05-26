@@ -4,6 +4,7 @@ import { createExecutiveDomain } from "@/domain/executive";
 import { executivePageQuerySchema } from "@/domain/executive/contracts/executive-query.schemas";
 import type { ActionCenterReadModel } from "@/domain/executive/contracts/action-center-repository.contract";
 import type { TeamOperationsReadModel } from "@/domain/executive/contracts/executive-read-repository.contract";
+import type { ExecutiveFreshnessStatus } from "@/domain/executive/contracts/executive-types";
 import { ActionItemsTable } from "@/components/executive/tables/action-items-table";
 import { FreshnessBadge } from "@/components/executive/sections/freshness-badge";
 import { ExportButton } from "@/components/executive/sections/export-button";
@@ -37,7 +38,7 @@ async function readActionCenter(
   teamOperations: TeamOperationsReadModel;
 }> {
   const params = (await searchParams) ?? {};
-  const query = executivePageQuerySchema.parse({
+  const parsedQuery = executivePageQuerySchema.safeParse({
     ...defaultQuery(),
     ...Object.fromEntries(
       Object.entries(params)
@@ -45,6 +46,7 @@ async function readActionCenter(
         .filter((entry): entry is [string, string] => Boolean(entry[1])),
     ),
   });
+  const query = parsedQuery.success ? parsedQuery.data : defaultQuery();
   const domain = createExecutiveDomain();
   const [actionCenter, teamOperations] = await Promise.all([
     createActionCenterService(domain.repositories.actionCenter).getActionCenter(query),
@@ -53,11 +55,21 @@ async function readActionCenter(
   return { actionCenter, teamOperations };
 }
 
+function deriveFreshnessStatus(
+  freshnessSummary: ActionCenterReadModel["freshnessSummary"],
+): ExecutiveFreshnessStatus {
+  if (freshnessSummary.unavailable > 0) return "unavailable";
+  if (freshnessSummary.very_stale > 0) return "very_stale";
+  if (freshnessSummary.stale > 0) return "stale";
+  return "current";
+}
+
 export default async function ExecutiveActionCenterPage({
   searchParams,
 }: PageProps) {
   const { actionCenter, teamOperations } = await readActionCenter(searchParams);
   const summary = actionCenter.sections.severitySummary;
+  const freshnessStatus = deriveFreshnessStatus(actionCenter.freshnessSummary);
 
   return (
     <main className="space-y-6 pb-16">
@@ -76,7 +88,7 @@ export default async function ExecutiveActionCenterPage({
         </div>
         <div className="flex items-center gap-2">
           <ExportButton pageId="action_center" query={teamOperations.query} />
-          <FreshnessBadge status="current" lastSuccessfulAt={actionCenter.generatedAt} />
+          <FreshnessBadge status={freshnessStatus} lastSuccessfulAt={actionCenter.generatedAt} />
         </div>
       </header>
 

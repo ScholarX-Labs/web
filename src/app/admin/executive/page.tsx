@@ -37,6 +37,11 @@ const metricPresentation = {
     favorableDirection: "up",
   },
 } as const;
+type MetricPresentationKey = keyof typeof metricPresentation;
+
+function isMetricPresentationKey(id: string): id is MetricPresentationKey {
+  return id in metricPresentation;
+}
 
 function isoDate(date: Date): string {
   return date.toISOString().slice(0, 10);
@@ -110,10 +115,9 @@ export default async function ExecutiveOverviewPage({ searchParams }: PageProps)
         aria-label="Business health key metrics"
       >
         {overview.sections.kpis.map((kpi) => {
-          const presentation =
-            metricPresentation[
-              kpi.definitionId as keyof typeof metricPresentation
-            ];
+          const presentation = isMetricPresentationKey(kpi.definitionId)
+            ? metricPresentation[kpi.definitionId]
+            : undefined;
           return (
             <MetricCard
               key={kpi.definitionId}

@@ -38,6 +38,11 @@ const metricPresentation = {
     favorableDirection: "down",
   },
 } as const;
+type MetricPresentationKey = keyof typeof metricPresentation;
+
+function isMetricPresentationKey(id: string): id is MetricPresentationKey {
+  return id in metricPresentation;
+}
 
 const dayLabels = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -108,10 +113,9 @@ export default async function ExecutiveUsersPage({ searchParams }: PageProps) {
         aria-label="User analytics key metrics"
       >
         {users.sections.kpis.map((kpi) => {
-          const presentation =
-            metricPresentation[
-              kpi.definitionId as keyof typeof metricPresentation
-            ];
+          const presentation = isMetricPresentationKey(kpi.definitionId)
+            ? metricPresentation[kpi.definitionId]
+            : undefined;
           return (
             <MetricCard
               key={kpi.definitionId}
