@@ -1,5 +1,6 @@
 "use client";
 
+import { useId } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { useExecutiveFilters } from "./executive-filter-provider";
@@ -46,6 +47,10 @@ function resolvePresetRange(preset: string): { from: string; to: string } {
 }
 
 export function DateRangeSelector() {
+  const idBase = useId();
+  const presetSelectId = `${idBase}-preset`;
+  const startDateInputId = `${idBase}-from`;
+  const endDateInputId = `${idBase}-to`;
   const { query, updateQuery } = useExecutiveFilters();
   const activePreset = query.get("preset") ?? "last_30_days";
   const from = query.get("from") ?? "";
@@ -54,7 +59,7 @@ export function DateRangeSelector() {
   return (
     <div className="flex flex-wrap items-end gap-3">
       <div className="min-w-[180px]">
-        <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+        <label htmlFor={presetSelectId} className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
           Range preset
         </label>
         <Select
@@ -68,7 +73,7 @@ export function DateRangeSelector() {
             });
           }}
         >
-          <SelectTrigger className="w-[180px] bg-white">
+          <SelectTrigger id={presetSelectId} className="w-[180px] bg-white">
             <SelectValue placeholder="Select range" />
           </SelectTrigger>
           <SelectContent>
@@ -81,10 +86,11 @@ export function DateRangeSelector() {
         </Select>
       </div>
       <div className="min-w-[148px]">
-        <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+        <label htmlFor={startDateInputId} className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
           From
         </label>
         <Input
+          id={startDateInputId}
           type="date"
           value={from}
           onChange={(event) =>
@@ -96,10 +102,11 @@ export function DateRangeSelector() {
         />
       </div>
       <div className="min-w-[148px]">
-        <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+        <label htmlFor={endDateInputId} className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
           To
         </label>
         <Input
+          id={endDateInputId}
           type="date"
           value={to}
           onChange={(event) =>
