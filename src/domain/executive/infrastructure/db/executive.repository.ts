@@ -1259,7 +1259,7 @@ export class DrizzleExecutiveReadRepository implements ExecutiveReadRepository {
         where u.created_at between ${from} and ${to}
       )
       select to_char(cohort, 'YYYY-MM') as cohort,
-             count(distinct user_id) as users,
+             count(distinct cohorts.user_id) as users,
              count(distinct pse.user_id) as retained_users
       from cohorts
       left join courses.progress_sync_events pse
