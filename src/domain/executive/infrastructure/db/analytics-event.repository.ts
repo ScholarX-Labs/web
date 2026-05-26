@@ -173,7 +173,7 @@ export async function getAiSearchAnalyticsSnapshot(
   const resultCountInt = sql<number>`
     case
       when (${dbExecutiveAnalyticsEvents.metadata}->>'resultCount') ~ '^-?[0-9]+$'
-        then (${dbExecutiveAnalyticsEvents.metadata}->>'resultCount')::int
+        then (${dbExecutiveAnalyticsEvents.metadata}->>'resultCount')::numeric
       else null
     end
   `;
