@@ -3,6 +3,7 @@ import { createExecutiveDomain } from "@/domain/executive";
 import { executivePageQuerySchema } from "@/domain/executive/contracts/executive-query.schemas";
 import type { OpportunitiesAiReadModel } from "@/domain/executive/contracts/executive-read-repository.contract";
 import { FreshnessBadge } from "@/components/executive/sections/freshness-badge";
+import { ExportButton } from "@/components/executive/sections/export-button";
 import { MetricCard } from "@/components/executive/sections/metric-card";
 import { AiQualitySection } from "@/components/executive/sections/ai-quality-section";
 import { AiUsageTable } from "@/components/executive/tables/ai-usage-table";
@@ -107,10 +108,13 @@ export default async function OpportunitiesAiPage({ searchParams }: PageProps) {
             {opportunities.query.from} to {opportunities.query.to}
           </p>
         </div>
-        <FreshnessBadge
-          status={opportunities.sections.opportunityCleanupQueue.state.freshness}
-          lastSuccessfulAt={opportunities.sections.opportunityCleanupQueue.state.lastSuccessfulAt}
-        />
+        <div className="flex items-center gap-2">
+          <ExportButton pageId="opportunities_ai" query={opportunities.query} />
+          <FreshnessBadge
+            status={opportunities.sections.opportunityCleanupQueue.state.freshness}
+            lastSuccessfulAt={opportunities.sections.opportunityCleanupQueue.state.lastSuccessfulAt}
+          />
+        </div>
       </header>
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4" aria-label="Opportunity and AI metrics">

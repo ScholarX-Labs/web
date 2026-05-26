@@ -3,6 +3,7 @@ import { createExecutiveDomain } from "@/domain/executive";
 import { executivePageQuerySchema } from "@/domain/executive/contracts/executive-query.schemas";
 import type { TechnicalHealthReadModel } from "@/domain/executive/contracts/executive-read-repository.contract";
 import { FreshnessBadge } from "@/components/executive/sections/freshness-badge";
+import { ExportButton } from "@/components/executive/sections/export-button";
 import { FreshnessGrid } from "@/components/executive/sections/freshness-grid";
 import { AdminAuditTable } from "@/components/executive/tables/admin-audit-table";
 import { BarChart } from "@/components/executive/charts/bar-chart";
@@ -98,10 +99,13 @@ export default async function ExecutiveTechnicalHealthPage({
             {health.query.from} to {health.query.to}
           </p>
         </div>
-        <FreshnessBadge
-          status={health.sections.freshnessGrid.state.freshness}
-          lastSuccessfulAt={health.sections.freshnessGrid.state.lastSuccessfulAt}
-        />
+        <div className="flex items-center gap-2">
+          <ExportButton pageId="technical_health" query={health.query} />
+          <FreshnessBadge
+            status={health.sections.freshnessGrid.state.freshness}
+            lastSuccessfulAt={health.sections.freshnessGrid.state.lastSuccessfulAt}
+          />
+        </div>
       </header>
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4" aria-label="Technical health counters">

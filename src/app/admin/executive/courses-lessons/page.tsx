@@ -7,6 +7,7 @@ import type {
 } from "@/domain/executive/contracts/executive-read-repository.contract";
 import { MetricCard } from "@/components/executive/sections/metric-card";
 import { FreshnessBadge } from "@/components/executive/sections/freshness-badge";
+import { ExportButton } from "@/components/executive/sections/export-button";
 import { BarChart } from "@/components/executive/charts/bar-chart";
 import { FunnelChart } from "@/components/executive/charts/funnel-chart";
 import { CourseLeaderboardTable } from "@/components/executive/tables/course-leaderboard-table";
@@ -96,10 +97,13 @@ export default async function CoursesLessonsPage({ searchParams }: PageProps) {
             {courses.query.courseCategory ? ` · Category: ${courses.query.courseCategory}` : ""}
           </p>
         </div>
-        <FreshnessBadge
-          status={courses.sections.courseLeaderboard.state.freshness}
-          lastSuccessfulAt={courses.sections.courseLeaderboard.state.lastSuccessfulAt}
-        />
+        <div className="flex items-center gap-2">
+          <ExportButton pageId="courses_lessons" query={courses.query} />
+          <FreshnessBadge
+            status={courses.sections.courseLeaderboard.state.freshness}
+            lastSuccessfulAt={courses.sections.courseLeaderboard.state.lastSuccessfulAt}
+          />
+        </div>
       </header>
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4" aria-label="Course analytics key metrics">

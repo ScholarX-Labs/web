@@ -6,6 +6,7 @@ import type { ActionCenterReadModel } from "@/domain/executive/contracts/action-
 import type { TeamOperationsReadModel } from "@/domain/executive/contracts/executive-read-repository.contract";
 import { ActionItemsTable } from "@/components/executive/tables/action-items-table";
 import { FreshnessBadge } from "@/components/executive/sections/freshness-badge";
+import { ExportButton } from "@/components/executive/sections/export-button";
 import { SalesPipelineTable } from "@/components/executive/tables/sales-pipeline-table";
 
 export const dynamic = "force-dynamic";
@@ -73,7 +74,10 @@ export default async function ExecutiveActionCenterPage({
             Prioritized operational queue for unresolved executive signals.
           </p>
         </div>
-        <FreshnessBadge status="current" lastSuccessfulAt={actionCenter.generatedAt} />
+        <div className="flex items-center gap-2">
+          <ExportButton pageId="action_center" query={teamOperations.query} />
+          <FreshnessBadge status="current" lastSuccessfulAt={actionCenter.generatedAt} />
+        </div>
       </header>
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4" aria-label="Action Center severity summary">

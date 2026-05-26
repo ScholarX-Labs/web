@@ -3,6 +3,7 @@ import { createExecutiveDomain } from "@/domain/executive";
 import { executivePageQuerySchema } from "@/domain/executive/contracts/executive-query.schemas";
 import type { PublicGrowthReadModel } from "@/domain/executive/contracts/executive-read-repository.contract";
 import { FreshnessBadge } from "@/components/executive/sections/freshness-badge";
+import { ExportButton } from "@/components/executive/sections/export-button";
 import { MetricCard } from "@/components/executive/sections/metric-card";
 import { GrowthFunnel } from "@/components/executive/sections/growth-funnel";
 import { WebsiteFunnel } from "@/components/executive/sections/website-funnel";
@@ -77,10 +78,13 @@ export default async function PublicGrowthPage({ searchParams }: PageProps) {
             {growth.query.from} to {growth.query.to}
           </p>
         </div>
-        <FreshnessBadge
-          status={growth.sections.growthFunnel.state.freshness}
-          lastSuccessfulAt={growth.sections.growthFunnel.state.lastSuccessfulAt}
-        />
+        <div className="flex items-center gap-2">
+          <ExportButton pageId="public_growth" query={growth.query} />
+          <FreshnessBadge
+            status={growth.sections.growthFunnel.state.freshness}
+            lastSuccessfulAt={growth.sections.growthFunnel.state.lastSuccessfulAt}
+          />
+        </div>
       </header>
 
       <section className="grid gap-4 md:grid-cols-2" aria-label="Growth conversion metrics">

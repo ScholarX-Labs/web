@@ -5,6 +5,7 @@ import type { OverviewReadModel } from "@/domain/executive/contracts/executive-r
 import { MetricCard } from "@/components/executive/sections/metric-card";
 import { SectionState } from "@/components/executive/sections/section-state";
 import { FreshnessBadge } from "@/components/executive/sections/freshness-badge";
+import { ExportButton } from "@/components/executive/sections/export-button";
 import { AreaChart } from "@/components/executive/charts/area-chart";
 import { FunnelChart } from "@/components/executive/charts/funnel-chart";
 
@@ -95,10 +96,13 @@ export default async function ExecutiveOverviewPage({ searchParams }: PageProps)
             {overview.query.from} to {overview.query.to}
           </p>
         </div>
-        <FreshnessBadge
-          status={overview.sections.revenueTrend.state.freshness}
-          lastSuccessfulAt={overview.sections.revenueTrend.state.lastSuccessfulAt}
-        />
+        <div className="flex items-center gap-2">
+          <ExportButton pageId="overview" query={overview.query} />
+          <FreshnessBadge
+            status={overview.sections.revenueTrend.state.freshness}
+            lastSuccessfulAt={overview.sections.revenueTrend.state.lastSuccessfulAt}
+          />
+        </div>
       </header>
 
       <section

@@ -4,6 +4,7 @@ import { executivePageQuerySchema } from "@/domain/executive/contracts/executive
 import type { UsersReadModel } from "@/domain/executive/contracts/executive-read-repository.contract";
 import { MetricCard } from "@/components/executive/sections/metric-card";
 import { FreshnessBadge } from "@/components/executive/sections/freshness-badge";
+import { ExportButton } from "@/components/executive/sections/export-button";
 import { SectionState } from "@/components/executive/sections/section-state";
 import { BarChart } from "@/components/executive/charts/bar-chart";
 import { Heatmap } from "@/components/executive/charts/heatmap";
@@ -93,10 +94,13 @@ export default async function ExecutiveUsersPage({ searchParams }: PageProps) {
             {users.query.userRole ? ` · Role: ${users.query.userRole}` : ""}
           </p>
         </div>
-        <FreshnessBadge
-          status={users.sections.growthTrend.state.freshness}
-          lastSuccessfulAt={users.sections.growthTrend.state.lastSuccessfulAt}
-        />
+        <div className="flex items-center gap-2">
+          <ExportButton pageId="users" query={users.query} />
+          <FreshnessBadge
+            status={users.sections.growthTrend.state.freshness}
+            lastSuccessfulAt={users.sections.growthTrend.state.lastSuccessfulAt}
+          />
+        </div>
       </header>
 
       <section
