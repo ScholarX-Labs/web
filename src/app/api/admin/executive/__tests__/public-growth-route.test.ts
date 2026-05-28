@@ -109,5 +109,7 @@ test("GET public growth returns growth and website funnels", async () => {
   assert.equal(body.data.pageId, "public_growth");
   assert.equal(body.data.sections.growthFunnel.chartType, "funnel");
   assert.equal(body.data.sections.websiteFunnel.points[0].value, 100);
+  assert.equal(body.data.sections.websiteAnalyticsSummary.signupStarts, 50);
+  assert.equal(body.data.sections.websiteAnalyticsSummary.signupConversionRate, 0.25);
   assert.equal(body.data.sections.publicImpactMetrics.length, 1);
 });
