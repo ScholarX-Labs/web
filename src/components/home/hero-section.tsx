@@ -7,8 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { ArrowRight, ShieldCheck, GraduationCap, UsersRound } from "lucide-react";
+import { useCtaTracking } from "@/components/analytics/use-cta-tracking";
 
 export const HeroSection = memo(function HeroSection() {
+  const trackCta = useCtaTracking();
+
   return (
     <section className="relative flex min-h-[min(100vh,800px)] items-center overflow-hidden bg-background px-6 py-24 md:px-12 md:py-32">
       {/* Subtle Grid Background */}
@@ -61,7 +64,17 @@ export const HeroSection = memo(function HeroSection() {
                       : "border border-[var(--color-hero-blue)]/20 bg-white/80 text-[var(--color-hero-heading)] shadow-[0_16px_36px_-24px_rgba(26,43,73,0.55)] backdrop-blur-xl hover:border-[var(--color-hero-blue)]/45 hover:bg-white hover:text-[var(--color-hero-blue)] hover:shadow-[0_22px_46px_-26px_rgba(51,153,204,0.65)] active:translate-y-0 dark:bg-white/10 dark:text-white dark:hover:bg-white/15",
                   )}
                 >
-                  <Link href={button.link}>
+                  <Link
+                    href={button.link}
+                    onClick={() => {
+                      trackCta({
+                        ctaId: button.id,
+                        ctaLabel: button.text,
+                        ctaPlacement: "home_hero",
+                        destination: button.link,
+                      });
+                    }}
+                  >
                     {isPrimary ? (
                       <>
                         <span className="absolute inset-0 bg-[linear-gradient(135deg,var(--color-hero-blue)_0%,#2563eb_48%,var(--color-hero-orange)_100%)]" />

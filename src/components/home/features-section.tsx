@@ -4,9 +4,11 @@ import React, { memo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { FEATURES_CONTENT, FEATURES_LIST } from "@/lib/home-data";
+import { useCtaTracking } from "@/components/analytics/use-cta-tracking";
 
 export const FeaturesSection = memo(function FeaturesSection() {
   const Icon = FEATURES_CONTENT.cta.icon;
+  const trackCta = useCtaTracking();
 
   return (
     <section className="relative overflow-hidden bg-white px-8 py-25 md:px-5 md:py-15 max-sm:py-12 max-sm:px-4">
@@ -46,6 +48,14 @@ export const FeaturesSection = memo(function FeaturesSection() {
 
           <Link
             href={FEATURES_CONTENT.cta.link}
+            onClick={() => {
+              trackCta({
+                ctaId: "features_primary_cta",
+                ctaLabel: FEATURES_CONTENT.cta.text,
+                ctaPlacement: "home_features",
+                destination: FEATURES_CONTENT.cta.link,
+              });
+            }}
             className="group relative inline-flex animate-[fadeInUp_0.6s_ease-out_0.6s_both] items-center gap-2.5 overflow-hidden rounded-xl border-none bg-gradient-to-br from-[#3399CC] to-[#2980b9] px-8 py-3.5 text-base font-semibold text-white shadow-[0_6px_20px_rgba(51,153,204,0.3)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(51,153,204,0.4)] active:-translate-y-px max-md:w-full max-md:justify-center"
           >
             <span className="absolute inset-0 bg-gradient-to-br from-transparent to-white/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
