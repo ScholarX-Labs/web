@@ -11,9 +11,8 @@ export async function trackClientEvent(input: AnalyticsEventInput): Promise<void
 
   await dispatchFailOpen(async () => {
     // PostHog is initialized centrally in provider/instrumentation files.
-    if ((posthog as { __loaded?: boolean }).__loaded) {
-      posthog.capture(input.event, properties);
-    }
+    // Avoid relying on private readiness flags; capture is safe to call directly.
+    posthog.capture(input.event, properties);
   }, "posthog_capture");
 
   if (shouldMirrorEvent(input.event)) {
