@@ -19,6 +19,7 @@ export type ExecutiveAnalyticsEventType =
   | "website_visit"
   | "cta_click"
   | "signup_started"
+  | "signup_completed"
   | "ai_search"
   | "opportunity_apply_click"
   | "opportunity_link_check"
