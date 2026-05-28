@@ -5,6 +5,12 @@ import OpportunityModal from "./OpportunityModal";
 import { COLOR_MAP, getBadgeColors } from "@/lib/opportunities/colors";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import {
+  trackOpportunityApplyClick,
+  trackOpportunitySave,
+} from "@/lib/opportunities/opportunity-analytics";
+import { trackClientEvent } from "@/lib/executive/analytics/client";
+import { ANALYTICS_EVENTS } from "@/lib/executive/analytics/constants";
 
 const FUNDING_DISPLAY_NAME: Record<Funding, string> = {
   [Funding.FullyFunded]: "Fully Funded",
@@ -25,6 +31,15 @@ function OpportiuntyCard({ Opportunity }: { Opportunity: Opportunity }) {
     cardElement.style.opacity = "0.3";
     
     setIsModalOpen(true);
+    if (Opportunity.id) {
+      void trackClientEvent({
+        event: ANALYTICS_EVENTS.OPPORTUNITY_VIEW,
+        properties: {
+          opportunity_id: Opportunity.id,
+          source: "opportunities_grid",
+        },
+      });
+    }
   };
 
   const handleClose = () => {
@@ -88,7 +103,9 @@ function OpportiuntyCard({ Opportunity }: { Opportunity: Opportunity }) {
             className="rounded-full p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
             onClick={(e) => {
               e.stopPropagation();
-              // TODO: Implement archiving
+              if (Opportunity.id) {
+                trackOpportunitySave(Opportunity.id, "opportunities_grid");
+              }
             }}
           >
             <Bookmark size={20} />
@@ -168,6 +185,11 @@ function OpportiuntyCard({ Opportunity }: { Opportunity: Opportunity }) {
             opportunity={Opportunity}
             isOpen={isModalOpen}
             originRect={originRect}
+            onApply={() => {
+              if (Opportunity.id) {
+                trackOpportunityApplyClick(Opportunity.id, "opportunities_modal");
+              }
+            }}
             onClose={handleClose}
           />
         )}

@@ -26,6 +26,8 @@ const optionalBooleanString = z.preprocess(
 const envSchema = z.object({
   NEXT_PUBLIC_API_URL: z.string().min(1).default("/api"),
   NEXT_PUBLIC_API_BASE_URL: z.string().min(1).default("/api"),
+  NEXT_PUBLIC_POSTHOG_KEY: optionalString,
+  NEXT_PUBLIC_POSTHOG_HOST: optionalUrl,
 
   R2_ENDPOINT: optionalUrl,
   R2_ACCESS_KEY: optionalString,
@@ -56,6 +58,8 @@ const envSchema = z.object({
   SCHOLARX_EXECUTIVE_FINANCE_ENABLED: optionalBooleanString,
   SCHOLARX_EXECUTIVE_GOVERNANCE_ENABLED: optionalBooleanString,
   SCHOLARX_EXECUTIVE_AI_HEATMAP_ENABLED: optionalBooleanString,
+  SCHOLARX_ANALYTICS_ENABLED: optionalBooleanString,
+  SCHOLARX_ANALYTICS_INTERNAL_MIRROR_ENABLED: optionalBooleanString,
 
   BETTER_AUTH_URL: optionalUrl,
   BETTER_AUTH_SECRET: z.preprocess(

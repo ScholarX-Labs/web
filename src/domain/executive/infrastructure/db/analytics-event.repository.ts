@@ -23,6 +23,10 @@ export interface AnalyticsEventRepository {
   record(input: AnalyticsEventInput): Promise<string>;
 }
 
+type AnalyticsQueryClient = {
+  select: (...args: unknown[]) => any;
+};
+
 export class DrizzleAnalyticsEventRepository implements AnalyticsEventRepository {
   async record(input: AnalyticsEventInput): Promise<string> {
     const rows = await db
@@ -57,10 +61,11 @@ function fallbackLabel(value: string | null, fallback: string): string {
 export async function getWebsiteAnalyticsSnapshot(
   from: Date,
   to: Date,
+  database: AnalyticsQueryClient = db,
 ): Promise<WebsiteAnalyticsSnapshot> {
   const [trafficRows, deviceRows, campaignRows, ctaRows, ctaCountRows] =
     await Promise.all([
-      db
+      database
         .select({
           label: dbExecutiveAnalyticsEvents.source,
           visits: count(),
@@ -76,7 +81,7 @@ export async function getWebsiteAnalyticsSnapshot(
         .groupBy(dbExecutiveAnalyticsEvents.source)
         .orderBy(desc(count()))
         .limit(10),
-      db
+      database
         .select({
           label: dbExecutiveAnalyticsEvents.deviceType,
           visits: count(),
@@ -92,7 +97,7 @@ export async function getWebsiteAnalyticsSnapshot(
         .groupBy(dbExecutiveAnalyticsEvents.deviceType)
         .orderBy(desc(count()))
         .limit(10),
-      db
+      database
         .select({
           label: dbExecutiveAnalyticsEvents.campaign,
           visits: count(),
@@ -108,7 +113,7 @@ export async function getWebsiteAnalyticsSnapshot(
         .groupBy(dbExecutiveAnalyticsEvents.campaign)
         .orderBy(desc(count()))
         .limit(10),
-      db
+      database
         .select({
           ctaId: sql<string>`coalesce(nullif(${dbExecutiveAnalyticsEvents.metadata}->>'ctaId', ''), coalesce(${dbExecutiveAnalyticsEvents.entityId}, 'unknown'))`,
           label: sql<string>`coalesce(nullif(${dbExecutiveAnalyticsEvents.metadata}->>'label', ''), nullif(${dbExecutiveAnalyticsEvents.metadata}->>'ctaLabel', ''), coalesce(${dbExecutiveAnalyticsEvents.entityId}, 'Unknown CTA'))`,
@@ -128,7 +133,7 @@ export async function getWebsiteAnalyticsSnapshot(
         )
         .orderBy(desc(count()))
         .limit(10),
-      db
+      database
         .select({
           eventType: dbExecutiveAnalyticsEvents.eventType,
           value: count(),
@@ -145,19 +150,19 @@ export async function getWebsiteAnalyticsSnapshot(
     ]);
 
   return {
-    trafficSources: trafficRows.map((row) => ({
+    trafficSources: trafficRows.map((row: { label: string | null; visits: unknown }) => ({
       label: fallbackLabel(row.label, "direct"),
       visits: numeric(row.visits),
     })),
-    deviceBreakdown: deviceRows.map((row) => ({
+    deviceBreakdown: deviceRows.map((row: { label: string | null; visits: unknown }) => ({
       label: fallbackLabel(row.label, "unknown"),
       visits: numeric(row.visits),
     })),
-    campaignPerformance: campaignRows.map((row) => ({
+    campaignPerformance: campaignRows.map((row: { label: string | null; visits: unknown }) => ({
       label: fallbackLabel(row.label, "unattributed"),
       visits: numeric(row.visits),
     })),
-    ctaPerformance: ctaRows.map((row) => ({
+    ctaPerformance: ctaRows.map((row: { ctaId: string; label: string; clicks: unknown }) => ({
       ctaId: row.ctaId,
       label: row.label,
       clicks: numeric(row.clicks),

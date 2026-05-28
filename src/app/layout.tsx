@@ -7,6 +7,7 @@ import { isDevAuthBypassEnabled } from "@/config/dev-auth-bypass";
 import Footer from "@/components/Footer";
 import PremiumHeader from "@/components/PremiumHeader";
 import { GlobalShellExclusions } from "@/components/global-shell-exclusions";
+import { AnalyticsTracker } from "@/components/analytics/analytics-tracker";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -52,6 +53,7 @@ export default async function RootLayout({
           </GlobalShellExclusions>
           <AppProviders>
             <TooltipProvider>
+              <AnalyticsTracker />
               {isDevAuthBypassEnabled ? (
                 <div className="w-full bg-amber-200 px-4 py-2 text-center text-xs font-semibold tracking-wide text-amber-950">
                   DEV_AUTH_BYPASS is ON: authentication and route protection are

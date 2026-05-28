@@ -13,9 +13,11 @@ const HOME_DATA = {
 import { sectionReveal, tapScale } from "@/lib/motion-variants";
 import Link from "next/link";
 import { GlassPanel } from "@/components/ui/glass-panel";
+import { useCtaTracking } from "@/components/analytics/use-cta-tracking";
 
 export function HomeCTASection() {
   const { headline, subline, buttonLabel, buttonHref } = HOME_DATA.cta;
+  const trackCta = useCtaTracking();
 
   return (
     <section className="py-24 bg-background relative overflow-hidden flex flex-col items-center justify-center px-4">
@@ -40,6 +42,14 @@ export function HomeCTASection() {
             <motion.div whileHover={tapScale.whileHover} whileTap={tapScale.whileTap}>
               <Link 
                 href={buttonHref}
+                onClick={() => {
+                  trackCta({
+                    ctaId: "home_bottom_cta",
+                    ctaLabel: buttonLabel,
+                    ctaPlacement: "home_footer_cta",
+                    destination: buttonHref,
+                  });
+                }}
                 className="inline-flex h-14 items-center justify-center rounded-xl bg-white px-10 text-base font-bold text-[#0a0f1e] transition-colors hover:bg-white/90 shadow-[0_0_20px_rgba(255,255,255,0.2)]"
               >
                 {buttonLabel}

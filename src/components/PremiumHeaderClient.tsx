@@ -28,6 +28,7 @@ import { cn } from "@/lib/utils";
 import { useScrollDirection } from "@/hooks/use-scroll-direction";
 import SignoutButton from "@/app/auth/_components/SignoutButton";
 import { Button } from "@/components/ui/button";
+import { useCtaTracking } from "@/components/analytics/use-cta-tracking";
 
 const SCHOLARX_HORIZONTAL_LOGO =
   "/ScholarX-Logo-horizontal-Blue-Solid-Small_ScholarX.png";
@@ -221,6 +222,8 @@ function NavLinks({ isActive }: { isActive: (href: string) => boolean }) {
 }
 
 function AuthButtons({ isLoggedIn }: { isLoggedIn: boolean }) {
+  const trackCta = useCtaTracking();
+
   if (isLoggedIn) {
     return (
       <div className="flex items-center gap-3">
@@ -241,6 +244,14 @@ function AuthButtons({ isLoggedIn }: { isLoggedIn: boolean }) {
     <div className="hidden lg:flex items-center gap-3">
       <Link
         href={ROUTES.SIGNIN}
+        onClick={() => {
+          trackCta({
+            ctaId: "header_login",
+            ctaLabel: "Log in",
+            ctaPlacement: "header_auth",
+            destination: ROUTES.SIGNIN,
+          });
+        }}
         className="group inline-flex h-10 items-center gap-2 rounded-full border border-[var(--color-hero-blue)]/15 bg-white/75 px-4 text-sm font-semibold text-[var(--color-hero-heading)] shadow-sm backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--color-hero-blue)]/30 hover:bg-[var(--color-hero-blue)]/6 hover:text-[var(--color-hero-blue)] hover:shadow-[0_16px_32px_-24px_rgba(51,153,204,0.75)]"
       >
         <LogIn className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
@@ -251,7 +262,17 @@ function AuthButtons({ isLoggedIn }: { isLoggedIn: boolean }) {
         size="sm"
         className="group h-10 rounded-full bg-[linear-gradient(135deg,var(--color-hero-blue)_0%,#2563eb_60%,var(--color-hero-orange)_100%)] px-5 text-sm font-semibold text-white shadow-[0_18px_36px_-18px_rgba(51,153,204,0.9)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_22px_44px_-20px_rgba(51,153,204,1)]"
       >
-        <Link href={ROUTES.SIGNUP}>
+        <Link
+          href={ROUTES.SIGNUP}
+          onClick={() => {
+            trackCta({
+              ctaId: "header_signup",
+              ctaLabel: "Sign up",
+              ctaPlacement: "header_auth",
+              destination: ROUTES.SIGNUP,
+            });
+          }}
+        >
           Sign up
           <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
         </Link>

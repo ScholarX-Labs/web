@@ -62,3 +62,28 @@ test("website analytics marks missing instrumentation as data gap", () => {
   assert.equal(model.sections.ctaPerformance.state.status, "data_gap");
   assert.equal(model.freshnessSummary.unavailable, 5);
 });
+
+test("website analytics treats true zero values as ready, not data gap", () => {
+  const service = new ExecutiveDashboardService();
+  const model = service.buildPublicGrowthReadModel({
+    query,
+    current: {
+      websiteVisits: 0,
+      signupStarts: 0,
+      signups: 0,
+      enrollments: 0,
+      completions: 0,
+      opportunityActions: 0,
+    },
+    websiteAnalytics: {
+      trafficSources: [],
+      deviceBreakdown: [],
+      campaignPerformance: [],
+      ctaPerformance: [],
+      ctaClicks: 0,
+    },
+  });
+
+  assert.equal(model.sections.websiteAnalyticsSummary.state.status, "ready");
+  assert.equal(model.sections.websiteFunnel.state.status, "ready");
+});

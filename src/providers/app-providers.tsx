@@ -5,6 +5,7 @@ import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Toaster } from "sonner";
 import { useState, lazy, Suspense } from "react";
 import { VidstackProviderRejectionBoundary } from "./vidstack-provider-rejection-boundary";
+import { PostHogProvider } from "./posthog-provider";
 
 const ReactQueryDevtools =
   process.env.NODE_ENV === "development"
@@ -48,6 +49,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(getQueryClient);
 
   return (
+    <PostHogProvider>
     <QueryClientProvider client={queryClient}>
       <NuqsAdapter>
         {children}
@@ -62,5 +64,6 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
         )}
       </NuqsAdapter>
     </QueryClientProvider>
+    </PostHogProvider>
   );
 }

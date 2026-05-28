@@ -13,6 +13,7 @@ interface OpportunityModalProps {
   opportunity: Opportunity;
   isOpen: boolean;
   originRect?: DOMRect | null;
+  onApply?: () => void;
   onClose: () => void;
 }
 
@@ -87,6 +88,7 @@ export default function OpportunityModal({
   opportunity,
   isOpen,
   originRect,
+  onApply,
   onClose,
 }: OpportunityModalProps) {
   const [mounted, setMounted] = useState(false);
@@ -426,6 +428,7 @@ export default function OpportunityModal({
                 href={opportunity.applicationLink}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={onApply}
                 className="px-6 py-3 sm:px-8 sm:py-4 bg-primary text-white rounded-xl sm:rounded-2xl font-black text-sm sm:text-base shadow-[0_10px_25px_-5px_rgba(30,64,175,0.4)] hover:shadow-[0_20px_40px_-5px_rgba(30,64,175,0.5)] transition-all flex items-center justify-center gap-2 sm:gap-3"
               >
                 <span>Apply Now</span>

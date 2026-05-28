@@ -7,6 +7,10 @@ import { toast } from "sonner";
 
 import { toggleSavedOpportunity } from "@/actions/user.actions";
 import { useSession } from "@/lib/auth-client";
+import {
+  trackOpportunityApplyClick,
+  trackOpportunitySave,
+} from "@/lib/opportunities/opportunity-analytics";
 
 import { Opportunity } from "@/components/ai-search/types";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -83,9 +87,20 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
       try {
         const result = await toggleSavedOpportunity(opportunity.id, newState ? "save" : "unsave");
         if (!result.success) {
+          console.error("opportunity.save: persistence failed", {
+            opportunityId: opportunity.id,
+            action: newState ? "save" : "unsave",
+            error: result.error,
+          });
           toast.error(result.error || "Failed to update saved status. Please try again.");
+          return;
         }
-      } catch {
+
+        if (newState) {
+          trackOpportunitySave(opportunity.id, "ai_search_card");
+        }
+      } catch (error) {
+        console.error("opportunity.save: unexpected persistence error", error);
         toast.error("An unexpected error occurred. Please try again.");
       }
     });
@@ -178,6 +193,9 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
               href={opportunity.applicationLink}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => {
+                trackOpportunityApplyClick(opportunity.id, "ai_search_card");
+              }}
             >
               Apply Now
               <ArrowRight className="ml-1.5 size-3.5 transition-transform duration-300 group-hover:translate-x-1" />

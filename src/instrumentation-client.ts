@@ -1,7 +1,20 @@
 import * as Sentry from "@sentry/nextjs";
+import posthog from "posthog-js";
+
+type PostHogInitConfigWithReplay = Parameters<typeof posthog.init>[1] & {
+  enable_session_recording: boolean;
+};
+
+posthog.init(process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN!, {
+  api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
+  defaults: "2026-01-30",
+  enable_session_recording: true,
+} as PostHogInitConfigWithReplay);
 
 if (!process.env.NEXT_PUBLIC_SENTRY_DSN) {
-  console.error("Missing NEXT_PUBLIC_SENTRY_DSN — skipping Sentry.init for client instrumentation");
+  console.error(
+    "Missing NEXT_PUBLIC_SENTRY_DSN — skipping Sentry.init for client instrumentation",
+  );
 } else {
   Sentry.init({
     dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,

@@ -597,6 +597,12 @@ function toIsoOrNull(value: Date | string | null | undefined): string | null {
   return value ? toDate(value).toISOString() : null;
 }
 
+function hasMissingWebsiteSignal(current: GrowthFunnelSnapshot): boolean {
+  return current.websiteVisits === null
+    || current.signupStarts === null
+    || current.opportunityActions === null;
+}
+
 export class ExecutiveDashboardService {
   private readonly financeSortKeys = new Set([
     "title",
@@ -1995,7 +2001,8 @@ export class ExecutiveDashboardService {
         calculations: this.calculations,
       }),
     ];
-    const websiteHasGap = websitePoints.some((point) => point.value === null);
+    // True-zero counts are valid; only missing/null instrumentation indicates a data gap.
+    const websiteHasGap = hasMissingWebsiteSignal(current);
     const websiteAnalyticsState: ExecutiveSectionState = websiteHasGap
       ? {
         ...sectionState,

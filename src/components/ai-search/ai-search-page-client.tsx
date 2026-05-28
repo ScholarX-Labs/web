@@ -13,6 +13,7 @@ import { ChatInput } from "@/components/ai-search/chat-input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAiChatStore } from "@/stores/ai-chat.store";
+import { trackAiSearchResult } from "@/lib/ai/ai-search-analytics";
 
 function createId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -49,6 +50,7 @@ export function AiSearchPageClient() {
 
     setDraft("");
     setStreaming(true);
+    const startedAt = Date.now();
 
     try {
       const response = await fetch(
@@ -72,6 +74,7 @@ export function AiSearchPageClient() {
       }
 
       const data = await response.json();
+      const latencyMs = Date.now() - startedAt;
 
       const mappedOpportunities = (data.results || []).map(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -112,8 +115,20 @@ export function AiSearchPageClient() {
         text: `Here are the top ${mappedOpportunities.length} opportunities I found based on your semantic query.`,
         opportunities: mappedOpportunities,
       });
+      trackAiSearchResult({
+        query: value,
+        resultCount: mappedOpportunities.length,
+        latencyMs,
+        ok: true,
+      });
     } catch (error) {
       console.error(error);
+      trackAiSearchResult({
+        query: value,
+        resultCount: 0,
+        latencyMs: Date.now() - startedAt,
+        ok: false,
+      });
       addMessage({
         id: createId(),
         role: "assistant",
