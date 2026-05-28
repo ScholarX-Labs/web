@@ -23,12 +23,17 @@ function PostHogPageView() {
 }
 
 if (typeof window !== "undefined") {
-  posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
-    api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
-    ui_host: process.env.NEXT_PUBLIC_POSTHOG_UI_HOST,
-    capture_pageview: false,
-    capture_pageleave: true,
-  });
+  const key = process.env.NEXT_PUBLIC_POSTHOG_KEY;
+  if (!key) {
+    console.warn("posthog.init skipped: NEXT_PUBLIC_POSTHOG_KEY is missing");
+  } else {
+    posthog.init(key, {
+      api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
+      ui_host: process.env.NEXT_PUBLIC_POSTHOG_UI_HOST,
+      capture_pageview: false,
+      capture_pageleave: true,
+    });
+  }
 }
 
 export function PostHogProvider({ children }: { children: React.ReactNode }) {
