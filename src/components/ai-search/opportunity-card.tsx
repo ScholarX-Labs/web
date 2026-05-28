@@ -84,15 +84,23 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
     const newState = !optimisticSaved;
     startTransition(async () => {
       addOptimisticSaved(newState);
-      if (newState) {
-        trackOpportunitySave(opportunity.id, "ai_search_card");
-      }
       try {
         const result = await toggleSavedOpportunity(opportunity.id, newState ? "save" : "unsave");
         if (!result.success) {
+          console.error("opportunity.save: persistence failed", {
+            opportunityId: opportunity.id,
+            action: newState ? "save" : "unsave",
+            error: result.error,
+          });
           toast.error(result.error || "Failed to update saved status. Please try again.");
+          return;
         }
-      } catch {
+
+        if (newState) {
+          trackOpportunitySave(opportunity.id, "ai_search_card");
+        }
+      } catch (error) {
+        console.error("opportunity.save: unexpected persistence error", error);
         toast.error("An unexpected error occurred. Please try again.");
       }
     });
