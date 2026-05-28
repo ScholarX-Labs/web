@@ -9,16 +9,20 @@ const FORBIDDEN_KEYS = [
   "authorization",
 ] as const;
 
+const FORBIDDEN_KEYS_NORMALIZED = new Set(
+  FORBIDDEN_KEYS.map((key) => key.toLowerCase()),
+);
+
 export function sanitizeAnalyticsProperties(
   input: AnalyticsProperties = {},
 ): AnalyticsProperties {
   const safe: AnalyticsProperties = {};
   for (const [key, value] of Object.entries(input)) {
-    if (FORBIDDEN_KEYS.includes(key as (typeof FORBIDDEN_KEYS)[number])) {
+    const normalizedKey = key.toLowerCase();
+    if (FORBIDDEN_KEYS_NORMALIZED.has(normalizedKey)) {
       continue;
     }
     safe[key] = value;
   }
   return safe;
 }
-
