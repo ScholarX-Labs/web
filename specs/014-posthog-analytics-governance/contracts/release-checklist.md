@@ -11,6 +11,8 @@ Complete this checklist before shipping analytics contract changes.
 - [ ] Tests passed:
   - [ ] `pnpm run typecheck`
   - [ ] `pnpm run test`
+  - [ ] `node --import tsx --test tests/e2e/**/*.spec.ts`
+  - [ ] E2E tests passed for critical event flows (confirm signup path, opportunity actions path, and search event path; include `tests/e2e/analytics-opportunity-search.spec.ts` in the run).
 - [ ] Change log entry completed from `change-log-template.md`.
 - [ ] Rollout plan defined (flags, shadow mode, monitoring).
 - [ ] Rollback plan documented.
