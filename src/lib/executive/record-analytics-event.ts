@@ -35,6 +35,14 @@ export async function recordAnalyticsEvent(
       metadata,
     });
   } catch (error) {
-    console.warn("recordAnalyticsEvent: non-blocking write failure", error);
+    const errorName = error instanceof Error ? error.name : "UnknownError";
+    const errorMessage = error instanceof Error
+      ? error.message
+      : "Unknown analytics write failure";
+    console.warn("recordAnalyticsEvent: non-blocking write failure", {
+      eventType: input.eventType,
+      errorName,
+      errorMessage,
+    });
   }
 }
