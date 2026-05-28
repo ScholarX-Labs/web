@@ -6,6 +6,8 @@ export type ExecutiveFeatureFlags = {
   EXECUTIVE_FINANCE_ENABLED: boolean;
   PUBLIC_IMPACT_GOVERNANCE_ENABLED: boolean;
   EXECUTIVE_AI_HEATMAP_ENABLED: boolean;
+  ANALYTICS_ENABLED?: boolean;
+  ANALYTICS_INTERNAL_MIRROR_ENABLED?: boolean;
 };
 
 const isEnabled = (value: "true" | "false" | undefined): boolean =>
@@ -27,6 +29,10 @@ export function getExecutiveFlags(): ExecutiveFeatureFlags {
     ),
     EXECUTIVE_AI_HEATMAP_ENABLED: isEnabled(
       env.SCHOLARX_EXECUTIVE_AI_HEATMAP_ENABLED,
+    ),
+    ANALYTICS_ENABLED: isEnabled(env.SCHOLARX_ANALYTICS_ENABLED),
+    ANALYTICS_INTERNAL_MIRROR_ENABLED: isEnabled(
+      env.SCHOLARX_ANALYTICS_INTERNAL_MIRROR_ENABLED,
     ),
   };
 }
