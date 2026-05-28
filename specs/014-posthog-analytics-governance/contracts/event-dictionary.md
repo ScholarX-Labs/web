@@ -14,7 +14,7 @@ All events MUST include:
 Optional global context:
 - session_id
 - anonymous_id
-- user_id
+- user_id [approved_stable_id; allowed format: internal UUID v4 or irreversible hashed internal ID]
 - path
 - attribution.source_class
 - attribution.medium_class
@@ -78,6 +78,9 @@ Do not emit:
 - raw secrets or env values
 - free-form personal message bodies
 - full PII beyond approved stable IDs
+
+Approved stable IDs are non-PII persistent identifiers only (for example internal UUIDs like `user_550e8400-e29b-41d4-a716-446655440000` or irreversible salted hashes like `usr_h_9f3a...`), must not embed email/phone/name, and must not be reversible to personal data.
+Do not log sensitive user data; only log approved stable identifiers and operational context.
 
 ## Validation Rules
 - Unknown event_name rejected in strict mode (or logged+drop in shadow mode).
