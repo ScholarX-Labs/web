@@ -4,6 +4,22 @@ import { chromium } from "playwright";
 
 const baseUrl = process.env.EXECUTIVE_E2E_BASE_URL;
 
+async function waitForMirroredEvents(
+  mirroredEvents: string[],
+  requiredEvents: readonly string[],
+  timeoutMs = 5000,
+): Promise<void> {
+  const startedAt = Date.now();
+  while (Date.now() - startedAt < timeoutMs) {
+    const allPresent = requiredEvents.every((event) =>
+      mirroredEvents.includes(event)
+    );
+    if (allPresent) return;
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  }
+  throw new Error(`Timed out waiting for mirrored analytics events: ${requiredEvents.join(", ")}`);
+}
+
 test("ai-search smoke emits search and opportunity apply analytics events", async (t) => {
   if (!baseUrl) {
     t.skip("Set EXECUTIVE_E2E_BASE_URL to run analytics opportunity/search e2e coverage.");
@@ -62,7 +78,10 @@ test("ai-search smoke emits search and opportunity apply analytics events", asyn
     await page.getByRole("button", { name: "Send" }).click();
     await page.getByRole("button", { name: "Apply Now" }).first().click();
 
-    await page.waitForTimeout(250);
+    await waitForMirroredEvents(mirroredEvents, [
+      "ai_search",
+      "opportunity_apply_click",
+    ]);
 
     assert.equal(mirroredEvents.includes("ai_search"), true);
     assert.equal(mirroredEvents.includes("opportunity_apply_click"), true);
