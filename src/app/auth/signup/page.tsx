@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
@@ -15,6 +15,8 @@ import { signIn, signUp } from "@/lib/auth-client";
 import { GoogleIcon } from "@/components/icons/GoogleIcon";
 import { ROUTES } from "@/lib/routes";
 import { springSnappy, tapScale } from "@/lib/motion-variants";
+import { trackClientEvent } from "@/lib/executive/analytics/client";
+import { ANALYTICS_EVENTS } from "@/lib/executive/analytics/constants";
 
 const signupSchema = z
   .object({
@@ -126,6 +128,16 @@ export default function Page() {
 
   const isAnySubmitting = isSubmitting || isSocialSubmitting;
 
+  useEffect(() => {
+    void trackClientEvent({
+      event: ANALYTICS_EVENTS.SIGNUP_STARTED,
+      properties: {
+        entry_surface: "signup_page",
+        path: "/auth/signup",
+      },
+    });
+  }, []);
+
   const onSubmit = async (data: SignupForm) => {
     if (isSocialSubmitting) return;
     setServerError(null);
@@ -176,6 +188,14 @@ export default function Page() {
       return;
     }
 
+    void trackClientEvent({
+      event: ANALYTICS_EVENTS.SIGNUP_COMPLETED,
+      properties: {
+        method: "email",
+        entry_surface: "signup_page",
+      },
+    });
+
     // Force a full navigation so server-rendered auth state is rebuilt
     // with the newly issued session cookie instead of stale prefetched data.
     window.location.assign("/");
@@ -198,6 +218,14 @@ export default function Page() {
           result.error.message ??
             "Unable to continue with Google. Please try again.",
         );
+      } else {
+        void trackClientEvent({
+          event: ANALYTICS_EVENTS.SIGNUP_COMPLETED,
+          properties: {
+            method: "google",
+            entry_surface: "signup_page",
+          },
+        });
       }
     } finally {
       setIsSocialSubmitting(false);
