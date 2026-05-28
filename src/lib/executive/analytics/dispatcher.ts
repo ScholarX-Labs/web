@@ -10,9 +10,14 @@ export async function dispatchFailOpen(
     return true;
   } catch (error) {
     incrementDeliveryCounter(context, "failure");
+    const errorName = error instanceof Error ? error.name : "UnknownError";
+    const errorMessage = error instanceof Error
+      ? error.message
+      : "Unknown analytics dispatch failure";
     console.warn("analytics.dispatchFailOpen: non-blocking failure", {
       context,
-      error,
+      errorName,
+      errorMessage,
     });
     return false;
   }
