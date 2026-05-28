@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
 
   const results = await searchScholarships(query);
   const resultCount = Array.isArray(results) ? results.length : 0;
-  await trackServerEvent({
+  void trackServerEvent({
     event: ANALYTICS_EVENTS.AI_SEARCH,
     properties: {
       query_intent_category: query ? "general" : "empty",
@@ -61,6 +61,8 @@ export async function GET(request: NextRequest) {
       status: "ok",
       source: "opportunities_search_api",
     },
+  }).catch((error) => {
+    console.error("opportunities.search.analytics: non-blocking tracking failure", error);
   });
   return NextResponse.json(results, {
     status: 200,
