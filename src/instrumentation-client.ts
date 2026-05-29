@@ -5,11 +5,21 @@ type PostHogInitConfigWithReplay = Parameters<typeof posthog.init>[1] & {
   enable_session_recording: boolean;
 };
 
-posthog.init(process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN!, {
-  api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
-  defaults: "2026-01-30",
-  enable_session_recording: true,
-} as PostHogInitConfigWithReplay);
+if (typeof window !== "undefined") {
+  const key = process.env.NEXT_PUBLIC_POSTHOG_KEY
+    ?? process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN;
+  if (!key) {
+    console.warn(
+      "posthog.init skipped in instrumentation-client: missing NEXT_PUBLIC_POSTHOG_KEY/NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN",
+    );
+  } else {
+    posthog.init(key, {
+      api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
+      defaults: "2026-01-30",
+      enable_session_recording: true,
+    } as PostHogInitConfigWithReplay);
+  }
+}
 
 if (!process.env.NEXT_PUBLIC_SENTRY_DSN) {
   console.error(
