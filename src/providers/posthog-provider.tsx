@@ -31,7 +31,7 @@ if (typeof window !== "undefined") {
     );
   } else {
     posthog.init(key, {
-      api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
+      api_host: '/ingest',
       ui_host: process.env.NEXT_PUBLIC_POSTHOG_UI_HOST,
       capture_pageview: false,
       capture_pageleave: true,
