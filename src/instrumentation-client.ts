@@ -14,7 +14,7 @@ if (typeof window !== "undefined") {
     );
   } else {
     posthog.init(key, {
-      api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
+      api_host: '/ingest',
       defaults: "2026-01-30",
       enable_session_recording: true,
     } as PostHogInitConfigWithReplay);
