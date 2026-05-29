@@ -131,6 +131,7 @@ flowchart LR
 
 ## Public architecture documents
 - `/docs` — implementation guides, UI specs, and operational playbooks.
+- `/docs/case-study.md` — case study covering product goals, architecture, and outcomes.
 - `/specs` — formal specs, plans, and architecture decisions.
 
 ## Issue tracking & release notes
