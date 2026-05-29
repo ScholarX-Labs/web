@@ -26,7 +26,8 @@ export function proxy(request: NextRequest) {
   const isAuthenticated = hasSessionCookie(request);
   const { pathname } = request.nextUrl;
   const isAuthRoute = pathname.startsWith("/auth");
-  const isPublicRoute = OPEN_ROUTES.has(pathname) || pathname.startsWith("/courses/");
+  const isIngestRoute = pathname === "/ingest" || pathname.startsWith("/ingest/");
+  const isPublicRoute = OPEN_ROUTES.has(pathname) || pathname.startsWith("/courses/") || isIngestRoute;
   const isAdminRoute = pathname.startsWith("/admin");
 
   if (process.env.NODE_ENV === "production") {
@@ -80,5 +81,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|.*\\..*).*)"],
+  matcher: ["/((?!api|ingest|_next/static|_next/image|.*\\..*).*)"],
 };
