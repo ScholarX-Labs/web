@@ -1,25 +1,29 @@
-# Testing
+# 🧪 TESTING
 
-## Linting and type checks
-```bash
-pnpm lint
-pnpm typecheck
-```
+## Test Strategy
+ScholarX uses layered testing:
+- Unit tests for utilities/policies/contracts
+- Integration tests for route/service interactions
+- E2E tests for user-critical journeys
 
-## Unit and integration tests
-```bash
-pnpm test      # src/**/*.test.ts
-pnpm test:api  # src/app/api/**/*.test.ts
-```
+## Commands
+- Typecheck: `pnpm typecheck`
+- Unit/integration: `pnpm test`
+- API-focused: `pnpm test:api`
+- E2E: `node --import tsx --test tests/e2e/**/*.spec.ts`
 
-## E2E smoke tests
-The current E2E command is tailored to executive analytics specs and expects `EXECUTIVE_E2E_BASE_URL` to point at the running app.
-```bash
-EXECUTIVE_E2E_BASE_URL=http://localhost:3000 \
-  node --import tsx --test tests/e2e/*.spec.ts
-```
+## Coverage Priorities
+1. Auth and access boundaries
+2. Analytics schema/privacy/fail-open behavior
+3. Executive read-model semantics (especially data-gap vs true-zero)
+4. Critical user flows:
+   - Signup flow
+   - Opportunity actions
+   - AI search lifecycle
 
-## Test locations
-- `src/**/*.test.ts` — unit and integration tests.
-- `src/app/api/**/*.test.ts` — API route tests.
-- `tests/e2e/*.spec.ts` — Playwright e2e coverage.
+## Release Validation
+Before release:
+- All required test suites pass
+- Analytics governance checklist is completed
+- Migration and deployment steps validated
+

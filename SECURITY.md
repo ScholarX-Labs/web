@@ -1,18 +1,28 @@
-# Security
+# 🔒 SECURITY
 
-## Secrets and configuration
-- Secrets are sourced from environment variables; no secrets are stored in the repository.
-- `.env.example` documents required variables.
+## Security Principles
+- Principle of least privilege
+- Strict separation of public/auth/admin surfaces
+- No secrets in client bundles
+- Input validation at all request boundaries
 
-## Database connections
-- When SSL is enabled, the connection enforces `sslmode=verify-full` for secure Postgres connections.
+## Authentication & Authorization
+- Better Auth for session and user identity
+- Route-level and layout-level guards for protected/admin surfaces
+- Middleware/proxy route classification for access control
 
-## API protection
-- Redis-backed rate limiting protects public endpoints.
-- Sensitive flows use stricter failure behavior than public reads.
+## Data Protection
+- Sensitive payloads are not logged verbatim in analytics error paths
+- Analytics properties pass through forbidden-key sanitization
+- Approved stable identifiers only for tracking identity context
 
-## Analytics governance
-- Raw PII is excluded from analytics event payloads.
+## Analytics Security Posture
+- Same-origin `/ingest/*` proxy reduces third-party interception risk
+- Internal mirror route validates and normalizes event input
+- Failures handled fail-open without leaking user payloads
 
-## Monitoring
-- Sentry captures errors and performance regressions.
+## Operational Recommendations
+- Rotate credentials and secrets regularly
+- Enforce secure transport (HTTPS/TLS)
+- Keep dependency updates and vulnerability scanning in CI cadence
+

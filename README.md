@@ -1,239 +1,402 @@
-# ScholarX Web
+# 🚀 ScholarX
 
-[![Build and Deploy to Azure Container Apps](https://github.com/ScholarX-Labs/web/actions/workflows/deploy-aca.yml/badge.svg)](https://github.com/ScholarX-Labs/web/actions/workflows/deploy-aca.yml)
-[![Deploy Certificate Worker to ACA](https://github.com/ScholarX-Labs/web/actions/workflows/deploy-worker-aca.yml/badge.svg)](https://github.com/ScholarX-Labs/web/actions/workflows/deploy-worker-aca.yml)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)](https://www.typescriptlang.org/)
+[![Web Deploy](https://img.shields.io/badge/Web%20Deploy-GitHub%20Actions-blue)](./.github/workflows/deploy-aca.yml)
+[![Worker Deploy](https://img.shields.io/badge/Worker%20Deploy-GitHub%20Actions-blue)](./.github/workflows/deploy-worker-aca.yml)
+[![Testing](https://img.shields.io/badge/Tests-Unit%20%2B%20Integration%20%2B%20E2E-success)](./TESTING.md)
+[![Architecture](https://img.shields.io/badge/Architecture-Documented-informational)](./ARCHITECTURE.md)
+[![License](https://img.shields.io/badge/License-Proprietary-lightgrey)](#-license)
 
-ScholarX is a premium learning platform that helps students and young professionals discover scholarships, courses, mentorship, and career opportunities. This repository contains the production Next.js web app, the API routes, and the certificate/analytics infrastructure that power the experience.
+🎯 ScholarX is an AI-powered scholarship and learning platform that helps learners discover high-fit opportunities and helps operators run the product with confidence through a production-grade executive analytics system.
 
-## Product mission
-Empower students globally with accessible education, mentorship, and curated opportunities that remove barriers to upward mobility.
+## 🌍 Product Mission
 
-## Live demo
-- https://scholarx.app
-- AI search: https://scholarx.app/ai-search
-- Courses: https://scholarx.app/courses
+ScholarX exists to reduce the time, uncertainty, and information gaps between learners and life-changing opportunities.
 
-## Screenshots
+Our product mission is to:
+- 🤖 Personalize discovery with AI-assisted search and ranking.
+- 📈 Improve conversion from interest to application with clean UX and reliable funnel instrumentation.
+- 🧭 Give leadership a trustworthy operating system (quality, growth, finance, technical health) via an executive dashboard.
 
-| Home | Courses | Certificates |
-| --- | --- | --- |
-| ![Home](public/home-page/hero1.png) | ![Courses](public/Courses-hero-1.png) | ![Certificate](public/certificate-template.png) |
+## 🔗 Live Demo
 
-## Architecture diagram
-See [ARCHITECTURE.md](ARCHITECTURE.md#architecture-diagram) for the canonical diagram.
+- 🌐 Production: [https://scholar-x.org](https://scholar-x.org)
+- 🛡️ Executive dashboard (auth/admin required): `https://scholar-x.org/admin/executive`
 
-## Tech stack
-- **Frontend:** Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS, Radix UI, Framer Motion
-- **Backend:** Next.js API routes, domain layer services, Zod validation
-- **Data:** PostgreSQL + Drizzle ORM, Redis caching (Azure Cache for Redis)
-- **Infra:** Docker, Azure Container Apps, Azure Service Bus
-- **Observability:** PostHog (product analytics), Sentry (error + perf)
-- **Testing:** Node test runner + tsx, Playwright for certificate rendering + e2e
+## 🖼️ Screenshots / GIFs
 
-## Main features
-- **Courses catalog & enrollment** with category filtering, featured views, and subscription status.
-- **AI scholarship/opportunity search** with result normalization, sorting, and caching.
-- **Certificate issuance pipeline** with idempotent issuance, PDF rendering, and verification.
-- **Admin & executive dashboards** for learning analytics, impact reporting, and operations.
-- **Email delivery system** with retry, rate limiting, and provider fallbacks.
+> Replace with project assets if not checked in yet.
 
-## System design & CS fundamentals
-### Key flows
-1. **AI search** → `/api/opportunities/search` → `searchScholarships` → external search API → cached normalization → UI sorting + pagination.
-2. **Certificate issuance** → domain service writes DB + outbox row → Azure Service Bus → worker renders PDF + sends email.
-3. **Executive analytics** → event registry + KPI mapping → dashboard aggregation and heatmap bucketing.
+- 🏠 Home: `docs/screenshots/home.png`
+- 🧠 AI Search: `docs/screenshots/ai-search.gif`
+- 🎓 Opportunities: `docs/screenshots/opportunities.png`
+- 📊 Executive Dashboard: `docs/screenshots/executive-dashboard.png`
 
-### Data structures & algorithms in practice
-- **Redis ZSET sliding-window rate limiter** with Lua script (O(log n) per request).
-- **Stale‑while‑revalidate caching** with TTL + freshness windows for resilience.
-- **Result normalization & ranking** (score/match/percent) and deterministic sorting.
-- **Activity heatmap bucketing** for executive dashboards (day/hour histogram).
-- **Certificate number generation** with retry on uniqueness collisions.
+## 🧱 Architecture
 
-## Engineering evidence (what proves real software + CS fundamentals)
-### Why each feature exists
-| Feature | User problem solved | Implementation note |
-| --- | --- | --- |
-| AI search | Students struggle to find the right scholarship fit. | Normalizes upstream scores + caches results to reduce latency. |
-| Courses catalog | Learners need structured, curated learning paths. | API endpoints support list, search, featured, and enroll flows. |
-| Certificates | Graduates need proof of achievement. | Idempotent issuance + worker-based PDF generation. |
-| Executive analytics | Leaders need visibility into outcomes. | KPI registry + aggregation and heatmaps. |
-| Email system | Notifications must be reliable at scale. | Circuit breakers + rate limits + retry policy. |
+```mermaid
+flowchart TB
+  %% =========================
+  %% Client Layer
+  %% =========================
+  subgraph C["🌐 Client Layer"]
+    U["User Browser"]
+    RSC["Next.js App Router (RSC + Client Components)"]
+    UI["Feature UIs (Home, Courses, Opportunities, AI Search, Executive)"]
+    PHSDK["PostHog JS SDK"]
+    SENTRYC["Sentry Client Instrumentation"]
+  end
 
-### Tradeoffs I made
-- **External search API vs in-house index:** faster iteration; mitigated with caching, rate limiting, and stale fallback.
-- **Fail‑open rate limits for public reads:** preserves UX during Redis outages; sensitive flows use fail‑closed.
-- **Server-side caching vs client-only storage:** protects user privacy and reduces upstream traffic.
-- **Outbox + worker pipeline vs direct PDF generation:** higher complexity but keeps user-facing latency low.
+  %% =========================
+  %% Edge / Routing Layer
+  %% =========================
+  subgraph E["🧭 Edge & Routing Layer"]
+    MW["Proxy/Middleware (route classification + auth redirects)"]
+    ING["/ingest/* same-origin analytics ingress"]
+    APIM["/api/analytics/events mirror route"]
+  end
 
-### Bugs fixed (examples visible in code)
-- **TLS handshake failures** avoided by enforcing `sslmode=verify-full` for Postgres connections.
-- **Inconsistent ranking** fixed by normalizing multiple score fields into a single match percentage.
-- **Upstream API flakiness** handled with stale cache fallbacks and bounded query length.
+  %% =========================
+  %% Application Layer
+  %% =========================
+  subgraph A["🧩 Application Runtime"]
+    RH["Route Handlers / Server Actions"]
+    AUTH["Better Auth (session + identity)"]
+    FLAGS["Feature Flags + Env Validation"]
+    ANALYTICS["Analytics Boundary (schemas, privacy sanitizer, fail-open dispatcher)"]
+    SEG["Segmentation + Mirror Routing"]
+  end
 
-### Tests I wrote
-- Cache semantics + Redis adapter tests (`src/lib/cache/*.test.ts`).
-- Rate limiter Lua script + utility tests (`src/lib/rate-limit/*.test.ts`).
-- Worker pipeline tests (`src/worker/*.test.ts`).
-- Executive analytics e2e coverage (`tests/e2e/*.spec.ts`).
+  %% =========================
+  %% Domain Layer
+  %% =========================
+  subgraph D["🏗️ Domain Layer"]
+    CORE["Domain Services (courses, opportunities, ai-search, executive)"]
+    EXECAPP["Executive Read-Model Builders"]
+    KPI["KPI Mapping + Reconciliation Utilities"]
+  end
 
-### Performance & reliability improvements
-- Redis cache with stale‑while‑revalidate for search and public data.
-- Public endpoint rate limiting to protect upstream services.
-- Outbox + retry + worker queues for certificate generation.
-- Cache metrics and analytics latency tracking for early regression detection.
+  %% =========================
+  %% Data Layer
+  %% =========================
+  subgraph DB["🗄️ Data & Infra Layer"]
+    DRIZZLE["Drizzle ORM"]
+    PG["PostgreSQL"]
+    REDIS["Redis (cache/rate limits when enabled)"]
+  end
 
-### What users gained
-- Faster search responses with predictable relevance ordering.
-- More reliable certificate delivery and verification.
-- Clearer impact reporting with executive dashboards.
+  %% =========================
+  %% Observability & Analytics
+  %% =========================
+  subgraph O["📊 Observability & Analytics"]
+    PH["PostHog Cloud"]
+    EAS["Executive Analytics Events Store"]
+    DASH["Executive Dashboard APIs + UI"]
+    SENTRY["Sentry (errors/perf/replay)"]
+  end
 
-### What I learned from mistakes
-- External dependencies will fail—build graceful degradation from day one.
-- SSL defaults vary across environments—make connection intent explicit.
+  %% =========================
+  %% Delivery Layer
+  %% =========================
+  subgraph CD["🚢 Delivery & Operations"]
+    GH["GitHub Actions (build/test/deploy)"]
+    DOCKER["Docker Standalone Build"]
+    ACA["Azure Container Apps"]
+    MIG["Production DB Migrations"]
+  end
 
-### What I rejected from AI suggestions
-- **Client-only caching of search results:** privacy + cache invalidation risks.
-- **Emitting raw PII to analytics:** violates governance rules and harms trust.
-- **Removing rate limits “for better UX”:** stability beats short-term convenience.
+  %% Client flows
+  U --> RSC --> UI
+  UI --> PHSDK
+  UI --> SENTRYC
 
-### How I reviewed, refactored, and validated
-- Lint + typecheck + test runs; perf regressions tracked via cache metrics.
-- Refactored shared cache policy and analytics contracts into typed registries.
-- Documented architecture in `/docs` and `/specs` for future maintainers.
+  %% Edge flows
+  U --> MW
+  MW --> RSC
+  PHSDK --> ING
+  UI --> APIM
 
-## Case study
-### What problem does ScholarX solve?
-ScholarX addresses the fragmented and often inaccessible landscape of scholarships, courses, mentorship, and early‑career opportunities. Students and young professionals need a single, trusted place to discover opportunities, enroll in programs, and receive verifiable proof of achievement.
+  %% Ingestion + server analytics flows
+  ING --> PH
+  APIM --> ANALYTICS
+  ANALYTICS --> SEG
+  SEG --> EAS
+  ANALYTICS --> PH
 
-### Why did I build it?
-I built ScholarX to remove barriers to upward mobility and empower students globally with accessible education, mentorship, and curated opportunities.
+  %% App/domain/data flows
+  RSC --> RH
+  RH --> AUTH
+  RH --> FLAGS
+  RH --> CORE
+  CORE --> EXECAPP
+  EXECAPP --> KPI
+  CORE --> DRIZZLE --> PG
+  CORE --> REDIS
+  KPI --> DASH
+  EAS --> DASH
 
-### What users is it for?
-- Students and young professionals searching for scholarships, courses, and mentorship.
-- Partner organizations delivering programs and issuing certificates.
-- Admin and executive teams who need reliable analytics and impact reporting.
+  %% Observability flows
+  SENTRYC --> SENTRY
+  RH --> SENTRY
 
-### What technical challenges appeared?
-- Integrating an external AI search API while keeping latency predictable and results reliable.
-- Implementing caching, stale‑while‑revalidate behavior, and rate limiting to protect upstream services.
-- Designing an idempotent certificate pipeline with background PDF rendering and email delivery.
-- Enforcing analytics governance to avoid raw PII in event payloads.
+  %% Delivery flows
+  GH --> DOCKER --> ACA
+  GH --> MIG --> PG
+```
 
-### What architecture did I choose?
-ScholarX is a Next.js 16 App Router application with API routes and a domain service layer. It uses PostgreSQL (Drizzle ORM) for data, Redis for caching and rate limiting, Azure Service Bus for queueing, and a worker service for certificate generation. Observability is provided by PostHog and Sentry, and the platform is deployed with Docker on Azure Container Apps.
+## 🛠️ Tech Stack
 
-### What alternatives did I reject?
-- Building an in‑house search index instead of using an external search API.
-- Client‑only caching of search results due to privacy and invalidation risks.
-- Emitting raw PII into analytics events.
-- Removing rate limits for “better UX” at the expense of reliability.
-- Generating certificates inline instead of using an outbox + worker pipeline.
+### 🧩 Application
+- Next.js 16 (App Router, Server Components)
+- React 19
+- TypeScript 5
+- Tailwind CSS
 
-### What results were achieved?
-- 15,000+ students attended programs, with 96 partner organizations and 38 events delivered.
-- Faster AI search responses with predictable relevance ordering.
-- More reliable certificate delivery and verification.
-- Clearer impact reporting through executive dashboards.
+### 🗄️ Data & Auth
+- Better Auth
+- Drizzle ORM
+- PostgreSQL
 
-### What would I improve next?
-- Add personalized ranking signals for AI search.
-- Ship certificate template v2 with richer metadata.
-- Expand opportunity support beyond English and Arabic.
-- Consolidate executive KPIs with anomaly detection.
+### 📡 Observability & Analytics
+- PostHog (same-origin ingestion proxy via `/ingest/*`)
+- Sentry
+- Internal executive analytics mirror
 
-## Architecture documentation
-- [SYSTEM_DESIGN.md](SYSTEM_DESIGN.md) — system design overview and key flows.
-- [ARCHITECTURE.md](ARCHITECTURE.md) — component architecture and repo layout.
-- [DATABASE_SCHEMA.md](DATABASE_SCHEMA.md) — schema modules and migration workflow.
-- [API_DOCUMENTATION.md](API_DOCUMENTATION.md) — API route structure and conventions.
-- [DEPLOYMENT.md](DEPLOYMENT.md) — deployment workflows and environment setup.
-- [TESTING.md](TESTING.md) — linting and test commands.
-- [SECURITY.md](SECURITY.md) — security posture and governance notes.
-- [PERFORMANCE.md](PERFORMANCE.md) — caching, rate limiting, and reliability.
-- [ROADMAP.md](ROADMAP.md) — forward-looking product and platform roadmap.
-- `/docs` — implementation guides, UI specs, and operational playbooks.
-- `/specs` — formal specs, plans, and architecture decisions.
+### ⚙️ Tooling
+- pnpm
+- ESLint
+- Node test runner + `tsx`
+- Playwright (E2E)
+- Docker (standalone output)
+- Azure Container Apps deployment workflows
 
-## Issue tracking & release notes
-- GitHub Issues for backlog + triage.
-- Release checklist + changelog templates under `/specs` (current location: `specs/014-posthog-analytics-governance/contracts/`).
+## ✨ Main Features
 
-## Setup instructions
+- 🌐 Public scholarship/course discovery
+- 🔐 Authenticated learner flows (profile, opportunities, AI search)
+- 📌 Opportunity save/apply tracking
+- 🤖 AI-assisted opportunity search
+- 🧑‍💼 Admin + executive views
+- 📈 Executive dashboard with sections for:
+  - Overview
+  - Public Growth
+  - Opportunities & AI
+  - Courses & Lessons
+  - Users
+  - Finance
+  - Technical Health
+  - Team Operations
+
+## 📊 Production-Grade Analytics (What’s Implemented)
+
+### ✅ Events currently tracked
+- `website_visit`
+- `cta_click`
+- `signup_started`
+- `signup_completed`
+- `ai_search`
+- `opportunity_apply_click`
+- `opportunity_view` (PostHog only)
+- `opportunity_save` (PostHog only)
+
+### 🧠 Architecture highlights
+- 🧼 Privacy sanitizer for forbidden keys
+- 🛡️ Fail-open dispatch (analytics failures never block UX)
+- ✅ Event schema validation
+- 🧭 Mirror routing policy for KPI-critical events
+- 📐 KPI mapping + reconciliation utilities
+- 🔎 True-zero vs data-gap semantics in executive metrics
+
+### 📚 Governance artifacts
+See `specs/014-posthog-analytics-governance/`:
+- event dictionary
+- KPI mapping
+- release checklist
+- contract change-log template
+- validation report
+
+## 🗂️ Repository Layout
+
+- `src/app/` route segments, layouts, route handlers
+- `src/components/` reusable and feature UI
+- `src/lib/` app libraries (auth, analytics, services)
+- `src/domain/` business/domain layer and read models
+- `src/db/` schema
+- `specs/` product + implementation artifacts
+- `.github/workflows/` deployment workflows
+
+## 🧪 Local Setup
+
+### 📦 Prerequisites
+- Node.js 22+
+- pnpm 10+
+- PostgreSQL
+
+### ⬇️ Install
 ```bash
-corepack enable
 pnpm install
-cp .env.example .env
+```
+
+### 🔧 Configure environment
+Create `.env.local` and set required variables.
+
+### 🗃️ Run migrations
+```bash
+pnpm db:migrate
+```
+
+### ▶️ Start dev server
+```bash
 pnpm dev
 ```
 
-## Environment variables
-Required for local development (see `.env.example` for the full list):
-- `DATABASE_URL` (PostgreSQL connection string)
-- `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`
-- `SMTP_*` or `EMAIL_*` variables for email delivery
-- `AZURE_REDIS_*` + `REDIS_KEY_PREFIX` for shared cache/rate limiting
+### ✅ Verify
+Open [http://localhost:3000](http://localhost:3000)
 
-Optional:
-- `NEXT_PUBLIC_POSTHOG_*` for analytics
-- `SENTRY_*` for error/performance monitoring
+## 🔐 Environment Variables
 
-## Database & migrations
+### 🌍 Public (build-time)
+- `NEXT_PUBLIC_API_URL`
+- `NEXT_PUBLIC_API_BASE_URL`
+- `NEXT_PUBLIC_POSTHOG_KEY` (or `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN`)
+- `NEXT_PUBLIC_POSTHOG_HOST`
+- `NEXT_PUBLIC_POSTHOG_UI_HOST`
+- `NEXT_PUBLIC_SENTRY_DSN`
+
+### 🖥️ Server / Auth / Data
+- `DATABASE_URL`
+- `DATABASE_SSL`
+- `BETTER_AUTH_URL`
+- `BETTER_AUTH_SECRET`
+
+### 🚩 Feature Flags (examples)
+- `SCHOLARX_EXECUTIVE_DASHBOARD_ENABLED`
+- `SCHOLARX_EXECUTIVE_TEAM_OPS_ENABLED`
+- `SCHOLARX_EXECUTIVE_FINANCE_ENABLED`
+- `SCHOLARX_EXECUTIVE_GOVERNANCE_ENABLED`
+- `SCHOLARX_EXECUTIVE_AI_HEATMAP_ENABLED`
+- `SCHOLARX_ANALYTICS_ENABLED`
+- `SCHOLARX_ANALYTICS_INTERNAL_MIRROR_ENABLED`
+
+### ⚡ Cache / Rate Limits
+- `CACHE_ENABLED`
+- `DISTRIBUTED_RATE_LIMITS_ENABLED`
+- `REDIS_URL` or `AZURE_REDIS_*`
+- `REDIS_KEY_PREFIX`
+
+## 🗄️ Database & Migrations
+
+Generate migration:
 ```bash
-pnpm db:generate   # generate migrations after schema changes
-pnpm db:migrate    # apply migrations
-pnpm db:push       # push schema (dev convenience)
+pnpm db:generate
 ```
 
-## Testing guide
+Apply migration:
 ```bash
-pnpm lint
+pnpm db:migrate
+```
+
+Push schema (non-prod workflows):
+```bash
+pnpm db:push
+```
+
+## 🧪 Testing Guide
+
+Typecheck:
+```bash
 pnpm typecheck
-pnpm test          # unit + integration tests under src/
-pnpm test:api      # API route tests
 ```
 
-Optional e2e smoke tests:
+Unit/integration tests:
 ```bash
-EXECUTIVE_E2E_BASE_URL=http://localhost:3000 \
-  node --import tsx --test tests/e2e/*.spec.ts
+pnpm test
 ```
 
-## Deployment guide
-- **Web app:** `deploy-aca.yml` builds the Docker image, runs migrations, and deploys to Azure Container Apps.
-- **Worker:** `deploy-worker-aca.yml` runs lint/typecheck/tests, builds the worker image, runs DB migrations, and deploys the certificate worker.
+API-focused tests:
+```bash
+pnpm test:api
+```
 
-## Roadmap
-See [ROADMAP.md](ROADMAP.md) for the current roadmap.
+E2E suite:
+```bash
+node --import tsx --test tests/e2e/**/*.spec.ts
+```
 
-## My role and contributions
-Principal SWE / tech lead responsible for:
-- End-to-end architecture, API design, and reliability tradeoffs.
-- AI search integration with caching and analytics.
-- Certificate pipeline (outbox + worker + PDF).
-- Redis caching + distributed rate limiting.
-- Executive analytics governance and e2e quality gates.
+## 🚢 Deployment Guide
 
-## Known limitations
-- AI search depends on an external service and is capped per request (20 results).
-- Search results are currently optimized for English and Arabic only.
-- Some course API auth guards are permissive in current backend contracts.
-- Public endpoints are rate-limited and may return 429s under heavy load.
+### 🤖 CI/CD
+- Web deploy workflow: `.github/workflows/deploy-aca.yml`
+- Worker deploy workflow: `.github/workflows/deploy-worker-aca.yml`
 
-## Security notes
-- Secrets are loaded from environment variables only; no secrets in repo.
-- Rate limiting protects public endpoints; sensitive actions are fail‑closed.
-- Postgres SSL mode is enforced for production-grade connections.
-- Analytics governance forbids raw PII in event payloads.
+### ⚠️ Build-time env requirement (critical)
+`NEXT_PUBLIC_*` values must be present during Docker build.
 
-## Impact metrics (product UI copy)
-These figures are hardcoded impact stats in `src/lib/home-data.ts` and mirror what the UI displays.
-- **15,000+** students attended programs
-- **96** partner organizations
-- **38** events and programs delivered
+Current workflow passes build args for:
+- `NEXT_PUBLIC_SENTRY_DSN`
+- `NEXT_PUBLIC_POSTHOG_KEY`
+- `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN`
+- `NEXT_PUBLIC_POSTHOG_HOST`
+- `NEXT_PUBLIC_POSTHOG_UI_HOST`
 
-## Resume bullets (copy/paste)
-- Built a production-grade Next.js platform serving 15k+ learners with Redis‑backed caching, rate limiting, and analytics instrumentation.
-- Designed an idempotent certificate issuance pipeline with outbox + worker architecture, reducing user-facing latency and improving reliability.
-- Integrated AI scholarship search with normalized ranking and stale‑while‑revalidate caching to keep results fast and resilient.
-- Authored governance documentation and e2e quality gates for executive analytics, improving data integrity across KPI dashboards.
+### ☁️ Runtime
+Deploys to Azure Container Apps with standalone Next.js output.
+
+## 🔒 Security Notes
+
+- 🚫 No secrets in client bundles.
+- 🧼 Analytics payloads are sanitized before dispatch.
+- 🛡️ Forbidden fields (tokens/secrets/password-like keys) are filtered.
+- 🧭 Admin/internal paths are excluded from public growth analytics.
+- 🔐 Auth boundaries preserved between public/auth/admin surfaces.
+
+## 👨‍💻 My Role & Contributions
+
+I led end-to-end engineering for core platform and analytics reliability, including:
+- 🏗️ Product architecture and full-stack delivery across discovery, AI search, and opportunities.
+- 📐 Production analytics governance system design and implementation.
+- 🔁 PostHog ingestion hardening (same-origin `/ingest` strategy + middleware/proxy safety).
+- 📊 KPI reconciliation and executive dashboard data integrity model.
+- 🚀 CI/CD deployment improvements for build-time public env correctness.
+- ✅ Test strategy spanning unit, integration, and E2E critical user journeys.
+
+## 📈 Impact Metrics (Template)
+
+> Replace with your latest validated numbers.
+
+- Signup funnel completion rate: `+X%`
+- Opportunity apply conversion: `+Y%`
+- AI zero-result rate: `-Z%`
+- Executive KPI reconciliation variance: `< 5%`
+- Analytics delivery reliability: `>= 99%`
+
+## ⚠️ Known Limitations
+
+- Total registered users should be sourced from DB as the authoritative metric.
+- Client-side events can still be impacted by user browser privacy extensions in edge cases.
+- Some advanced analytics slices depend on instrumentation depth per surface.
+
+## 🗺️ Roadmap
+
+- [ ] Server-authoritative `user_created` event at auth boundary
+- [ ] Advanced cohort retention dashboards
+- [ ] Experimentation framework (A/B)
+- [ ] Anomaly detection on executive KPIs
+- [ ] Multi-tenant/org-level analytics segmentation
+
+## 📄 License
+
+Proprietary. All rights reserved.
+
+## 🏅 Engineering Quality Evidence
+
+- ✅ CI/CD workflows: `.github/workflows/deploy-aca.yml`, `.github/workflows/deploy-worker-aca.yml`
+- ✅ Changelog: [CHANGELOG.md](./CHANGELOG.md)
+- ✅ Release/tagging process: [RELEASES.md](./RELEASES.md)
+- ✅ Testing strategy + E2E notes: [TESTING.md](./TESTING.md)
+- ✅ Lint/typecheck/test commands: [ENGINEERING_QUALITY.md](./ENGINEERING_QUALITY.md)
+- ✅ Security practices: [SECURITY.md](./SECURITY.md)
+- ✅ Performance strategy + benchmark protocol: [PERFORMANCE.md](./PERFORMANCE.md)
+- ✅ Planning artifacts: [ROADMAP.md](./ROADMAP.md), [GitHub issue template](./.github/ISSUE_TEMPLATE/feature_request.md)
+- ✅ PR decision documentation: [PR template](./.github/pull_request_template.md)

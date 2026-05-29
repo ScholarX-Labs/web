@@ -3,7 +3,8 @@
 import posthog from "posthog-js";
 import { PostHogProvider as PHProvider, usePostHog } from "posthog-js/react";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useEffect, Suspense } from "react";
+import { useEffect, Suspense, useRef } from "react";
+import { useSession } from "@/lib/auth-client";
 
 function PostHogPageView() {
   const pathname = usePathname();
@@ -18,6 +19,36 @@ function PostHogPageView() {
       (searchParams.toString() ? `?${searchParams.toString()}` : "");
     ph.capture("$pageview", { $current_url: url });
   }, [pathname, searchParams, ph]);
+
+  return null;
+}
+
+function PostHogIdentityBridge() {
+  const ph = usePostHog();
+  const { data: session } = useSession();
+  const lastIdentifiedIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!ph) return;
+
+    const userId =
+      typeof session?.user?.id === "string" ? session.user.id : null;
+
+    if (userId) {
+      if (lastIdentifiedIdRef.current !== userId) {
+        ph.identify(userId, {
+          user_state: "authenticated",
+        });
+        lastIdentifiedIdRef.current = userId;
+      }
+      return;
+    }
+
+    if (lastIdentifiedIdRef.current) {
+      ph.reset();
+      lastIdentifiedIdRef.current = null;
+    }
+  }, [ph, session?.user?.id]);
 
   return null;
 }
@@ -44,6 +75,7 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
     <PHProvider client={posthog}>
       <Suspense fallback={null}>
         <PostHogPageView />
+        <PostHogIdentityBridge />
       </Suspense>
       {children}
     </PHProvider>

@@ -1,28 +1,43 @@
-# System Design
+# 🧠 SYSTEM_DESIGN
 
 ## Overview
-ScholarX is a Next.js 16 App Router platform that combines UI, API routes, and a domain services layer. It relies on PostgreSQL for persistence, Redis for caching and rate limiting, Azure Service Bus for queueing, and a background worker for certificate generation and email delivery.
+ScholarX is a full-stack platform for scholarship/course/opportunity discovery with AI-assisted search and executive analytics.  
+The system is designed around reliability, clear domain boundaries, and trustworthy metrics.
 
-## Core flows
-### AI search
-1. `GET /api/opportunities/search` receives a query from the UI.
-2. The domain layer calls the external search API.
-3. Results are normalized, ranked, cached, and returned with deterministic ordering.
+## Design Goals
+- Fast, intuitive discovery for learners
+- Secure auth boundaries for public/auth/admin surfaces
+- Reliable event tracking and KPI-aligned analytics
+- Clear separation between UI, application logic, domain services, and data access
+- Production readiness on Azure Container Apps
 
-### Certificate issuance
-1. Domain service writes the certificate record and outbox entry.
-2. Azure Service Bus queues the job for the worker.
-3. The worker renders the PDF and triggers email delivery.
+## High-Level Components
+- Next.js App Router frontend + server runtime
+- Auth layer (Better Auth)
+- Route handlers / server actions
+- Domain services + read-model builders
+- PostgreSQL via Drizzle ORM
+- PostHog ingestion via same-origin `/ingest/*`
+- Internal executive analytics mirror
 
-### Executive analytics
-1. Events flow through a registry with KPI mappings.
-2. Aggregations and heatmap bucketing feed executive dashboards.
+## Core Flows
+1. Learner Discovery Flow
+- User lands on public pages → navigates opportunities/courses → applies/saves opportunities.
 
-## Reliability patterns
-- Redis cache with stale‑while‑revalidate behavior for read-heavy endpoints.
-- Redis ZSET sliding‑window rate limiting for public endpoints.
-- Outbox + worker pipeline for long‑running jobs.
+2. AI Search Flow
+- User submits query → API fetches ranked results → analytics events emitted (client + mirrored where applicable).
 
-## Observability
-- PostHog for product analytics.
-- Sentry for error and performance monitoring.
+3. Executive Analytics Flow
+- Tracked events → privacy/schemas/dispatch → internal mirror for KPI-critical events → read models for dashboard APIs.
+
+## Reliability Patterns
+- Fail-open analytics dispatch (UX never blocked by telemetry failures)
+- Event schema validation + sanitization before writes
+- Environment validation gates
+- Build-time public env wiring for frontend analytics
+
+## Scalability Considerations
+- Domain/read-model separation reduces coupling
+- Selective mirroring avoids overloading executive store
+- Cache/rate-limit infrastructure is pluggable (Redis/Azure Redis)
+

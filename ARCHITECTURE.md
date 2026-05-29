@@ -1,48 +1,43 @@
-# Architecture
+# 🧱 ARCHITECTURE
 
-## High-level components
-- **Web app:** Next.js App Router UI + server components.
-- **API layer:** Next.js API routes that validate inputs and call domain services.
-- **Domain services:** Shared business logic for search, courses, certificates, and analytics.
-- **Worker:** Background service for certificate rendering and email delivery.
-- **Data & infra:** PostgreSQL, Redis, Azure Service Bus, and external providers.
+## Layered Architecture
 
-## Repository layout
-- `src/app` — UI routes and API route handlers.
-- `src/domain` — domain services and infrastructure adapters.
-- `src/db/schema` — Drizzle ORM schema definitions.
-- `src/worker` — certificate worker pipeline.
-- `drizzle/` — generated migrations.
-- `docs/` and `specs/` — implementation guides and formal specs.
+1. Presentation Layer
+- `src/app/`, `src/components/`
+- Handles rendering, interaction, navigation, route-level composition
 
-## Deployment architecture
-ScholarX is deployed to Azure Container Apps. The web app and worker are built as separate Docker images and deployed via GitHub Actions for consistent releases.
+2. Application Layer
+- Route handlers and orchestration logic
+- Coordinates auth, services, and policies
 
-## Architecture diagram
-```mermaid
-flowchart LR
-  Browser[Users + Browsers]
-  subgraph Web["ScholarX Web (Next.js App Router)"]
-    UI[UI + Server Components]
-    API[Next.js API Routes]
-    Domain[Domain Services]
-  end
-  subgraph Data["Data & Infra"]
-    Postgres[(PostgreSQL)]
-    Redis[(Azure Cache for Redis)]
-    ServiceBus[(Azure Service Bus)]
-  end
-  SearchAPI[ScholarX Search API]
-  PostHog[PostHog Analytics]
-  Sentry[Sentry]
-  Worker[Certificate Worker]
-  Email[Email Providers]
+3. Domain Layer
+- `src/domain/`
+- Business logic, read-model builders, KPI semantics, policy objects
 
-  Browser --> UI --> API --> Domain
-  Domain --> Postgres
-  Domain --> Redis
-  API --> SearchAPI
-  API --> PostHog
-  API --> Sentry
-  Domain --> ServiceBus --> Worker --> Email
-```
+4. Data Layer
+- `src/db/` + Drizzle repositories
+- PostgreSQL persistence
+
+5. Observability & Analytics Layer
+- PostHog capture path via `/ingest/*`
+- Internal mirror (`/api/analytics/events`) for selected events
+- Event governance, validation, reconciliation
+
+## Request Boundary Rules
+- Public routes must not depend on authenticated-only logic
+- Admin behaviors must remain isolated
+- Client components must not import server-only modules
+
+## Analytics Architecture
+- Client boundary: `trackClientEvent`
+- Server boundary: `trackServerEvent`
+- Privacy filtering: forbidden-key sanitizer
+- Mirroring policy: event-driven whitelist
+- KPI alignment: mapping + reconciliation utilities
+
+## Runtime Topology
+- Browser ↔ Next.js standalone container on ACA
+- App container ↔ PostgreSQL
+- App/browser analytics ↔ PostHog (via same-origin proxy)
+- CI/CD via GitHub Actions builds Docker image and deploys ACA revision
+

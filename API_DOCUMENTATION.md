@@ -1,19 +1,39 @@
-# API Documentation
-
-## Overview
-ScholarX API routes are implemented in the Next.js App Router under `src/app/api`. Routes validate input, call domain services, and return JSON responses.
-
-## Major areas
-- **Opportunities search:** `/api/opportunities/search` for AI‑powered scholarship search.
-- **Courses & enrollment:** course listing, filtering, and enrollment flows.
-- **Certificates:** issuance, verification, and delivery flows.
-- **Analytics & dashboards:** executive analytics and KPI reporting.
-- **Auth & accounts:** authentication and user management.
+# 📡 API_DOCUMENTATION
 
 ## Conventions
-- Input validation uses Zod schemas.
-- Domain services encapsulate business logic.
-- Errors are surfaced through consistent API responses.
+- Framework: Next.js route handlers (`src/app/api/**/route.ts`)
+- JSON responses by default
+- Auth required for protected/admin endpoints
+- Validation at boundaries for query/body params
 
-## Where to look
-Browse `src/app/api` for the full route list and handler implementations.
+## Representative Endpoints
+
+### Public / Product
+1. `GET /api/opportunities/search?q=...`
+- Performs public opportunity search
+- Applies rate limit checks
+- Emits non-blocking analytics (`ai_search`)
+
+2. `POST /api/analytics/events`
+- Internal mirror ingestion endpoint for selected client events
+- Validates payload schema
+- Sanitizes and records analytics event
+
+### Executive / Admin
+1. `GET /api/admin/executive/*`
+- Serves executive page read-model payloads
+- Requires auth/admin access
+- Supports date-window and paging query shapes per section
+
+## Error Handling Pattern
+- `400` invalid request/query
+- `401` unauthenticated
+- `403` unauthorized
+- `404` feature-disabled/resource-not-found contextually
+- `429` rate-limited
+- `500` unexpected server errors
+
+## Versioning
+- Current APIs are path-versionless and controlled through internal contracts/tests.
+- Backward compatibility is maintained through additive changes where possible.
+

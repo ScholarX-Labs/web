@@ -1,27 +1,38 @@
-# Database Schema
+# 🗄️ DATABASE_SCHEMA
 
-## Overview
-ScholarX uses PostgreSQL with Drizzle ORM. Schema definitions live in `src/db/schema`, and migrations are generated into the `drizzle/` directory.
+## Primary Database
+- PostgreSQL
+- ORM: Drizzle
 
-## Schema files
-The Drizzle configuration includes the following schema modules:
-- `src/db/schema/auth-schema.ts`
-- `src/db/schema/contact-us-schema.ts`
-- `src/db/schema/courses-db.schema.ts`
-- `src/db/schema/admin-db.schema.ts`
-- `src/db/schema/certificates-db.schema.ts`
-- `src/db/schema/email-db.schema.ts`
+## Key Schema Areas
 
-## Namespaces
-The schema filter includes: `auth`, `public`, `courses`, `certificates`, and `email`.
+1. Auth/User
+- User identity and session-related tables managed by Better Auth integration
 
-## Migrations
-```bash
-pnpm db:generate   # generate migrations
-pnpm db:migrate    # apply migrations
-pnpm db:push       # push schema (dev convenience)
-```
+2. Product Domain
+- Courses, lessons, opportunities, learner progress, related operational entities
 
-## Notes
-- SSL mode is enforced to `verify-full` when SSL is enabled to avoid insecure database connections.
-- Refer to the schema files for exact table definitions and relationships.
+3. Executive Analytics
+- `executive.analytics_events` (typed event stream for mirrored analytics)
+- Freshness/action/governance tables for executive read models
+
+## Analytics Event Shape (Executive Mirror)
+- `event_type`
+- `occurred_at`
+- `user_id` (nullable)
+- `session_id_hash` (nullable)
+- `entity_type`, `entity_id` (nullable)
+- attribution fields (`source`, `medium`, `campaign`)
+- `device_type`
+- `metadata` JSONB
+
+## Migration Workflow
+- Generate: `pnpm db:generate`
+- Apply: `pnpm db:migrate`
+- Push (non-prod): `pnpm db:push`
+
+## Data Integrity Notes
+- Event types are strongly typed in schema contracts
+- Nullable fields used intentionally for privacy-safe, resilient ingestion
+- Governance/state tables support operational read models
+
