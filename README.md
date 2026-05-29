@@ -208,7 +208,7 @@ Principal SWE / tech lead responsible for:
 - Analytics governance forbids raw PII in event payloads.
 
 ## Impact metrics (product UI copy)
-These figures reflect the impact stats currently displayed in the app UI (see `src/lib/home-data.ts`).
+These figures are hardcoded impact stats in `src/lib/home-data.ts` and mirror what the UI displays.
 - **15,000+** students attended programs
 - **96** partner organizations
 - **38** events and programs delivered
