@@ -169,7 +169,16 @@ ScholarX is a Next.js 16 App Router application with API routes and a domain ser
 - Expand opportunity support beyond English and Arabic.
 - Consolidate executive KPIs with anomaly detection.
 
-## Public architecture documents
+## Architecture documentation
+- [SYSTEM_DESIGN.md](SYSTEM_DESIGN.md) — system design overview and key flows.
+- [ARCHITECTURE.md](ARCHITECTURE.md) — component architecture and repo layout.
+- [DATABASE_SCHEMA.md](DATABASE_SCHEMA.md) — schema modules and migration workflow.
+- [API_DOCUMENTATION.md](API_DOCUMENTATION.md) — API route structure and conventions.
+- [DEPLOYMENT.md](DEPLOYMENT.md) — deployment workflows and environment setup.
+- [TESTING.md](TESTING.md) — linting and test commands.
+- [SECURITY.md](SECURITY.md) — security posture and governance notes.
+- [PERFORMANCE.md](PERFORMANCE.md) — caching, rate limiting, and reliability.
+- [ROADMAP.md](ROADMAP.md) — forward-looking product and platform roadmap.
 - `/docs` — implementation guides, UI specs, and operational playbooks.
 - `/specs` — formal specs, plans, and architecture decisions.
 
