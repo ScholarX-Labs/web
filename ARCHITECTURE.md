@@ -16,7 +16,7 @@
 - `docs/` and `specs/` — implementation guides and formal specs.
 
 ## Deployment architecture
-ScholarX is deployed to Azure Container Apps. The web app and the worker are built as separate Docker images and deployed via GitHub Actions.
+ScholarX is deployed to Azure Container Apps. The web app and worker are built as separate Docker images and deployed via GitHub Actions for consistent releases.
 
 ## Architecture diagram
 ```mermaid
