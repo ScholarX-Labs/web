@@ -20,34 +20,7 @@ Empower students globally with accessible education, mentorship, and curated opp
 | ![Home](public/home-page/hero1.png) | ![Courses](public/Courses-hero-1.png) | ![Certificate](public/certificate-template.png) |
 
 ## Architecture diagram
-
-```mermaid
-flowchart LR
-  Browser[Users + Browsers]
-  subgraph Web["ScholarX Web (Next.js App Router)"]
-    UI[UI + Server Components]
-    API[Next.js API Routes]
-    Domain[Domain Services]
-  end
-  subgraph Data["Data & Infra"]
-    Postgres[(PostgreSQL)]
-    Redis[(Azure Cache for Redis)]
-    ServiceBus[(Azure Service Bus)]
-  end
-  SearchAPI[ScholarX Search API]
-  PostHog[PostHog Analytics]
-  Sentry[Sentry]
-  Worker[Certificate Worker]
-  Email[Email Providers]
-
-  Browser --> UI --> API --> Domain
-  Domain --> Postgres
-  Domain --> Redis
-  API --> SearchAPI
-  API --> PostHog
-  API --> Sentry
-  Domain --> ServiceBus --> Worker --> Email
-```
+See [ARCHITECTURE.md](ARCHITECTURE.md#architecture-diagram) for the canonical diagram.
 
 ## Tech stack
 - **Frontend:** Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS, Radix UI, Framer Motion
@@ -184,7 +157,7 @@ ScholarX is a Next.js 16 App Router application with API routes and a domain ser
 
 ## Issue tracking & release notes
 - GitHub Issues for backlog + triage.
-- Release checklist + changelog templates in `specs/014-posthog-analytics-governance/contracts/`.
+- Release checklist + changelog templates under `/specs` (current location: `specs/014-posthog-analytics-governance/contracts/`).
 
 ## Setup instructions
 ```bash
@@ -231,10 +204,7 @@ EXECUTIVE_E2E_BASE_URL=http://localhost:3000 \
 - **Worker:** `deploy-worker-aca.yml` runs lint/typecheck/tests, builds the worker image, runs DB migrations, and deploys the certificate worker.
 
 ## Roadmap
-- Personalized ranking signals for AI search.
-- Certificate template v2 with richer metadata.
-- Expanded multi-language opportunity support (beyond EN/AR).
-- Consolidated executive KPIs with anomaly detection.
+See [ROADMAP.md](ROADMAP.md) for the current roadmap.
 
 ## My role and contributions
 Principal SWE / tech lead responsible for:
