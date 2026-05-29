@@ -23,9 +23,12 @@ function PostHogPageView() {
 }
 
 if (typeof window !== "undefined") {
-  const key = process.env.NEXT_PUBLIC_POSTHOG_KEY;
+  const key = process.env.NEXT_PUBLIC_POSTHOG_KEY
+    ?? process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN;
   if (!key) {
-    console.warn("posthog.init skipped: NEXT_PUBLIC_POSTHOG_KEY is missing");
+    console.warn(
+      "posthog.init skipped: missing NEXT_PUBLIC_POSTHOG_KEY/NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN",
+    );
   } else {
     posthog.init(key, {
       api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
