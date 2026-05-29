@@ -207,8 +207,9 @@ Principal SWE / tech lead responsible for:
 - Postgres SSL mode is enforced for production-grade connections.
 - Analytics governance forbids raw PII in event payloads.
 
-## Impact metrics
-- **15,000+** students served
+## Impact metrics (product UI copy)
+These figures reflect the impact stats currently displayed in the app UI (see `src/lib/home-data.ts`).
+- **15,000+** students attended programs
 - **96** partner organizations
 - **38** events and programs delivered
 
