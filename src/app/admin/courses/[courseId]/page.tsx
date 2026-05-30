@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState, useEffect } from "react";
+import { use, useState } from "react";
 
 interface AdminLesson {
   id: string;
@@ -90,11 +90,12 @@ export default function AdminCourseDetailPage({ params }: { params: Promise<{ co
   const [pendingData, setPendingData] = useState<Partial<AdminCourse> | null>(null);
   const [resetKey, setResetKey] = useState(0);
 
-  useEffect(() => {
-    if (lessonsData) {
-      setLessons(lessonsData as AdminLesson[]);
-    }
-  }, [lessonsData]);
+  // Initialize lessons when lessonsData arrives
+  const [initializedData, setInitializedData] = useState<unknown>(null);
+  if (lessonsData && lessonsData !== initializedData) {
+    setInitializedData(lessonsData);
+    setLessons(lessonsData as AdminLesson[]);
+  }
 
   const c = course as AdminCourse | undefined;
 
