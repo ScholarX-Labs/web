@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 interface LessonData {
   id: string;
@@ -81,19 +81,21 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
     status: "draft"
   });
 
-  useEffect(() => {
-    if (lesson) {
-      setFormData({
-        title: lesson.title || "",
-        description: lesson.description || "",
-        content: lesson.content || "",
-        videoUrl: lesson.videoUrl || "",
-        duration: lesson.duration || 1,
-        isPrivate: lesson.isPrivate ?? true,
-        status: lesson.status ?? "draft"
-      });
-    }
-  }, [lesson]);
+  // Track the ID of the lesson we've initialized form state for
+  const [initializedLessonId, setInitializedLessonId] = useState<string | null>(null);
+
+  if (lesson && lesson.id !== initializedLessonId) {
+    setInitializedLessonId(lesson.id);
+    setFormData({
+      title: lesson.title || "",
+      description: lesson.description || "",
+      content: lesson.content || "",
+      videoUrl: lesson.videoUrl || "",
+      duration: lesson.duration || 1,
+      isPrivate: lesson.isPrivate ?? true,
+      status: lesson.status ?? "draft"
+    });
+  }
 
   const handleSave = async () => {
     if (!lesson) return;
@@ -110,9 +112,9 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
         className: "rounded-[20px] bg-white/80 backdrop-blur-xl border-emerald-100 shadow-xl",
       });
       onClose();
-    } catch (error: any) {
+    } catch (error) {
       console.error("Sync Error:", error);
-      toast.error("Synchronization failure: " + (error?.response?.data?.message || "Check log"));
+      toast.error("Synchronization failure: " + ((error as { response?: { data?: { message?: string } } })?.response?.data?.message || "Check log"));
     }
   };
 
