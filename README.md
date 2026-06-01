@@ -1,402 +1,248 @@
 # 🚀 ScholarX
 
 [![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)](https://www.typescriptlang.org/)
-[![Web Deploy](https://img.shields.io/badge/Web%20Deploy-GitHub%20Actions-blue)](./.github/workflows/deploy-aca.yml)
-[![Worker Deploy](https://img.shields.io/badge/Worker%20Deploy-GitHub%20Actions-blue)](./.github/workflows/deploy-worker-aca.yml)
+[![React](https://img.shields.io/badge/React-19-149eca)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6)](https://www.typescriptlang.org/)
 [![Testing](https://img.shields.io/badge/Tests-Unit%20%2B%20Integration%20%2B%20E2E-success)](./TESTING.md)
-[![Architecture](https://img.shields.io/badge/Architecture-Documented-informational)](./ARCHITECTURE.md)
-[![License](https://img.shields.io/badge/License-Proprietary-lightgrey)](#-license)
+[![Deploy](https://img.shields.io/badge/Deploy-Azure%20Container%20Apps-blue)](./DEPLOYMENT.md)
 
-🎯 ScholarX is an AI-powered scholarship and learning platform that helps learners discover high-fit opportunities and helps operators run the product with confidence through a production-grade executive analytics system.
+ScholarX is a production web platform for scholarship discovery, course learning, and executive operations.
 
-## 🌍 Product Mission
+This repository is intentionally engineered as a full-stack product system, not a marketing demo:
+- 🌐 Public growth surfaces are isolated from authenticated learner flows and admin operations.
+- 🧠 Domain logic lives in typed service boundaries, not UI components.
+- 📊 Analytics are governed as product-critical infrastructure with privacy, reconciliation, and fail-open guarantees.
+- 🚢 Delivery is automated with migration-aware CI/CD, environment validation, and operational runbooks.
 
-ScholarX exists to reduce the time, uncertainty, and information gaps between learners and life-changing opportunities.
+## 🏗️ Why This Codebase Shows Engineering Depth
 
-Our product mission is to:
-- 🤖 Personalize discovery with AI-assisted search and ranking.
-- 📈 Improve conversion from interest to application with clean UX and reliable funnel instrumentation.
-- 🧭 Give leadership a trustworthy operating system (quality, growth, finance, technical health) via an executive dashboard.
+### 1) 🧱 Architecture with Explicit Boundaries
 
-## 🔗 Live Demo
+ScholarX uses Next.js App Router with clear ownership seams:
+- `src/app`: routes, layouts, loading states, thin route handlers
+- `src/domain`: business modules (admin, courses, certificates, executive, email)
+- `src/lib`: cross-cutting adapters (auth, cache, analytics, APIs, rate limits)
+- `src/db`: schema and persistence definitions
 
-- 🌐 Production: [https://scholar-x.org](https://scholar-x.org)
-- 🛡️ Executive dashboard (auth/admin required): `https://scholar-x.org/admin/executive`
+The design principle is simple: request handlers orchestrate, services decide, repositories persist.
 
-## 🖼️ Screenshots / GIFs
+### 2) 🧭 Domain-Oriented Modeling (Not CRUD-Only)
 
-> Replace with project assets if not checked in yet.
+The system models behavior with explicit contracts and policies:
+- Course progression and completion policies
+- Certificate generation, queueing, storage, and artifact lifecycle
+- Executive metric definition, freshness, governance, and export rules
+- Email provider abstraction with rate-limiting and delivery classification
 
-- 🏠 Home: `docs/screenshots/home.png`
-- 🧠 AI Search: `docs/screenshots/ai-search.gif`
-- 🎓 Opportunities: `docs/screenshots/opportunities.png`
-- 📊 Executive Dashboard: `docs/screenshots/executive-dashboard.png`
+This reduces drift between product behavior and implementation details.
 
-## 🧱 Architecture
+### 3) 📈 Reliability-Centered Analytics Governance
+
+Analytics are treated as production infrastructure:
+- Canonical event dictionary and KPI mapping contracts
+- Same-origin ingestion path support (`/ingest/*`) for resilient client delivery
+- Privacy sanitization and forbidden-key filtering
+- Fail-open dispatch (user journeys never block on telemetry)
+- Curated internal mirror for executive continuity and reconciliation
+
+Governance artifacts and rollout playbooks live in:
+- `specs/014-posthog-analytics-governance/`
+
+### 4) ⚡ Performance and Runtime Safety
+
+The platform uses multiple safety levers:
+- Server Components by default where appropriate
+- Typed boundary validation for params and payloads
+- Feature-flag gating for executive and analytics capabilities
+- Shared cache abstractions with namespaced keys and test coverage
+- Controlled degradation behavior for external dependency failure paths
+
+### 5) 🛠️ Operational Maturity
+
+The repository includes operational capabilities usually missing from early-stage products:
+- Web + worker deployment pipelines
+- Drizzle migration lifecycle and baseline protections
+- Environment validation before build/dev entrypoints
+- Security and performance documentation with evidence artifacts
+- Executive E2E coverage for growth, quality, finance, and technical health views
+
+## 🗺️ System Architecture
 
 ```mermaid
 flowchart TB
-  %% =========================
-  %% Client Layer
-  %% =========================
-  subgraph C["🌐 Client Layer"]
-    U["User Browser"]
-    RSC["Next.js App Router (RSC + Client Components)"]
-    UI["Feature UIs (Home, Courses, Opportunities, AI Search, Executive)"]
-    PHSDK["PostHog JS SDK"]
-    SENTRYC["Sentry Client Instrumentation"]
+  subgraph Client["Client"]
+    Browser["Browser"]
+    UI["Next.js App Router UI"]
   end
 
-  %% =========================
-  %% Edge / Routing Layer
-  %% =========================
-  subgraph E["🧭 Edge & Routing Layer"]
-    MW["Proxy/Middleware (route classification + auth redirects)"]
-    ING["/ingest/* same-origin analytics ingress"]
-    APIM["/api/analytics/events mirror route"]
+  subgraph Edge["Edge and Routing"]
+    Middleware["Route Classification and Auth Redirects"]
+    Ingest["Same-Origin Analytics Ingestion"]
   end
 
-  %% =========================
-  %% Application Layer
-  %% =========================
-  subgraph A["🧩 Application Runtime"]
-    RH["Route Handlers / Server Actions"]
-    AUTH["Better Auth (session + identity)"]
-    FLAGS["Feature Flags + Env Validation"]
-    ANALYTICS["Analytics Boundary (schemas, privacy sanitizer, fail-open dispatcher)"]
-    SEG["Segmentation + Mirror Routing"]
+  subgraph App["Application Layer"]
+    Handlers["Route Handlers and Server Actions"]
+    Auth["Better Auth"]
+    AnalyticsBoundary["Typed Analytics Boundary"]
+    Flags["Feature Flags and Env Guards"]
   end
 
-  %% =========================
-  %% Domain Layer
-  %% =========================
-  subgraph D["🏗️ Domain Layer"]
-    CORE["Domain Services (courses, opportunities, ai-search, executive)"]
-    EXECAPP["Executive Read-Model Builders"]
-    KPI["KPI Mapping + Reconciliation Utilities"]
+  subgraph Domain["Domain Services"]
+    Courses["Courses"]
+    Certificates["Certificates"]
+    Admin["Admin"]
+    Executive["Executive"]
+    Email["Email"]
   end
 
-  %% =========================
-  %% Data Layer
-  %% =========================
-  subgraph DB["🗄️ Data & Infra Layer"]
-    DRIZZLE["Drizzle ORM"]
-    PG["PostgreSQL"]
-    REDIS["Redis (cache/rate limits when enabled)"]
+  subgraph Data["Data and Infra"]
+    Drizzle["Drizzle ORM"]
+    Postgres["PostgreSQL"]
+    Redis["Redis (optional)"]
+    PostHog["PostHog"]
   end
 
-  %% =========================
-  %% Observability & Analytics
-  %% =========================
-  subgraph O["📊 Observability & Analytics"]
-    PH["PostHog Cloud"]
-    EAS["Executive Analytics Events Store"]
-    DASH["Executive Dashboard APIs + UI"]
-    SENTRY["Sentry (errors/perf/replay)"]
-  end
-
-  %% =========================
-  %% Delivery Layer
-  %% =========================
-  subgraph CD["🚢 Delivery & Operations"]
-    GH["GitHub Actions (build/test/deploy)"]
-    DOCKER["Docker Standalone Build"]
-    ACA["Azure Container Apps"]
-    MIG["Production DB Migrations"]
-  end
-
-  %% Client flows
-  U --> RSC --> UI
-  UI --> PHSDK
-  UI --> SENTRYC
-
-  %% Edge flows
-  U --> MW
-  MW --> RSC
-  PHSDK --> ING
-  UI --> APIM
-
-  %% Ingestion + server analytics flows
-  ING --> PH
-  APIM --> ANALYTICS
-  ANALYTICS --> SEG
-  SEG --> EAS
-  ANALYTICS --> PH
-
-  %% App/domain/data flows
-  RSC --> RH
-  RH --> AUTH
-  RH --> FLAGS
-  RH --> CORE
-  CORE --> EXECAPP
-  EXECAPP --> KPI
-  CORE --> DRIZZLE --> PG
-  CORE --> REDIS
-  KPI --> DASH
-  EAS --> DASH
-
-  %% Observability flows
-  SENTRYC --> SENTRY
-  RH --> SENTRY
-
-  %% Delivery flows
-  GH --> DOCKER --> ACA
-  GH --> MIG --> PG
+  Browser --> Middleware --> UI
+  UI --> Handlers
+  Handlers --> Auth
+  Handlers --> Flags
+  UI --> AnalyticsBoundary
+  AnalyticsBoundary --> Ingest --> PostHog
+  Handlers --> Courses
+  Handlers --> Certificates
+  Handlers --> Admin
+  Handlers --> Executive
+  Handlers --> Email
+  Courses --> Drizzle
+  Certificates --> Drizzle
+  Admin --> Drizzle
+  Executive --> Drizzle
+  Email --> Drizzle
+  Drizzle --> Postgres
+  Courses --> Redis
+  Executive --> Redis
 ```
 
-## 🛠️ Tech Stack
+## ✨ Core Capabilities
 
-### 🧩 Application
-- Next.js 16 (App Router, Server Components)
-- React 19
-- TypeScript 5
-- Tailwind CSS
+- 🎓 Public scholarship and opportunity discovery surfaces
+- 🤖 AI-assisted opportunity search workflows
+- 🔐 Authenticated learner profiles and opportunity actions
+- 📚 Course catalog, enrollment, progress, and completion logic
+- 🧾 Certificate issuance and retrieval pipeline
+- 🧑‍💼 Admin operations and reporting
+- 📉 Executive analytics dashboard (growth, funnel quality, finance, technical health)
 
-### 🗄️ Data & Auth
-- Better Auth
+## 🧩 Stack and Platform Choices
+
+### Application
+- Next.js `16.2.6`
+- React `19.2.3`
+- TypeScript `5`
+- Tailwind CSS `4`
+
+### Data and Auth
+- Better Auth with Drizzle adapter
 - Drizzle ORM
 - PostgreSQL
+- Redis (cache/rate-limit capability)
 
-### 📡 Observability & Analytics
-- PostHog (same-origin ingestion proxy via `/ingest/*`)
-- Sentry
+### Analytics and Observability
+- PostHog (`posthog-js`)
+- Sentry (`@sentry/nextjs`)
 - Internal executive analytics mirror
 
-### ⚙️ Tooling
+### Delivery
 - pnpm
-- ESLint
-- Node test runner + `tsx`
-- Playwright (E2E)
-- Docker (standalone output)
-- Azure Container Apps deployment workflows
+- GitHub Actions CI/CD
+- Docker standalone output
+- Azure Container Apps deployment
 
-## ✨ Main Features
+## 🗂️ Repository Topology
 
-- 🌐 Public scholarship/course discovery
-- 🔐 Authenticated learner flows (profile, opportunities, AI search)
-- 📌 Opportunity save/apply tracking
-- 🤖 AI-assisted opportunity search
-- 🧑‍💼 Admin + executive views
-- 📈 Executive dashboard with sections for:
-  - Overview
-  - Public Growth
-  - Opportunities & AI
-  - Courses & Lessons
-  - Users
-  - Finance
-  - Technical Health
-  - Team Operations
+- `src/app/`: Next.js route tree and API handlers
+- `src/domain/`: business domains and contracts
+- `src/lib/`: shared platform libraries and adapters
+- `src/components/`: shared + feature UI
+- `src/db/`: schema and DB integration
+- `drizzle/`: migration history
+- `tests/e2e/`: executive and product journey tests
+- `specs/`: product specs, plans, contracts, rollout artifacts
 
-## 📊 Production-Grade Analytics (What’s Implemented)
+## 🧪 Local Development
 
-### ✅ Events currently tracked
-- `website_visit`
-- `cta_click`
-- `signup_started`
-- `signup_completed`
-- `ai_search`
-- `opportunity_apply_click`
-- `opportunity_view` (PostHog only)
-- `opportunity_save` (PostHog only)
-
-### 🧠 Architecture highlights
-- 🧼 Privacy sanitizer for forbidden keys
-- 🛡️ Fail-open dispatch (analytics failures never block UX)
-- ✅ Event schema validation
-- 🧭 Mirror routing policy for KPI-critical events
-- 📐 KPI mapping + reconciliation utilities
-- 🔎 True-zero vs data-gap semantics in executive metrics
-
-### 📚 Governance artifacts
-See `specs/014-posthog-analytics-governance/`:
-- event dictionary
-- KPI mapping
-- release checklist
-- contract change-log template
-- validation report
-
-## 🗂️ Repository Layout
-
-- `src/app/` route segments, layouts, route handlers
-- `src/components/` reusable and feature UI
-- `src/lib/` app libraries (auth, analytics, services)
-- `src/domain/` business/domain layer and read models
-- `src/db/` schema
-- `specs/` product + implementation artifacts
-- `.github/workflows/` deployment workflows
-
-## 🧪 Local Setup
-
-### 📦 Prerequisites
+### Prerequisites
 - Node.js 22+
 - pnpm 10+
 - PostgreSQL
 
-### ⬇️ Install
+### Install
 ```bash
 pnpm install
 ```
 
-### 🔧 Configure environment
-Create `.env.local` and set required variables.
+### Configure
+- Copy `.env.example` to `.env.local`
+- Fill required public and server variables
 
-### 🗃️ Run migrations
+### Migrate DB
 ```bash
 pnpm db:migrate
 ```
 
-### ▶️ Start dev server
+### Run
 ```bash
 pnpm dev
 ```
 
-### ✅ Verify
-Open [http://localhost:3000](http://localhost:3000)
+## ✅ Engineering Commands
 
-## 🔐 Environment Variables
-
-### 🌍 Public (build-time)
-- `NEXT_PUBLIC_API_URL`
-- `NEXT_PUBLIC_API_BASE_URL`
-- `NEXT_PUBLIC_POSTHOG_KEY` (or `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN`)
-- `NEXT_PUBLIC_POSTHOG_HOST`
-- `NEXT_PUBLIC_POSTHOG_UI_HOST`
-- `NEXT_PUBLIC_SENTRY_DSN`
-
-### 🖥️ Server / Auth / Data
-- `DATABASE_URL`
-- `DATABASE_SSL`
-- `BETTER_AUTH_URL`
-- `BETTER_AUTH_SECRET`
-
-### 🚩 Feature Flags (examples)
-- `SCHOLARX_EXECUTIVE_DASHBOARD_ENABLED`
-- `SCHOLARX_EXECUTIVE_TEAM_OPS_ENABLED`
-- `SCHOLARX_EXECUTIVE_FINANCE_ENABLED`
-- `SCHOLARX_EXECUTIVE_GOVERNANCE_ENABLED`
-- `SCHOLARX_EXECUTIVE_AI_HEATMAP_ENABLED`
-- `SCHOLARX_ANALYTICS_ENABLED`
-- `SCHOLARX_ANALYTICS_INTERNAL_MIRROR_ENABLED`
-
-### ⚡ Cache / Rate Limits
-- `CACHE_ENABLED`
-- `DISTRIBUTED_RATE_LIMITS_ENABLED`
-- `REDIS_URL` or `AZURE_REDIS_*`
-- `REDIS_KEY_PREFIX`
-
-## 🗄️ Database & Migrations
-
-Generate migration:
 ```bash
-pnpm db:generate
-```
-
-Apply migration:
-```bash
-pnpm db:migrate
-```
-
-Push schema (non-prod workflows):
-```bash
-pnpm db:push
-```
-
-## 🧪 Testing Guide
-
-Typecheck:
-```bash
+pnpm lint
 pnpm typecheck
-```
-
-Unit/integration tests:
-```bash
 pnpm test
-```
-
-API-focused tests:
-```bash
 pnpm test:api
 ```
 
-E2E suite:
+E2E suite (current pattern in repo):
 ```bash
 node --import tsx --test tests/e2e/**/*.spec.ts
 ```
 
-## 🚢 Deployment Guide
+## 🗄️ Data and Migration Workflow
 
-### 🤖 CI/CD
-- Web deploy workflow: `.github/workflows/deploy-aca.yml`
-- Worker deploy workflow: `.github/workflows/deploy-worker-aca.yml`
+```bash
+pnpm db:generate
+pnpm db:migrate
+pnpm db:push
+```
 
-### ⚠️ Build-time env requirement (critical)
-`NEXT_PUBLIC_*` values must be present during Docker build.
+`db:migrate` includes baseline migration protections before applying new steps.
 
-Current workflow passes build args for:
-- `NEXT_PUBLIC_SENTRY_DSN`
-- `NEXT_PUBLIC_POSTHOG_KEY`
-- `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN`
-- `NEXT_PUBLIC_POSTHOG_HOST`
-- `NEXT_PUBLIC_POSTHOG_UI_HOST`
+## 🔒 Security and Privacy Posture
 
-### ☁️ Runtime
-Deploys to Azure Container Apps with standalone Next.js output.
+- Public/auth/admin boundaries are intentionally separated.
+- Client bundles use only `NEXT_PUBLIC_*` values.
+- Analytics payloads are sanitized before dispatch.
+- Sensitive key patterns are filtered from telemetry.
+- Admin and internal paths are excluded from public growth instrumentation.
 
-## 🔒 Security Notes
+## 🏅 Quality Evidence
 
-- 🚫 No secrets in client bundles.
-- 🧼 Analytics payloads are sanitized before dispatch.
-- 🛡️ Forbidden fields (tokens/secrets/password-like keys) are filtered.
-- 🧭 Admin/internal paths are excluded from public growth analytics.
-- 🔐 Auth boundaries preserved between public/auth/admin surfaces.
+- Architecture notes: [ARCHITECTURE.md](./ARCHITECTURE.md)
+- System design: [SYSTEM_DESIGN.md](./SYSTEM_DESIGN.md)
+- Security notes: [SECURITY.md](./SECURITY.md)
+- Testing strategy: [TESTING.md](./TESTING.md)
+- Engineering quality: [ENGINEERING_QUALITY.md](./ENGINEERING_QUALITY.md)
+- Performance protocol: [PERFORMANCE.md](./PERFORMANCE.md)
+- Release process: [RELEASES.md](./RELEASES.md)
 
-## 👨‍💻 My Role & Contributions
+## 📚 Selected Reference Specs
 
-I led end-to-end engineering for core platform and analytics reliability, including:
-- 🏗️ Product architecture and full-stack delivery across discovery, AI search, and opportunities.
-- 📐 Production analytics governance system design and implementation.
-- 🔁 PostHog ingestion hardening (same-origin `/ingest` strategy + middleware/proxy safety).
-- 📊 KPI reconciliation and executive dashboard data integrity model.
-- 🚀 CI/CD deployment improvements for build-time public env correctness.
-- ✅ Test strategy spanning unit, integration, and E2E critical user journeys.
-
-## 📈 Impact Metrics (Template)
-
-> Replace with your latest validated numbers.
-
-- Signup funnel completion rate: `+X%`
-- Opportunity apply conversion: `+Y%`
-- AI zero-result rate: `-Z%`
-- Executive KPI reconciliation variance: `< 5%`
-- Analytics delivery reliability: `>= 99%`
-
-## ⚠️ Known Limitations
-
-- Total registered users should be sourced from DB as the authoritative metric.
-- Client-side events can still be impacted by user browser privacy extensions in edge cases.
-- Some advanced analytics slices depend on instrumentation depth per surface.
-
-## 🗺️ Roadmap
-
-- [ ] Server-authoritative `user_created` event at auth boundary
-- [ ] Advanced cohort retention dashboards
-- [ ] Experimentation framework (A/B)
-- [ ] Anomaly detection on executive KPIs
-- [ ] Multi-tenant/org-level analytics segmentation
+- Analytics governance plan: [specs/014-posthog-analytics-governance/plan.md](./specs/014-posthog-analytics-governance/plan.md)
+- Analytics contracts: [specs/014-posthog-analytics-governance/contracts/README.md](./specs/014-posthog-analytics-governance/contracts/README.md)
+- Executive dashboard spec: [specs/012-executive-dashboard/spec.md](./specs/012-executive-dashboard/spec.md)
 
 ## 📄 License
 
 Proprietary. All rights reserved.
-
-## 🏅 Engineering Quality Evidence
-
-- ✅ CI/CD workflows: `.github/workflows/deploy-aca.yml`, `.github/workflows/deploy-worker-aca.yml`
-- ✅ Changelog: [CHANGELOG.md](./CHANGELOG.md)
-- ✅ Release/tagging process: [RELEASES.md](./RELEASES.md)
-- ✅ Testing strategy + E2E notes: [TESTING.md](./TESTING.md)
-- ✅ Lint/typecheck/test commands: [ENGINEERING_QUALITY.md](./ENGINEERING_QUALITY.md)
-- ✅ Security practices: [SECURITY.md](./SECURITY.md)
-- ✅ Performance strategy + benchmark protocol: [PERFORMANCE.md](./PERFORMANCE.md)
-- ✅ Planning artifacts: [ROADMAP.md](./ROADMAP.md), [GitHub issue template](./.github/ISSUE_TEMPLATE/feature_request.md)
-- ✅ PR decision documentation: [PR template](./.github/pull_request_template.md)
