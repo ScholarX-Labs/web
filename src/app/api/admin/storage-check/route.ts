@@ -25,7 +25,6 @@ export async function GET(request: NextRequest) {
     });
 
     const isAdmin = session?.user?.role === "admin";
-
     const providedKey = request.headers.get("x-internal-key") || "";
     const expectedKey = process.env.INTERNAL_API_KEY || "";
 
