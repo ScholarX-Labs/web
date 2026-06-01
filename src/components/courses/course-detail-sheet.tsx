@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 import { CourseSurfaceIntent } from "@/stores/course-sheet.store";
 import { useFlipAnimation } from "@/hooks/use-flip-animation";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { CourseRichText } from "./course-rich-text";
 
 interface CourseDetailSheetProps {
   course: Course;
@@ -300,9 +301,10 @@ export function CourseDetailSheet({
                       <h4 className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-400">
                         Overview
                       </h4>
-                      <p className="mt-3 text-[17px] leading-relaxed text-slate-700 dark:text-slate-300">
-                        {course.description}
-                      </p>
+                      <CourseRichText
+                        text={course.description}
+                        className="mt-3 text-[17px] text-slate-700 dark:text-slate-300"
+                      />
                     </motion.div>
 
                     <motion.div
