@@ -517,7 +517,7 @@ export function CourseApplicationForm({
   return (
     <DialogContent
       overlayClassName={overlayClassName}
-      className="z-90 overflow-hidden rounded-[24px] sm:rounded-[30px] border border-white/60 bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.16),_transparent_30%),linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,250,252,0.94))] p-0 shadow-[0_40px_120px_rgba(15,23,42,0.28)] backdrop-blur-2xl dark:border-white/10 dark:bg-[radial-gradient(circle_at_top,_rgba(14,165,233,0.16),_transparent_28%),linear-gradient(180deg,rgba(2,6,23,0.94),rgba(15,23,42,0.96))] w-[calc(100vw-24px)] max-w-none sm:w-[90vw] sm:max-w-5xl h-[96vh] sm:h-auto sm:max-h-[90vh] flex flex-col"
+      className="z-90 overflow-hidden rounded-[24px] sm:rounded-[30px] border border-white/60 bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.16),_transparent_30%),linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,250,252,0.94))] p-0 shadow-[0_40px_120px_rgba(15,23,42,0.28)] backdrop-blur-2xl dark:border-white/10 dark:bg-[radial-gradient(circle_at_top,_rgba(14,165,233,0.16),_transparent_28%),linear-gradient(180deg,rgba(2,6,23,0.94),rgba(15,23,42,0.96))] w-[calc(100vw-24px)] max-w-none sm:w-[90vw] sm:max-w-5xl h-[100dvh] max-h-[100dvh] sm:h-auto sm:max-h-[90dvh] flex flex-col"
     >
       <DialogTitle className="sr-only">Apply for {course.title}</DialogTitle>
 
@@ -643,7 +643,7 @@ export function CourseApplicationForm({
               </div>
             </div>
 
-            <div className="min-h-0 flex-1 overflow-y-auto scholar-scrollbar px-5 py-6 sm:px-8 relative">
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain scholar-scrollbar px-5 py-6 pb-[max(env(safe-area-inset-bottom),1rem)] sm:px-8 relative">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={currentStep.key}
