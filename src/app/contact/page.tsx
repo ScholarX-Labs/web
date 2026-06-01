@@ -2,6 +2,9 @@ import Image from "next/image";
 
 import ContactForm from "./_components/ContactForm";
 
+export const revalidate = 60 * 60 * 24;
+export const dynamic = "force-static";
+
 function Page() {
   return (
     <section className="p-8 mx-auto grid w-full max-w-6xl items-start gap-8 lg:grid-cols-[1.1fr_1fr] lg:gap-12">
