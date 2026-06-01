@@ -13,6 +13,9 @@ import {
   ANIMATION_TIMINGS,
 } from "./constants";
 
+export const revalidate = 60 * 60 * 24;
+export const dynamic = "force-static";
+
 export default function AboutPage() {
   return (
     <main className="relative min-h-screen w-full overflow-x-hidden">
