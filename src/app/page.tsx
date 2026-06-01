@@ -8,6 +8,8 @@ import {
   WHO_WE_HELP_SECTION,
 } from "@/lib/home-data";
 
+export const revalidate = 60 * 60 * 24;
+export const dynamic = "force-static";
 
 export const metadata: Metadata = {
   title: "ScholarX — Premium Learning Platform",
