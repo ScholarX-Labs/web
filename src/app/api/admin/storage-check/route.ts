@@ -5,6 +5,7 @@ import { appConfig } from "@/db/schema/app-config-schema";
 import { auth } from "@/lib/auth";
 import { calculateR2Usage } from "@/lib/upload";
 import { clearConfigCache, setConfig } from "@/lib/app-config";
+import * as crypto from "crypto";
 
 const FREE_TIER_GB = 10;
 
@@ -24,7 +25,17 @@ export async function GET(request: NextRequest) {
     });
 
     const isAdmin = session?.user?.role === "admin";
-    const isInternal = request.headers.get("x-internal-key") === process.env.INTERNAL_API_KEY;
+    const providedKey = request.headers.get("x-internal-key") || "";
+    const expectedKey = process.env.INTERNAL_API_KEY || "";
+
+    let isInternal = false;
+    if (providedKey && expectedKey) {
+      const providedBuffer = Buffer.from(providedKey);
+      const expectedBuffer = Buffer.from(expectedKey);
+      if (providedBuffer.length === expectedBuffer.length) {
+        isInternal = crypto.timingSafeEqual(providedBuffer, expectedBuffer);
+      }
+    }
 
     if (!isAdmin && !isInternal) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
