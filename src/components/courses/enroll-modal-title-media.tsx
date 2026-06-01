@@ -4,6 +4,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Course } from "@/types/course.types";
+import { CourseRichText } from "./course-rich-text";
 
 interface EnrollModalTitleMediaProps {
   course: Course;
@@ -66,6 +67,12 @@ export function EnrollModalTitleMedia({
           <p className="mt-1 truncate text-sm text-slate-500">
             By {course.instructor?.name || "Expert Instructor"}
           </p>
+          {course.description ? (
+            <CourseRichText
+              text={course.description}
+              className="mt-2 line-clamp-2 text-sm text-slate-600 dark:text-slate-300"
+            />
+          ) : null}
         </div>
       </div>
     </div>
