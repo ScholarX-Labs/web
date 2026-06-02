@@ -1,0 +1,10 @@
+--- src/app/admin/courses/[courseId]/_components/lesson-editor.tsx
++++ src/app/admin/courses/[courseId]/_components/lesson-editor.tsx
+@@ -116,7 +116,7 @@
+       onClose();
+     } catch (error: unknown) {
+       console.error("Sync Error:", error);
+-      toast.error("Synchronization failure: " + ((error as any)?.response?.data?.message || "Check log"));
++      toast.error("Synchronization failure: " + (error instanceof Error ? error.message : "Check log"));
+     }
+   };
