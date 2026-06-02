@@ -1,0 +1,54 @@
+--- src/app/admin/courses/[courseId]/_components/lesson-editor.tsx
++++ src/app/admin/courses/[courseId]/_components/lesson-editor.tsx
+@@ -82,15 +82,18 @@
+
+   useEffect(() => {
+     if (lesson) {
+-      setFormData({
+-        title: lesson.title || "",
+-        description: lesson.description || "",
+-        content: lesson.content || "",
+-        videoUrl: lesson.videoUrl || "",
+-        duration: lesson.duration || 1,
+-        isPrivate: lesson.isPrivate ?? true,
+-        status: lesson.status ?? "draft"
+-      });
++      const timeout = setTimeout(() => {
++        setFormData({
++          title: lesson.title || "",
++          description: lesson.description || "",
++          content: lesson.content || "",
++          videoUrl: lesson.videoUrl || "",
++          duration: lesson.duration || 1,
++          isPrivate: lesson.isPrivate ?? true,
++          status: lesson.status ?? "draft"
++        });
++      }, 0);
++      return () => clearTimeout(timeout);
+     }
+   }, [lesson]);
+
+@@ -112,7 +115,7 @@
+         className: "rounded-[20px] bg-white/80 backdrop-blur-xl border-emerald-100 shadow-xl",
+       });
+       onClose();
+-    } catch (error: any) {
++    } catch (error: unknown) {
+       console.error("Sync Error:", error);
+-      toast.error("Synchronization failure: " + (error?.response?.data?.message || "Check log"));
++      toast.error("Synchronization failure: " + ((error as any)?.response?.data?.message || "Check log"));
+     }
+   };
+--- src/app/admin/courses/[courseId]/page.tsx
++++ src/app/admin/courses/[courseId]/page.tsx
+@@ -91,7 +91,10 @@
+
+   useEffect(() => {
+     if (lessonsData) {
+-      setLessons(lessonsData as AdminLesson[]);
++      const timeout = setTimeout(() => {
++        setLessons(lessonsData as AdminLesson[]);
++      }, 0);
++      return () => clearTimeout(timeout);
+     }
+   }, [lessonsData]);

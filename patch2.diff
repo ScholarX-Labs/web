@@ -1,0 +1,11 @@
+--- src/components/ui/radial-orbital-timeline.tsx
++++ src/components/ui/radial-orbital-timeline.tsx
+@@ -20,7 +20,7 @@
+   const [activeNodeId, setActiveNodeId] = useState<number | null>(null)
+   const containerRef = useRef<HTMLDivElement>(null)
+   const orbitRef = useRef<HTMLDivElement>(null)
+-  const nodeRefs = useRef<Record<number, HTMLDivElement | null>>({})
++  const nodeRefs = useRef<Record<number, HTMLButtonElement | null>>({})
+
+   const handleContainerClick = (e: React.MouseEvent<HTMLDivElement>) => {
+     if (e.target === containerRef.current || e.target === orbitRef.current) {

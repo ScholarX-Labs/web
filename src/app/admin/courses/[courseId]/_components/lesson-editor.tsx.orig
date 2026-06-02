@@ -22,12 +22,12 @@ import {
   DrawerContent,
 } from "@/components/ui/drawer-sheet";
 import { Label } from "@/components/ui/label";
-import { 
-  Video, 
-  FileText, 
-  Clock, 
-  Lock, 
-  Globe, 
+import {
+  Video,
+  FileText,
+  Clock,
+  Lock,
+  Globe,
   Sparkles,
   Layers,
   CheckCircle2,
@@ -115,7 +115,7 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
       onClose();
     } catch (error: unknown) {
       console.error("Sync Error:", error);
-      toast.error("Synchronization failure: " + (error instanceof Error ? error.message : "Check log"));
+      toast.error("Synchronization failure: " + ((error as any)?.response?.data?.message || "Check log"));
     }
   };
 
@@ -127,13 +127,13 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
         {/* Immersive Loading Overlay */}
         <AnimatePresence>
           {updateLesson.isPending && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="absolute inset-0 z-[100] bg-white/70 dark:bg-zinc-950/70 backdrop-blur-xl flex flex-col items-center justify-center p-12 text-center"
             >
-              <motion.div 
+              <motion.div
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 className="space-y-8 max-w-md w-full"
@@ -142,7 +142,7 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
                   <div className="size-24 rounded-[32px] bg-blue-500/10 flex items-center justify-center mx-auto ring-1 ring-blue-500/20">
                     <Layers className="size-10 text-blue-500 animate-pulse" />
                   </div>
-                  <motion.div 
+                  <motion.div
                     animate={{ rotate: 360 }}
                     transition={{ repeat: Infinity, duration: 4, ease: "linear" }}
                     className="absolute inset-0 border-t-2 border-blue-500 rounded-[32px] opacity-40"
@@ -154,7 +154,7 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
                 </div>
                 <div className="space-y-4">
                   <div className="w-full h-2 bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden shadow-inner">
-                    <motion.div 
+                    <motion.div
                       initial={{ width: "0%" }}
                       animate={{ width: "100%" }}
                       transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
@@ -172,9 +172,9 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
         </AnimatePresence>
 
         <div className={cn("mx-auto w-full max-w-3xl overflow-y-auto max-h-[88vh] px-8 pb-12 pt-6 hide-scrollbar relative", updateLesson.isPending && "pointer-events-none")}>
-          
+
           {/* Close Button - Magnetic Effect */}
-          <motion.button 
+          <motion.button
             whileHover={{ scale: 1.1, rotate: 90 }}
             whileTap={{ scale: 0.9 }}
             onClick={onClose}
@@ -184,12 +184,12 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
           </motion.button>
 
           {/* Header - Staggered & Animated */}
-          <motion.header 
+          <motion.header
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             className="flex flex-col items-center text-center mb-14 mt-4"
           >
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.5, rotate: -15 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ type: "spring", stiffness: 200, damping: 12 }}
@@ -210,19 +210,19 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
             </div>
           </motion.header>
 
-          <motion.div 
+          <motion.div
             variants={containerVariants}
             initial="hidden"
             animate="visible"
             className="space-y-8"
           >
             {/* Essential Configuration Section */}
-            <motion.section 
+            <motion.section
               variants={itemVariants}
               className="group relative bg-white dark:bg-zinc-900/50 rounded-[32px] p-7 shadow-sm border border-slate-100 dark:border-white/5 transition-all duration-500 hover:shadow-2xl hover:shadow-blue-500/5 hover:border-blue-500/20"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-[32px]" />
-              
+
               <div className="relative space-y-6">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between mb-1 ml-1">
@@ -251,7 +251,7 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
             </motion.section>
 
             {/* Knowledge Registry (Markdown) */}
-            <motion.section 
+            <motion.section
               variants={itemVariants}
               className="group relative bg-white dark:bg-zinc-900/50 rounded-[32px] p-7 shadow-sm border border-slate-100 dark:border-white/5 transition-all duration-500 hover:shadow-2xl hover:shadow-indigo-500/5 hover:border-indigo-500/20"
             >
@@ -275,12 +275,12 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
             </motion.section>
 
             {/* Bento Dynamic Grid */}
-            <motion.section 
+            <motion.section
               variants={itemVariants}
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"
             >
               {/* Video URL */}
-              <motion.div 
+              <motion.div
                 whileHover={{ y: -5 }}
                 className="sm:col-span-2 lg:col-span-2 bg-white dark:bg-zinc-900/50 rounded-[28px] p-6 shadow-sm border border-slate-100 dark:border-white/5 space-y-4 hover:border-red-500/20 group"
               >
@@ -297,7 +297,7 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
               </motion.div>
 
               {/* Duration */}
-              <motion.div 
+              <motion.div
                 whileHover={{ y: -5 }}
                 className="bg-white dark:bg-zinc-900/50 rounded-[28px] p-6 shadow-sm border border-slate-100 dark:border-white/5 space-y-4 hover:border-emerald-500/20 group"
               >
@@ -320,7 +320,7 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
               </motion.div>
 
             {/* Access Protocol - Dual Bento Selection */}
-            <motion.section 
+            <motion.section
               variants={itemVariants}
               className="space-y-6"
             >
@@ -331,18 +331,18 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[
-                  { 
-                    id: "private", 
-                    label: "Secure Node", 
+                  {
+                    id: "private",
+                    label: "Secure Node",
                     intel: "Private Access",
                     desc: "Restricted to authorized enrolled students only. Requires active subscription.",
                     icon: Lock,
                     color: "amber",
                     isPrivate: true
                   },
-                  { 
-                    id: "public", 
-                    label: "Open Node", 
+                  {
+                    id: "public",
+                    label: "Open Node",
                     intel: "Public Preview",
                     desc: "Visible to all visitors as a free preview sample. Marketing discovery enabled.",
                     icon: Globe,
@@ -357,8 +357,8 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
                     onClick={() => setFormData({ ...formData, isPrivate: p.isPrivate })}
                     className={cn(
                       "relative flex flex-col text-left p-6 rounded-[32px] transition-all duration-300 border-2 cursor-pointer overflow-hidden group",
-                      formData.isPrivate === p.isPrivate 
-                        ? `bg-white dark:bg-zinc-900 border-${p.color}-500 shadow-2xl shadow-${p.color}-500/10 ring-4 ring-${p.color}-500/5` 
+                      formData.isPrivate === p.isPrivate
+                        ? `bg-white dark:bg-zinc-900 border-${p.color}-500 shadow-2xl shadow-${p.color}-500/10 ring-4 ring-${p.color}-500/5`
                         : "bg-slate-50/50 dark:bg-zinc-950/50 border-transparent hover:border-slate-200 dark:hover:border-zinc-800"
                     )}
                   >
@@ -370,7 +370,7 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
                         <p.icon className="size-5" />
                       </div>
                       {formData.isPrivate === p.isPrivate && (
-                        <motion.div 
+                        <motion.div
                           initial={{ scale: 0 }}
                           animate={{ scale: 1 }}
                           className={cn("size-6 rounded-full flex items-center justify-center bg-white shadow-md border", `text-${p.color}-500`)}
@@ -379,7 +379,7 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
                         </motion.div>
                       )}
                     </div>
-                    
+
                     <div className="space-y-1 relative z-10">
                       <h3 className={cn(
                         "text-[13px] font-black uppercase tracking-wider",
@@ -395,7 +395,7 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
                 ))}
               </div>
 
-              <motion.div 
+              <motion.div
                 layout
                 className="bg-slate-50 dark:bg-zinc-900/50 border border-slate-100 dark:border-zinc-800 rounded-[28px] p-6 relative overflow-hidden"
               >
@@ -406,8 +406,8 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
                   <div className="space-y-1">
                     <h4 className="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-widest">Protocol Intelligence</h4>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
-                      {formData.isPrivate 
-                        ? "This node is encrypted for premium subscribers. Access tokens are required for visual stream decryption and knowledge base retrieval." 
+                      {formData.isPrivate
+                        ? "This node is encrypted for premium subscribers. Access tokens are required for visual stream decryption and knowledge base retrieval."
                         : "This node is marked for discovery. It will be used in marketing funnels and SEO indexing to demonstrate curriculum quality."}
                     </p>
                   </div>
@@ -424,7 +424,7 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
                   </div>
                   <AnimatePresence>
                     {updateLesson.isPending && (
-                      <motion.div 
+                      <motion.div
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: 20 }}
@@ -439,33 +439,33 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {[
-                    { 
-                      id: "draft", 
-                      label: "Draft", 
+                    {
+                      id: "draft",
+                      label: "Draft",
                       intel: "Incubation",
                       desc: "Work-in-progress. Private & Inaccessible.",
                       icon: FileText,
                       color: "blue"
                     },
-                    { 
-                      id: "staging", 
-                      label: "Staging", 
+                    {
+                      id: "staging",
+                      label: "Staging",
                       intel: "QA Review",
                       desc: "Content complete. Pending final verification.",
                       icon: Layers,
                       color: "indigo"
                     },
-                    { 
-                      id: "published", 
-                      label: "Live", 
+                    {
+                      id: "published",
+                      label: "Live",
                       intel: "Production",
                       desc: "Operational. Accessible to all students.",
                       icon: Globe,
                       color: "emerald"
                     },
-                    { 
-                      id: "archived", 
-                      label: "Archived", 
+                    {
+                      id: "archived",
+                      label: "Archived",
                       intel: "Legacy",
                       desc: "Retired. Preserves historical data logs.",
                       icon: Lock,
@@ -480,13 +480,13 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
                       onClick={() => setFormData({ ...formData, status: s.id })}
                       className={cn(
                         "relative flex flex-col text-left p-6 rounded-[32px] transition-all duration-500 border-2 cursor-pointer overflow-hidden group",
-                        formData.status === s.id 
-                          ? `bg-white dark:bg-zinc-900 border-${s.color}-500 shadow-2xl shadow-${s.color}-500/20 ring-4 ring-${s.color}-500/5` 
+                        formData.status === s.id
+                          ? `bg-white dark:bg-zinc-900 border-${s.color}-500 shadow-2xl shadow-${s.color}-500/20 ring-4 ring-${s.color}-500/5`
                           : "bg-slate-50/50 dark:bg-zinc-950/50 border-transparent hover:border-slate-200 dark:hover:border-zinc-800"
                       )}
                     >
                       <div className="flex items-start justify-between mb-5">
-                        <motion.div 
+                        <motion.div
                           layout
                           className={cn(
                             "p-3.5 rounded-2xl text-white shadow-lg transition-colors duration-500",
@@ -496,7 +496,7 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
                           <s.icon className="size-5" />
                         </motion.div>
                         {formData.status === s.id && (
-                          <motion.div 
+                          <motion.div
                             initial={{ scale: 0, rotate: -45 }}
                             animate={{ scale: 1, rotate: 0 }}
                             className={cn("size-6 rounded-full flex items-center justify-center bg-white shadow-md border border-slate-100", `text-${s.color}-500`)}
@@ -505,7 +505,7 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
                           </motion.div>
                         )}
                       </div>
-                      
+
                       <div className="space-y-2 relative z-10">
                         <div className="flex items-center gap-2">
                           <h3 className={cn(
@@ -516,8 +516,8 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
                           </h3>
                           <span className={cn(
                             "text-[8px] font-black uppercase tracking-[0.2em] px-2 py-0.5 rounded-full transition-all duration-500",
-                            formData.status === s.id 
-                              ? `bg-${s.color}-500/10 text-${s.color}-500` 
+                            formData.status === s.id
+                              ? `bg-${s.color}-500/10 text-${s.color}-500`
                               : "bg-slate-100 dark:bg-zinc-800 text-slate-400"
                           )}>
                             {s.intel}
@@ -534,7 +534,7 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
                       {/* Dynamic Background Halo */}
                       <AnimatePresence>
                         {formData.status === s.id && (
-                          <motion.div 
+                          <motion.div
                             layoutId="haloglow"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
@@ -551,7 +551,7 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
                 </div>
 
                 {/* State Intelligence Dashboard */}
-                <motion.div 
+                <motion.div
                   layout
                   className="bg-slate-900 dark:bg-white rounded-[32px] p-8 shadow-2xl relative overflow-hidden"
                 >
@@ -567,7 +567,7 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
                           Architectural Impact: High
                         </div>
                       </div>
-                      
+
                       <AnimatePresence mode="wait">
                         <motion.div
                           key={formData.status}
@@ -610,7 +610,7 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
           </motion.div>
 
           {/* Action Footer - High Energy */}
-          <motion.footer 
+          <motion.footer
             initial={{ y: 50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.6, type: "spring", damping: 15 }}
@@ -635,7 +635,7 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
                 </div>
               </Button>
             </motion.div>
-            
+
             <motion.div className="flex-1" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button
                 variant="outline"
@@ -651,5 +651,3 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
     </Drawer>
   );
 }
-
-
