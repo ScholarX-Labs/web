@@ -1,0 +1,4 @@
+## 2024-05-24 - Zod URL Validation XSS Vulnerability
+**Vulnerability:** `z.string().url()` in Zod allows URLs starting with `javascript:`, enabling Stored XSS if the URL is later rendered as an `href` or `src` attribute. This was present in user profile social links and admin schemas.
+**Learning:** Zod's default `.url()` schema only checks for valid URI format per RFC 3986, not specifically for safe HTTP/HTTPS protocols. Relying on it for user-provided URLs in web applications is insecure by default.
+**Prevention:** Always refine Zod URL schemas to explicitly require secure protocols (e.g., `z.string().url().refine((val) => val.startsWith("http://") || val.startsWith("https://"))`) when validating URLs intended for web output.
