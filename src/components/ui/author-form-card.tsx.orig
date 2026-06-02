@@ -2,7 +2,6 @@ import * as React from "react";
 import { motion } from "framer-motion";
 import { Plus, Info, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Variants } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,7 +20,7 @@ interface AuthorFormCardProps {
   className?: string;
 }
 
-const FADE_IN_VARIANTS: Variants = {
+const FADE_IN_VARIANTS = {
   hidden: { opacity: 0, y: 10 },
   show: { opacity: 1, y: 0, transition: { type: "spring" } },
 };
