@@ -1,0 +1,4 @@
+## 2025-02-28 - [Timing Attack Vulnerability in API Key Comparison]
+**Vulnerability:** Comparing `INTERNAL_API_KEY` or other sensitive tokens/keys using strict equality (`===`) exposes the application to timing attacks, as strict equality returns `false` as soon as the first character mismatch is detected. This allows an attacker to deduce the key character by character by measuring the response time.
+**Learning:** Node.js's standard equality operator `===` is not constant-time. Timing-safe comparisons must always be used for secrets.
+**Prevention:** Use `crypto.timingSafeEqual` to compare secrets. Ensure strings are first converted to `Buffer`s, and make sure their lengths are compared before calling `timingSafeEqual` (since `timingSafeEqual` will throw an error if buffers are of different lengths).
