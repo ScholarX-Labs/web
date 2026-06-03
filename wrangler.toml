@@ -1,0 +1,9 @@
+name = "web"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+[site]
+bucket = ".open-next/assets"
+
+[build]
+command = "npm run build"
