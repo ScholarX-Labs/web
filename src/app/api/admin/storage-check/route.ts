@@ -5,6 +5,7 @@ import { appConfig } from "@/db/schema/app-config-schema";
 import { auth } from "@/lib/auth";
 import { calculateR2Usage } from "@/lib/upload";
 import { clearConfigCache, setConfig } from "@/lib/app-config";
+import crypto from "crypto";
 
 const FREE_TIER_GB = 10;
 
@@ -24,7 +25,21 @@ export async function GET(request: NextRequest) {
     });
 
     const isAdmin = session?.user?.role === "admin";
-    const isInternal = request.headers.get("x-internal-key") === process.env.INTERNAL_API_KEY;
+
+    // Constant-time validation of internal API key to prevent timing attacks
+    const providedKeyStr = request.headers.get("x-internal-key");
+    const expectedKeyStr = process.env.INTERNAL_API_KEY;
+
+    let isInternal = false;
+
+    if (providedKeyStr && expectedKeyStr) {
+      const providedKey = Buffer.from(providedKeyStr);
+      const expectedKey = Buffer.from(expectedKeyStr);
+
+      if (providedKey.length === expectedKey.length) {
+        isInternal = crypto.timingSafeEqual(providedKey, expectedKey);
+      }
+    }
 
     if (!isAdmin && !isInternal) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
