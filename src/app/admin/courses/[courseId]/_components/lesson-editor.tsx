@@ -72,17 +72,18 @@ const itemVariants = {
 export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
   const updateLesson = useUpdateLesson();
   const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    content: "",
-    videoUrl: "",
-    duration: 0,
-    isPrivate: true,
-    status: "draft"
+    title: lesson?.title || "",
+    description: lesson?.description || "",
+    content: lesson?.content || "",
+    videoUrl: lesson?.videoUrl || "",
+    duration: lesson?.duration || 0,
+    isPrivate: lesson?.isPrivate ?? true,
+    status: lesson?.status || "draft"
   });
 
   useEffect(() => {
     if (lesson) {
+
       setFormData({
         title: lesson.title || "",
         description: lesson.description || "",
@@ -93,7 +94,8 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
         status: lesson.status ?? "draft"
       });
     }
-  }, [lesson]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lesson?.id]);
 
   const handleSave = async () => {
     if (!lesson) return;
@@ -110,9 +112,24 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
         className: "rounded-[20px] bg-white/80 backdrop-blur-xl border-emerald-100 shadow-xl",
       });
       onClose();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Sync Error:", error);
-      toast.error("Synchronization failure: " + (error?.response?.data?.message || "Check log"));
+      let errorMessage = "Check log";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (typeof error === "object" && error !== null) {
+        const errObj = error as Record<string, unknown>;
+        if (
+          typeof errObj.response === "object" &&
+          errObj.response !== null &&
+          typeof (errObj.response as Record<string, unknown>).data === "object" &&
+          (errObj.response as Record<string, unknown>).data !== null &&
+          typeof ((errObj.response as Record<string, unknown>).data as Record<string, unknown>).message === "string"
+        ) {
+          errorMessage = ((errObj.response as Record<string, unknown>).data as Record<string, unknown>).message as string;
+        }
+      }
+      toast.error("Synchronization failure: " + errorMessage);
     }
   };
 
