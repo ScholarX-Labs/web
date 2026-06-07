@@ -1,6 +1,6 @@
 import "server-only";
 
-import { createHmac, randomUUID } from "crypto";
+import { createHmac, randomUUID } from "node:crypto";
 
 const INTERNAL_AUTH_VERSION = "v1";
 const DEFAULT_TOKEN_TTL_SECONDS = 60;

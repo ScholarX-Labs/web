@@ -140,6 +140,9 @@ importers:
       nuqs:
         specifier: ^2.8.9
         version: 2.8.9(next@16.2.6(@babel/core@7.29.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react@19.2.3)
+      opennextjs-cloudflare:
+        specifier: ^1.0.0
+        version: 1.0.0
       pg:
         specifier: ^8.20.0
         version: 8.20.0
@@ -5027,6 +5030,9 @@ packages:
   open@11.0.0:
     resolution: {integrity: sha512-smsWv2LzFjP03xmvFoJ331ss6h+jixfA4UUV/Bsiyuu4YJPfN+FIQGOIiv4w9/+MoHkfkJ22UIaQWRVFRfH6Vw==}
     engines: {node: '>=20'}
+
+  opennextjs-cloudflare@1.0.0:
+    resolution: {integrity: sha512-udcoJaxZyMUp+uYt5Lumz0b+uuCsbnQP8jG7kexZltHaO9ANxfPBhrju4MzkrUPUb3ePox9nQ7Bo2e9Wbeux9g==}
 
   optionator@0.9.4:
     resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
@@ -11044,6 +11050,8 @@ snapshots:
       is-inside-container: 1.0.0
       powershell-utils: 0.1.0
       wsl-utils: 0.3.1
+
+  opennextjs-cloudflare@1.0.0: {}
 
   optionator@0.9.4:
     dependencies:

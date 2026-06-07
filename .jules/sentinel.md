@@ -1,0 +1,5 @@
+
+## 2024-06-07 - [Prevent Timing Attacks in Key Comparisons]
+**Vulnerability:** Internal API key validation was performing string comparison using strict equality (`===`) for the `x-internal-key` header against the `INTERNAL_API_KEY` environment variable. This allows an attacker to perform a timing attack because strict equality exits early when characters do not match, revealing the key length and character-by-character values.
+**Learning:** Security-sensitive string comparisons like API keys, secrets, or passwords should always be compared in constant time, meaning the execution time of the comparison function does not change depending on whether the strings match or not, or where the first mismatch occurs.
+**Prevention:** Use `crypto.timingSafeEqual(Buffer.from(provided), Buffer.from(expected))` to compare secrets. Ensure the inputs are converted to Buffers, and the buffers are strictly compared by length first (`buf1.length === buf2.length`), to avoid `RangeError` from unequal length inputs without prematurely leaking information.
