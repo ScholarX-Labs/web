@@ -59,7 +59,7 @@ export const AuthorFormCard: React.FC<AuthorFormCardProps> = ({
       )}
     >
       <div className="flex items-center justify-between">
-        <motion.h3 variants={FADE_IN_VARIANTS} className="text-xl font-semibold text-foreground">
+        <motion.h3  className="text-xl font-semibold text-foreground">
           Add a writer
         </motion.h3>
         <Button variant="ghost" size="icon" onClick={onCancel} aria-label="Close">
@@ -68,7 +68,7 @@ export const AuthorFormCard: React.FC<AuthorFormCardProps> = ({
       </div>
 
       <form onSubmit={handleSubmit} className="mt-6 grid grid-cols-1 gap-8 md:grid-cols-3">
-        <motion.div variants={FADE_IN_VARIANTS} className="flex flex-col items-center gap-3 md:col-span-1">
+        <motion.div  className="flex flex-col items-center gap-3 md:col-span-1">
           <div className="relative">
             <Avatar className="h-24 w-24 border-2 border-dashed border-border">
               <AvatarImage src={imageUrl} alt={name || "Author"} />
@@ -94,7 +94,7 @@ export const AuthorFormCard: React.FC<AuthorFormCardProps> = ({
         </motion.div>
 
         <div className="flex flex-col gap-4 md:col-span-2">
-          <motion.div variants={FADE_IN_VARIANTS} className="grid w-full items-center gap-1.5">
+          <motion.div  className="grid w-full items-center gap-1.5">
             <Label htmlFor="author-name">
               Author name <span className="text-red-500">*</span>
             </Label>
@@ -107,7 +107,7 @@ export const AuthorFormCard: React.FC<AuthorFormCardProps> = ({
               required
             />
           </motion.div>
-          <motion.div variants={FADE_IN_VARIANTS} className="grid w-full items-center gap-1.5">
+          <motion.div  className="grid w-full items-center gap-1.5">
             <div className="flex items-center gap-1">
               <Label htmlFor="title">Title</Label>
               <TooltipProvider>
@@ -131,7 +131,7 @@ export const AuthorFormCard: React.FC<AuthorFormCardProps> = ({
           </motion.div>
         </div>
 
-        <motion.div variants={FADE_IN_VARIANTS} className="flex justify-end gap-3 md:col-span-3">
+        <motion.div  className="flex justify-end gap-3 md:col-span-3">
           <Button type="button" variant="ghost" onClick={onCancel}>
             Cancel
           </Button>
