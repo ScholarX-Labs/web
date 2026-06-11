@@ -1,0 +1,4 @@
+## 2024-06-11 - [Timing Attack in API Key Comparison]
+**Vulnerability:** The API key in `src/app/api/admin/storage-check/route.ts` was compared using strict equality (`===`), which is vulnerable to timing attacks. An attacker could potentially deduce the internal API key by observing the time taken to reject incorrect keys.
+**Learning:** Comparing sensitive strings like API keys or secrets using standard equality operators allows timing attacks because the comparison stops at the first differing character.
+**Prevention:** Always use `crypto.timingSafeEqual` to compare secrets. Ensure inputs are converted to Buffers and verify their byte lengths match (`buf1.length === buf2.length`) before comparing to prevent `RangeError`. Also, avoid empty string fallbacks for provided and expected keys, as missing environment variables might lead to authentication bypasses.
