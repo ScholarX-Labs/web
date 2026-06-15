@@ -33,7 +33,7 @@ export const AuthorFormCard: React.FC<AuthorFormCardProps> = ({
 }) => {
   const [name, setName] = React.useState(initialData?.name || "");
   const [title, setTitle] = React.useState(initialData?.title || "");
-  const [imageUrl, setImageUrl] = React.useState<string | undefined>(initialData?.imageUrl);
+  const [imageUrl] = React.useState<string | undefined>(initialData?.imageUrl);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
