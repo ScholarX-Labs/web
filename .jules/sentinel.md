@@ -1,0 +1,7 @@
+## 2024-06-16 - Prevent Auth Bypass & Timing Attacks in Custom Auth Headers
+
+**Vulnerability:** The internal API route authentication `src/app/api/admin/storage-check/route.ts` previously used strict equality (`===`) to compare the incoming `x-internal-key` header with `process.env.INTERNAL_API_KEY`. This was vulnerable to a timing attack, potentially allowing an attacker to deduce the secret key character by character by measuring response times. In addition, insecure empty string fallbacks during comparison could potentially lead to an auth bypass if the environment variable is missing and the user sends an empty header.
+
+**Learning:** When comparing sensitive strings like API keys or secrets, strict string comparison (`===`) must be avoided. The standard Node `crypto.timingSafeEqual` should be utilized. Additionally, when using `crypto.timingSafeEqual`, the comparison will fail with a `RangeError` if the two Buffers do not have the exact same length. We must first explicitly compare byte lengths (`buf1.length === buf2.length`) before comparing their contents, instead of comparing string lengths (which can lead to bypasses with multi-byte characters).
+
+**Prevention:** Always convert input keys/secrets into Buffers and securely check length (`headerBuffer.length === expectedBuffer.length`) before calling `crypto.timingSafeEqual` in authentication checks. Never use fallback values (e.g., `|| ""`) that might evaluate to true if the environment lacks the secret and the request lacks the header.
