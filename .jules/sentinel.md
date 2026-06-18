@@ -1,0 +1,4 @@
+## 2024-06-03 - [Stored XSS via javascript: URIs in Zod's z.string().url()]
+**Vulnerability:** Zod's `z.string().url()` permits `javascript:` URIs by default. If URLs parsed by this schema are later injected into `href` or `src` attributes on the frontend without additional validation, it can lead to Stored Cross-Site Scripting (XSS).
+**Learning:** `z.string().url()` only verifies if a string is technically a valid URI. It doesn't restrict protocols. Assuming that `.url()` acts as a security measure against XSS is a common pitfall.
+**Prevention:** Always refine URL schemas when the expected input should be a web link: `.refine((val) => /^https?:\/\//i.test(val), "Must be an HTTP/HTTPS URL")`. Apply this to profile social links, admin image/video fields, and any env configuration fetching external URLs.

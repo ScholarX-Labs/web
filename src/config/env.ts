@@ -4,18 +4,18 @@ const envSchema = z.object({
   NEXT_PUBLIC_API_URL: z.string().min(1).default("/api"),
   NEXT_PUBLIC_API_BASE_URL: z.string().min(1).default("/api"),
 
-  R2_ENDPOINT: z.string().url().optional(),
+  R2_ENDPOINT: z.string().url().refine((val) => /^https?:\/\//i.test(val), "Must be an HTTP or HTTPS URL").optional(),
   R2_ACCESS_KEY: z.string().optional(),
   R2_SECRET_KEY: z.string().optional(),
   R2_BUCKET_NAME: z.string().optional(),
-  R2_PUBLIC_URL: z.string().url().optional(),
+  R2_PUBLIC_URL: z.string().url().refine((val) => /^https?:\/\//i.test(val), "Must be an HTTP or HTTPS URL").optional(),
 
-  UPSTASH_REDIS_URL: z.string().url().optional(),
+  UPSTASH_REDIS_URL: z.string().url().refine((val) => /^https?:\/\//i.test(val), "Must be an HTTP or HTTPS URL").optional(),
   UPSTASH_REDIS_TOKEN: z.string().optional(),
 
   AVATAR_UPLOAD_ENABLED: z.enum(["true", "false"]).optional(),
 
-  BETTER_AUTH_URL: z.string().url().optional(),
+  BETTER_AUTH_URL: z.string().url().refine((val) => /^https?:\/\//i.test(val), "Must be an HTTP or HTTPS URL").optional(),
   BETTER_AUTH_SECRET: z.string().min(32).optional(),
 });
 
