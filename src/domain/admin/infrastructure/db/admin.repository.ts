@@ -70,7 +70,7 @@ export const createAdminRepository = (): AdminRepository => {
         conditions.push(eq(dbCourses.category, query.category));
       }
 
-      const where = and(...(conditions as SQL[]));
+      const where = conditions.length > 0 ? and(...(conditions as SQL[])) : undefined;
 
       return paginate(
         async (l, o) =>
