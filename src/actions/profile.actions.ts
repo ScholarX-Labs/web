@@ -38,12 +38,16 @@ const updateProfileSchema = z.object({
   gpa: z.coerce.number().min(0).max(4).optional(),
 });
 
+const secureUrlSchema = z.string().url().refine((val) => /^https?:\/\//i.test(val), {
+  message: "URL must start with http:// or https://",
+});
+
 const socialLinksSchema = z.object({
-  githubUrl: z.string().url().optional().or(z.literal("")),
-  facebookUrl: z.string().url().optional().or(z.literal("")),
-  instagramUrl: z.string().url().optional().or(z.literal("")),
-  twitterUrl: z.string().url().optional().or(z.literal("")),
-  linkedinUrl: z.string().url().optional().or(z.literal("")),
+  githubUrl: secureUrlSchema.optional().or(z.literal("")),
+  facebookUrl: secureUrlSchema.optional().or(z.literal("")),
+  instagramUrl: secureUrlSchema.optional().or(z.literal("")),
+  twitterUrl: secureUrlSchema.optional().or(z.literal("")),
+  linkedinUrl: secureUrlSchema.optional().or(z.literal("")),
 });
 
 export async function getProfile(): Promise<ActionResponse<ProfileData>> {

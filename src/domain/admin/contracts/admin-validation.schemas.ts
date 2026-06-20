@@ -1,5 +1,9 @@
 import { z } from "zod";
 
+const secureUrlSchema = z.string().url().refine((val) => /^https?:\/\//i.test(val), {
+  message: "URL must start with http:// or https://",
+});
+
 export const CreateCourseSchema = z.object({
   title: z.string().min(3).max(255),
   slug: z.string().min(3).max(255).regex(/^[a-z0-9-]+$/, "Slug must be lowercase alphanumeric with dashes"),
@@ -10,8 +14,8 @@ export const CreateCourseSchema = z.object({
   originalPrice: z.coerce.number().min(0).optional(),
   requiresForm: z.coerce.boolean().optional(),
   salesInquiry: z.coerce.boolean().optional(),
-  imageUrl: z.string().url().optional().or(z.literal("")),
-  videoPreviewUrl: z.string().url().optional().or(z.literal("")),
+  imageUrl: secureUrlSchema.optional().or(z.literal("")),
+  videoPreviewUrl: secureUrlSchema.optional().or(z.literal("")),
   tags: z.array(z.string()).optional(),
   status: z.enum(["active", "inactive", "draft"]).optional(),
   instructorId: z.string().uuid().optional(),
@@ -35,7 +39,7 @@ export const CreateLessonSchema = z.object({
   title: z.string().min(1).max(255),
   description: z.string().max(2000).optional(),
   content: z.string().optional(),
-  videoUrl: z.string().url().optional().or(z.literal("")),
+  videoUrl: secureUrlSchema.optional().or(z.literal("")),
   duration: z.coerce.number().int().positive().optional(),
   isPrivate: z.coerce.boolean().optional(),
   status: z.enum(["draft", "staging", "published", "archived"]).optional(),
