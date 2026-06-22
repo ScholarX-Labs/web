@@ -11,3 +11,5 @@ export default async function AdminInquiriesPage() {
 
   return <InquiriesTable initialItems={items} initialPagination={pagination} />;
 }
+
+export const dynamic = "force-dynamic";

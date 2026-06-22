@@ -11,3 +11,5 @@ export default async function AdminUsersPage() {
 
   return <UsersTable initialItems={items} initialPagination={pagination} />;
 }
+
+export const dynamic = "force-dynamic";
