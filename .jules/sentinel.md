@@ -1,4 +1,0 @@
-## 2024-06-22 - [Secure Internal API Key Comparison]
-**Vulnerability:** Timing attack vulnerability in `src/app/api/admin/storage-check/route.ts` where `x-internal-key` header was compared to `process.env.INTERNAL_API_KEY` using strict equality (`===`).
-**Learning:** Using strict equality (`===`) for secrets allows attackers to determine the length and contents of the secret by measuring the time it takes to compare the values (timing attacks). Also, if the environment variable is missing and the user omits the header, empty string fallbacks (e.g., `|| ""`) can create an authentication bypass.
-**Prevention:** Always use `crypto.timingSafeEqual` to compare secrets. Convert the inputs to Buffers first and verify their byte lengths match (`buf1.length === buf2.length`) before calling `timingSafeEqual`. Do not use empty string fallbacks; check that both values exist before comparison.
