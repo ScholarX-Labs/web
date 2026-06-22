@@ -1,5 +1,7 @@
 import "server-only";
 
+export const dynamic = "force-dynamic";
+
 import { createHmac, randomUUID } from "crypto";
 
 const INTERNAL_AUTH_VERSION = "v1";

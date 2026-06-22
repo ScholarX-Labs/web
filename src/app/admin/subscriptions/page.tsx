@@ -13,3 +13,5 @@ export default async function AdminSubscriptionsPage() {
     <SubscriptionsTable initialItems={items} initialPagination={pagination} />
   );
 }
+
+export const dynamic = "force-dynamic";
