@@ -1,0 +1,4 @@
+## 2025-02-24 - [HIGH] Fix API Key Timing Attack Vulnerability
+**Vulnerability:** The `x-internal-key` header was being compared against `process.env.INTERNAL_API_KEY` using strict string equality (`===`). This allows an attacker to deduce the correct key character by character by measuring the response time (a timing attack).
+**Learning:** Comparing secrets or API keys must be done in constant time to prevent leaking information through response times. Simple equality checks short-circuit and fail immediately upon finding the first mismatched character.
+**Prevention:** Always use `crypto.timingSafeEqual` when comparing secrets. Ensure both inputs are converted to Buffers, and explicitly compare their lengths before using `timingSafeEqual` to avoid `RangeError`. Do not use empty string fallbacks (e.g. `|| ""`) because if both are missing, they would falsely match as empty strings, creating an authentication bypass.
