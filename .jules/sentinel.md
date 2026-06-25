@@ -1,0 +1,4 @@
+## 2025-02-23 - [Timing-Safe Equality for API Keys]
+**Vulnerability:** The application was using strict equality (`===`) to compare the `x-internal-key` header with `process.env.INTERNAL_API_KEY`. This is vulnerable to timing attacks, as strict equality returns `false` early when a character mismatch occurs.
+**Learning:** Comparing secrets, API keys, or tokens should always use a constant-time comparison algorithm to prevent attackers from inferring the correct value by measuring response times.
+**Prevention:** Always use `crypto.timingSafeEqual(Buffer.from(providedKey), Buffer.from(expectedKey))` to compare secrets. Ensure that the provided strings are not empty or missing, and verify `providedBuffer.length === expectedBuffer.length` before calling `timingSafeEqual`, as it throws an error if lengths differ.
