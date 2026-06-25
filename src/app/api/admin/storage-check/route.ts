@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
-import crypto from "crypto";
+import crypto from "node:crypto";
 import { auth } from "@/lib/auth";
 import { calculateR2Usage } from "@/lib/upload";
 import { clearConfigCache, setConfig } from "@/lib/app-config";
