@@ -20,9 +20,9 @@ interface AuthorFormCardProps {
   className?: string;
 }
 
-const FADE_IN_VARIANTS = {
+const FADE_IN_VARIANTS: any = {
   hidden: { opacity: 0, y: 10 },
-  show: { opacity: 1, y: 0, transition: { type: "spring" as const } },
+  show: { opacity: 1, y: 0, transition: { type: "spring" } },
 };
 
 export const AuthorFormCard: React.FC<AuthorFormCardProps> = ({

@@ -31,7 +31,7 @@ export default function RadialOrbitalTimeline({ timelineData }: RadialOrbitalTim
   const [activeNodeId, setActiveNodeId] = useState<number | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const orbitRef = useRef<HTMLDivElement>(null)
-  const nodeRefs = useRef<Record<number, HTMLButtonElement | null>>({})
+  const nodeRefs = useRef<Record<number, HTMLDivElement | null>>({})
 
   const handleContainerClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === containerRef.current || e.target === orbitRef.current) {
@@ -156,7 +156,7 @@ export default function RadialOrbitalTimeline({ timelineData }: RadialOrbitalTim
             return (
               <button type="button"
                 key={item.id}
-                ref={(el) => { nodeRefs.current[item.id] = el }}
+                ref={(el) => { nodeRefs.current[item.id] = el as any }}
                 className="absolute transition-all duration-700 cursor-pointer text-left"
                 style={nodeStyle}
                 onClick={(e) => { e.stopPropagation(); toggleItem(item.id) }}
