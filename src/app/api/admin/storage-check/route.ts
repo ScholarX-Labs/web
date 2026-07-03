@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { calculateR2Usage } from "@/lib/upload";
 import { clearConfigCache, setConfig } from "@/lib/app-config";
-import { timingSafeEqual } from "node:crypto";
+import crypto from "crypto";
 
 const FREE_TIER_GB = 10;
 
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
 
       // Compare byte length first to avoid RangeError, then use timingSafeEqual
       isInternal = providedBuffer.length === expectedBuffer.length &&
-                   timingSafeEqual(providedBuffer, expectedBuffer);
+                   crypto.timingSafeEqual(providedBuffer, expectedBuffer);
     }
 
     if (!isAdmin && !isInternal) {
