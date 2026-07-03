@@ -9,7 +9,7 @@ import { admin, bearer, emailOTP, phoneNumber } from "better-auth/plugins";
 import { parsePhoneNumberWithError } from "libphonenumber-js";
 import { z } from "zod";
 import { sendEmail } from "./email";
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { resolveEmailLocale } from "@/lib/email/send";
 import { verificationEmail } from "@/lib/email/templates/verification";
 import { signinOtpEmail } from "@/lib/email/templates/signin-otp";
@@ -133,7 +133,7 @@ export const auth = betterAuth({
         category: "password_reset",
         requestedByUserId: user.id,
         purpose: "password_reset",
-        idempotencyKey: `password_reset:${user.id}:${url}`,
+        idempotencyKey: `password_reset:${user.id}:${createHash("sha256").update(url).digest("hex")}`,
       });
     },
   },
@@ -412,7 +412,7 @@ export const auth = betterAuth({
             html,
             category: "auth_otp",
             purpose: type,
-            idempotencyKey: `auth_otp:${type}:${normalizedEmail}:${otp}`,
+            idempotencyKey: `auth_otp:${type}:${normalizedEmail}:${createHash("sha256").update(otp).digest("hex")}`,
           });
         } finally {
           await recordEmailOtpSend(normalizedEmail);

@@ -39,6 +39,9 @@ function createDb() {
 let _db: ReturnType<typeof drizzle> | undefined;
 
 function getDb() {
+  if (typeof globalThis !== "undefined" && (globalThis as any).__MOCK_DB__) {
+    return (globalThis as any).__MOCK_DB__;
+  }
   if (!_db) {
     _db = createDb();
   }
