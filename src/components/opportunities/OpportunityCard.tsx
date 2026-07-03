@@ -1,6 +1,10 @@
+"use client";
+
 import { useState } from "react";
 import { Funding, FundingColors, Opportunity } from "@/lib/opportunities/types";
 import { Bookmark, Calendar, MapPin, ArrowUpRight } from "lucide-react";
+import { useTranslations, useLocale } from "next-intl";
+import { useRTLMotion } from "@/hooks/useRTLMotion";
 import OpportunityModal from "./OpportunityModal";
 import { COLOR_MAP, getBadgeColors } from "@/lib/opportunities/colors";
 import { motion, AnimatePresence } from "framer-motion";
@@ -18,9 +22,17 @@ const FUNDING_DISPLAY_NAME: Record<Funding, string> = {
 };
 
 function OpportiuntyCard({ Opportunity }: { Opportunity: Opportunity }) {
+  const t = useTranslations("opportunities.card");
+  const locale = useLocale();
+  const { getX } = useRTLMotion();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [originRect, setOriginRect] = useState<DOMRect | null>(null);
+
+  const fundingDisplayNames = {
+    [Funding.FullyFunded]: t("fullyFunded"),
+    [Funding.PartiallyFunded]: t("partiallyFunded"),
+  };
 
   const handleCardClick = (e: React.MouseEvent) => {
     const cardElement = e.currentTarget as HTMLElement;
@@ -133,7 +145,7 @@ function OpportiuntyCard({ Opportunity }: { Opportunity: Opportunity }) {
               <div className="flex items-center gap-1.5">
                 <Calendar size={14} className="text-primary/60" />
                 <span>
-                  {new Date(Opportunity.deadline).toLocaleDateString("en-US", {
+                  {new Date(Opportunity.deadline).toLocaleDateString(locale, {
                     month: "short",
                     day: "2-digit",
                     year: "numeric",
@@ -163,17 +175,17 @@ function OpportiuntyCard({ Opportunity }: { Opportunity: Opportunity }) {
                         colors.border
                       )}
                     >
-                      {FUNDING_DISPLAY_NAME[type]}
+                      {fundingDisplayNames[type]}
                     </span>
                   );
                 })}
             </div>
             
             <motion.div
-              animate={isHovered ? { x: 5 } : { x: 0 }}
+              animate={isHovered ? { x: getX(5) } : { x: 0 }}
               className="flex items-center gap-1 text-primary font-bold text-sm shrink-0"
             >
-              <span>View Details</span>
+              <span>{t("viewDetails")}</span>
               <ArrowUpRight size={16} />
             </motion.div>
           </div>
