@@ -24,6 +24,7 @@ import { useCourseSheetStore } from "@/stores/course-sheet.store";
 import { useEnrollIntentController } from "@/lib/enrollment/intent-controller";
 import { useSession } from "@/lib/auth-client";
 import { getCategoryStyle } from "@/lib/course-categories";
+import { useTranslations } from "next-intl";
 
 interface CourseCardProps {
   course: Course;
@@ -31,6 +32,7 @@ interface CourseCardProps {
 }
 
 export function CourseCard({ course, className }: CourseCardProps) {
+  const t = useTranslations("courses.card");
   const isDesktop = useMediaQuery("(min-width: 1024px)");
   const router = useRouter();
   const { data: session, isPending: isSessionPending } = useSession();
@@ -156,14 +158,14 @@ export function CourseCard({ course, className }: CourseCardProps) {
             {/* Elegant gradient overlay */}
             <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/10 to-transparent opacity-80 transition-opacity duration-500 group-hover/course-card:opacity-95" />
 
-            {course.category &&
+             {course.category &&
               (() => {
                 const style = getCategoryStyle(course.category);
                 const Icon = style.icon;
                 return (
                   <div
                     className={cn(
-                      "absolute left-4 top-4 px-3 py-1.5 text-xs shadow-sm text-white font-semibold tracking-wide rounded-md ring-1 backdrop-blur-md flex items-center gap-1.5 bg-linear-to-r",
+                      "absolute dir-left-4 top-4 px-3 py-1.5 text-xs shadow-sm text-white font-semibold tracking-wide rounded-md ring-1 backdrop-blur-md flex items-center gap-1.5 bg-linear-to-r",
                       style.gradient,
                       style.shadow,
                       style.ring,
@@ -175,7 +177,7 @@ export function CourseCard({ course, className }: CourseCardProps) {
                 );
               })()}
 
-            <div className="absolute bottom-4 right-4 shadow-lg transition-transform duration-500 ease-out group-hover/course-card:-translate-y-1">
+            <div className="absolute bottom-4 dir-right-4 shadow-lg transition-transform duration-500 ease-out group-hover/course-card:-translate-y-1">
               <CoursePrice
                 price={course.price}
                 className="bg-black/60 backdrop-blur-xl px-3 py-1.5 rounded-full text-sm border border-white/10 text-white"
@@ -186,13 +188,13 @@ export function CourseCard({ course, className }: CourseCardProps) {
               type="button"
               onClick={handleEnrollClick}
               className={cn(
-                "absolute bottom-4 left-4 rounded-full px-3 py-1.5 text-xs font-semibold text-white shadow-lg transition-colors",
+                "absolute bottom-4 dir-left-4 rounded-full px-3 py-1.5 text-xs font-semibold text-white shadow-lg transition-colors",
                 course.isSubscribed 
                   ? "bg-emerald-500 hover:bg-emerald-600" 
                   : "bg-hero-blue hover:bg-hero-blue-dark"
               )}
             >
-              {course.isSubscribed ? "Go to Course" : "Enroll"}
+              {course.isSubscribed ? t("goToCourse") : t("enroll")}
             </button>
           </div>
 
