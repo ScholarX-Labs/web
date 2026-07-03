@@ -1,21 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import Field from "@/app/auth/_components/Field";
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
+import { useTranslations } from "next-intl";
 
-const forgotPasswordSchema = z.object({
-  email: z.email({ message: "Enter a valid email address" }),
-});
-
-type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
+type ForgotPasswordFormData = {
+  email: string;
+};
 
 export default function ForgotPasswordForm() {
+  const t = useTranslations("auth.forgotPassword");
   const [success, setSuccess] = useState(false);
+
+  const forgotPasswordSchema = useMemo(() => z.object({
+    email: z.email({ message: t("errors.emailInvalid") }),
+  }), [t]);
 
   const {
     register,
@@ -45,11 +49,10 @@ export default function ForgotPasswordForm() {
     return (
       <div className="flex flex-col gap-4 text-center">
         <h2 className="text-2xl font-semibold text-primary">
-          Check your email
+          {t("successTitle")}
         </h2>
         <p className="text-muted-foreground">
-          We&apos;ve sent a password reset link to your email address. It will
-          expire in 10 minutes.
+          {t("successDescription")}
         </p>
       </div>
     );
@@ -58,17 +61,16 @@ export default function ForgotPasswordForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
       <h2 className="text-center text-3xl font-semibold mb-2">
-        Request Reset Password Link
+        {t("title")}
       </h2>
       <p className="text-center text-sm text-muted-foreground mb-4">
-        Enter your email address and we&apos;ll send you a link to reset your
-        password.
+        {t("description")}
       </p>
 
       <Field
-        label="Email"
+        label={t("emailLabel")}
         type="email"
-        placeholder="you@example.com"
+        placeholder={t("emailPlaceholder")}
         {...register("email")}
         error={errors.email?.message}
       />
@@ -81,7 +83,7 @@ export default function ForgotPasswordForm() {
           (isSubmitting ? "cursor-not-allowed opacity-50" : "cursor-pointer")
         }
       >
-        {isSubmitting ? "Sending..." : "Send Reset Link"}
+        {isSubmitting ? t("sending") : t("submitButton")}
       </Button>
     </form>
   );
