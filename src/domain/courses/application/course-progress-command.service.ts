@@ -174,7 +174,11 @@ export class CourseProgressCommandService {
         },
       );
 
-      if (result) return result;
+      if (result) {
+        // Emit point events for leaderboard asynchronously
+        this.emitPointEvents(normalized, result).catch(console.error);
+        return result;
+      }
 
       await wait(BACKOFF_MS[attempt] ?? 150);
     }
@@ -186,6 +190,51 @@ export class CourseProgressCommandService {
       9106,
       { courseId: normalized.courseId, lessonId: normalized.lessonId },
     );
+  }
+
+  private async emitPointEvents(
+    normalized: SyncLessonProgressCommand,
+    result: CourseProgressResult
+  ) {
+    const baseUrl = process.env.BETTER_AUTH_URL || "http://localhost:3000";
+    const secret = process.env.INTERNAL_API_SECRET || "";
+
+    const headers = {
+      "Content-Type": "application/json",
+      "x-internal-secret": secret,
+    };
+
+    // Determine if the lesson was just completed in this request
+    // We check if result.lesson.completed is true. Wait, result.lesson is the *current* state.
+    // If it was already completed before this request, the idempotent `awardPoints` handles duplicate idempotency keys.
+    if (result.lesson.completed) {
+      await fetch(`${baseUrl}/api/leaderboard/point-events`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          userId: normalized.userId,
+          courseId: normalized.courseId,
+          activityType: "lesson_completion",
+          points: 10,
+          idempotencyKey: `lesson_completion_${normalized.courseId}_${normalized.lessonId}_${normalized.userId}`,
+        }),
+      });
+    }
+
+    // Check for course completion
+    if (result.course.status === "completed") {
+      await fetch(`${baseUrl}/api/leaderboard/point-events`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          userId: normalized.userId,
+          courseId: normalized.courseId,
+          activityType: "course_completion",
+          points: 50,
+          idempotencyKey: `course_completion_${normalized.courseId}_${normalized.userId}`,
+        }),
+      });
+    }
   }
 
   async getLatestProgress(
