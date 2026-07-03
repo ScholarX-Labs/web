@@ -14,12 +14,15 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAiChatStore } from "@/stores/ai-chat.store";
 import { trackAiSearchResult } from "@/lib/ai/ai-search-analytics";
+import { useTranslations, useLocale } from "next-intl";
 
 function createId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
 export function AiSearchPageClient() {
+  const t = useTranslations("aiSearch.chat");
+  const locale = useLocale();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const messages = useAiChatStore((state) => state.messages);
   const draft = useAiChatStore((state) => state.draft);
@@ -63,7 +66,7 @@ export function AiSearchPageClient() {
           },
           body: JSON.stringify({
             query: value,
-            lang: "en",
+            lang: locale,
             limit: 10,
           }),
         },
@@ -83,26 +86,26 @@ export function AiSearchPageClient() {
         return {
           id: opp.id || result.id,
           type: opp.type?.subtype?.[0] || "scholarship",
-          title: opp.title || "Unknown Opportunity",
+          title: opp.title || t("unknownOpportunity"),
           subtitle:
             opp.location ||
             (opp.target_segment ? opp.target_segment.join(", ") : ""),
           description: opp.description
             ? opp.description.slice(0, 150) + "..."
             : "",
-          aiReason: `Matched based on semantic similarity of ${Math.round(result.score * 100)}%.`,
-          country: opp.country?.[0] || "Global",
+          aiReason: t("matchReason", { percent: Math.round(result.score * 100) }),
+          country: opp.country?.[0] || t("global"),
           deadline: opp.deadline
-            ? new Date(opp.deadline).toLocaleDateString("en-US", {
+            ? new Date(opp.deadline).toLocaleDateString(locale, {
                 month: "short",
                 day: "numeric",
                 year: "numeric",
               })
-            : "Rolling",
+            : t("rolling"),
           fundingLabel:
             opp.fund_type?.[0] === "fully_funded"
-              ? "Fully Funded"
-              : (opp.fund_type?.[0] || "Funded").replace("_", " "),
+              ? t("fullyFunded")
+              : (opp.fund_type?.[0] ? opp.fund_type[0].replace("_", " ") : t("funded")),
           remote: opp.is_remote || false,
           matchScore: Math.round(result.score * 100),
           applicationLink: opp.application_link || null,
@@ -112,7 +115,7 @@ export function AiSearchPageClient() {
       addMessage({
         id: createId(),
         role: "assistant",
-        text: `Here are the top ${mappedOpportunities.length} opportunities I found based on your semantic query.`,
+        text: t("assistantFound", { count: mappedOpportunities.length }),
         opportunities: mappedOpportunities,
       });
       trackAiSearchResult({
@@ -132,7 +135,7 @@ export function AiSearchPageClient() {
       addMessage({
         id: createId(),
         role: "assistant",
-        text: "I'm sorry, I encountered an error while searching the database. Please try again later.",
+        text: t("assistantError"),
       });
     } finally {
       setStreaming(false);
@@ -177,7 +180,7 @@ export function AiSearchPageClient() {
             >
               <Menu className="size-4" />
             </Button>
-            <span className="ml-2 text-sm font-medium">AI Search</span>
+            <span className="dir-ml-2 text-sm font-medium">{t("mobileTitle")}</span>
           </div>
 
           <ChatHeader />
@@ -190,8 +193,7 @@ export function AiSearchPageClient() {
 
               {!hasConversation && !isStreaming ? (
                 <p className="text-center text-xs text-muted-foreground">
-                  Ask for scholarships, internships, fellowships, or
-                  conferences.
+                  {t("emptyState")}
                 </p>
               ) : null}
 
