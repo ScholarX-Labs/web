@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { ExecutiveFilterProvider } from "@/components/executive/filters/executive-filter-provider";
 import { EXECUTIVE_ADMIN_ROUTES } from "@/lib/executive/executive-routes";
-import { getExecutiveFlags, isExecutiveDashboardEnabled } from "@/lib/executive/feature-flags";
+import { getExecutiveFlags } from "@/lib/executive/feature-flags";
 
 export const dynamic = "force-dynamic";
 
