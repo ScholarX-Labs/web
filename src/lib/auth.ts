@@ -10,6 +10,14 @@ import { parsePhoneNumberWithError } from "libphonenumber-js";
 import { z } from "zod";
 import { sendEmail } from "./email";
 import { randomUUID } from "node:crypto";
+import { resolveEmailLocale } from "@/lib/email/send";
+import { verificationEmail } from "@/lib/email/templates/verification";
+import { signinOtpEmail } from "@/lib/email/templates/signin-otp";
+import {
+  passwordResetCodeEmail,
+  passwordResetEmail,
+} from "@/lib/email/templates/password-reset";
+import { emailChangeEmail } from "@/lib/email/templates/email-change";
 
 const EMAIL_OTP_RATE_LIMIT_IDENTIFIER = "email-otp-rate-limit";
 const EMAIL_OTP_HOURLY_LIMIT = 4;
@@ -91,39 +99,18 @@ async function recordEmailOtpSend(email: string, tx: DB = db): Promise<void> {
   });
 }
 
-function getOtpEmailContent(
-  type: string,
-  otp: string,
-): {
-  subject: string;
-  text: string;
-} {
+function getOtpEmailContent(type: string, otp: string, locale: "en" | "ar") {
   switch (type) {
     case "email-verification":
-      return {
-        subject: "Your ScholarX email verification code",
-        text: `Your ScholarX verification code is ${otp}. It expires in 10 minutes.`,
-      };
+      return verificationEmail(locale, otp, 10);
     case "sign-in":
-      return {
-        subject: "Your ScholarX sign-in code",
-        text: `Your ScholarX sign-in code is ${otp}. It expires in 10 minutes.`,
-      };
+      return signinOtpEmail(locale, otp, 10);
     case "forget-password":
-      return {
-        subject: "Your ScholarX password reset code",
-        text: `Your ScholarX password reset code is ${otp}. It expires in 10 minutes.`,
-      };
+      return passwordResetCodeEmail(locale, otp, 10);
     case "change-email":
-      return {
-        subject: "Your ScholarX email change code",
-        text: `Your ScholarX email change code is ${otp}. It expires in 10 minutes.`,
-      };
+      return emailChangeEmail(locale, otp, 10);
     default:
-      return {
-        subject: "Your ScholarX verification code",
-        text: `Your ScholarX verification code is ${otp}. It expires in 10 minutes.`,
-      };
+      return verificationEmail(locale, otp, 10);
   }
 }
 
@@ -135,10 +122,14 @@ export const auth = betterAuth({
     enabled: true,
     resetPasswordTokenExpiresIn: 600,
     sendResetPassword: async ({ user, url }) => {
+      const locale = await resolveEmailLocale({ userId: user.id });
+      const emailContent = passwordResetEmail(locale, url);
+
       await sendEmail({
         to: user.email,
-        subject: "Reset your ScholarX password",
-        text: `Click the link to reset your ScholarX password: ${url}`,
+        subject: emailContent.subject,
+        text: emailContent.text,
+        html: emailContent.html,
         category: "password_reset",
         requestedByUserId: user.id,
         purpose: "password_reset",
@@ -394,6 +385,7 @@ export const auth = betterAuth({
       twitterUrl: { type: "string", required: false },
       linkedinUrl: { type: "string", required: false },
       isProfilePublic: { type: "boolean", required: false, defaultValue: true },
+      locale: { type: "string", required: false, defaultValue: "en" },
     },
   },
   plugins: [
@@ -409,13 +401,15 @@ export const auth = betterAuth({
       },
       sendVerificationOTP: async ({ email, otp, type }) => {
         const normalizedEmail = normalizeEmailAddress(email);
-        const { subject, text } = getOtpEmailContent(type, otp);
+        const locale = await resolveEmailLocale({ email: normalizedEmail });
+        const { subject, text, html } = getOtpEmailContent(type, otp, locale);
 
         try {
           await sendEmail({
             to: normalizedEmail,
             subject,
             text,
+            html,
             category: "auth_otp",
             purpose: type,
             idempotencyKey: `auth_otp:${type}:${normalizedEmail}:${otp}`,
