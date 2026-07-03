@@ -2,8 +2,8 @@
 
 import React, { useRef, useEffect } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import {
   Mail,
   Phone,
@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
+import { Link } from "@/lib/i18n/navigation";
 
 const SCHOLARX_VERTICAL_LOGO = "/biglogo.png";
 
@@ -28,66 +29,10 @@ type FooterLink = {
 };
 
 type FooterSection = {
+  id: string;
   title: string;
   links: FooterLink[];
 };
-
-const footerLinks: FooterSection[] = [
-  {
-    title: "Platform",
-    links: [
-      { name: "Home", href: ROUTES.HOME },
-      { name: "About Us", href: ROUTES.ABOUT },
-      { name: "Services", href: ROUTES.SERVICES },
-      { name: "Courses", href: ROUTES.COURSES },
-    ],
-  },
-  {
-    title: "Support",
-    links: [
-      { name: "Help Center", href: "#" },
-      { name: "Terms of Service", href: "#" },
-      { name: "Privacy Policy", href: "#" },
-      { name: "Cookie Policy", href: "#" },
-    ],
-  },
-  {
-    title: "Contact",
-    links: [
-      {
-        name: "scholarx.eg@gmail.com",
-        href: "mailto:scholarx.eg@gmail.com",
-        icon: Mail,
-      },
-      { name: "+(20) 1012072516", href: "tel:+(20) 1012072516", icon: Phone },
-    ],
-  },
-];
-
-const socialLinks = [
-  {
-    name: "LinkedIn",
-    icon: Linkedin,
-    href: "https://www.linkedin.com/company/scholarx0",
-    hoverColor: "hover:bg-blue-500 dark:hover:bg-blue-500",
-    whiteOnHover: true,
-  },
-  {
-    name: "Facebook",
-    icon: Facebook,
-    href: "https://www.facebook.com/ScholarX.eg/",
-    hoverColor: "hover:bg-blue-700 dark:hover:bg-blue-600",
-    whiteOnHover: true,
-  },
-  {
-    name: "Instagram",
-    icon: Instagram,
-    href: "https://www.instagram.com/scholarx.eg/",
-    hoverColor:
-      "hover:bg-gradient-to-br hover:from-purple-500 hover:via-pink-500 hover:to-orange-400 dark:hover:from-purple-400 dark:hover:via-pink-400 dark:hover:to-orange-300",
-    isGradient: true,
-  },
-];
 
 const MagneticButton = ({
   children,
@@ -130,6 +75,67 @@ const Footer = () => {
   const containerRef = useRef<HTMLElement>(null);
   const [copiedText, setCopiedText] = React.useState<string | null>(null);
   const [pendingHref, setPendingHref] = React.useState<string | null>(null);
+  const t = useTranslations("common");
+
+  const footerLinks: FooterSection[] = [
+    {
+      id: "platform",
+      title: t("footer.platform"),
+      links: [
+        { name: t("nav.home"), href: ROUTES.HOME },
+        { name: t("nav.about"), href: ROUTES.ABOUT },
+        { name: t("nav.services"), href: ROUTES.SERVICES },
+        { name: t("nav.courses"), href: ROUTES.COURSES },
+      ],
+    },
+    {
+      id: "support",
+      title: t("footer.support"),
+      links: [
+        { name: t("footer.helpCenter"), href: "#" },
+        { name: t("footer.termsOfService"), href: "#" },
+        { name: t("footer.privacyPolicy"), href: "#" },
+        { name: t("footer.cookiePolicy"), href: "#" },
+      ],
+    },
+    {
+      id: "contact",
+      title: t("footer.contact"),
+      links: [
+        {
+          name: "scholarx.eg@gmail.com",
+          href: "mailto:scholarx.eg@gmail.com",
+          icon: Mail,
+        },
+        { name: "+(20) 1012072516", href: "tel:+(20) 1012072516", icon: Phone },
+      ],
+    },
+  ];
+
+  const socialLinks = [
+    {
+      name: t("footer.socialLinkedIn"),
+      icon: Linkedin,
+      href: "https://www.linkedin.com/company/scholarx0",
+      hoverColor: "hover:bg-blue-500 dark:hover:bg-blue-500",
+      whiteOnHover: true,
+    },
+    {
+      name: t("footer.socialFacebook"),
+      icon: Facebook,
+      href: "https://www.facebook.com/ScholarX.eg/",
+      hoverColor: "hover:bg-blue-700 dark:hover:bg-blue-600",
+      whiteOnHover: true,
+    },
+    {
+      name: t("footer.socialInstagram"),
+      icon: Instagram,
+      href: "https://www.instagram.com/scholarx.eg/",
+      hoverColor:
+        "hover:bg-gradient-to-br hover:from-purple-500 hover:via-pink-500 hover:to-orange-400 dark:hover:from-purple-400 dark:hover:via-pink-400 dark:hover:to-orange-300",
+      isGradient: true,
+    },
+  ];
 
   useEffect(() => {
     if (pendingHref) {
@@ -198,11 +204,11 @@ const Footer = () => {
               className="text-3xl md:text-4xl font-bold tracking-tight"
             >
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-600 dark:from-blue-400 dark:via-purple-400 dark:to-cyan-400">
-                Unlock your potential
+                {t("footer.unlockLineOne")}
               </span>
               <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-600 dark:from-cyan-400 dark:via-blue-400 dark:to-purple-400">
-                with ScholarX
+                {t("footer.unlockLineTwo")}
               </span>
             </motion.h2>
             <motion.div
@@ -223,7 +229,7 @@ const Footer = () => {
             >
               <Image
                 src={SCHOLARX_VERTICAL_LOGO}
-                alt="ScholarX"
+                alt={t("header.logoAlt")}
                 width={160}
                 height={120}
                 className="dark:invert opacity-90 hover:opacity-100 transition-opacity"
@@ -236,8 +242,7 @@ const Footer = () => {
               className="mb-4 p-3 rounded-lg bg-gradient-to-r from-blue-50/50 to-cyan-50/50 dark:from-blue-950/20 dark:to-cyan-950/20 border border-blue-200/50 dark:border-blue-800/30 backdrop-blur-sm text-center"
             >
               <p className="text-sm font-medium text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-cyan-600 dark:from-blue-300 dark:to-cyan-400 leading-relaxed tracking-tight">
-                Empowering academic success through personalized support and
-                mentorship
+                {t("footer.tagline")}
               </p>
             </motion.div>
             <div className="flex gap-2.5 justify-center">
@@ -272,7 +277,7 @@ const Footer = () => {
           {/* Link columns with tight spacing */}
           <div className="flex flex-col sm:flex-row sm:flex-wrap lg:flex-nowrap gap-4 sm:gap-3 lg:gap-6 w-full md:flex-1">
             {footerLinks
-              .filter((s) => s.title !== "Contact")
+              .filter((s) => s.id !== "contact")
               .map((section) => (
                 <div
                   key={section.title}
@@ -311,7 +316,7 @@ const Footer = () => {
 
             {/* Contact section - separate container */}
             {footerLinks
-              .filter((s) => s.title === "Contact")
+              .filter((s) => s.id === "contact")
               .map((section) => (
                 <div
                   key={section.title}
@@ -400,7 +405,7 @@ const Footer = () => {
                                   exit={{ opacity: 0, y: -2 }}
                                   className="text-xs font-medium text-green-600 dark:text-green-400"
                                 >
-                                  Copied!
+                                  {t("footer.copied")}
                                 </motion.span>
                               )}
                             </div>
@@ -425,7 +430,7 @@ const Footer = () => {
             >
               <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-400/0 via-blue-400/10 to-cyan-400/0 dark:from-blue-500/0 dark:via-blue-500/5 dark:to-cyan-500/0 animate-pulse" />
               <span className="relative text-sm font-semibold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-600 dark:from-blue-400 dark:to-cyan-400">
-                © {new Date().getFullYear()} ScholarX Inc.
+                © {new Date().getFullYear()} {t("footer.copyright")}
               </span>
             </motion.div>
             <div className="hidden md:block w-1 h-1 bg-zinc-300 dark:bg-zinc-700 rounded-full" />
@@ -438,7 +443,7 @@ const Footer = () => {
               <div className="absolute inset-0 rounded-full bg-gradient-to-r from-red-400/0 via-red-400/10 to-pink-400/0 dark:from-red-500/0 dark:via-red-500/5 dark:to-pink-500/0 animate-pulse" />
               <span className="relative flex items-center gap-2.5 text-sm font-semibold">
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-pink-600 dark:from-red-400 dark:to-pink-400">
-                  Building with
+                  {t("footer.buildingWith")}
                 </span>
                 <motion.div
                   animate={{ scale: [1, 1.2, 1] }}
@@ -451,7 +456,7 @@ const Footer = () => {
                   />
                 </motion.div>
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-red-600 dark:from-pink-400 dark:to-red-400">
-                  since 2024
+                  {t("footer.since")}
                 </span>
               </span>
             </motion.div>
@@ -466,7 +471,7 @@ const Footer = () => {
                     "p-2 rounded-lg transition-all cursor-not-allowed",
                     "text-zinc-400",
                   )}
-                  aria-label="Light Mode (Coming Soon)"
+                  aria-label={t("footer.lightModeComingSoon")}
                 >
                   <Sun size={18} strokeWidth={1.5} />
                 </button>
@@ -476,13 +481,13 @@ const Footer = () => {
                     "p-2 rounded-lg transition-all cursor-not-allowed",
                     "text-zinc-400",
                   )}
-                  aria-label="Dark Mode (Coming Soon)"
+                  aria-label={t("footer.darkModeComingSoon")}
                 >
                   <Moon size={18} strokeWidth={1.5} />
                 </button>
               </div>
               <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-xs font-semibold rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                Upcoming Feature
+                {t("footer.upcomingFeature")}
               </div>
             </div>
 
@@ -490,7 +495,7 @@ const Footer = () => {
               onClick={scrollToTop}
               className="group flex items-center gap-3 text-sm font-semibold text-zinc-900 dark:text-zinc-100 hover:text-blue-600 dark:hover:text-blue-500 transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-900 rounded px-2 py-1"
             >
-              <span>Back to Top</span>
+              <span>{t("footer.backToTop")}</span>
               <div className="flex items-center justify-center w-10 h-10 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 group-hover:-translate-y-1.5 transition-all duration-300">
                 <ArrowUp size={16} strokeWidth={2.5} />
               </div>
