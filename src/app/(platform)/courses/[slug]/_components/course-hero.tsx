@@ -11,6 +11,7 @@ import Link from "next/link";
 import { StaggerContainer, StaggerItem } from "@/components/animations/stagger";
 import { cn } from "@/lib/utils";
 import { getCategoryStyle } from "@/lib/course-categories";
+import { CourseRichText } from "@/components/courses/course-rich-text";
 
 interface CourseHeroProps {
   course: Course;
@@ -120,11 +121,8 @@ export function CourseHero({ course }: CourseHeroProps) {
             {course.title}
           </StaggerItem>
 
-          <StaggerItem
-            as="p"
-            className="text-lg text-slate-300 leading-relaxed md:line-clamp-3 text-balance"
-          >
-            {course.description}
+          <StaggerItem className="text-lg text-slate-300 md:line-clamp-4 text-balance">
+            <CourseRichText text={course.description} className="space-y-2" />
           </StaggerItem>
 
           {/* Stats Bar */}
