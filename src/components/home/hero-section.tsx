@@ -1,16 +1,33 @@
 "use client";
 
 import React, { memo } from "react";
-import Link from "next/link";
-import { HERO_CONTENT, HERO_BUTTONS } from "@/lib/home-data";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { ArrowRight, ShieldCheck, GraduationCap, UsersRound } from "lucide-react";
 import { useCtaTracking } from "@/components/analytics/use-cta-tracking";
+import { Link } from "@/lib/i18n/navigation";
+import { ROUTES } from "@/lib/routes";
+
+const HERO_BUTTONS = [
+  {
+    id: "explore",
+    type: "primary",
+    link: ROUTES.SIGNUP,
+    icon: ArrowRight,
+  },
+  {
+    id: "join",
+    type: "secondary",
+    link: ROUTES.COURSES,
+    icon: GraduationCap,
+  },
+] as const;
 
 export const HeroSection = memo(function HeroSection() {
   const trackCta = useCtaTracking();
+  const t = useTranslations("home.hero");
 
   return (
     <section className="relative flex min-h-[min(100vh,800px)] items-center overflow-hidden bg-background px-6 py-24 md:px-12 md:py-32">
@@ -26,22 +43,22 @@ export const HeroSection = memo(function HeroSection() {
           >
             <ShieldCheck className="h-4 w-4" />
             <span className="text-sm font-medium tracking-wide">
-              Verified & Premium Academic Standards
+              {t("badge")}
             </span>
           </Badge>
 
           <h1 className="mb-6 text-4xl font-extrabold tracking-tight text-[var(--color-hero-heading)] sm:text-5xl lg:text-6xl xl:text-7xl">
-            {HERO_CONTENT.title} <br className="hidden sm:block" />
+            {t("title")} <br className="hidden sm:block" />
             <span className="font-light text-muted-foreground">
-              {HERO_CONTENT.subtitle}
+              {t("subtitle")}
             </span>{" "}
             <span className="text-[var(--color-hero-blue)] relative inline-block underline decoration-[var(--color-hero-orange)] decoration-4 underline-offset-8">
-              {HERO_CONTENT.highlight}
+              {t("highlight")}
             </span>
           </h1>
 
           <p className="mb-10 max-w-[600px] text-lg leading-relaxed text-[var(--color-hero-body)] sm:text-xl">
-            {HERO_CONTENT.description}
+            {t("description")}
           </p>
 
           {/* CTA Buttons */}
@@ -67,9 +84,13 @@ export const HeroSection = memo(function HeroSection() {
                   <Link
                     href={button.link}
                     onClick={() => {
+                      const label =
+                        button.id === "explore"
+                          ? t("primaryCta")
+                          : t("secondaryCta");
                       trackCta({
                         ctaId: button.id,
-                        ctaLabel: button.text,
+                        ctaLabel: label,
                         ctaPlacement: "home_hero",
                         destination: button.link,
                       });
@@ -99,7 +120,9 @@ export const HeroSection = memo(function HeroSection() {
                       >
                         <Icon className="h-4.5 w-4.5 transition-transform duration-300 group-hover/hero-cta:translate-x-0.5" />
                       </span>
-                      <span className="whitespace-nowrap">{button.text}</span>
+                      <span className="whitespace-nowrap">
+                        {button.id === "explore" ? t("primaryCta") : t("secondaryCta")}
+                      </span>
                       {isPrimary && (
                         <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/hero-cta:translate-x-1" />
                       )}
@@ -118,10 +141,10 @@ export const HeroSection = memo(function HeroSection() {
               </span>
               <span className="min-w-0">
                 <span className="block text-lg font-extrabold leading-none tracking-normal text-[var(--color-hero-heading)] dark:text-white">
-                  {HERO_CONTENT.stats.count}+
+                  10,000+
                 </span>
                 <span className="mt-1 block text-sm font-semibold leading-snug text-[var(--color-hero-body)] dark:text-white/70">
-                  students supported worldwide
+                  {t("studentsCountLabel")}
                 </span>
               </span>
             </div>
@@ -134,7 +157,7 @@ export const HeroSection = memo(function HeroSection() {
                   96
                 </span>
                 <span className="mt-1 block text-sm font-semibold leading-snug text-[var(--color-hero-body)] dark:text-white/70">
-                  verified partner institutions
+                  {t("partnersCountLabel")}
                 </span>
               </span>
             </div>
@@ -155,10 +178,10 @@ export const HeroSection = memo(function HeroSection() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900">
-                    Expert-Led Courses
+                    {t("expertTitle")}
                   </h3>
                   <p className="text-sm text-gray-600">
-                    Master new skills with industry leaders
+                    {t("expertDescription")}
                   </p>
                 </div>
               </div>
