@@ -80,10 +80,32 @@ export default async function CourseDetailPage({
 
   // Determine if enrollment modal should open automatically
   const shouldOpenEnrollIntent = intent === "enroll";
+  
+  const isLeaderboardEnabled = process.env.LEADERBOARD_ENABLED === "true";
+  const hasLearners = (course.studentsCount ?? 0) > 0;
 
   return (
     <div className="relative w-full flex flex-col min-h-screen pb-24 bg-white dark:bg-card">
       <CourseHero course={course} />
+
+      {/* Navigation Tabs */}
+      <div className="border-b bg-card">
+        <div className="container mx-auto max-w-5xl px-4">
+          <nav className="flex items-center gap-8" aria-label="Course navigation">
+            <div className="border-b-2 border-primary py-4 text-sm font-bold text-primary">
+              Overview
+            </div>
+            {isLeaderboardEnabled && hasLearners && (
+              <a
+                href={ROUTES.COURSE_LEADERBOARD(course.slug)}
+                className="border-b-2 border-transparent py-4 text-sm font-bold text-muted-foreground hover:border-muted hover:text-foreground transition-colors"
+              >
+                Leaderboard
+              </a>
+            )}
+          </nav>
+        </div>
+      </div>
 
       <div className="container mx-auto max-w-5xl px-4 py-12 flex flex-col gap-12 lg:gap-16">
         {certificateLink ? (
