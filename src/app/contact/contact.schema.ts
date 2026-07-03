@@ -1,34 +1,69 @@
 import { z } from "zod";
 
+// Schema without custom messages — used by the API route for server-side validation.
+// The form layer uses createContactSchema() with translated messages instead.
 export const contactSchema = z.object({
-  firstName: z
-    .string()
-    .trim()
-    .min(1, { message: "First name is required" })
-    .max(50, { message: "First name must be 50 characters or less" }),
-  lastName: z
-    .string()
-    .trim()
-    .min(1, { message: "Last name is required" })
-    .max(50, { message: "Last name must be 50 characters or less" }),
-  email: z
-    .string()
-    .trim()
-    .pipe(z.email({ message: "Enter a valid email address" })),
+  firstName: z.string().trim().min(1).max(50),
+  lastName: z.string().trim().min(1).max(50),
+  email: z.string().trim().pipe(z.email()),
   phoneNumber: z
     .string()
     .trim()
-    .max(25, { message: "Phone number must be 25 characters or less" })
+    .max(25)
     .optional()
-    .transform((value) => {
-      return value ? value : undefined;
-    }),
-  message: z
-    .string()
-    .trim()
-    .min(10, { message: "Message must be at least 10 characters" })
-    .max(2000, { message: "Message must be 2000 characters or less" }),
+    .transform((v) => v || undefined),
+  message: z.string().trim().min(10).max(2000),
 });
 
-export type ContactFormInput = z.input<typeof contactSchema>;
-export type ContactFormValues = z.output<typeof contactSchema>;
+export type ContactSchemaMessages = {
+  firstNameRequired: string;
+  firstNameMax: string;
+  lastNameRequired: string;
+  lastNameMax: string;
+  emailInvalid: string;
+  phoneNumberMax: string;
+  messageMin: string;
+  messageMax: string;
+};
+
+export function createContactSchema(messages: ContactSchemaMessages) {
+  return z.object({
+    firstName: z
+      .string()
+      .trim()
+      .min(1, { message: messages.firstNameRequired })
+      .max(50, { message: messages.firstNameMax }),
+    lastName: z
+      .string()
+      .trim()
+      .min(1, { message: messages.lastNameRequired })
+      .max(50, { message: messages.lastNameMax }),
+    email: z
+      .string()
+      .trim()
+      .pipe(z.email({ message: messages.emailInvalid })),
+    phoneNumber: z
+      .string()
+      .trim()
+      .max(25, { message: messages.phoneNumberMax })
+      .optional()
+      .transform((value) => {
+        return value ? value : undefined;
+      }),
+    message: z
+      .string()
+      .trim()
+      .min(10, { message: messages.messageMin })
+      .max(2000, { message: messages.messageMax }),
+  });
+}
+
+export type ContactFormValues = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber?: string;
+  message: string;
+};
+
+export type ContactFormInput = ContactFormValues;
