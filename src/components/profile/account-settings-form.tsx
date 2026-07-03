@@ -20,8 +20,10 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Separator } from "@/components/ui/separator";
 import { deleteAccount } from "@/actions/profile.actions";
+import { useTranslations } from "next-intl";
 
 export function AccountSettingsForm() {
+  const t = useTranslations("profile.settings");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -30,11 +32,11 @@ export function AccountSettingsForm() {
 
   const handleChangePassword = async () => {
     if (newPassword !== confirmPassword) {
-      toast.error("Passwords do not match");
+      toast.error(t("changePassword.errors.mismatch"));
       return;
     }
     if (newPassword.length < 8) {
-      toast.error("Password must be at least 8 characters");
+      toast.error(t("changePassword.errors.tooShort"));
       return;
     }
     setChangingPassword(true);
@@ -45,16 +47,16 @@ export function AccountSettingsForm() {
         body: JSON.stringify({ currentPassword, newPassword }),
       });
       if (res.ok) {
-        toast.success("Password changed successfully");
+        toast.success(t("changePassword.success"));
         setCurrentPassword("");
         setNewPassword("");
         setConfirmPassword("");
       } else {
         const data = await res.json();
-        toast.error(data.error ?? "Failed to change password");
+        toast.error(data.error ?? t("changePassword.errors.fallback"));
       }
     } catch {
-      toast.error("Failed to change password");
+      toast.error(t("changePassword.errors.fallback"));
     } finally {
       setChangingPassword(false);
     }
@@ -65,20 +67,24 @@ export function AccountSettingsForm() {
     try {
       const cleanup = await deleteAccount();
       if (!cleanup.success) {
-        toast.error(typeof cleanup.error === "string" ? cleanup.error : "Failed to prepare account for deletion");
+        toast.error(
+          typeof cleanup.error === "string"
+            ? cleanup.error
+            : t("dangerZone.errors.prepareFailed")
+        );
         return;
       }
 
       const res = await fetch("/api/auth/delete-account", { method: "DELETE" });
       if (res.ok) {
-        toast.success("Account deleted");
+        toast.success(t("dangerZone.success"));
         window.location.href = "/";
       } else {
         const data = await res.json();
-        toast.error(data.error ?? "Failed to delete account");
+        toast.error(data.error ?? t("dangerZone.errors.fallback"));
       }
     } catch {
-      toast.error("Failed to delete account");
+      toast.error(t("dangerZone.errors.fallback"));
     } finally {
       setDeletingAccount(false);
     }
@@ -90,13 +96,13 @@ export function AccountSettingsForm() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Key className="h-4 w-4" />
-            Change Password
+            {t("changePassword.title")}
           </CardTitle>
-          <CardDescription>Update your account password.</CardDescription>
+          <CardDescription>{t("changePassword.description")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-1.5">
-            <Label htmlFor="currentPassword">Current Password</Label>
+            <Label htmlFor="currentPassword">{t("changePassword.currentPasswordLabel")}</Label>
             <Input
               id="currentPassword"
               type="password"
@@ -105,7 +111,7 @@ export function AccountSettingsForm() {
             />
           </div>
           <div className="grid gap-1.5">
-            <Label htmlFor="newPassword">New Password</Label>
+            <Label htmlFor="newPassword">{t("changePassword.newPasswordLabel")}</Label>
             <Input
               id="newPassword"
               type="password"
@@ -114,7 +120,7 @@ export function AccountSettingsForm() {
             />
           </div>
           <div className="grid gap-1.5">
-            <Label htmlFor="confirmPassword">Confirm New Password</Label>
+            <Label htmlFor="confirmPassword">{t("changePassword.confirmPasswordLabel")}</Label>
             <Input
               id="confirmPassword"
               type="password"
@@ -127,7 +133,7 @@ export function AccountSettingsForm() {
             disabled={changingPassword || !currentPassword || !newPassword || !confirmPassword}
           >
             {changingPassword && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Change Password
+            {t("changePassword.button")}
           </Button>
         </CardContent>
       </Card>
@@ -138,10 +144,10 @@ export function AccountSettingsForm() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-destructive">
             <Trash2 className="h-4 w-4" />
-            Danger Zone
+            {t("dangerZone.title")}
           </CardTitle>
           <CardDescription>
-            Permanently delete your account and all associated data. This action cannot be undone.
+            {t("dangerZone.description")}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -149,26 +155,25 @@ export function AccountSettingsForm() {
             <AlertDialogTrigger asChild>
               <Button variant="destructive">
                 <AlertTriangle className="mr-2 h-4 w-4" />
-                Delete Account
+                {t("dangerZone.button")}
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogTitle>{t("dangerZone.dialog.title")}</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This will permanently delete your account, your profile, course progress, certificates,
-                  and all associated data. This action cannot be undone.
+                  {t("dangerZone.dialog.description")}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogCancel>{t("dangerZone.dialog.cancel")}</AlertDialogCancel>
                 <AlertDialogAction
                   onClick={handleDeleteAccount}
                   disabled={deletingAccount}
                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                 >
                   {deletingAccount && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Delete My Account
+                  {t("dangerZone.dialog.delete")}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>

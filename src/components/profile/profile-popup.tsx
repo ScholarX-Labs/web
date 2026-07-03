@@ -23,6 +23,8 @@ import { useRouter } from "next/navigation";
 import { signOut } from "@/lib/auth-client";
 import { ROUTES } from "@/lib/routes";
 
+import { useTranslations } from "next-intl";
+
 interface ProfilePopupProps {
   user: {
     id: string;
@@ -38,6 +40,7 @@ const POPUP_HOVER_DELAY = 300;
 
 export function ProfilePopup({ user }: ProfilePopupProps) {
   const router = useRouter();
+  const t = useTranslations("profile.popup");
 
   const handleSignOut = async () => {
     await signOut();
@@ -85,7 +88,7 @@ export function ProfilePopup({ user }: ProfilePopupProps) {
           onMouseLeave={handleClose}
           onClick={handleClick}
           className="relative flex items-center justify-center rounded-full transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-          aria-label="Profile menu"
+          aria-label={t("ariaLabel")}
         >
           <Avatar className="h-8 w-8 border-2 border-border">
             <AvatarImage src={user.image ?? undefined} alt={user.name} />
@@ -128,7 +131,7 @@ export function ProfilePopup({ user }: ProfilePopupProps) {
             className="flex cursor-pointer items-center gap-3"
           >
             <User className="h-4 w-4" />
-            <span>My Profile</span>
+            <span>{t("myProfile")}</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
@@ -137,7 +140,7 @@ export function ProfilePopup({ user }: ProfilePopupProps) {
             className="flex cursor-pointer items-center gap-3"
           >
             <BookOpen className="h-4 w-4" />
-            <span>My Courses</span>
+            <span>{t("myCourses")}</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
@@ -146,7 +149,7 @@ export function ProfilePopup({ user }: ProfilePopupProps) {
             className="flex cursor-pointer items-center gap-3"
           >
             <Award className="h-4 w-4" />
-            <span>Certificates</span>
+            <span>{t("certificates")}</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
@@ -155,7 +158,7 @@ export function ProfilePopup({ user }: ProfilePopupProps) {
             className="flex cursor-pointer items-center gap-3"
           >
             <Heart className="h-4 w-4" />
-            <span>Saved Opportunities</span>
+            <span>{t("savedOpportunities")}</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
@@ -164,7 +167,7 @@ export function ProfilePopup({ user }: ProfilePopupProps) {
           className="flex cursor-pointer items-center gap-3 text-destructive focus:text-destructive"
         >
           <LogOut className="h-4 w-4" />
-          <span>Sign out</span>
+          <span>{t("signOut")}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
