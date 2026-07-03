@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -18,7 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ROUTES } from "@/lib/routes";
 import {
-  contactSchema,
+  createContactSchema,
   type ContactFormInput,
   type ContactFormValues,
 } from "../contact.schema";
@@ -40,8 +41,23 @@ async function persistContactResponse(
 }
 
 export default function ContactForm() {
+  const t = useTranslations("contact.form");
   const router = useRouter();
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const contactSchema = useMemo(
+    () =>
+      createContactSchema({
+        firstNameRequired: t("validation.firstNameRequired"),
+        firstNameMax: t("validation.firstNameMax"),
+        lastNameRequired: t("validation.lastNameRequired"),
+        lastNameMax: t("validation.lastNameMax"),
+        emailInvalid: t("validation.emailInvalid"),
+        phoneNumberMax: t("validation.phoneNumberMax"),
+        messageMin: t("validation.messageMin"),
+        messageMax: t("validation.messageMax"),
+      }),
+    [t],
+  );
 
   const {
     register,
@@ -64,13 +80,13 @@ export default function ContactForm() {
       await persistContactResponse(values);
       reset();
       setIsRedirecting(true);
-      toast.success("Your response was recorded.");
+      toast.success(t("toast.success"));
 
       window.setTimeout(() => {
         router.replace(ROUTES.HOME);
       }, REDIRECT_DELAY_MS);
     } catch {
-      toast.error("We could not record your response. Please try again.");
+      toast.error(t("toast.error"));
     }
   };
 
@@ -80,7 +96,7 @@ export default function ContactForm() {
     <Card className="border-slate-200/80 bg-white shadow-sm">
       <CardHeader className="border-b border-slate-100">
         <CardTitle className="text-2xl text-slate-900">
-          Send us a message
+          {t("title")}
         </CardTitle>
       </CardHeader>
 
@@ -89,15 +105,15 @@ export default function ContactForm() {
           onSubmit={handleSubmit(onSubmit)}
           className="grid gap-5"
           noValidate
-          aria-label="Contact us form"
+          aria-label={t("ariaLabel")}
         >
           <div className="grid gap-5 sm:grid-cols-2">
             <Field>
-              <FieldLabel htmlFor="firstName">First name</FieldLabel>
+              <FieldLabel htmlFor="firstName">{t("fields.firstName.label")}</FieldLabel>
               <FieldContent>
                 <Input
                   id="firstName"
-                  placeholder="Enter your first name"
+                  placeholder={t("fields.firstName.placeholder")}
                   aria-invalid={errors.firstName ? true : undefined}
                   disabled={isBusy}
                   {...register("firstName")}
@@ -107,11 +123,11 @@ export default function ContactForm() {
             </Field>
 
             <Field>
-              <FieldLabel htmlFor="lastName">Last name</FieldLabel>
+              <FieldLabel htmlFor="lastName">{t("fields.lastName.label")}</FieldLabel>
               <FieldContent>
                 <Input
                   id="lastName"
-                  placeholder="Enter your last name"
+                  placeholder={t("fields.lastName.placeholder")}
                   aria-invalid={errors.lastName ? true : undefined}
                   disabled={isBusy}
                   {...register("lastName")}
@@ -122,12 +138,12 @@ export default function ContactForm() {
           </div>
 
           <Field>
-            <FieldLabel htmlFor="email">Email</FieldLabel>
+            <FieldLabel htmlFor="email">{t("fields.email.label")}</FieldLabel>
             <FieldContent>
               <Input
                 id="email"
                 type="email"
-                placeholder="you@example.com"
+                placeholder={t("fields.email.placeholder")}
                 aria-invalid={errors.email ? true : undefined}
                 disabled={isBusy}
                 {...register("email")}
@@ -137,14 +153,12 @@ export default function ContactForm() {
           </Field>
 
           <Field>
-            <FieldLabel htmlFor="phoneNumber">
-              Phone number (optional)
-            </FieldLabel>
+            <FieldLabel htmlFor="phoneNumber">{t("fields.phoneNumber.label")}</FieldLabel>
             <FieldContent>
               <Input
                 id="phoneNumber"
                 type="tel"
-                placeholder="+20 123 456 7890"
+                placeholder={t("fields.phoneNumber.placeholder")}
                 aria-invalid={errors.phoneNumber ? true : undefined}
                 disabled={isBusy}
                 {...register("phoneNumber")}
@@ -154,13 +168,13 @@ export default function ContactForm() {
           </Field>
 
           <Field className="min-w-0">
-            <FieldLabel htmlFor="message">Message</FieldLabel>
+            <FieldLabel htmlFor="message">{t("fields.message.label")}</FieldLabel>
             <FieldContent className="min-w-0">
               <Textarea
                 id="message"
                 rows={6}
                 className="max-h-64 resize-none"
-                placeholder="Tell us how we can help"
+                placeholder={t("fields.message.placeholder")}
                 aria-invalid={errors.message ? true : undefined}
                 disabled={isBusy}
                 {...register("message")}
@@ -174,7 +188,7 @@ export default function ContactForm() {
             disabled={isBusy}
             className="h-10 w-full sm:w-auto sm:min-w-44 hover:cursor-pointer"
           >
-            {isBusy ? "Submitting..." : "Submit"}
+            {isBusy ? t("submit.submitting") : t("submit.idle")}
           </Button>
         </form>
       </CardContent>
