@@ -12,8 +12,7 @@ type ThenableRows<T> = {
 };
 
 function makeThenableRows<T>(rows: T[]): ThenableRows<T> {
-  let chain: ThenableRows<T>;
-  chain = {
+  const chain: ThenableRows<T> = {
     then(onFulfilled: (value: T[]) => unknown) {
       return Promise.resolve(rows).then(onFulfilled);
     },
@@ -37,7 +36,7 @@ test("getWebsiteAnalyticsSnapshot maps and normalizes aggregated analytics rows"
 
   let call = 0;
   const fakeDb = {
-    select: (..._args: unknown[]) => {
+    select: () => {
       const result = selectResults[call];
       call += 1;
       return result;
