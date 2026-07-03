@@ -5,8 +5,10 @@ import { useRouter } from "next/navigation";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 export default function PhoneForm() {
+  const t = useTranslations("auth.collectPhone");
   const router = useRouter();
   const [phone, setPhone] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
@@ -15,7 +17,7 @@ export default function PhoneForm() {
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!isValidPhoneNumber(phone)) {
-      setError("Invalid phone number");
+      setError(t("errors.invalidPhone"));
       return;
     }
     setError(null);
@@ -28,12 +30,12 @@ export default function PhoneForm() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setError(data?.error || "Failed to save phone");
+        setError(data?.error || t("errors.saveFailed"));
         return;
       }
       router.replace("/");
     } catch {
-      setError("An unexpected error occurred");
+      setError(t("errors.fallback"));
     } finally {
       setSubmitting(false);
     }
@@ -43,14 +45,14 @@ export default function PhoneForm() {
     <form onSubmit={onSubmit} className="flex flex-col gap-4">
       <div className="flex flex-col gap-1.5">
         <label htmlFor="phone" className="text-sm font-medium leading-none">
-          Phone number
+          {t("label")}
         </label>
         <div className="flex h-9 w-full rounded-md border border-input bg-white px-3 shadow-sm focus-within:ring-1 focus-within:ring-ring">
           <PhoneInput
             id="phone"
             international
             defaultCountry="EG"
-            placeholder="+20 123 456 7890"
+            placeholder={t("placeholder")}
             value={phone}
             onChange={(val) => setPhone(val ?? "")}
             className="w-full text-sm"
@@ -71,7 +73,7 @@ export default function PhoneForm() {
           (submitting ? "cursor-not-allowed" : "cursor-pointer")
         }
       >
-        {submitting ? "Saving..." : "Save phone"}
+        {submitting ? t("saving") : t("saveButton")}
       </Button>
     </form>
   );
