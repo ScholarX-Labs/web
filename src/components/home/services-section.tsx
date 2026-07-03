@@ -1,12 +1,14 @@
 "use client";
 
 import React, { memo } from "react";
+import type { LucideIcon } from "lucide-react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { WHY_CHOOSE_SERVICES, WHO_WE_HELP_SERVICES } from "@/lib/home-data";
 
 interface ServiceItem {
   id: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   title: string;
   description: string;
   color?: string;
@@ -28,7 +30,7 @@ const ServiceCard = memo(function ServiceCard({
   color = "orange",
   delay = 0,
 }: {
-  icon: React.ElementType;
+  icon: LucideIcon;
   title: string;
   description: string;
   color?: string;
@@ -76,6 +78,7 @@ export const ServicesSection = memo(function ServicesSection({
 }: Omit<ServicesSectionProps, "services"> & {
   servicesKey: "whyChoose" | "whoWeHelp";
 }) {
+  const t = useTranslations(`home.${servicesKey}.items`);
   const services =
     servicesKey === "whyChoose" ? WHY_CHOOSE_SERVICES : WHO_WE_HELP_SERVICES;
 
@@ -126,8 +129,8 @@ export const ServicesSection = memo(function ServicesSection({
             <ServiceCard
               key={service.id}
               icon={service.icon}
-              title={service.title}
-              description={service.description}
+              title={t(`${service.id}.title`)}
+              description={t(`${service.id}.description`)}
               color={service.color}
               delay={index * 100}
             />

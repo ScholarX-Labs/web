@@ -1,9 +1,11 @@
 "use client";
 
 import React, { memo, useState, useEffect, useRef } from "react";
+import type { LucideIcon } from "lucide-react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { IMPACT_SECTION, IMPACT_STATS } from "@/lib/home-data";
+import { useTranslations } from "next-intl";
+import { IMPACT_STATS } from "@/lib/home-data";
 import { 
   statCardReveal, 
   statIconReveal, 
@@ -12,7 +14,7 @@ import {
 
 interface StatItem {
   id: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   value: number;
   label: string;
   suffix?: string;
@@ -134,6 +136,7 @@ export const ImpactSection = memo(function ImpactSection({
 }: {
   watermarkImage?: string;
 }) {
+  const t = useTranslations("home.impact");
   return (
     <section className="relative overflow-hidden bg-[linear-gradient(180deg,#D6EBF5_0%,rgba(214,235,245,0.3)_80%,transparent_100%)] px-8 py-25 max-md:px-5 max-md:py-15 max-sm:px-4 max-sm:py-12">
       {/* Background pattern */}
@@ -150,13 +153,13 @@ export const ImpactSection = memo(function ImpactSection({
         {/* Header */}
         <div className="mb-15 animate-[fadeInDown_0.8s_ease-out] text-center max-md:mb-10">
           <h2 className="relative mb-5 inline-block text-[clamp(2rem,4vw,2.5rem)] font-semibold leading-[1.2] text-[#1a1a1a] max-md:text-[1.8rem] max-sm:text-[1.5rem]">
-            {IMPACT_SECTION.title}{" "}
+            {t("title")}{" "}
             <span className="relative text-[#3399CC] before:absolute before:-right-[25px] before:-top-[30px] before:animate-[bounceIn_1s_ease-out_0.5s_both] before:text-2xl before:content-['🎯'] max-md:before:-right-[20px] max-md:before:-top-[25px] max-md:before:text-[1.2rem]">
-              {IMPACT_SECTION.highlight}
+              {t("highlight")}
             </span>
           </h2>
           <p className="mx-auto max-w-[630px] text-[1.125rem] font-normal leading-[1.6] text-[#555555] max-md:text-base max-sm:text-[0.95rem]">
-            {IMPACT_SECTION.description}
+            {t("description")}
           </p>
         </div>
 
@@ -168,7 +171,7 @@ export const ImpactSection = memo(function ImpactSection({
               id={stat.id}
               icon={stat.icon}
               value={stat.value}
-              label={stat.label}
+              label={t(`stats.${stat.id}`)}
               suffix={stat.suffix}
               animationDuration={stat.animationDuration}
               delay={index * 100}
