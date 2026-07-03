@@ -97,3 +97,15 @@ export async function setConfig(
     markSharedRedisUnavailable(`config-write-through:${key}`, error);
   }
 }
+
+export async function isArabicEnabled(): Promise<boolean> {
+  const value = await getConfig("arabic_enabled");
+  if (value === null) {
+    const envVal = process.env.ARABIC_ENABLED;
+    if (envVal !== undefined) {
+      return envVal !== "false";
+    }
+    return true;
+  }
+  return value !== "false";
+}
