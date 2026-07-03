@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "title": "ScholarX Opportunities",
+    "description": "Browse scholarships and opportunities curated for ambitious learners."
+  },
+  "card": {
+    "fullyFunded": "Fully Funded",
+    "partiallyFunded": "Partially Funded",
+    "viewDetails": "View Details"
+  }
+}

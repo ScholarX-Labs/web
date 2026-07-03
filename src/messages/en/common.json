@@ -1,0 +1,55 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About us",
+    "services": "Services",
+    "courses": "Courses",
+    "opportunities": "Opportunities",
+    "aiSearch": "AI Search",
+    "contact": "Contact us",
+    "profile": "Profile"
+  },
+  "auth": {
+    "login": "Log in",
+    "logout": "Log out",
+    "signup": "Sign up"
+  },
+  "localeSwitcher": {
+    "ariaLabel": "Language switcher",
+    "english": "English",
+    "arabic": "Arabic"
+  },
+  "menu": {
+    "toggle": "Toggle menu",
+    "close": "Close menu",
+    "title": "Menu",
+    "mobileNavigation": "Mobile Navigation"
+  },
+  "header": {
+    "mainNavigation": "Main Navigation",
+    "logoAlt": "ScholarX logo"
+  },
+  "footer": {
+    "platform": "Platform",
+    "support": "Support",
+    "contact": "Contact",
+    "unlockLineOne": "Unlock your potential",
+    "unlockLineTwo": "with ScholarX",
+    "tagline": "Empowering academic success through personalized support and mentorship",
+    "helpCenter": "Help Center",
+    "termsOfService": "Terms of Service",
+    "privacyPolicy": "Privacy Policy",
+    "cookiePolicy": "Cookie Policy",
+    "copied": "Copied!",
+    "buildingWith": "Building with",
+    "since": "since 2024",
+    "lightModeComingSoon": "Light Mode (Coming Soon)",
+    "darkModeComingSoon": "Dark Mode (Coming Soon)",
+    "upcomingFeature": "Upcoming Feature",
+    "backToTop": "Back to Top",
+    "socialLinkedIn": "LinkedIn",
+    "socialFacebook": "Facebook",
+    "socialInstagram": "Instagram",
+    "copyright": "ScholarX Inc."
+  }
+}

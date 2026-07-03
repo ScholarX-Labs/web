@@ -1,0 +1,55 @@
+{
+  "nav": {
+    "home": "الرئيسية",
+    "about": "من نحن",
+    "services": "الخدمات",
+    "courses": "الدورات",
+    "opportunities": "الفرص",
+    "aiSearch": "البحث الذكي",
+    "contact": "تواصل معنا",
+    "profile": "الملف الشخصي"
+  },
+  "auth": {
+    "login": "تسجيل الدخول",
+    "logout": "تسجيل الخروج",
+    "signup": "إنشاء حساب"
+  },
+  "localeSwitcher": {
+    "ariaLabel": "مبدل اللغة",
+    "english": "English",
+    "arabic": "العربية"
+  },
+  "menu": {
+    "toggle": "فتح القائمة",
+    "close": "إغلاق القائمة",
+    "title": "القائمة",
+    "mobileNavigation": "التنقل عبر الجوال"
+  },
+  "header": {
+    "mainNavigation": "التنقل الرئيسي",
+    "logoAlt": "شعار اسكولار اكس"
+  },
+  "footer": {
+    "platform": "المنصة",
+    "support": "الدعم",
+    "contact": "تواصل معنا",
+    "unlockLineOne": "أطلق إمكاناتك",
+    "unlockLineTwo": "مع اسكولار اكس",
+    "tagline": "نمكّن النجاح الأكاديمي من خلال الدعم الشخصي والإرشاد",
+    "helpCenter": "مركز المساعدة",
+    "termsOfService": "شروط الخدمة",
+    "privacyPolicy": "سياسة الخصوصية",
+    "cookiePolicy": "سياسة ملفات تعريف الارتباط",
+    "copied": "تم النسخ!",
+    "buildingWith": "نبني بشغف",
+    "since": "منذ 2024",
+    "lightModeComingSoon": "الوضع الفاتح (قريباً)",
+    "darkModeComingSoon": "الوضع الداكن (قريباً)",
+    "upcomingFeature": "ميزة قادمة",
+    "backToTop": "العودة إلى الأعلى",
+    "socialLinkedIn": "لينكدإن",
+    "socialFacebook": "فيسبوك",
+    "socialInstagram": "إنستغرام",
+    "copyright": "اسكولار اكس"
+  }
+}

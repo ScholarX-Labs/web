@@ -1,0 +1,70 @@
+{
+  "meta": {
+    "title": "ScholarX AI Search",
+    "description": "Use AI-assisted discovery to find scholarships and learning opportunities faster."
+  },
+  "hero": {
+    "badge": "By ScholarX AI",
+    "titlePrefix": "Find your future with",
+    "titleBrand": "ScholarX AI",
+    "description": "The premium discovery engine for global scholarships and academic opportunities. Get personalized recommendations in seconds.",
+    "placeholder": "Tell us about your dreams, your major, and where you want to go...",
+    "searchAriaLabel": "Search query",
+    "tryLabel": "Try:",
+    "submit": "Discover Opportunities",
+    "stats": {
+      "scholarships": "Scholarships",
+      "countries": "Countries",
+      "funding": "In Funding"
+    },
+    "suggestions": {
+      "mastersEurope": "Fully funded masters in Europe",
+      "stemNoEssays": "STEM scholarships with no essays",
+      "ieltsStudyAbroad": "Study abroad with IELTS below 6.5"
+    }
+  },
+  "results": {
+    "found": "We've found {count} opportunities. Here are the best matches for your profile.",
+    "noResults": "No results found. Try a different query.",
+    "loading": "Searching opportunities...",
+    "newSearch": "New search",
+    "sortBy": "Sort by:",
+    "mostRelevant": "Most relevant",
+    "nearestDeadline": "Nearest deadline",
+    "showMore": "Show more results"
+  },
+  "card": {
+    "deadline": "Deadline: {date}",
+    "explore": "Explore",
+    "viewDetails": "View Details"
+  },
+  "modal": {
+    "eligibilityOverview": "Eligibility Overview",
+    "requirements": "Requirements",
+    "benefits": "Benefits",
+    "matchScore": "ScholarX AI Match Score",
+    "fundingAmount": "Funding Amount",
+    "deadline": "Deadline",
+    "location": "Location",
+    "sourceWebsite": "Source Website",
+    "proceedToApplication": "Proceed to Application",
+    "copyLink": "Copy Link",
+    "copied": "Copied!",
+    "closeContinue": "Close & Continue Searching"
+  },
+  "chat": {
+    "headerTitle": "ScholarX AI Assistant",
+    "headerStatus": "Online • Ready to help",
+    "liveSession": "Live Session",
+    "mobileTitle": "AI Search",
+    "emptyState": "Ask for scholarships, internships, fellowships, or conferences.",
+    "assistantFound": "Here are the top {count} opportunities I found based on your semantic query.",
+    "assistantError": "I'm sorry, I encountered an error while searching the database. Please try again later.",
+    "unknownOpportunity": "Unknown Opportunity",
+    "global": "Global",
+    "rolling": "Rolling",
+    "fullyFunded": "Fully Funded",
+    "funded": "Funded",
+    "matchReason": "Matched based on semantic similarity of {percent}%."
+  }
+}

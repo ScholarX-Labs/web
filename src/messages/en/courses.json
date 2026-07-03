@@ -1,0 +1,37 @@
+{
+  "meta": {
+    "title": "ScholarX Courses",
+    "description": "Explore expert-led courses designed to help you grow faster."
+  },
+  "card": {
+    "goToCourse": "Go to Course",
+    "enroll": "Enroll",
+    "lessonsCount": "{count} lessons",
+    "studentsCount": "{count} students",
+    "paid": "Paid",
+    "free": "Free",
+    "resumeLearning": "Resume Learning",
+    "enrollNow": "Enroll Now",
+    "details": "Details"
+  },
+  "detailSheet": {
+    "enrolled": "{count} enrolled",
+    "duration": "{duration}",
+    "enrollmentPreview": "Enrollment preview",
+    "courseDetail": "Course detail",
+    "close": "Close course details",
+    "overview": "Overview",
+    "whatYouWillLearn": "What you'll learn",
+    "investment": "Investment",
+    "lifetimeAccess": "Lifetime access to content",
+    "officialCertificate": "Official completion certificate",
+    "premiumExperience": "Premium learning experience",
+    "continueToEnrollment": "Continue to Enrollment",
+    "enrollForFree": "Enroll for Free"
+  },
+  "hero": {
+    "ourCourses": "Our Courses",
+    "latestCourses": "Latest <blue>Courses</blue>",
+    "seeMore": "See more →"
+  }
+}

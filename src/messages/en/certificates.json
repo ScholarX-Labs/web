@@ -1,0 +1,24 @@
+{
+  "meta": {
+    "title": "ScholarX Certificates",
+    "description": "View and verify certificates issued through ScholarX."
+  },
+  "card": {
+    "issued": "Certificate issued",
+    "ready": "Your course certificate is ready",
+    "viewAndShare": "View and share your verified certificate for {title}.",
+    "issuedDate": "Issued {date}",
+    "view": "View certificate"
+  },
+  "poller": {
+    "download": "Download Certificate PDF",
+    "failed": "PDF generation failed",
+    "failedDesc": "Our system will automatically retry. You can also refresh the page to check for updates, or contact support if this persists.",
+    "stillGenerating": "Still generating…",
+    "stillGeneratingDesc": "Large batches can take a few minutes. Refresh this page to check if your PDF is ready.",
+    "refresh": "Refresh page",
+    "generating": "Generating your PDF…",
+    "queued": "PDF queued for generation",
+    "generatingDesc": "This usually takes under a minute. The page updates automatically."
+  }
+}
