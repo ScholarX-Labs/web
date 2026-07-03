@@ -1,9 +1,10 @@
-import Link from "next/link";
+import { Link } from "@/lib/i18n/navigation";
 import Image from "next/image";
 import { getSession } from "@/lib/dal";
 import SignoutButton from "@/app/auth/_components/SignoutButton";
 import MobileMenu from "@/components/MobileMenu";
 import { ProfilePopup } from "@/components/profile/profile-popup";
+import { LocaleSwitcher } from "@/components/locale-switcher";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/lib/routes";
 import { ArrowRight, LogIn, LogOut } from "lucide-react";
@@ -94,6 +95,9 @@ async function Header() {
                 Log out
               </SignoutButton>
             </div>
+            <div className="hidden lg:block">
+              <LocaleSwitcher />
+            </div>
           </>
         ) : (
           <div className="hidden lg:flex flex-row items-center gap-4">
@@ -118,6 +122,7 @@ async function Header() {
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
+            <LocaleSwitcher />
           </div>
         )}
         <div className="flex items-center lg:hidden">
