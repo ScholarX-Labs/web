@@ -1,7 +1,9 @@
 'use client'
 
 import { useState, useCallback } from 'react';
-import Link from 'next/link';
+import { Link } from '@/lib/i18n/navigation';
+import { useTranslations } from 'next-intl';
+import { LocaleSwitcher } from '@/components/locale-switcher';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
 import { Mail, Lock, Eye, EyeClosed, ArrowRight } from 'lucide-react';
 import { signIn } from '@/lib/auth-client';
@@ -14,6 +16,7 @@ function validateEmail(email: string) {
 }
 
 export function Component() {
+  const t = useTranslations("auth.signin");
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -46,17 +49,17 @@ export function Component() {
   const validateForm = useCallback(() => {
     const errors: { email?: string; password?: string } = {};
     if (!email.trim()) {
-      errors.email = "Email is required";
+      errors.email = t("errors.emailRequired");
     } else if (!validateEmail(email)) {
-      errors.email = "Enter a valid email address";
+      errors.email = t("errors.emailInvalid");
     }
     if (!password) {
-      errors.password = "Password is required";
+      errors.password = t("errors.passwordRequired");
     }
     setFieldErrors(errors);
     if (Object.keys(errors).length > 0) triggerShake();
     return Object.keys(errors).length === 0;
-  }, [email, password, triggerShake]);
+  }, [email, password, triggerShake, t]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,7 +77,7 @@ export function Component() {
     setIsLoading(false);
 
     if (error) {
-      setServerError(error.message ?? "Unable to sign in. Please try again.");
+      setServerError(t("errors.unableToSignIn"));
       triggerShake();
     }
   };
@@ -91,9 +94,7 @@ export function Component() {
       });
 
       if (result?.error) {
-        setServerError(
-          result.error.message ?? "Unable to continue with Google. Please try again.",
-        );
+        setServerError(t("errors.googleError"));
       }
     } finally {
       setIsSocialSubmitting(false);
@@ -108,6 +109,9 @@ export function Component() {
 
   return (
     <div className="min-h-screen w-screen bg-black relative overflow-hidden flex items-center justify-center">
+      <div className="absolute top-4 right-4 z-50">
+        <LocaleSwitcher />
+      </div>
       <div className="absolute inset-0 bg-gradient-to-b from-purple-500/40 via-purple-700/50 to-black" />
       
       <div className="absolute inset-0 opacity-[0.03] mix-blend-soft-light" 
@@ -372,7 +376,7 @@ export function Component() {
                   transition={{ delay: 0.2 }}
                   className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-white to-white/80"
                 >
-                  Welcome Back
+                  {t("welcomeBack")}
                 </motion.h1>
                 
                 <motion.p
@@ -381,7 +385,7 @@ export function Component() {
                   transition={{ delay: 0.3 }}
                   className="text-white/60 text-xs"
                 >
-                  Sign in to continue to ScholarX
+                  {t("signInToContinue")}
                 </motion.p>
               </div>
 
@@ -408,7 +412,7 @@ export function Component() {
                       }`} />
                       <input
                         type="email"
-                        placeholder="Email address"
+                        placeholder={t("emailPlaceholder")}
                         value={email}
                         onChange={(e) => {
                           setEmail(e.target.value);
@@ -418,7 +422,7 @@ export function Component() {
                         onBlur={() => {
                           setFocusedInput(null);
                           if (email && !validateEmail(email)) {
-                            setFieldErrors((prev) => ({ ...prev, email: "Enter a valid email address" }));
+                            setFieldErrors((prev) => ({ ...prev, email: t("errors.emailInvalid") }));
                           }
                         }}
                         data-slot="input"
@@ -448,7 +452,7 @@ export function Component() {
                       }`} />
                       <input
                         type={showPassword ? "text" : "password"}
-                        placeholder="Password"
+                        placeholder={t("passwordPlaceholder")}
                         value={password}
                         onChange={(e) => {
                           setPassword(e.target.value);
@@ -458,7 +462,7 @@ export function Component() {
                         onBlur={() => {
                           setFocusedInput(null);
                           if (password && password.length < 8) {
-                            setFieldErrors((prev) => ({ ...prev, password: "Password must be at least 8 characters" }));
+                            setFieldErrors((prev) => ({ ...prev, password: t("errors.passwordTooShort") }));
                           }
                         }}
                         data-slot="input"
@@ -518,13 +522,13 @@ export function Component() {
                       )}
                     </div>
                     <label htmlFor="remember-me" className="text-xs text-white/60 hover:text-white/80 transition-colors duration-200 cursor-pointer">
-                      Remember me
+                      {t("rememberMe")}
                     </label>
                   </div>
                   
                   <div className="text-xs relative group/link">
                     <Link href={ROUTES.FORGOT_PASSWORD} className="text-white/60 hover:text-white transition-colors duration-200">
-                      Forgot password?
+                      {t("forgotPassword")}
                     </Link>
                   </div>
                 </div>
@@ -576,7 +580,7 @@ export function Component() {
                           exit={{ opacity: 0 }}
                           className="flex items-center justify-center gap-1 text-sm font-medium"
                         >
-                          Sign In
+                          {t("signInButton")}
                           <ArrowRight className="w-3 h-3 group-hover/button:translate-x-1 transition-transform duration-300" />
                         </motion.span>
                       )}
@@ -592,7 +596,7 @@ export function Component() {
                     animate={{ opacity: [0.7, 0.9, 0.7] }}
                     transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
                   >
-                    or
+                    {t("orDivider")}
                   </motion.span>
                   <div className="flex-grow border-t border-white/5"></div>
                 </div>
@@ -612,7 +616,7 @@ export function Component() {
                     <GoogleIcon />
                     
                     <span className="text-white/80 group-hover/google:text-white transition-colors text-xs">
-                      {isSocialSubmitting ? "Loading..." : "Sign in with Google"}
+                      {isSocialSubmitting ? t("loading") : t("googleSignIn")}
                     </span>
                     
                     <motion.div 
@@ -633,13 +637,13 @@ export function Component() {
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.5 }}
                 >
-                  Don&apos;t have an account?{' '}
+                  {t("dontHaveAccount")}{' '}
                   <Link 
                     href={ROUTES.SIGNUP} 
                     className="relative inline-block group/signup"
                   >
                     <span className="relative z-10 text-white group-hover/signup:text-white/70 transition-colors duration-300 font-medium">
-                      Sign up
+                      {t("signUpLink")}
                     </span>
                     <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-white group-hover/signup:w-full transition-all duration-300" />
                   </Link>
