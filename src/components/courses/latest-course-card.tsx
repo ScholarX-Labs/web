@@ -24,6 +24,7 @@ import { CoursePriceDisplay } from "./card-parts/course-price-display";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useCourseSheetStore } from "@/stores/course-sheet.store";
 import { useEnrollIntentController } from "@/lib/enrollment/intent-controller";
+import { useTranslations } from "next-intl";
 
 interface LatestCourseCardProps {
   course: Course;
@@ -36,6 +37,7 @@ export function LatestCourseCard({
   className,
   index = 0,
 }: LatestCourseCardProps) {
+  const t = useTranslations("courses.card");
   const [wishlisted, setWishlisted] = useState(false);
   const isDesktop = useMediaQuery("(min-width: 1024px)");
   const openCourseSheet = useCourseSheetStore((state) => state.openCourseSheet);
@@ -147,7 +149,7 @@ export function LatestCourseCard({
           <CourseCategoryBadge
             category={course.category}
             delay={index * 0.1 + 0.2}
-            className="absolute top-3 left-3 z-20"
+            className="absolute top-3 dir-left-3 z-20"
           />
 
           {/* Wishlist button */}
@@ -157,7 +159,7 @@ export function LatestCourseCard({
               setWishlisted((v) => !v);
             }}
             aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
-            className="absolute top-3 right-3 z-20 w-9 h-9 rounded-full bg-white/95 backdrop-blur-sm shadow-md border border-white/40 flex items-center justify-center transition-all group-hover/image:bg-white"
+            className="absolute top-3 dir-right-3 z-20 w-9 h-9 rounded-full bg-white/95 backdrop-blur-sm shadow-md border border-white/40 flex items-center justify-center transition-all group-hover/image:bg-white"
             whileHover={{ scale: 1.15 }}
             whileTap={{ scale: 0.8 }}
             transition={{ type: "spring", stiffness: 500, damping: 15 }}
@@ -200,13 +202,13 @@ export function LatestCourseCard({
             {course.lessonsCount !== undefined && (
               <div className="flex items-center gap-1.5 bg-blue-50/80 text-blue-700 px-2.5 py-1 rounded-md text-[11px] font-bold border border-blue-100/50">
                 <BookOpen className="w-3.5 h-3.5" />
-                <span>{course.lessonsCount} lessons</span>
+                <span>{t("lessonsCount", { count: course.lessonsCount })}</span>
               </div>
             )}
             {course.studentsCount !== undefined && (
               <div className="flex items-center gap-1.5 bg-orange-50/80 text-orange-700 px-2.5 py-1 rounded-md text-[11px] font-bold border border-orange-100/50">
                 <Users className="w-3.5 h-3.5" />
-                <span>{course.studentsCount} students</span>
+                <span>{t("studentsCount", { count: course.studentsCount })}</span>
               </div>
             )}
             <div
@@ -218,7 +220,7 @@ export function LatestCourseCard({
               )}
             >
               <CircleDollarSign className="w-3.5 h-3.5" />
-              <span>{isPaid ? "Paid" : "Free"}</span>
+              <span>{isPaid ? t("paid") : t("free")}</span>
             </div>
           </div>
 
@@ -253,7 +255,7 @@ export function LatestCourseCard({
               >
                 <span className="absolute inset-0 w-full h-full bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 ease-in-out" />
                 <span className="relative z-10 flex items-center gap-1.5">
-                  Resume Learning
+                  {t("resumeLearning")}
                   <ChevronRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
                 </span>
               </Link>
@@ -265,7 +267,7 @@ export function LatestCourseCard({
               >
                 <span className="absolute inset-0 w-full h-full bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 ease-in-out" />
                 <span className="relative z-10 flex items-center gap-1.5">
-                  Enroll Now
+                  {t("enrollNow")}
                   <ChevronRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
                 </span>
               </Link>
@@ -318,7 +320,7 @@ export function LatestCourseCard({
               onClick={(event) => handleSurfaceLinkClick(event, "details")}
               className="text-xs font-bold text-hero-blue hover:text-hero-blue-dark shrink-0 flex items-center gap-1 group/link transition-colors"
             >
-              Details
+              {t("details")}
               <ChevronRight className="w-3.5 h-3.5 transition-transform group-hover/link:translate-x-1" />
             </Link>
           </div>
