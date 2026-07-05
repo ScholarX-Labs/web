@@ -37,7 +37,7 @@ require.cache[serverOnlyPath] = {
 } as any;
 
 // Mock the email delivery service factory
-import * as factory from "../../../src/domain/email/factory/email-service.factory";
+const factory = require("../../../src/domain/email/factory/email-service.factory");
 const sentEmails: any[] = [];
 const mockService = {
   sendEmail: async (options: any) => {
