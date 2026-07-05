@@ -196,43 +196,75 @@ export class CourseProgressCommandService {
     normalized: SyncLessonProgressCommand,
     result: CourseProgressResult
   ) {
+    // Only emit point events when the lesson actually transitions to completed.
+    // Heartbeat, pause, and seek events should never emit points — even if the
+    // lesson is already marked complete from a prior request.
+    const isCompletionEvent =
+      normalized.eventType === "completion" ||
+      normalized.eventType === "manual_complete" ||
+      normalized.completed === true;
+
+    if (!isCompletionEvent && !result.lesson.completed) return;
+
     const baseUrl = process.env.BETTER_AUTH_URL || "http://localhost:3000";
-    const secret = process.env.INTERNAL_API_SECRET || "";
+    const secret = process.env.INTERNAL_API_SECRET;
+
+    if (!secret) {
+      console.warn(
+        "[course-progress] INTERNAL_API_SECRET is not set — leaderboard points cannot be awarded. " +
+          "Set INTERNAL_API_SECRET in your environment."
+      );
+      return;
+    }
 
     const headers = {
       "Content-Type": "application/json",
       "x-internal-secret": secret,
     };
 
-    // Determine if the lesson was just completed in this request
-    // We check if result.lesson.completed is true. Wait, result.lesson is the *current* state.
-    // If it was already completed before this request, the idempotent `awardPoints` handles duplicate idempotency keys.
-    if (result.lesson.completed) {
-      await fetch(`${baseUrl}/api/leaderboard/point-events`, {
+    const postPointEvent = async (payload: {
+      activityType: string;
+      points: number;
+      idempotencyKey: string;
+    }) => {
+      const res = await fetch(`${baseUrl}/api/leaderboard/point-events`, {
         method: "POST",
         headers,
         body: JSON.stringify({
           userId: normalized.userId,
           courseId: normalized.courseId,
-          activityType: "lesson_completion",
-          points: 10,
-          idempotencyKey: `lesson_completion_${normalized.courseId}_${normalized.lessonId}_${normalized.userId}`,
+          ...payload,
         }),
+      });
+      if (!res.ok) {
+        const text = await res.text().catch(() => "(no body)");
+        console.error(
+          `[course-progress] leaderboard point-event failed (${res.status}) for ` +
+            `${payload.activityType}/${payload.idempotencyKey}: ${text}`
+        );
+      } else {
+        console.info(
+          `[course-progress] awarded ${payload.points} pts for ${payload.activityType} ` +
+            `(key: ${payload.idempotencyKey})`
+        );
+      }
+    };
+
+    // Award lesson completion points (idempotent — DB rejects duplicate keys)
+    if (result.lesson.completed) {
+      await postPointEvent({
+        activityType: "lesson_completion",
+        points: 10,
+        idempotencyKey: `lesson_completion_${normalized.courseId}_${normalized.lessonId}_${normalized.userId}`,
       });
     }
 
-    // Check for course completion
+    // Award course completion bonus when the entire course is finished
     if (result.course.status === "completed") {
-      await fetch(`${baseUrl}/api/leaderboard/point-events`, {
-        method: "POST",
-        headers,
-        body: JSON.stringify({
-          userId: normalized.userId,
-          courseId: normalized.courseId,
-          activityType: "course_completion",
-          points: 50,
-          idempotencyKey: `course_completion_${normalized.courseId}_${normalized.userId}`,
-        }),
+      await postPointEvent({
+        activityType: "course_completion",
+        points: 50,
+        idempotencyKey: `course_completion_${normalized.courseId}_${normalized.userId}`,
       });
     }
   }
