@@ -27,7 +27,10 @@
     "officialCertificate": "Official completion certificate",
     "premiumExperience": "Premium learning experience",
     "continueToEnrollment": "Continue to Enrollment",
-    "enrollForFree": "Enroll for Free"
+    "enrollForFree": "Enroll for Free",
+    "free": "Free",
+    "resumeLearning": "Resume Learning",
+    "enrollNow": "Enroll Now"
   },
   "hero": {
     "ourCourses": "Our Courses",

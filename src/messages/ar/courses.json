@@ -27,7 +27,10 @@
     "officialCertificate": "شهادة إتمام رسمية",
     "premiumExperience": "تجربة تعليمية ممتازة",
     "continueToEnrollment": "متابعة التسجيل",
-    "enrollForFree": "سجل مجانًا"
+    "enrollForFree": "سجل مجانًا",
+    "free": "مجاني",
+    "resumeLearning": "متابعة التعلم",
+    "enrollNow": "سجل الآن"
   },
   "hero": {
     "ourCourses": "دوراتنا",
