@@ -41,7 +41,8 @@ export default async function LeaderboardPage({ params }: LeaderboardPageProps) 
   try {
     const courseDomain = createNextCourseDomain();
     course = await courseDomain.catalog.getBySlug(slug);
-  } catch {
+  } catch (error) {
+    console.error("[LeaderboardPage] Error fetching course by slug:", slug, error);
     notFound();
   }
 
