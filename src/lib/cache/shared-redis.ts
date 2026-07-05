@@ -55,7 +55,7 @@ function closeRedisClient(client: RedisClient | null): void {
 }
 
 function isRedisClientReady(client: RedisClient): boolean {
-  return client.status === "ready";
+  return ["ready", "connecting", "connect"].includes(client.status);
 }
 
 export function isSharedRedisEnabled(): boolean {
@@ -123,7 +123,7 @@ function createRedisOptions(host: string, port: number): RedisOptions {
     keepAlive: 30_000,
     maxRetriesPerRequest: numberFromEnv(env.REDIS_MAX_RETRIES_PER_REQUEST, 2),
     enableReadyCheck: true,
-    enableOfflineQueue: false,
+    enableOfflineQueue: true,
     retryStrategy(times) {
       if (times > 5) return null;
       return Math.min(times * 100, 2_000);
