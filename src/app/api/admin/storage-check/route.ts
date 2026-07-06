@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
-import { calculateR2Usage } from "@/lib/upload";
+import { calculateAzureStorageUsage } from "@/lib/upload";
 import { clearConfigCache, setConfig } from "@/lib/app-config";
 import { checkDistributedRateLimit } from "@/lib/rate-limit/rate-limit.factory";
 import { buildRateLimitSubject } from "@/lib/rate-limit/rate-limit.utils";
@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const totalBytes = await calculateR2Usage();
+    const totalBytes = await calculateAzureStorageUsage();
     const totalGB = totalBytes / (1024 * 1024 * 1024);
     const usagePercent = (totalGB / FREE_TIER_GB) * 100;
 
@@ -60,12 +60,12 @@ export async function GET(request: NextRequest) {
           await setConfig("avatar_upload_enabled", "false", "system:storage-check");
           await clearConfigCache("avatar_upload_enabled");
           await sendAlert(
-            `R2 storage at ${totalGB.toFixed(1)}GB (${tier.label}) — auto-disabled uploads`
+            `Azure Blob storage at ${totalGB.toFixed(1)}GB (${tier.label}) — auto-disabled uploads`
           );
           actionTaken = "avatar_upload_disabled";
         } else {
           await sendAlert(
-            `R2 storage at ${totalGB.toFixed(1)}GB (${tier.label} of ${FREE_TIER_GB}GB free tier)`
+            `Azure Blob storage at ${totalGB.toFixed(1)}GB (${tier.label} of ${FREE_TIER_GB}GB free tier)`
           );
           actionTaken = actionTaken ?? "alert_sent";
         }
