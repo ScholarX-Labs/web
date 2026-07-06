@@ -69,7 +69,7 @@ export class LeaderboardQueryService {
 
     // Fetch user profiles
     const users = await db
-      .select({ id: user.id, name: user.name, image: user.image })
+      .select({ id: user.id, name: user.name, image: user.image, isProfilePublic: user.isProfilePublic })
       .from(user)
       .where(inArray(user.id, userIds));
 
@@ -82,7 +82,9 @@ export class LeaderboardQueryService {
     const entries: LeaderboardEntryDto[] = cachedEntries.map((entry) => {
       const u = userMap.get(entry.userId);
       const isCurrentUser = entry.userId === currentUserId;
-      const isAnonymous = anonymousSet.has(entry.userId);
+      const isOptedOut = anonymousSet.has(entry.userId);
+      const isGloballyPrivate = u ? !u.isProfilePublic : false;
+      const isAnonymous = isOptedOut || isGloballyPrivate;
 
       const dto: LeaderboardEntryDto = {
         rank: entry.rank,
