@@ -6,9 +6,10 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 
 interface PrivacyBadgeProps {
   isCurrentUser?: boolean;
+  isGloballyPrivate?: boolean;
 }
 
-export function PrivacyBadge({ isCurrentUser }: PrivacyBadgeProps) {
+export function PrivacyBadge({ isCurrentUser, isGloballyPrivate }: PrivacyBadgeProps) {
   const t = useTranslations("leaderboard.admin");
   
   if (isCurrentUser) {
@@ -22,7 +23,11 @@ export function PrivacyBadge({ isCurrentUser }: PrivacyBadgeProps) {
             </span>
           </TooltipTrigger>
           <TooltipContent side="top">
-            <p>Your name is masked from other users</p>
+            <p>
+              {isGloballyPrivate 
+                ? "Hidden because your global profile is private." 
+                : "Hidden because you opted out of this leaderboard."}
+            </p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>

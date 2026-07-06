@@ -75,7 +75,7 @@ export function LeaderboardShell({
 
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
           {myRank && (
-            <LeaderboardOptOutToggle courseId={courseId} isAnonymous={myRank.isAnonymous} />
+            <LeaderboardOptOutToggle courseId={courseId} isAnonymous={myRank.isAnonymous} isGloballyPrivate={myRank.isGloballyPrivate} />
           )}
 
           {/* Stubbed time window selector (Activated fully in US3) */}

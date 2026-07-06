@@ -42,7 +42,8 @@ export function LeaderboardMyRank({ myRank }: LeaderboardMyRankProps) {
     avatarUrl: session.user.image || null,
     totalScore: myRank.totalScore,
     isCurrentUser: true,
-    isPrivate: myRank.isAnonymous,
+    isPrivate: myRank.isAnonymous || myRank.isGloballyPrivate,
+    isGloballyPrivate: myRank.isGloballyPrivate,
   };
 
   return (
