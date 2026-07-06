@@ -70,7 +70,7 @@ export function LeaderboardRow({ entry, isMyRank = false }: LeaderboardRowProps)
         )}>
           {displayName}
           {entry.isCurrentUser && <span className="ml-2 text-xs font-normal text-muted-foreground">({t("you")})</span>}
-          {entry.isPrivate && !entry.isCurrentUser && <PrivacyBadge />}
+          {entry.isPrivate && <PrivacyBadge isCurrentUser={entry.isCurrentUser} />}
         </p>
       </div>
 
