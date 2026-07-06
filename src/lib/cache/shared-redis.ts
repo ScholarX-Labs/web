@@ -20,6 +20,8 @@ export interface SharedRedisStatus {
   cacheEnabled: boolean;
   configured: boolean;
   provider: "azure" | "generic" | "unconfigured";
+  host: string | null;
+  port: number | null;
   circuitOpen: boolean;
   circuitCooldownMs: number;
   consecutiveFailures: number;
@@ -278,6 +280,8 @@ export function getSharedRedisStatus(): SharedRedisStatus {
     cacheEnabled: isSharedCacheEnabled(),
     configured: isSharedRedisConfigured(),
     provider: getRedisProvider(),
+    host: isSharedRedisConfigured() ? getRedisHost() : null,
+    port: isSharedRedisConfigured() ? getRedisPort() : null,
     circuitOpen: redisDown && isCircuitOpen(),
     circuitCooldownMs: CIRCUIT_BREAKER_COOLDOWN_MS,
     consecutiveFailures,
