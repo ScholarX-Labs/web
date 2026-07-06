@@ -8,6 +8,7 @@ import { useLeaderboardEntries, useLeaderboardMyRank } from "@/hooks/queries/use
 import { motion } from "framer-motion";
 import { AdminLeaderboardControls } from "./AdminLeaderboardControls";
 import { useLocale, useTranslations } from "next-intl";
+import { LeaderboardOptOutToggle } from "./LeaderboardOptOutToggle";
 
 interface LeaderboardShellProps {
   courseId: string;
@@ -72,28 +73,34 @@ export function LeaderboardShell({
           )}
         </div>
 
-        {/* Stubbed time window selector (Activated fully in US3) */}
-        <div className="inline-flex items-center rounded-lg border bg-muted p-1">
-          {(["week", "month", "all"] as LeaderboardWindow[]).map((w) => (
-            <button
-              key={w}
-              onClick={() => setWindow(w)}
-              className={`relative inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
-                window === w ? "text-foreground" : "hover:bg-background/50 text-muted-foreground"
-              }`}
-            >
-              {window === w && (
-                <motion.div
-                  layoutId="activeWindowTab"
-                  className="absolute inset-0 bg-background shadow-sm rounded-md"
-                  transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                />
-              )}
-              <span className="relative z-10">
-                {w === "week" ? t("tabs.week") : w === "month" ? t("tabs.month") : t("tabs.all")}
-              </span>
-            </button>
-          ))}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          {myRank && (
+            <LeaderboardOptOutToggle courseId={courseId} isAnonymous={myRank.isAnonymous} />
+          )}
+
+          {/* Stubbed time window selector (Activated fully in US3) */}
+          <div className="inline-flex items-center rounded-lg border bg-muted p-1">
+            {(["week", "month", "all"] as LeaderboardWindow[]).map((w) => (
+              <button
+                key={w}
+                onClick={() => setWindow(w)}
+                className={`relative inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                  window === w ? "text-foreground" : "hover:bg-background/50 text-muted-foreground"
+                }`}
+              >
+                {window === w && (
+                  <motion.div
+                    layoutId="activeWindowTab"
+                    className="absolute inset-0 bg-background shadow-sm rounded-md"
+                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                  />
+                )}
+                <span className="relative z-10">
+                  {w === "week" ? t("tabs.week") : w === "month" ? t("tabs.month") : t("tabs.all")}
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
