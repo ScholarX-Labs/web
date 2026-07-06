@@ -4,9 +4,9 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { user } from "@/db/schema/auth-schema";
 import { auth } from "@/lib/auth";
-import { uploadAvatar, deleteAvatar, getAvatarKeyFromUrl, UploadError } from "@/lib/upload";
+import { uploadAvatar, deleteAvatar, UploadError } from "@/lib/upload";
 import { isAvatarUploadEnabled } from "@/lib/app-config";
-import { checkAvatarUploadLimit } from "@/lib/rate-limiter";
+import { peekAvatarUploadLimit, consumeAvatarUploadSlot } from "@/lib/rate-limiter";
 import { invalidatePublicProfileCache } from "@/actions/public-profile.actions";
 
 const MAX_FILE_SIZE = 1 * 1024 * 1024;
@@ -33,14 +33,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const rateLimit = await checkAvatarUploadLimit(session.user.id);
-    if (!rateLimit.allowed) {
+    // Peek: check budget without spending a slot (failed uploads won't burn quota).
+    const budgetCheck = await peekAvatarUploadLimit(session.user.id);
+    if (!budgetCheck.allowed) {
       return NextResponse.json(
         {
           success: false,
           error: "Upload limit exceeded. Try again later.",
-          remaining: rateLimit.remaining,
-          reset: rateLimit.reset,
+          remaining: budgetCheck.remaining,
+          reset: budgetCheck.reset,
         },
         { status: 429 }
       );
@@ -95,10 +96,7 @@ export async function POST(request: NextRequest) {
       .limit(1);
 
     if (current?.image) {
-      const oldKey = getAvatarKeyFromUrl(current.image);
-      if (oldKey) {
-        await deleteAvatar(oldKey);
-      }
+      await deleteAvatar(current.image);
     }
 
     await db
@@ -107,6 +105,10 @@ export async function POST(request: NextRequest) {
       .where(eq(user.id, session.user.id));
 
     await invalidatePublicProfileCache(current?.username);
+
+    // Consume a slot AFTER the upload succeeds — failed attempts don't burn quota.
+    await consumeAvatarUploadSlot(session.user.id);
+
     return NextResponse.json({ success: true, data: { url } });
   } catch (error) {
     console.error("[upload/avatar] Error:", error);
