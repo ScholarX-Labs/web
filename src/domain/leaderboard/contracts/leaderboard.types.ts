@@ -60,6 +60,7 @@ export interface LeaderboardEntryDto {
   totalScore: number;
   isCurrentUser: boolean;
   isPrivate?: boolean; // For admin view
+  isGloballyPrivate?: boolean; // To tell the user why they are private
 }
 
 export interface MyRankDto {
@@ -67,7 +68,8 @@ export interface MyRankDto {
   totalScore: number;
   categoryBreakdown: ScoreBreakdown;
   window: LeaderboardWindow;
-  isAnonymous: boolean;
+  isAnonymous: boolean; // Course-specific opt-out
+  isGloballyPrivate?: boolean; // Global profile privacy
 }
 
 export interface InsertPointEvent {

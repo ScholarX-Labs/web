@@ -9,7 +9,7 @@ import {
 import { LeaderboardPrivacyPolicy } from "./leaderboard-privacy.policy";
 import { db } from "@/db";
 import { user } from "@/db/schema/auth-schema";
-import { inArray } from "drizzle-orm";
+import { inArray, eq } from "drizzle-orm";
 
 import { CachedRankEntry } from "../contracts/leaderboard.types";
 
@@ -92,6 +92,7 @@ export class LeaderboardQueryService {
         avatarUrl: u?.image ?? null,
         totalScore: entry.score,
         isCurrentUser,
+        isGloballyPrivate,
       };
 
       if (isAnonymous) {
@@ -125,10 +126,13 @@ export class LeaderboardQueryService {
       }
     }
 
-    const [breakdown, isAnonymous] = await Promise.all([
+    const [breakdown, isAnonymous, userRecord] = await Promise.all([
       this.pointEventRepo.getUserBreakdown(courseId, userId, this.getWindowStart(window)),
       this.optOutRepo.isAnonymous(courseId, userId),
+      db.select({ isProfilePublic: user.isProfilePublic }).from(user).where(eq(user.id, userId)).limit(1),
     ]);
+    
+    const isGloballyPrivate = userRecord.length > 0 ? !userRecord[0].isProfilePublic : false;
 
     const totalScore = breakdown.quizzesAndExams + breakdown.participation + breakdown.courseCompletion;
 
@@ -157,6 +161,7 @@ export class LeaderboardQueryService {
       categoryBreakdown: breakdown,
       window,
       isAnonymous,
+      isGloballyPrivate,
     };
   }
 
