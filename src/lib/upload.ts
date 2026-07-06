@@ -1,15 +1,10 @@
-import {
-  S3Client,
-  PutObjectCommand,
-  DeleteObjectCommand,
-  ListObjectsV2Command,
-} from "@aws-sdk/client-s3";
+import { BlobServiceClient } from "@azure/storage-blob";
 import sharp from "sharp";
-import { env } from "@/config/env";
 
 const ACCEPTED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_FILE_SIZE = 1 * 1024 * 1024;
 const AVATAR_MAX_DIMENSION = 512;
+const AVATAR_CONTAINER = "avatars";
 
 const MAGIC_BYTES: Record<string, number[]> = {
   "image/jpeg": [0xFF, 0xD8, 0xFF],
@@ -17,23 +12,16 @@ const MAGIC_BYTES: Record<string, number[]> = {
   "image/webp": [0x52, 0x49, 0x46, 0x46],
 };
 
-let r2Client: S3Client | null = null;
-
-function getR2Client(): S3Client {
-  if (!r2Client) {
-    r2Client = new S3Client({
-      region: "auto",
-      endpoint: env.R2_ENDPOINT,
-      credentials: {
-        accessKeyId: env.R2_ACCESS_KEY!,
-        secretAccessKey: env.R2_SECRET_KEY!,
-      },
-      requestHandler: {
-        requestTimeout: 30_000,
-      },
-    });
+function getBlobServiceClient(): BlobServiceClient {
+  const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
+  if (!connectionString) {
+    throw new UploadError(
+      "STORAGE_NOT_CONFIGURED",
+      503,
+      "AZURE_STORAGE_CONNECTION_STRING is not configured."
+    );
   }
-  return r2Client;
+  return BlobServiceClient.fromConnectionString(connectionString);
 }
 
 export class UploadError extends Error {
@@ -106,62 +94,88 @@ export async function uploadAvatar(
 
   const processedBuffer = await processAvatar(fileBuffer);
 
-  const key = `avatars/${userId}/${crypto.randomUUID()}.jpg`;
-
-  const command = new PutObjectCommand({
-    Bucket: env.R2_BUCKET_NAME!,
-    Key: key,
-    Body: processedBuffer,
-    ContentType: "image/jpeg",
-    CacheControl: "public, max-age=86400",
-  });
+  const blobName = `${userId}/${crypto.randomUUID()}.jpg`;
 
   try {
-    await getR2Client().send(command);
-  } catch {
+    const client = getBlobServiceClient();
+    const containerClient = client.getContainerClient(AVATAR_CONTAINER);
+    const blobClient = containerClient.getBlockBlobClient(blobName);
+    await blobClient.uploadData(processedBuffer, {
+      blobHTTPHeaders: {
+        blobContentType: "image/jpeg",
+        blobCacheControl: "public, max-age=86400",
+      },
+    });
+    return blobClient.url;
+  } catch (error) {
+    if (error instanceof UploadError) throw error;
+    // Provide a more specific message for common Azure errors
+    const azureCode = (error as { code?: string })?.code;
+    if (azureCode === "ContainerNotFound") {
+      throw new UploadError(
+        "CONTAINER_NOT_FOUND",
+        503,
+        `Azure Blob container '${AVATAR_CONTAINER}' does not exist. Create it in the Azure Portal.`
+      );
+    }
+    if (azureCode === "PublicAccessNotPermitted") {
+      throw new UploadError(
+        "PUBLIC_ACCESS_DENIED",
+        503,
+        "Storage account has public blob access disabled. Set 'Allow Blob public access' in Azure Portal, or use a private container with SAS tokens."
+      );
+    }
+    console.error("[upload] Azure upload error:", error);
     throw new UploadError("UPLOAD_FAILED", 500, "Failed to upload to storage");
   }
-
-  return `${env.R2_PUBLIC_URL}/${key}`;
 }
 
-export async function deleteAvatar(key: string): Promise<void> {
+export async function deleteAvatar(blobUrl: string): Promise<void> {
   try {
-    const command = new DeleteObjectCommand({
-      Bucket: env.R2_BUCKET_NAME!,
-      Key: key,
-    });
-    await getR2Client().send(command);
+    const client = getBlobServiceClient();
+    const containerClient = client.getContainerClient(AVATAR_CONTAINER);
+    // Extract blob name from the full URL: everything after the container segment
+    const url = new URL(blobUrl);
+    // pathname is like /<container>/<blobName>
+    const segments = url.pathname.split("/").filter(Boolean);
+    // segments[0] = container name, rest = blob name parts
+    const blobName = segments.slice(1).join("/");
+    if (blobName) {
+      await containerClient.deleteBlob(blobName);
+    }
   } catch (error) {
     console.error("[upload] Failed to delete old avatar:", error);
   }
 }
 
 export function getAvatarKeyFromUrl(url: string): string | null {
-  const prefix = env.R2_PUBLIC_URL + "/";
-  if (url.startsWith(prefix)) {
-    return url.slice(prefix.length);
+  try {
+    const parsed = new URL(url);
+    const segments = parsed.pathname.split("/").filter(Boolean);
+    // segments[0] = container, rest = blob name
+    if (segments.length < 2) return null;
+    return segments.slice(1).join("/");
+  } catch {
+    return null;
   }
-  return null;
 }
 
-export async function calculateR2Usage(): Promise<number> {
-  let totalBytes = 0;
-  let isTruncated = true;
-  let continuationToken: string | undefined;
-
-  while (isTruncated) {
-    const command = new ListObjectsV2Command({
-      Bucket: env.R2_BUCKET_NAME!,
-      ContinuationToken: continuationToken,
-    });
-    const response = await getR2Client().send(command);
-    for (const obj of response.Contents ?? []) {
-      totalBytes += obj.Size ?? 0;
+export async function calculateAzureStorageUsage(): Promise<number> {
+  try {
+    const client = getBlobServiceClient();
+    const containerClient = client.getContainerClient(AVATAR_CONTAINER);
+    
+    if (!(await containerClient.exists())) {
+      return 0;
     }
-    isTruncated = response.IsTruncated ?? false;
-    continuationToken = response.NextContinuationToken;
-  }
 
-  return totalBytes;
+    let totalBytes = 0;
+    for await (const blob of containerClient.listBlobsFlat()) {
+      totalBytes += blob.properties.contentLength || 0;
+    }
+    return totalBytes;
+  } catch (error) {
+    console.error("[upload] Failed to calculate Azure storage usage:", error);
+    return 0;
+  }
 }
