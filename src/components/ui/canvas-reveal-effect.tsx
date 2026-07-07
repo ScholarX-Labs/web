@@ -300,6 +300,12 @@ const ShaderMaterial = ({
     return materialObject;
   }, [source, getUniforms]);
 
+  useEffect(() => {
+    return () => {
+      material.dispose();
+    };
+  }, [material]);
+
   return (
     <mesh ref={ref}>
       <planeGeometry args={[2, 2]} />
