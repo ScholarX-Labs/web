@@ -64,3 +64,12 @@ containerapp.yaml
 *.txt
 .codex/auth.json
 .env.local
+
+
+.opencode
+.agent*
+.claude
+.codex
+.config*
+.cursor
+.gemini*
