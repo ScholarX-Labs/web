@@ -216,7 +216,7 @@ export const Text3DFlip = ({
       <span className="sr-only">{text}</span>
 
       {characters.map((wordObj, wordIndex) => (
-        <span key={wordIndex} className="inline-flex">
+        <span key={wordIndex} className="inline-flex" aria-hidden="true">
           {wordObj.characters.map((char, charIndex) => (
             <CharBox
               key={charOffsets[wordIndex] + charIndex}
