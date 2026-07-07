@@ -166,6 +166,9 @@ export const PillBase: React.FC = () => {
     <motion.nav
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      onFocus={handleMouseEnter}
+      onBlur={handleMouseLeave}
+      tabIndex={0}
       className="relative rounded-full transition-shadow duration-300"
       style={{
         width: pillWidth,
