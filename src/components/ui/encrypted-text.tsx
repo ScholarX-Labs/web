@@ -154,7 +154,6 @@ export const EncryptedText: React.FC<EncryptedTextProps> = ({
       ref={ref}
       className={cn(className)}
       aria-label={text}
-      role="text"
     >
       {text.split("").map((char, index) => {
         const isRevealed = index < revealCount;
