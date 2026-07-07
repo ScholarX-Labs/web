@@ -249,3 +249,103 @@ return {
   reset: bottleneck.resetAt,
 };
 ```
+
+---
+
+## 16. major: Untyped cast of raw API response to MyRankDto
+
+**File:** `src/hooks/queries/use-leaderboard.ts:29-36`
+
+`res.json()` is returned directly as `Promise<MyRankDto>` with no intermediate raw type or validation, weakening the boundary between the API payload and the normalized/UI-facing type.
+
+### Suggestion
+
+Add a response validation layer or interface for the raw payload before casting to `MyRankDto`.
+
+---
+
+## 17. minor: Non-percentage unit strings aren't mirrored for RTL
+
+**File:** `src/hooks/useRTLMotion.ts:21-30`
+
+`getX` only flips numbers and percentage strings. Other unit strings (e.g. `"10px"`, `"2rem"`) pass through unchanged even when `isRTL` is true, silently failing to mirror x-offsets.
+
+### Proposed Fix
+
+```ts
+if (typeof xValue === "string") {
+  const match = xValue.match(/^(-?\d*\.?\d+)([a-z%]*)$/i);
+  if (match) {
+    const [, num, unit] = match;
+    return isRTL ? `${-parseFloat(num)}${unit}` : xValue;
+  }
+}
+```
+
+---
+
+## 18. major: Type the raw API response before mapping in use-leaderboard
+
+**File:** `src/hooks/queries/use-leaderboard.ts:12-20`
+
+`res.json()` resolves to `any`, so `data.entries`/`data.updatedAt` are unchecked and pass through into `LeaderboardData` with no validation. A shape mismatch from the API surfaces as a silent runtime bug.
+
+### Proposed Fix
+
+```ts
+interface LeaderboardApiResponse {
+  entries: LeaderboardEntryDto[];
+  updatedAt: string | null;
+}
+
+queryFn: async (): Promise<LeaderboardData> => {
+  const res = await fetch(`/api/leaderboard/${courseId}?window=${window}`);
+  if (!res.ok) throw new Error("Failed to fetch leaderboard");
+  const data: LeaderboardApiResponse = await res.json();
+  return {
+    entries: data.entries,
+    updatedAt: data.updatedAt ? new Date(data.updatedAt) : null,
+  };
+},
+```
+
+---
+
+## 19. minor: Avoid returning raw error internals in point-events route
+
+**File:** `src/app/api/leaderboard/point-events/route.ts:24-29`
+
+Both the validation error (`details: result.error`) and the catch handler (`details: err.message`) serialize internal detail to the client. The full ZodError object includes internal schema structure.
+
+### Suggestion
+
+Log the full error server-side and return a minimal message.
+
+---
+
+## 20. minor: Avoid leaking raw error internals in opt-out route
+
+**File:** `src/app/api/leaderboard/opt-out/route.ts:23-28`
+
+Same pattern as point-events route: returning `details: result.error` (full ZodError) and `details: err.message` exposes internal detail to clients.
+
+### Suggestion
+
+Log server-side, return a minimal message.
+
+---
+
+## 21. major: CSV formula injection via displayName
+
+**File:** `src/app/api/leaderboard/[courseId]/export/route.ts:48-58`
+
+`displayName` is user-controlled and written into CSV with only double-quote escaping. A value beginning with `=`, `+`, `-`, `@` (or tab/CR) is interpreted as a formula when opened in Excel/Sheets.
+
+### Proposed Fix
+
+```ts
+const sanitizeCsv = (value: string) => {
+  const escaped = value.replace(/"/g, '""');
+  return /^[=+\-@\t\r]/.test(escaped) ? `'${escaped}` : escaped;
+};
+```
