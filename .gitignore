@@ -73,3 +73,5 @@ containerapp.yaml
 .config*
 .cursor
 .gemini*
+.specify*
+/task-manager
