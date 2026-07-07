@@ -22,9 +22,12 @@ export function useRTLMotion() {
     if (typeof xValue === "number") {
       return isRTL ? -xValue : xValue;
     }
-    if (typeof xValue === "string" && xValue.endsWith("%")) {
-      const numericPart = parseFloat(xValue);
-      return isRTL ? `${-numericPart}%` : xValue;
+    if (typeof xValue === "string") {
+      const match = xValue.match(/^(-?\d*\.?\d+)([a-z%]*)$/i);
+      if (match) {
+        const [, num, unit] = match;
+        return isRTL ? `${-parseFloat(num)}${unit}` : xValue;
+      }
     }
     return xValue;
   };

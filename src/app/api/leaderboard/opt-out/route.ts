@@ -21,7 +21,8 @@ export async function PUT(request: NextRequest) {
     const result = optOutSchema.safeParse(body);
 
     if (!result.success) {
-      return new NextResponse(JSON.stringify({ error: "Invalid payload", details: result.error }), {
+      console.error("[OptOut API] Validation error:", result.error);
+      return new NextResponse(JSON.stringify({ error: "Invalid payload" }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
       });
@@ -57,7 +58,7 @@ export async function PUT(request: NextRequest) {
     const err = error instanceof Error ? error : new Error(String(error));
     console.error("[OptOut API] Error:", err);
     return NextResponse.json(
-      { error: "Internal Server Error", details: err.message },
+      { error: "Internal Server Error" },
       { status: 500 }
     );
   }

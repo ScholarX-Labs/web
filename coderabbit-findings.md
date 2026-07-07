@@ -252,7 +252,7 @@ return {
 
 ---
 
-## 16. major: Untyped cast of raw API response to MyRankDto
+## 16. major: Untyped cast of raw API response to MyRankDto - Solved
 
 **File:** `src/hooks/queries/use-leaderboard.ts:29-36`
 
@@ -264,7 +264,7 @@ Add a response validation layer or interface for the raw payload before casting 
 
 ---
 
-## 17. minor: Non-percentage unit strings aren't mirrored for RTL
+## 17. minor: Non-percentage unit strings aren't mirrored for RTL - Solved
 
 **File:** `src/hooks/useRTLMotion.ts:21-30`
 
@@ -284,7 +284,7 @@ if (typeof xValue === "string") {
 
 ---
 
-## 18. major: Type the raw API response before mapping in use-leaderboard
+## 18. major: Type the raw API response before mapping in use-leaderboard - Solved
 
 **File:** `src/hooks/queries/use-leaderboard.ts:12-20`
 
@@ -311,7 +311,7 @@ queryFn: async (): Promise<LeaderboardData> => {
 
 ---
 
-## 19. minor: Avoid returning raw error internals in point-events route
+## 19. minor: Avoid returning raw error internals in point-events route - Solved
 
 **File:** `src/app/api/leaderboard/point-events/route.ts:24-29`
 
@@ -323,7 +323,7 @@ Log the full error server-side and return a minimal message.
 
 ---
 
-## 20. minor: Avoid leaking raw error internals in opt-out route
+## 20. minor: Avoid leaking raw error internals in opt-out route - Solved
 
 **File:** `src/app/api/leaderboard/opt-out/route.ts:23-28`
 
@@ -335,7 +335,7 @@ Log server-side, return a minimal message.
 
 ---
 
-## 21. major: CSV formula injection via displayName
+## 21. major: CSV formula injection via displayName - Solved
 
 **File:** `src/app/api/leaderboard/[courseId]/export/route.ts:48-58`
 

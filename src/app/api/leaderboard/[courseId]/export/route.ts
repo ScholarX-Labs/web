@@ -44,10 +44,15 @@ export async function GET(request: NextRequest, context: RouteContext) {
     // CSV Header
     const headers = ["Rank", "Name", "Total Score", "Is Opted Out"];
     
+    const sanitizeCsv = (value: string) => {
+      const escaped = value.replace(/"/g, '""');
+      return /^[=+\-@\t\r]/.test(escaped) ? `'${escaped}` : escaped;
+    };
+
     // CSV Rows
     const rows = result.entries.map((entry) => [
       entry.rank,
-      `"${entry.displayName.replace(/"/g, '""')}"`, // escape quotes
+      `"${sanitizeCsv(entry.displayName)}"`, // escape quotes and formulas
       entry.totalScore,
       entry.isPrivate ? "Yes" : "No"
     ]);
