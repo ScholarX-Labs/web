@@ -66,10 +66,10 @@ export function Lens({
   lensColor = "black",
   ariaLabel = "Zoom Area",
 }: LensProps) {
-  if (zoomFactor < 1) {
+  if (zoomFactor <= 1) {
     throw new Error("zoomFactor must be greater than 1")
   }
-  if (lensSize < 0) {
+  if (lensSize <= 0) {
     throw new Error("lensSize must be greater than 0")
   }
 
