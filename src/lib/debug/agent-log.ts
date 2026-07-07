@@ -18,7 +18,13 @@ function sanitizeData(data?: Record<string, unknown>): Record<string, unknown> |
   for (const [key, val] of Object.entries(data)) {
     if (sensitiveKeys.some(sensitive => key.toLowerCase().includes(sensitive))) {
       sanitized[key] = "[REDACTED]";
-    } else if (val && typeof val === "object" && !Array.isArray(val)) {
+    } else if (Array.isArray(val)) {
+      sanitized[key] = val.map((item) =>
+        item && typeof item === "object" && !Array.isArray(item)
+          ? sanitizeData(item as Record<string, unknown>)
+          : item,
+      );
+    } else if (val && typeof val === "object") {
       sanitized[key] = sanitizeData(val as Record<string, unknown>);
     } else {
       sanitized[key] = val;

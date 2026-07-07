@@ -39,9 +39,10 @@ export class LeaderboardCacheRebuildJob {
 
     // 3. Compute scores
     const entries: CacheEntry[] = [];
+    const rebuildTimestamp = Date.now();
     for (const [userId, aggs] of userAggs.entries()) {
       const { totalScore } = this.scoringPolicy.computeCompositeScore(aggs);
-      const score = this.scoringPolicy.computeZsetScore(totalScore, Date.now()); // Using Date.now() for placeholder tie-breaker logic in bulk rebuild
+      const score = this.scoringPolicy.computeZsetScore(totalScore, rebuildTimestamp);
       entries.push({ userId, score });
     }
 
@@ -62,8 +63,9 @@ export class LeaderboardCacheRebuildJob {
     }
     
     if (window === "month") {
-      const startOfMonth = new Date(now.getUTCFullYear(), now.getUTCMonth(), 1);
-      startOfMonth.setUTCHours(0, 0, 0, 0);
+      const startOfMonth = new Date(
+        Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0)
+      );
       return startOfMonth;
     }
     

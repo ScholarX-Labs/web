@@ -57,7 +57,7 @@ function closeRedisClient(client: RedisClient | null): void {
 }
 
 function isRedisClientReady(client: RedisClient): boolean {
-  return ["ready", "connecting", "connect"].includes(client.status);
+  return client.status === "ready";
 }
 
 export function isSharedRedisEnabled(): boolean {

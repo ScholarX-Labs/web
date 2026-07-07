@@ -33,7 +33,7 @@ export class LeaderboardScoringPolicy {
         participation,
         courseCompletion,
       },
-      totalScore: Math.floor(totalScore), // Assuming we floor the final score
+      totalScore,
     };
   }
 

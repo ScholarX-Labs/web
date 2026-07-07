@@ -36,10 +36,13 @@ export async function peekAvatarUploadLimit(
     return { allowed: false, remaining: 0, reset: denied.resetAt };
   }
 
+  const bottleneck = results.reduce((min, r) =>
+    r.remaining < min.remaining ? r : min,
+  );
   return {
     allowed: true,
-    remaining: Math.min(...results.map((r) => r.remaining)),
-    reset: Math.max(...results.map((r) => r.resetAt)),
+    remaining: bottleneck.remaining,
+    reset: bottleneck.resetAt,
   };
 }
 
@@ -61,10 +64,13 @@ export async function consumeAvatarUploadSlot(
     return { allowed: false, remaining: 0, reset: denied.resetAt };
   }
 
+  const bottleneck = results.reduce((min, r) =>
+    r.remaining < min.remaining ? r : min,
+  );
   return {
     allowed: true,
-    remaining: Math.min(...results.map((r) => r.remaining)),
-    reset: Math.max(...results.map((r) => r.resetAt)),
+    remaining: bottleneck.remaining,
+    reset: bottleneck.resetAt,
   };
 }
 

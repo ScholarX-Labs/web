@@ -23,7 +23,7 @@ export class LeaderboardService {
     activityId?: string;
     idempotencyKey?: string;
   }): Promise<LeaderboardDomainEvent> {
-    if (event.points <= 0) {
+    if (!Number.isFinite(event.points) || event.points <= 0) {
       throw new LeaderboardError(
         "INVALID_OPERATION",
         "Points awarded must be greater than zero."
@@ -33,8 +33,8 @@ export class LeaderboardService {
     await this.pointEventRepo.insertPointEvent(event);
 
     if (this.rebuildJob) {
-      // Run cache rebuilds asynchronously
-      Promise.all([
+      // Run cache rebuilds
+      await Promise.all([
         this.rebuildJob.rebuild(event.courseId, "all"),
         this.rebuildJob.rebuild(event.courseId, "week"),
         this.rebuildJob.rebuild(event.courseId, "month"),

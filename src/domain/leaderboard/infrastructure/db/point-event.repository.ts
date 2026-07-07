@@ -49,6 +49,9 @@ export class PointEventRepository implements IPointEventRepository {
 
     for (const row of rows) {
       const category: LeaderboardActivityCategory = ACTIVITY_CATEGORY_MAP[row.activityType];
+      if (!category) {
+        continue; // skip unmapped activity types
+      }
       const key = `${row.userId}:${category}`;
 
       const existing = aggregateMap.get(key);
@@ -97,6 +100,9 @@ export class PointEventRepository implements IPointEventRepository {
 
     for (const row of rows) {
       const category = ACTIVITY_CATEGORY_MAP[row.activityType];
+      if (!category) {
+        continue; // skip unmapped activity types
+      }
       breakdown[category] += row.totalPoints;
     }
 

@@ -36,7 +36,7 @@ export class LeaderboardQueryService {
       updatedAt = await this.cacheRepo.getUpdatedAt(courseId, window);
     } catch (err: unknown) {
       const error = err as { code?: string; message?: string };
-      const isRedisError = error.code === 'ECONNREFUSED' || error.message?.includes('ECONNREFUSED') || error.message?.includes('ClosedClient');
+      const isRedisError = error.code === 'ECONNREFUSED' || error.code === 'CACHE_UNAVAILABLE' || error.message?.includes('ECONNREFUSED') || error.message?.includes('ClosedClient');
       if (isRedisError) {
         console.warn("[LeaderboardQueryService] Redis unavailable, falling back to PostgreSQL for top entries");
         const windowStart = this.getWindowStart(window);
@@ -117,7 +117,7 @@ export class LeaderboardQueryService {
       cachedRank = await this.cacheRepo.getUserRank(courseId, window, userId);
     } catch (err: unknown) {
       const error = err as { code?: string; message?: string };
-      const isRedisError = error.code === 'ECONNREFUSED' || error.message?.includes('ECONNREFUSED') || error.message?.includes('ClosedClient');
+      const isRedisError = error.code === 'ECONNREFUSED' || error.code === 'CACHE_UNAVAILABLE' || error.message?.includes('ECONNREFUSED') || error.message?.includes('ClosedClient');
       if (isRedisError) {
         console.warn("[LeaderboardQueryService] Redis unavailable, falling back to PostgreSQL for my rank");
         isDegraded = true;

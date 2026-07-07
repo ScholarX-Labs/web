@@ -6,7 +6,7 @@ const isArabicActive =
   process.env.NEXT_PUBLIC_ARABIC_ENABLED !== "false";
 
 export const routing = defineRouting({
-  locales: isArabicActive ? (SUPPORTED_LOCALES as any) : [DEFAULT_LOCALE],
+  locales: isArabicActive ? [...SUPPORTED_LOCALES] : [DEFAULT_LOCALE],
   defaultLocale: DEFAULT_LOCALE,
   localePrefix: "as-needed",
 });

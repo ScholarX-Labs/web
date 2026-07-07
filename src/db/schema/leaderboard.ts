@@ -24,7 +24,7 @@ export const pointEvents = pgTable(
     activityType: activityTypeEnum("activity_type").notNull(),
     activityId: uuid("activity_id"),
     points: integer("points").notNull(),
-    idempotencyKey: varchar("idempotency_key", { length: 255 }).unique(),
+    idempotencyKey: varchar("idempotency_key", { length: 255 }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

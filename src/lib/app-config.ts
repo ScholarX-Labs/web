@@ -99,13 +99,6 @@ export async function setConfig(
 }
 
 export async function isArabicEnabled(): Promise<boolean> {
-  const value = await getConfig("arabic_enabled");
-  if (value === null) {
-    const envVal = process.env.ARABIC_ENABLED;
-    if (envVal !== undefined) {
-      return envVal !== "false";
-    }
-    return true;
-  }
-  return value !== "false";
+  return process.env.ARABIC_ENABLED !== "false" &&
+         process.env.NEXT_PUBLIC_ARABIC_ENABLED !== "false";
 }

@@ -69,7 +69,7 @@ export function LeaderboardOptOutToggle({ courseId, isAnonymous, isGloballyPriva
         <TooltipProvider delayDuration={100}>
           <Tooltip>
             <TooltipTrigger asChild>
-              <div>
+              <div tabIndex={0}>
                 <Switch 
                   id="opt-out" 
                   checked={true} 
