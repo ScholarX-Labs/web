@@ -59,6 +59,8 @@ export function IconCloud({ icons, images, className, ...props }: IconCloudProps
     startTime: number
     duration: number
   } | null>(null)
+  const stateRef = useRef({ isDragging, mousePos, targetRotation })
+  stateRef.current = { isDragging, mousePos, targetRotation }
   const animationFrameRef = useRef<number>(0)
   const rotationRef = useRef({ x: 0, y: 0 })
   const iconCanvasesRef = useRef<HTMLCanvasElement[]>([])
@@ -132,7 +134,7 @@ export function IconCloud({ icons, images, className, ...props }: IconCloudProps
           offCtx.scale(0.4, 0.4)
           const svgString = renderToString(item as React.ReactElement)
           const img = new Image()
-          img.src = "data:image/svg+xml;base64," + btoa(svgString)
+          img.src = "data:image/svg+xml;utf8," + encodeURIComponent(svgString)
           img.onload = () => {
             offCtx.clearRect(0, 0, offscreen.width, offscreen.height)
             offCtx.drawImage(img, 0, 0)
@@ -240,6 +242,7 @@ export function IconCloud({ icons, images, className, ...props }: IconCloudProps
       const animate = () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height)
 
+        const { isDragging, mousePos, targetRotation } = stateRef.current
         const centerX = canvas.width / 2
         const centerY = canvas.height / 2
         const maxDistance = Math.sqrt(centerX * centerX + centerY * centerY)
@@ -327,7 +330,7 @@ export function IconCloud({ icons, images, className, ...props }: IconCloudProps
         cancelAnimationFrame(animationFrameRef.current)
       }
     }
-  }, [icons, images, iconPositions, isDragging, mousePos, targetRotation])
+  }, [icons, images, iconPositions])
 
   return (
     <canvas
