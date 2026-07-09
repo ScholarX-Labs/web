@@ -11,8 +11,8 @@ export const CreateCourseSchema = z.object({
   requiresForm: z.coerce.boolean().optional(),
   salesInquiry: z.coerce.boolean().optional(),
   // Security: Enforce HTTP/HTTPS to prevent XSS via javascript: URIs
-  imageUrl: z.string().url().refine(val => /^https?:\/\//i.test(val), { message: "Must be a valid HTTP/HTTPS URL" }).optional().or(z.literal("")),
-  videoPreviewUrl: z.string().url().refine(val => /^https?:\/\//i.test(val), { message: "Must be a valid HTTP/HTTPS URL" }).optional().or(z.literal("")),
+  imageUrl: z.string().url().refine((val) => /^https?:\/\//i.test(val), { message: "Must be a valid HTTP/HTTPS URL" }).optional().or(z.literal("")),
+  videoPreviewUrl: z.string().url().refine((val) => /^https?:\/\//i.test(val), { message: "Must be a valid HTTP/HTTPS URL" }).optional().or(z.literal("")),
   tags: z.array(z.string()).optional(),
   status: z.enum(["active", "inactive", "draft"]).optional(),
   instructorId: z.string().uuid().optional(),
@@ -37,7 +37,7 @@ export const CreateLessonSchema = z.object({
   description: z.string().max(2000).optional(),
   content: z.string().optional(),
   // Security: Enforce HTTP/HTTPS to prevent XSS via javascript: URIs
-  videoUrl: z.string().url().refine(val => /^https?:\/\//i.test(val), { message: "Must be a valid HTTP/HTTPS URL" }).optional().or(z.literal("")),
+  videoUrl: z.string().url().refine((val) => /^https?:\/\//i.test(val), { message: "Must be a valid HTTP/HTTPS URL" }).optional().or(z.literal("")),
   duration: z.coerce.number().int().positive().optional(),
   isPrivate: z.coerce.boolean().optional(),
   status: z.enum(["draft", "staging", "published", "archived"]).optional(),

@@ -156,7 +156,7 @@ export default function RadialOrbitalTimeline({ timelineData }: RadialOrbitalTim
             return (
               <button type="button"
                 key={item.id}
-                ref={(el) => { nodeRefs.current[item.id] = el as unknown as HTMLDivElement }}
+                ref={(el) => { nodeRefs.current[item.id] = el }}
                 className="absolute transition-all duration-700 cursor-pointer text-left"
                 style={nodeStyle}
                 onClick={(e) => { e.stopPropagation(); toggleItem(item.id) }}

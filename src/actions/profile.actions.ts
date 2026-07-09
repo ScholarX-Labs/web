@@ -40,11 +40,11 @@ const updateProfileSchema = z.object({
 
 const socialLinksSchema = z.object({
   // Security: Enforce HTTP/HTTPS to prevent XSS via javascript: URIs
-  githubUrl: z.string().url().refine(val => /^https?:\/\//i.test(val), { message: "Must be a valid HTTP/HTTPS URL" }).optional().or(z.literal("")),
-  facebookUrl: z.string().url().refine(val => /^https?:\/\//i.test(val), { message: "Must be a valid HTTP/HTTPS URL" }).optional().or(z.literal("")),
-  instagramUrl: z.string().url().refine(val => /^https?:\/\//i.test(val), { message: "Must be a valid HTTP/HTTPS URL" }).optional().or(z.literal("")),
-  twitterUrl: z.string().url().refine(val => /^https?:\/\//i.test(val), { message: "Must be a valid HTTP/HTTPS URL" }).optional().or(z.literal("")),
-  linkedinUrl: z.string().url().refine(val => /^https?:\/\//i.test(val), { message: "Must be a valid HTTP/HTTPS URL" }).optional().or(z.literal("")),
+  githubUrl: z.string().url().refine((val) => /^https?:\/\//i.test(val), { message: "Must be a valid HTTP/HTTPS URL" }).optional().or(z.literal("")),
+  facebookUrl: z.string().url().refine((val) => /^https?:\/\//i.test(val), { message: "Must be a valid HTTP/HTTPS URL" }).optional().or(z.literal("")),
+  instagramUrl: z.string().url().refine((val) => /^https?:\/\//i.test(val), { message: "Must be a valid HTTP/HTTPS URL" }).optional().or(z.literal("")),
+  twitterUrl: z.string().url().refine((val) => /^https?:\/\//i.test(val), { message: "Must be a valid HTTP/HTTPS URL" }).optional().or(z.literal("")),
+  linkedinUrl: z.string().url().refine((val) => /^https?:\/\//i.test(val), { message: "Must be a valid HTTP/HTTPS URL" }).optional().or(z.literal("")),
 });
 
 export async function getProfile(): Promise<ActionResponse<ProfileData>> {
