@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { execSync } from "node:child_process";
 import test, { describe } from "node:test";
 import assert from "node:assert/strict";
