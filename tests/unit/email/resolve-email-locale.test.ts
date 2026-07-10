@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import test, { describe, beforeEach } from "node:test";
 import assert from "node:assert/strict";
 

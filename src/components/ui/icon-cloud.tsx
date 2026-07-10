@@ -59,8 +59,12 @@ export function IconCloud({ icons, images, className, ...props }: IconCloudProps
     startTime: number
     duration: number
   } | null>(null)
-  const stateRef = useRef({ isDragging, mousePos, targetRotation })
-  stateRef.current = { isDragging, mousePos, targetRotation }
+  const stateRef = useRef({ isDragging: false, mousePos: { x: 0, y: 0 }, targetRotation: null as typeof targetRotation })
+
+  useEffect(() => {
+    stateRef.current = { isDragging, mousePos, targetRotation }
+  }, [isDragging, mousePos, targetRotation])
+
   const animationFrameRef = useRef<number>(0)
   const rotationRef = useRef({ x: 0, y: 0 })
   const iconCanvasesRef = useRef<HTMLCanvasElement[]>([])

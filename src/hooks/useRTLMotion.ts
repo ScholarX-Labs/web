@@ -36,18 +36,20 @@ export function useRTLMotion() {
    * Helper to mirror motion variant keyframes or properties.
    * Iterates through a variants object and dynamically flips any 'x' offsets.
    */
-  const rtlVariants = <T extends Record<string, any>>(variants: T): T => {
-    const flipped = { ...variants };
+  const rtlVariants = <T extends Record<string, unknown>>(variants: T): T => {
+    const flipped = { ...variants } as Record<string, unknown>;
     
     for (const state in flipped) {
-      if (flipped[state] && typeof flipped[state] === "object") {
-        const item = { ...flipped[state] };
+      const stateValue = flipped[state];
+      if (stateValue && typeof stateValue === "object" && !Array.isArray(stateValue)) {
+        const item = { ...stateValue } as Record<string, unknown>;
         
         if ("x" in item) {
-          if (typeof item.x === "number" || typeof item.x === "string") {
-            item.x = getX(item.x);
-          } else if (Array.isArray(item.x)) {
-            item.x = item.x.map((val: any) => (typeof val === "number" || typeof val === "string" ? getX(val) : val));
+          const xVal = item.x;
+          if (typeof xVal === "number" || typeof xVal === "string") {
+            item.x = getX(xVal);
+          } else if (Array.isArray(xVal)) {
+            item.x = xVal.map((val: unknown) => (typeof val === "number" || typeof val === "string" ? getX(val) : val));
           }
         }
         
@@ -55,7 +57,7 @@ export function useRTLMotion() {
       }
     }
     
-    return flipped;
+    return flipped as T;
   };
 
   return {

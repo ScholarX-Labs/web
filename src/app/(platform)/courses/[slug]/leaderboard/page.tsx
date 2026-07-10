@@ -5,7 +5,6 @@ import { createLeaderboardDomain } from "@/domain/leaderboard/factory";
 import { LeaderboardShell } from "@/components/leaderboard/LeaderboardShell";
 import { getSession } from "@/lib/dal";
 import { getTranslations } from "next-intl/server";
-import { setRequestLocale } from "next-intl/server";
 import * as Sentry from "@sentry/nextjs";
 
 export const dynamic = "force-dynamic";

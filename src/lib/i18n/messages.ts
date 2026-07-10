@@ -28,8 +28,8 @@ export type AppMessages = Record<MessageNamespace, Record<string, unknown>>;
 const reportedGaps = new Set<string>();
 
 function findKeysGap(
-  enObj: Record<string, any>,
-  locObj: Record<string, any>,
+  enObj: Record<string, unknown>,
+  locObj: Record<string, unknown>,
   path = ""
 ): string[] {
   const missing: string[] = [];
@@ -44,7 +44,7 @@ function findKeysGap(
       enObj[key] && typeof enObj[key] === "object" &&
       locObj[key] && typeof locObj[key] === "object"
     ) {
-      missing.push(...findKeysGap(enObj[key], locObj[key], fullPath));
+      missing.push(...findKeysGap(enObj[key] as Record<string, unknown>, locObj[key] as Record<string, unknown>, fullPath));
     }
   }
   return missing;

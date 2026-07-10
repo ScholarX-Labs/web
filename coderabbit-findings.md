@@ -349,3 +349,160 @@ const sanitizeCsv = (value: string) => {
   return /^[=+\-@\t\r]/.test(escaped) ? `'${escaped}` : escaped;
 };
 ```
+
+---
+
+## 22. critical: Missing React import breaks type references in pointer-highlight - Solved
+
+**File:** `src/components/ui/pointer-highlight.tsx:19`
+
+File references `React.ReactNode` and `React.SVGProps` but never imports React (only imports `useRef, useEffect, useState`).
+
+### Proposed Fix
+
+```ts
+import React, { useRef, useEffect, useState } from "react";
+```
+
+---
+
+## 23. minor: Boundary checks don't match their own error messages in lens.tsx - Solved
+
+**File:** `src/components/ui/lens.tsx:69-74`
+
+`zoomFactor < 1` doesn't match error "must be greater than 1". `lensSize < 0` doesn't match "must be greater than 0".
+
+### Proposed Fix
+
+```ts
+- if (zoomFactor < 1) {
++ if (zoomFactor <= 1) {
+    throw new Error("zoomFactor must be greater than 1")
+  }
+- if (lensSize < 0) {
++ if (lensSize <= 0) {
+    throw new Error("lensSize must be greater than 0")
+  }
+```
+
+---
+
+## 24. minor: `role="text"` is not a standard ARIA role - Solved
+
+**File:** `src/components/ui/encrypted-text.tsx:152-158`
+
+`role="text"` is non-standard (Safari-specific) and may be flagged by linters. `aria-label` already provides an accessible name.
+
+### Suggestion
+
+Remove the `role="text"` attribute.
+
+---
+
+## 25. minor: Invalid Tailwind class `bg-red-transparent` - Solved
+
+**File:** `src/components/ui/google-gemini-effect.tsx:47`
+
+`bg-red-transparent` is not a valid Tailwind utility class. Replace with a real utility (e.g. `bg-transparent`).
+
+---
+
+## 26. minor: `btoa` throws on non-Latin1 SVG content - Solved
+
+**File:** `src/components/ui/icon-cloud.tsx:133-135`
+
+`btoa(svgString)` raises `InvalidCharacterError` if SVG contains Unicode glyphs/emoji. Use `encodeURIComponent` or `TextEncoder` instead.
+
+---
+
+## 27. major: Hover-only nav, not keyboard/touch accessible - Solved
+
+**File:** `src/components/ui/3d-adaptive-navigation-bar.tsx:165-168`
+
+Pill expansion is driven exclusively by `onMouseEnter`/`onMouseLeave`. Keyboard-only and touch users can never open the menu.
+
+### Suggestion
+
+Add focus-based expansion (`onFocus`/`onBlur`) and ensure collapsed state exposes a focusable control.
+
+---
+
+## 28. major: Animation loop torn down on every mouse move - Solved
+
+**File:** `src/components/ui/icon-cloud.tsx:236-330`
+
+The effect depends on `mousePos`, `targetRotation`, and `isDragging` — all update on pointer movement. Each update tears down and re-creates the `requestAnimationFrame` loop.
+
+### Suggestion
+
+Read these values from refs inside a single, stable loop instead of listing them as effect dependencies.
+
+---
+
+## 29. major: Potential GPU material leak on resize - Solved
+
+**File:** `src/components/ui/canvas-reveal-effect.tsx:277-301`
+
+`material` is memoized on `[source, getUniforms]`, and `getUniforms` depends on `size`. Each resize produces a new `ShaderMaterial` without disposing the previous one.
+
+### Proposed Fix
+
+```ts
+useEffect(() => {
+  return () => {
+    material.dispose();
+  };
+}, [material]);
+```
+
+---
+
+## 30. minor: Decorative characters read twice by screen readers - Solved
+
+**File:** `src/components/ui/text-3d-flip.tsx:209-233`
+
+The `sr-only` span provides accessible text, but the animated `CharBox` characters remain in the accessibility tree, so AT announces the word twice.
+
+### Proposed Fix
+
+```tsx
+- <span key={wordIndex} className="inline-flex">
++ <span key={wordIndex} className="inline-flex" aria-hidden="true">
+```
+
+---
+
+## 31. major: Validation bounds duplicated across two contact schemas
+
+**File:** `src/app/contact/contact.schema.ts:3-16`
+
+`contactSchema` (server-side) and `createContactSchema` (client-side) independently repeat the same numeric bounds (50, 25, 10, 2000). If one is updated without the other, client and server validation will silently diverge.
+
+### Proposed Fix
+
+```ts
+const LIMITS = {
+  firstNameMax: 50,
+  lastNameMax: 50,
+  phoneNumberMax: 25,
+  messageMin: 10,
+  messageMax: 2000,
+} as const;
+```
+
+Then reference `LIMITS.firstNameMax`, etc. in both schemas.
+
+---
+
+## 32. major: Manually duplicated types instead of deriving from contact schema
+
+**File:** `src/app/contact/contact.schema.ts:61-69`
+
+`ContactFormValues` / `ContactFormInput` are hand-written rather than inferred via `z.infer`. A future change to `contactSchema` won't be reflected in the types.
+
+### Proposed Fix
+
+```ts
+export type ContactFormValues = z.infer<typeof contactSchema>;
+export type ContactFormInput = ContactFormValues;
+```

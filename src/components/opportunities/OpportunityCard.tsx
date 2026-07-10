@@ -16,11 +16,6 @@ import {
 import { trackClientEvent } from "@/lib/executive/analytics/client";
 import { ANALYTICS_EVENTS } from "@/lib/executive/analytics/constants";
 
-const FUNDING_DISPLAY_NAME: Record<Funding, string> = {
-  [Funding.FullyFunded]: "Fully Funded",
-  [Funding.PartiallyFunded]: "Partially Funded",
-};
-
 function OpportiuntyCard({ Opportunity }: { Opportunity: Opportunity }) {
   const t = useTranslations("opportunities.card");
   const locale = useLocale();
