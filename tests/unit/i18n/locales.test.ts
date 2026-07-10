@@ -1,5 +1,5 @@
 import { expect, test, describe } from "vitest";
-import { isLocale, getDir, isRTL, SUPPORTED_LOCALES, DEFAULT_LOCALE } from "@/lib/i18n/locales";
+import { isLocale, getDir, isRTL, SUPPORTED_LOCALES } from "@/lib/i18n/locales";
 
 describe("i18n locales", () => {
   test("SUPPORTED_LOCALES includes en and ar", () => {
