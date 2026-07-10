@@ -1,0 +1,51 @@
+{
+  "title": "Course Leaderboard",
+  "lastUpdated": "Last updated",
+  "justNow": "just now",
+  "minutesAgo": "{minutes} min ago",
+  "hoursAgo": "{hours} hours ago",
+  "tabs": {
+    "all": "All Time",
+    "week": "This Week",
+    "month": "This Month"
+  },
+  "admin": {
+    "title": "Admin View Active",
+    "description": "You are seeing real names for anonymized learners. These learners have opted out of public visibility.",
+    "exportCsv": "Export CSV",
+    "privateBadge": "Private"
+  },
+  "emptyState": {
+    "title": "No rankings yet",
+    "description": "Be the first to earn points in this course and secure your spot at the top of the leaderboard!"
+  },
+  "myRank": {
+    "unranked": "Unranked",
+    "noActivity": "No activity this {window}",
+    "you": "You",
+    "points": "{score} pts"
+  },
+  "scoringInfo": {
+    "button": "How Scores Work",
+    "title": "How Leaderboard Scores Work",
+    "description": "Your total leaderboard score is calculated using a weighted formula based on your course activity:",
+    "weights": {
+      "quizzes": "Quizzes & Exams (40%)",
+      "quizzesDesc": "Points earned from passing quizzes and final exams.",
+      "participation": "Participation (30%)",
+      "participationDesc": "Points earned from forum posts, peer reviews, and active discussions.",
+      "completion": "Course Completion (30%)",
+      "completionDesc": "Points awarded for completing lessons and modules on time."
+    },
+    "note": "Scores are updated automatically. If you tie with another learner, the one who reached the score first is ranked higher."
+  },
+  "breakdown": {
+    "title": "Your Score Breakdown",
+    "quizzes": "Quizzes & Exams",
+    "participation": "Participation",
+    "completion": "Course Completion",
+    "points": "{points} points ({percentage}%)",
+    "close": "Close"
+  },
+  "anonymous": "Anonymous Learner"
+}

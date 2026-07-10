@@ -1,4 +1,4 @@
-import { checkDistributedRateLimit } from "@/lib/rate-limit/rate-limit.factory";
+import { checkDistributedRateLimit, peekDistributedRateLimit } from "@/lib/rate-limit/rate-limit.factory";
 import { buildRateLimitSubject } from "@/lib/rate-limit/rate-limit.utils";
 
 export interface RateLimitResult {
@@ -7,30 +7,70 @@ export interface RateLimitResult {
   reset: number;
 }
 
-export async function checkAvatarUploadLimit(
+const AVATAR_RULES = [
+  // fail-closed: if Redis is unavailable the request is denied.
+  // This is intentional — avatar uploads are storage-budget-sensitive and
+  // must not bypass rate limits just because Redis is temporarily unreachable.
+  { id: "avatar.upload.user.hour",  windowSeconds: 60 * 60,            maxRequests: 3,  failureMode: "fail-closed" as const },
+  { id: "avatar.upload.user.day",   windowSeconds: 24 * 60 * 60,       maxRequests: 5,  failureMode: "fail-closed" as const },
+  { id: "avatar.upload.user.week",  windowSeconds: 7 * 24 * 60 * 60,   maxRequests: 7,  failureMode: "fail-closed" as const },
+  { id: "avatar.upload.user.month", windowSeconds: 30 * 24 * 60 * 60,  maxRequests: 10, failureMode: "fail-closed" as const },
+];
+
+/**
+ * Read-only budget check — does NOT consume a rate-limit slot.
+ * Call this at the start of the request to gate it cheaply.
+ * Call consumeAvatarUploadSlot() after a successful upload to spend the slot.
+ */
+export async function peekAvatarUploadLimit(
   userId: string
 ): Promise<RateLimitResult> {
   const subject = buildRateLimitSubject(["avatar", userId]);
-  const rules = [
-    { id: "avatar.upload.user.hour", windowSeconds: 60 * 60, maxRequests: 3, failureMode: "fail-closed" as const },
-    { id: "avatar.upload.user.day", windowSeconds: 24 * 60 * 60, maxRequests: 5, failureMode: "fail-closed" as const },
-    { id: "avatar.upload.user.week", windowSeconds: 7 * 24 * 60 * 60, maxRequests: 7, failureMode: "fail-closed" as const },
-    { id: "avatar.upload.user.month", windowSeconds: 30 * 24 * 60 * 60, maxRequests: 10, failureMode: "fail-closed" as const },
-  ];
 
   const results = await Promise.all(
-    rules.map((rule) => checkDistributedRateLimit(rule, subject)),
+    AVATAR_RULES.map((rule) => peekDistributedRateLimit(rule, subject)),
   );
 
-  const denied = results.find((result) => !result.allowed);
+  const denied = results.find((r) => !r.allowed);
   if (denied && !denied.allowed) {
     return { allowed: false, remaining: 0, reset: denied.resetAt };
   }
 
+  const bottleneck = results.reduce((min, r) =>
+    r.remaining < min.remaining ? r : min,
+  );
   return {
     allowed: true,
-    remaining: Math.min(...results.map((result) => result.remaining)),
-    reset: Math.max(...results.map((result) => result.resetAt)),
+    remaining: bottleneck.remaining,
+    reset: bottleneck.resetAt,
+  };
+}
+
+/**
+ * Atomically consume one rate-limit slot across all windows.
+ * Call this ONLY after a successful upload so failed attempts don't burn quota.
+ */
+export async function consumeAvatarUploadSlot(
+  userId: string
+): Promise<RateLimitResult> {
+  const subject = buildRateLimitSubject(["avatar", userId]);
+
+  const results = await Promise.all(
+    AVATAR_RULES.map((rule) => checkDistributedRateLimit(rule, subject)),
+  );
+
+  const denied = results.find((r) => !r.allowed);
+  if (denied && !denied.allowed) {
+    return { allowed: false, remaining: 0, reset: denied.resetAt };
+  }
+
+  const bottleneck = results.reduce((min, r) =>
+    r.remaining < min.remaining ? r : min,
+  );
+  return {
+    allowed: true,
+    remaining: bottleneck.remaining,
+    reset: bottleneck.resetAt,
   };
 }
 

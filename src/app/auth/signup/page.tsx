@@ -1,6 +1,8 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/lib/i18n/navigation";
+import { useTranslations } from "next-intl";
+import { LocaleSwitcher } from "@/components/locale-switcher";
 import { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
@@ -18,36 +20,37 @@ import { springSnappy, tapScale } from "@/lib/motion-variants";
 import { trackClientEvent } from "@/lib/executive/analytics/client";
 import { ANALYTICS_EVENTS } from "@/lib/executive/analytics/constants";
 
-const signupSchema = z
-  .object({
-    firstName: z.string().min(1, { message: "First name is required" }).max(50),
-    lastName: z.string().min(1, { message: "Last name is required" }).max(50),
-    email: z.string().email({ message: "Enter a valid email address" }),
-    password: z
-      .string()
-      .min(8, { message: "Password must be at least 8 characters" })
-      .max(128, { message: "Password is too long" })
-      .regex(/[A-Z]/, {
-        message: "Password must contain at least one uppercase letter",
-      })
-      .regex(/[a-z]/, {
-        message: "Password must contain at least one lowercase letter",
-      })
-      .regex(/[0-9]/, { message: "Password must contain at least one number" }),
-    confirmPassword: z.string(),
-    phoneNumber: z
-      .string()
-      .min(1, { message: "Phone number is required" })
-      .refine((v) => isValidPhoneNumber(v), {
-        message: "Invalid phone number",
-      }),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    path: ["confirmPassword"],
-    message: "Passwords do not match",
-  });
+type SignupForm = z.infer<ReturnType<typeof getSignupSchema>>;
 
-type SignupForm = z.infer<typeof signupSchema>;
+const getSignupSchema = (t: (key: string) => string) =>
+  z
+    .object({
+      firstName: z.string().min(1, { message: t("errors.firstNameRequired") }).max(50),
+      lastName: z.string().min(1, { message: t("errors.lastNameRequired") }).max(50),
+      email: z.string().email({ message: t("errors.emailInvalid") }),
+      password: z
+        .string()
+        .min(8, { message: t("errors.passwordTooShort") })
+        .max(128, { message: t("errors.passwordTooLong") })
+        .regex(/[A-Z]/, {
+          message: t("errors.passwordUpperRequired"),
+        })
+        .regex(/[a-z]/, {
+          message: t("errors.passwordLowerRequired"),
+        })
+        .regex(/[0-9]/, { message: t("errors.passwordNumberRequired") }),
+      confirmPassword: z.string(),
+      phoneNumber: z
+        .string()
+        .min(1, { message: t("errors.phoneRequired") })
+        .refine((v) => isValidPhoneNumber(v), {
+          message: t("errors.phoneInvalid"),
+        }),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      path: ["confirmPassword"],
+      message: t("errors.passwordsDoNotMatch"),
+    });
 
 type PasswordStrength = {
   score: number;
@@ -75,13 +78,14 @@ function getPasswordStrength(password: string): PasswordStrength {
 }
 
 const passwordRequirements = [
-  { label: "8+ characters", test: (p: string) => p.length >= 8 },
-  { label: "Uppercase letter", test: (p: string) => /[A-Z]/.test(p) },
-  { label: "Lowercase letter", test: (p: string) => /[a-z]/.test(p) },
-  { label: "Number", test: (p: string) => /[0-9]/.test(p) },
+  { key: "reqLength", test: (p: string) => p.length >= 8 },
+  { key: "reqUppercase", test: (p: string) => /[A-Z]/.test(p) },
+  { key: "reqLowercase", test: (p: string) => /[a-z]/.test(p) },
+  { key: "reqNumber", test: (p: string) => /[0-9]/.test(p) },
 ];
 
 export default function Page() {
+  const t = useTranslations("auth.signup");
   const [serverError, setServerError] = useState<string | null>(null);
   const [isSocialSubmitting, setIsSocialSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -112,7 +116,7 @@ export default function Page() {
     watch,
     formState: { errors, isSubmitting },
   } = useForm<SignupForm>({
-    resolver: zodResolver(signupSchema),
+    resolver: zodResolver(getSignupSchema(t)),
     defaultValues: {
       firstName: "",
       lastName: "",
@@ -162,14 +166,14 @@ export default function Page() {
       if (hasEmailExistsError) {
         setError("email", {
           type: "server",
-          message: "Email already exists",
+          message: t("errors.emailExists"),
         });
       }
 
       if (hasPhoneExistsError) {
         setError("phoneNumber", {
           type: "server",
-          message: "Phone number already exists",
+          message: t("errors.phoneExists"),
         });
       }
 
@@ -178,13 +182,11 @@ export default function Page() {
       }
 
       if (error.status === 422 || message.toLowerCase().includes("invalid")) {
-        setServerError("Invalid details provided. Please check your inputs.");
+        setServerError(t("errors.invalidDetails"));
         return;
       }
 
-      setServerError(
-        error.message || "Something went wrong. Please try again.",
-      );
+      setServerError(t("errors.somethingWentWrong"));
       return;
     }
 
@@ -214,10 +216,7 @@ export default function Page() {
       });
 
       if (result?.error) {
-        setServerError(
-          result.error.message ??
-            "Unable to continue with Google. Please try again.",
-        );
+        setServerError(t("errors.googleError"));
       } else {
         void trackClientEvent({
           event: ANALYTICS_EVENTS.SIGNUP_COMPLETED,
@@ -227,6 +226,9 @@ export default function Page() {
           },
         });
       }
+    } catch (error) {
+      console.error("Google sign in error", error);
+      setServerError(t("errors.googleError"));
     } finally {
       setIsSocialSubmitting(false);
     }
@@ -237,6 +239,9 @@ export default function Page() {
 
   return (
     <div className="min-h-screen w-screen bg-black relative overflow-hidden flex items-center justify-center p-4">
+      <div className="absolute top-4 right-4 z-50">
+        <LocaleSwitcher />
+      </div>
       <div className="absolute inset-0 bg-gradient-to-b from-purple-500/30 via-purple-700/40 to-black" />
 
       <div className="absolute inset-0 opacity-[0.03] mix-blend-soft-light"
@@ -378,7 +383,7 @@ export default function Page() {
                   transition={{ delay: 0.15 }}
                   className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-white to-white/80"
                 >
-                  Create your account
+                  {t("createAccount")}
                 </motion.h1>
 
                 <motion.p
@@ -387,7 +392,7 @@ export default function Page() {
                   transition={{ delay: 0.25 }}
                   className="text-white/60 text-xs"
                 >
-                  Join ScholarX and start learning
+                  {t("joinScholarX")}
                 </motion.p>
               </div>
 
@@ -416,7 +421,7 @@ export default function Page() {
                     <div className="relative flex items-center overflow-hidden rounded-lg">
                       <User className={`absolute left-3 w-4 h-4 transition-all duration-300 z-10 ${focusedInput === "firstName" ? "text-white" : "text-white/40"}`} />
                       <input
-                        placeholder="First name"
+                        placeholder={t("firstNamePlaceholder")}
                         {...register("firstName")}
                         onFocus={() => setFocusedInput("firstName")}
                         onBlur={() => setFocusedInput(null)}
@@ -448,7 +453,7 @@ export default function Page() {
                     <div className="relative flex items-center overflow-hidden rounded-lg">
                       <User className={`absolute left-3 w-4 h-4 transition-all duration-300 z-10 ${focusedInput === "lastName" ? "text-white" : "text-white/40"}`} />
                       <input
-                        placeholder="Last name"
+                        placeholder={t("lastNamePlaceholder")}
                         {...register("lastName")}
                         onFocus={() => setFocusedInput("lastName")}
                         onBlur={() => setFocusedInput(null)}
@@ -482,7 +487,7 @@ export default function Page() {
                     <Mail className={`absolute left-3 w-4 h-4 transition-all duration-300 z-10 ${focusedInput === "email" ? "text-white" : "text-white/40"}`} />
                     <input
                       type="email"
-                      placeholder="Email address"
+                      placeholder={t("emailPlaceholder")}
                       {...register("email")}
                       onFocus={() => setFocusedInput("email")}
                       onBlur={() => setFocusedInput(null)}
@@ -515,7 +520,7 @@ export default function Page() {
                     <Lock className={`absolute left-3 w-4 h-4 transition-all duration-300 z-10 ${focusedInput === "password" ? "text-white" : "text-white/40"}`} />
                     <input
                       type={showPassword ? "text" : "password"}
-                      placeholder="Password"
+                      placeholder={t("passwordPlaceholder")}
                       {...register("password")}
                       onFocus={() => setFocusedInput("password")}
                       onBlur={() => setFocusedInput(null)}
@@ -551,15 +556,21 @@ export default function Page() {
                           />
                         ))}
                       </div>
-                      {strength.label && (
-                        <p className="text-xs text-white/50">{strength.label}</p>
+                      {strength.score > 0 && (
+                        <p className="text-xs text-white/50">
+                          {strength.score === 1 && t("strength.weak")}
+                          {strength.score === 2 && t("strength.fair")}
+                          {strength.score === 3 && t("strength.good")}
+                          {strength.score === 4 && t("strength.strong")}
+                          {strength.score === 5 && t("strength.veryStrong")}
+                        </p>
                       )}
                       <div className="space-y-1">
                         {passwordRequirements.map((req) => {
                           const passed = req.test(passwordValue);
                           return (
                             <motion.div
-                              key={req.label}
+                              key={req.key}
                               className="flex items-center gap-1.5"
                               initial={{ opacity: 0, x: -5 }}
                               animate={{ opacity: 1, x: 0 }}
@@ -570,7 +581,7 @@ export default function Page() {
                                 <X className="w-3 h-3 text-white/30" />
                               )}
                               <span className={`text-xs ${passed ? "text-green-400/80" : "text-white/40"}`}>
-                                {req.label}
+                                {t(`requirements.${req.key}`)}
                               </span>
                             </motion.div>
                           );
@@ -603,7 +614,7 @@ export default function Page() {
                     <Lock className={`absolute left-3 w-4 h-4 transition-all duration-300 z-10 ${focusedInput === "confirmPassword" ? "text-white" : "text-white/40"}`} />
                     <input
                       type={showConfirmPassword ? "text" : "password"}
-                      placeholder="Confirm password"
+                      placeholder={t("confirmPasswordPlaceholder")}
                       {...register("confirmPassword")}
                       onFocus={() => setFocusedInput("confirmPassword")}
                       onBlur={() => setFocusedInput(null)}
@@ -711,7 +722,7 @@ export default function Page() {
                             exit={{ opacity: 0 }}
                             className="flex items-center justify-center gap-1 text-sm font-medium"
                           >
-                            Create Account
+                            {t("createAccountButton")}
                             <ArrowRight className="w-3 h-3 group-hover/button:translate-x-1 transition-transform duration-300" />
                           </motion.span>
                         )}
@@ -728,7 +739,7 @@ export default function Page() {
                     animate={{ opacity: [0.7, 0.9, 0.7] }}
                     transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
                   >
-                    or
+                    {t("orDivider")}
                   </motion.span>
                   <div className="flex-grow border-t border-white/5" />
                 </div>
@@ -751,7 +762,7 @@ export default function Page() {
                     <div className="relative overflow-hidden bg-white/5 text-white font-medium h-10 rounded-lg border border-white/10 hover:border-white/20 transition-all duration-300 flex items-center justify-center gap-2">
                       <GoogleIcon />
                       <span className="text-white/80 group-hover/google:text-white transition-colors text-xs">
-                        {isAnySubmitting ? "Loading..." : "Continue with Google"}
+                        {isAnySubmitting ? t("loading") : t("googleSignUp")}
                       </span>
                     </div>
                   </motion.button>
@@ -763,13 +774,13 @@ export default function Page() {
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.5 }}
                 >
-                  Already have an account?{' '}
+                  {t("alreadyHaveAccount")}{' '}
                   <Link
                     href={ROUTES.SIGNIN}
                     className="relative inline-block group/signin"
                   >
                     <span className="relative z-10 text-white group-hover/signin:text-white/70 transition-colors duration-300 font-medium">
-                      Sign in
+                      {t("signInLink")}
                     </span>
                     <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-white group-hover/signin:w-full transition-all duration-300" />
                   </Link>

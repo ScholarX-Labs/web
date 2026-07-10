@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { getOpportunityById } from "@/lib/ai-search/api";
 import { OpportunityDetail } from "@/components/opportunity/opportunity-detail";
 
-export const revalidate = 60 * 60 * 24;
+export const revalidate = 86400;
 export const dynamic = "force-static";
 export const dynamicParams = true;
 

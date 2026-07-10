@@ -21,6 +21,14 @@ class FallbackDistributedRateLimiter implements DistributedRateLimiter {
     void subject;
     return createFallbackDecision(rule.failureMode, rule.windowSeconds) as RateLimitDecision;
   }
+
+  // peek has the same fallback semantics as check
+  async peek(
+    rule: DistributedRateLimitRule,
+    subject: string,
+  ): Promise<RateLimitDecision> {
+    return this.check(rule, subject);
+  }
 }
 
 let adapter: DistributedRateLimiter | null = null;
@@ -76,6 +84,28 @@ export async function checkDistributedRateLimit(
       operation: "check",
       outcome: "error",
       context: rule.id,
+      metadata: { failureMode: rule.failureMode },
+    });
+    return createFallbackDecision(rule.failureMode, rule.windowSeconds) as RateLimitDecision;
+  }
+}
+
+/** Read-only check — does NOT increment the counter. */
+export async function peekDistributedRateLimit(
+  rule: DistributedRateLimitRule,
+  subject: string,
+): Promise<RateLimitDecision> {
+  const limiter = getAdapter();
+
+  try {
+    return await limiter.peek(rule, subject);
+  } catch (error) {
+    markSharedRedisUnavailable(`rate-limit:${rule.id}`, error);
+    emitCacheMetricEvent({
+      source: "rate-limit",
+      operation: "check",
+      outcome: "error",
+      context: `${rule.id}:peek`,
       metadata: { failureMode: rule.failureMode },
     });
     return createFallbackDecision(rule.failureMode, rule.windowSeconds) as RateLimitDecision;

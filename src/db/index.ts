@@ -36,9 +36,16 @@ function createDb() {
   });
 }
 
+declare global {
+  var __MOCK_DB__: ReturnType<typeof drizzle> | undefined;
+}
+
 let _db: ReturnType<typeof drizzle> | undefined;
 
 function getDb() {
+  if (process.env.NODE_ENV === "test" && globalThis.__MOCK_DB__) {
+    return globalThis.__MOCK_DB__;
+  }
   if (!_db) {
     _db = createDb();
   }

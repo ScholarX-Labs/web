@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { emailOtp } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 type VerifyEmailOtpFormProps = {
   email: string;
@@ -15,9 +16,9 @@ type AuthError = {
   code?: string;
 };
 
-function getFriendlyError(error?: AuthError): string {
+function getFriendlyError(t: any, error?: AuthError): string {
   if (!error) {
-    return "Something went wrong. Please try again.";
+    return t("errors.fallback");
   }
 
   const { message, code } = error;
@@ -26,32 +27,33 @@ function getFriendlyError(error?: AuthError): string {
     code === "ERR_EMAIL_OTP_RATE_LIMIT_HOURLY" ||
     message?.includes("ERR_EMAIL_OTP_RATE_LIMIT_HOURLY")
   ) {
-    return "You have reached the hourly limit. You can request up to 4 codes per hour.";
+    return t("errors.rateLimitHourly");
   }
 
   if (
     code === "ERR_EMAIL_OTP_RATE_LIMIT_DAILY" ||
     message?.includes("ERR_EMAIL_OTP_RATE_LIMIT_DAILY")
   ) {
-    return "You have reached the daily limit. You can request up to 10 codes per day.";
+    return t("errors.rateLimitDaily");
   }
 
   if (code === "OTP_EXPIRED" || message?.includes("OTP_EXPIRED")) {
-    return "This code has expired. Request a new code and try again.";
+    return t("errors.otpExpired");
   }
 
   if (code === "INVALID_OTP" || message?.includes("INVALID_OTP")) {
-    return "The code is invalid. Please check it and try again.";
+    return t("errors.otpInvalid");
   }
 
   if (code === "TOO_MANY_ATTEMPTS" || message?.includes("TOO_MANY_ATTEMPTS")) {
-    return "Too many incorrect attempts. Request a new code and try again.";
+    return t("errors.tooManyAttempts");
   }
 
-  return message || "Something went wrong. Please try again.";
+  return message || t("errors.fallback");
 }
 
 export default function VerifyEmailOtpForm({ email }: VerifyEmailOtpFormProps) {
+  const t = useTranslations("auth.verifyEmail");
   const router = useRouter();
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [isVerifying, setIsVerifying] = useState(false);
@@ -125,14 +127,14 @@ export default function VerifyEmailOtpForm({ email }: VerifyEmailOtpFormProps) {
       });
 
       if (error) {
-        setErrorMessage(getFriendlyError(error));
+        setErrorMessage(getFriendlyError(t, error));
         return;
       }
 
-      setSuccessMessage("Email verified successfully.");
+      setSuccessMessage(t("successMessage"));
       router.refresh();
     } catch {
-      setErrorMessage("Email verification failed. Please try again.");
+      setErrorMessage(t("errors.fallback"));
     } finally {
       setIsVerifying(false);
     }
@@ -154,14 +156,14 @@ export default function VerifyEmailOtpForm({ email }: VerifyEmailOtpFormProps) {
       });
 
       if (error) {
-        setErrorMessage(getFriendlyError(error));
+        setErrorMessage(getFriendlyError(t, error));
         return;
       }
 
-      setSuccessMessage("A verification code was sent to your inbox.");
+      setSuccessMessage(t("sentMessage"));
       setCountdown(60);
     } catch {
-      setErrorMessage("Failed to send a new code. Please try again.");
+      setErrorMessage(t("errors.fallback"));
     } finally {
       setIsResending(false);
     }
@@ -171,10 +173,10 @@ export default function VerifyEmailOtpForm({ email }: VerifyEmailOtpFormProps) {
     <div className="flex flex-col items-center gap-8 w-full max-w-md mx-auto py-4">
       <div className="text-center space-y-2">
         <h1 className="text-3xl font-bold tracking-tight text-foreground">
-          Enter OTP
+          {t("title")}
         </h1>
         <p className="text-muted-foreground text-sm">
-          We&apos;ve sent an OTP Code to your Email,
+          {t("description")}
         </p>
       </div>
 
@@ -211,8 +213,7 @@ export default function VerifyEmailOtpForm({ email }: VerifyEmailOtpFormProps) {
       <div className="text-center space-y-6 w-full">
         {countdown > 0 ? (
           <p className="text-sm text-gray-500">
-            You can request another code in{" "}
-            <span className="text-[#ff6b6b] font-semibold">{countdown}s</span>
+            {t("countdownText", { seconds: countdown })}
           </p>
         ) : (
           <div className="h-5" />
@@ -225,7 +226,7 @@ export default function VerifyEmailOtpForm({ email }: VerifyEmailOtpFormProps) {
             disabled={!otpIsValid || isVerifying || isResending}
             className="w-full h-12 text-lg font-semibold bg-hero-blue hover:bg-[#2d88b6] transition-colors rounded-xl text-white border-none shadow-md hover:cursor-pointer"
           >
-            {isVerifying ? "Verifying..." : "Verify"}
+            {isVerifying ? t("verifying") : t("verifyButton")}
           </Button>
 
           <Button
@@ -235,7 +236,7 @@ export default function VerifyEmailOtpForm({ email }: VerifyEmailOtpFormProps) {
             disabled={isResending || countdown > 0}
             className="w-full h-12 text-lg font-semibold border-hero-blue text-hero-blue hover:bg-hero-blue/5 transition-colors rounded-xl hover:cursor-pointer"
           >
-            {isResending ? "Resending..." : "Resend"}
+            {isResending ? t("resending") : t("resendButton")}
           </Button>
         </div>
 

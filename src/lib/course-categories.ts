@@ -1,4 +1,4 @@
-import { type ElementType } from "react";
+import type { LucideIcon } from "lucide-react";
 import {
   BookOpen,
   Briefcase,
@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 
 export interface CategoryStyle {
-  icon: ElementType;
+  icon: LucideIcon;
   bg: string;
   gradient: string;
   shadow: string;

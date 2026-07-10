@@ -29,11 +29,7 @@ const envSchema = z.object({
   NEXT_PUBLIC_POSTHOG_KEY: optionalString,
   NEXT_PUBLIC_POSTHOG_HOST: optionalUrl,
 
-  R2_ENDPOINT: optionalUrl,
-  R2_ACCESS_KEY: optionalString,
-  R2_SECRET_KEY: optionalString,
-  R2_BUCKET_NAME: optionalString,
-  R2_PUBLIC_URL: optionalUrl,
+  AZURE_STORAGE_CONNECTION_STRING: optionalString,
 
   AZURE_REDIS_HOST: optionalString,
   AZURE_REDIS_PORT: optionalDigits,
@@ -129,18 +125,20 @@ function validateRedisEnv(input: EnvInput): string[] {
       issues.push("Set AZURE_REDIS_PORT when AZURE_REDIS_HOST is set.");
     }
 
-    if (!readEnv(input, "AZURE_REDIS_KEY")) {
-      issues.push("Set AZURE_REDIS_KEY when AZURE_REDIS_HOST is set.");
-    }
+    if (process.env.NODE_ENV === "production") {
+      if (!readEnv(input, "AZURE_REDIS_KEY")) {
+        issues.push("Set AZURE_REDIS_KEY when AZURE_REDIS_HOST is set.");
+      }
 
-    if (readEnv(input, "AZURE_REDIS_TLS") !== "true") {
-      issues.push("Set AZURE_REDIS_TLS=true for Azure Cache for Redis.");
-    }
+      if (readEnv(input, "AZURE_REDIS_TLS") !== "true") {
+        issues.push("Set AZURE_REDIS_TLS=true for Azure Cache for Redis.");
+      }
 
-    if (readEnv(input, "AZURE_REDIS_PORT") !== "6380") {
-      issues.push(
-        "Use AZURE_REDIS_PORT=6380 for TLS connections to Azure Cache for Redis.",
-      );
+      if (readEnv(input, "AZURE_REDIS_PORT") !== "6380") {
+        issues.push(
+          "Use AZURE_REDIS_PORT=6380 for TLS connections to Azure Cache for Redis.",
+        );
+      }
     }
   }
 

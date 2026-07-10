@@ -1,14 +1,11 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import HeroWrapper from "@/components/home/hero-wrapper";
 import FeaturesSection from "@/components/home/features-section";
 import ServicesSection from "@/components/home/services-section";
 import ImpactSection from "@/components/home/impact-section";
-import {
-  WHY_CHOOSE_SECTION,
-  WHO_WE_HELP_SECTION,
-} from "@/lib/home-data";
 
-export const revalidate = 60 * 60 * 24;
+export const revalidate = 86400;
 export const dynamic = "force-static";
 
 export const metadata: Metadata = {
@@ -23,7 +20,8 @@ export const metadata: Metadata = {
 };
 
 
-export default function HomePage() {
+export default async function HomePage() {
+  const t = await getTranslations("home");
   return (
     <main className="relative w-full overflow-x-hidden">
       {/* Hero Section */}
@@ -34,9 +32,9 @@ export default function HomePage() {
 
       {/* Why Choose ScholarX Section */}
       <ServicesSection
-        title={WHY_CHOOSE_SECTION.title}
-        highlight={WHY_CHOOSE_SECTION.highlight}
-        description={WHY_CHOOSE_SECTION.description}
+        title={t("whyChoose.title")}
+        highlight={t("whyChoose.highlight")}
+        description={t("whyChoose.description")}
         servicesKey="whyChoose"
         theme="light"
         watermarkImage="/ScholarX-Logo-Icon-Blue_ScholarX.svg"
@@ -44,9 +42,9 @@ export default function HomePage() {
 
       {/* Who We Help Section */}
       <ServicesSection
-        title={WHO_WE_HELP_SECTION.title}
-        highlight={WHO_WE_HELP_SECTION.highlight}
-        description={WHO_WE_HELP_SECTION.description}
+        title={t("whoWeHelp.title")}
+        highlight={t("whoWeHelp.highlight")}
+        description={t("whoWeHelp.description")}
         servicesKey="whoWeHelp"
         theme="white"
         watermarkImage="/ScholarX-Logo-Icon-Blue_ScholarX.svg"

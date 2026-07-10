@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useLayoutEffect } from "react";
+import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { ArrowUp, ChevronDown } from "lucide-react";
 import { SearchResult } from "@/lib/ai-search/types";
 import { ScholarshipCard } from "./scholarship-card";
@@ -59,6 +60,7 @@ export function SearchResults({
   isLoading,
   onScrollToTop,
 }: SearchResultsProps) {
+  const t = useTranslations("aiSearch.results");
   const [selectedResult, setSelectedResult] = useState<SearchResult | null>(
     null,
   );
@@ -66,18 +68,17 @@ export function SearchResults({
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [sortBy, setSortBy] = useState<SortOption>("match");
 
-  // Reset visible count when results change (new search)
-  useLayoutEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+  const [prevResults, setPrevResults] = useState(results);
+  if (results !== prevResults) {
+    setPrevResults(results);
     setVisibleCount(PAGE_SIZE);
-  }, [results]);
+  }
 
   function handleViewDetails(result: SearchResult) {
     setSelectedResult(result);
     setIsModalOpen(true);
   }
 
-  // Split query for color highlight: last word in blue
   const words = query.trim().split(" ");
   const firstPart = words.slice(0, -1).join(" ");
   const lastWord = words[words.length - 1];
@@ -85,10 +86,10 @@ export function SearchResults({
   const sortedResults = sortResults(results ?? [], sortBy);
   const visibleResults = sortedResults.slice(0, visibleCount);
   const hasMore = visibleCount < results.length;
+  const roundedCount = `${results.length < 10 ? results.length : Math.floor(results.length / 10) * 10}${results.length >= 10 && results.length % 10 !== 0 ? "+" : ""}`;
 
   return (
     <div style={{ backgroundColor: "var(--page-bg)" }}>
-      {/* Header with query heading + new search arrow */}
       <div className="border-t border-gray-200 bg-white/60 backdrop-blur-sm">
         <div className="mx-auto max-w-5xl px-6 py-6 flex items-start justify-between gap-4">
           <div>
@@ -98,45 +99,37 @@ export function SearchResults({
             </h1>
             {!isLoading && results.length > 0 && (
               <p className="text-muted-foreground mt-2 text-base max-w-xl">
-                We&apos;ve found{" "}
-                {results.length < 10
-                  ? results.length
-                  : Math.floor(results.length / 10) * 10}
-                {results.length >= 10 && results.length % 10 !== 0 && "+"}{" "}
-                opportunities. Here are the best matches for your profile.
+                {t("found", { count: roundedCount })}
               </p>
             )}
             {!isLoading && results.length === 0 && (
               <p className="text-muted-foreground mt-2 text-base">
-                No results found. Try a different query.
+                {t("noResults")}
               </p>
             )}
             {isLoading && (
               <p className="text-muted-foreground mt-2 text-base">
-                Searching opportunities...
+                {t("loading")}
               </p>
             )}
           </div>
 
-          {/* Scroll-to-top button for new search */}
           <button
             onClick={onScrollToTop}
             className="shrink-0 size-10 rounded-full flex items-center justify-center text-white transition-all hover:scale-105 active:scale-95 mt-1"
             style={{ backgroundColor: "var(--scholar-blue)" }}
-            aria-label="New search"
-            title="New search"
+            aria-label={t("newSearch")}
+            title={t("newSearch")}
           >
             <ArrowUp className="size-5" />
           </button>
         </div>
       </div>
 
-      {/* Main content */}
       <div className="mx-auto max-w-5xl px-6 py-8">
-        {/* Sort controls */}
         {!isLoading && results.length > 0 && (
           <div className="flex items-center justify-end gap-1 mb-6">
-            <span className="text-gray-500 text-sm">Sort by:</span>
+            <span className="text-gray-500 text-sm">{t("sortBy")}</span>
             <button
               onClick={() => setSortBy("match")}
               className={`text-xs font-medium px-3 py-1.5 rounded-full transition-all hover:cursor-pointer ${
@@ -150,7 +143,7 @@ export function SearchResults({
                   : {}
               }
             >
-              Most relevant
+              {t("mostRelevant")}
             </button>
             <button
               onClick={() => setSortBy("deadline")}
@@ -165,12 +158,11 @@ export function SearchResults({
                   : {}
               }
             >
-              Nearest Deadline
+              {t("nearestDeadline")}
             </button>
           </div>
         )}
 
-        {/* Cards grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {isLoading
             ? Array.from({ length: 6 }).map((_, i) => <CardSkeleton key={i} />)
@@ -183,7 +175,6 @@ export function SearchResults({
               ))}
         </div>
 
-        {/* Show more */}
         {!isLoading && hasMore && (
           <div className="flex justify-center mt-10">
             <Button
@@ -191,14 +182,13 @@ export function SearchResults({
               className="gap-2 px-6 font-medium text-muted-foreground hover:text-foreground hover:cursor-pointer"
               onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
             >
-              Show more results
+              {t("showMore")}
               <ChevronDown className="size-4" />
             </Button>
           </div>
         )}
       </div>
 
-      {/* Modal */}
       <ScholarshipModal
         result={selectedResult}
         open={isModalOpen}

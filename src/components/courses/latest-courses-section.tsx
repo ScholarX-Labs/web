@@ -5,6 +5,7 @@ import useEmblaCarousel from "embla-carousel-react";
 import { motion, useReducedMotion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Course } from "@/types/course.types";
 import { LatestCourseCard } from "./latest-course-card";
 import { cn } from "@/lib/utils";
@@ -17,6 +18,7 @@ interface LatestCoursesSectionProps {
 }
 
 export function LatestCoursesSection({ courses }: LatestCoursesSectionProps) {
+  const t = useTranslations("courses.hero");
   const prefersReducedMotion = useReducedMotion();
   const isDesktop = useMediaQuery("(min-width: 1024px)");
   const [emblaRef, emblaApi] = useEmblaCarousel({
@@ -76,7 +78,7 @@ export function LatestCoursesSection({ courses }: LatestCoursesSectionProps) {
             viewport={{ once: true }}
             transition={{ duration: 0.4, delay: 0.05 }}
           >
-            Our Courses
+            {t("ourCourses")}
           </motion.p>
           <motion.h2
             className="text-4xl font-extrabold leading-tight text-gray-900"
@@ -85,7 +87,9 @@ export function LatestCoursesSection({ courses }: LatestCoursesSectionProps) {
             viewport={{ once: true }}
             transition={{ duration: 0.4, delay: 0.15 }}
           >
-            Latest <span className="text-hero-blue">Courses</span>
+            {t.rich("latestCourses", {
+              blue: (chunks) => <span className="text-hero-blue">{chunks}</span>
+            })}
           </motion.h2>
         </div>
         <motion.div
@@ -98,7 +102,7 @@ export function LatestCoursesSection({ courses }: LatestCoursesSectionProps) {
             href={ROUTES.COURSES}
             className="text-hero-blue text-sm font-medium hover:underline underline-offset-2"
           >
-            See more →
+            {t("seeMore")}
           </Link>
         </motion.div>
       </div>

@@ -98,16 +98,18 @@ function validateEnv() {
       issues.push("Set AZURE_REDIS_PORT when AZURE_REDIS_HOST is set.");
     }
 
-    if (!readEnv("AZURE_REDIS_KEY")) {
-      issues.push("Set AZURE_REDIS_KEY when AZURE_REDIS_HOST is set.");
-    }
+    if (process.env.NODE_ENV === "production") {
+      if (!readEnv("AZURE_REDIS_KEY")) {
+        issues.push("Set AZURE_REDIS_KEY when AZURE_REDIS_HOST is set.");
+      }
 
-    if (readEnv("AZURE_REDIS_TLS") !== "true") {
-      issues.push("Set AZURE_REDIS_TLS=true for Azure Cache for Redis.");
-    }
+      if (readEnv("AZURE_REDIS_TLS") !== "true") {
+        issues.push("Set AZURE_REDIS_TLS=true for Azure Cache for Redis.");
+      }
 
-    if (readEnv("AZURE_REDIS_PORT") !== "6380") {
-      issues.push("Use AZURE_REDIS_PORT=6380 for TLS connections to Azure Cache for Redis.");
+      if (readEnv("AZURE_REDIS_PORT") !== "6380") {
+        issues.push("Use AZURE_REDIS_PORT=6380 for TLS connections to Azure Cache for Redis.");
+      }
     }
   }
 

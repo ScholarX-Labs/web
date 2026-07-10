@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import {
   motion,
   useMotionValueEvent,
@@ -21,6 +19,7 @@ import {
   MessageCircle,
   User,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import PremiumMobileMenu from "@/components/PremiumMobileMenu";
 import HamburgerIcon from "@/components/HamburgerIcon";
 import { ROUTES } from "@/lib/routes";
@@ -29,18 +28,11 @@ import { useScrollDirection } from "@/hooks/use-scroll-direction";
 import SignoutButton from "@/app/auth/_components/SignoutButton";
 import { Button } from "@/components/ui/button";
 import { useCtaTracking } from "@/components/analytics/use-cta-tracking";
+import { Link, usePathname } from "@/lib/i18n/navigation";
+import { LocaleSwitcher } from "@/components/locale-switcher";
 
 const SCHOLARX_HORIZONTAL_LOGO =
   "/ScholarX-Logo-horizontal-Blue-Solid-Small_ScholarX.png";
-
-const navItems = [
-  { label: "Home", href: ROUTES.HOME, icon: Home },
-  { label: "About us", href: ROUTES.ABOUT, icon: Info },
-  { label: "Courses", href: ROUTES.COURSES, icon: BookOpen },
-  { label: "Opportunities", href: ROUTES.OPPORTUNITIES, icon: Compass },
-  { label: "AI Search", href: ROUTES.AI_SEARCH, icon: Bot },
-  { label: "Contact us", href: ROUTES.CONTACT, icon: MessageCircle },
-];
 
 const EXPAND_SCROLL_THRESHOLD = 50;
 const DOCK_EFFECT_WIDTH = 280;
@@ -70,7 +62,26 @@ function getDockScale(
   return DOCK_MIN_SCALE + scaleFactor * (DOCK_MAX_SCALE - DOCK_MIN_SCALE);
 }
 
-function NavLinks({ isActive }: { isActive: (href: string) => boolean }) {
+function useNavItems() {
+  const t = useTranslations("common");
+
+  return [
+    { label: t("nav.home"), href: ROUTES.HOME, icon: Home },
+    { label: t("nav.about"), href: ROUTES.ABOUT, icon: Info },
+    { label: t("nav.courses"), href: ROUTES.COURSES, icon: BookOpen },
+    { label: t("nav.opportunities"), href: ROUTES.OPPORTUNITIES, icon: Compass },
+    { label: t("nav.aiSearch"), href: ROUTES.AI_SEARCH, icon: Bot },
+    { label: t("nav.contact"), href: ROUTES.CONTACT, icon: MessageCircle },
+  ];
+}
+
+function NavLinks({
+  isActive,
+  navItems,
+}: {
+  isActive: (href: string) => boolean;
+  navItems: ReturnType<typeof useNavItems>;
+}) {
   const dockRef = useRef<HTMLDivElement>(null);
   const linkRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const [mouseX, setMouseX] = useState<number | null>(null);
@@ -222,6 +233,7 @@ function NavLinks({ isActive }: { isActive: (href: string) => boolean }) {
 }
 
 function AuthButtons({ isLoggedIn }: { isLoggedIn: boolean }) {
+  const t = useTranslations("common");
   const trackCta = useCtaTracking();
 
   if (isLoggedIn) {
@@ -229,12 +241,15 @@ function AuthButtons({ isLoggedIn }: { isLoggedIn: boolean }) {
       <div className="flex items-center gap-3">
         <Link
           href={ROUTES.PROFILE}
+          aria-label={t("nav.profile")}
           className="p-2 rounded-full hover:bg-muted/50 transition-colors duration-200"
         >
           <User className="h-5 w-5 text-foreground/70" />
         </Link>
         <div className="hidden lg:block">
-          <SignoutButton className="px-4 py-2 rounded-full bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-all duration-200 active:scale-[0.97]" />
+          <SignoutButton className="px-4 py-2 rounded-full bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-all duration-200 active:scale-[0.97]">
+            {t("auth.logout")}
+          </SignoutButton>
         </div>
       </div>
     );
@@ -247,7 +262,7 @@ function AuthButtons({ isLoggedIn }: { isLoggedIn: boolean }) {
         onClick={() => {
           trackCta({
             ctaId: "header_login",
-            ctaLabel: "Log in",
+            ctaLabel: t("auth.login"),
             ctaPlacement: "header_auth",
             destination: ROUTES.SIGNIN,
           });
@@ -255,7 +270,7 @@ function AuthButtons({ isLoggedIn }: { isLoggedIn: boolean }) {
         className="group inline-flex h-10 items-center gap-2 rounded-full border border-[var(--color-hero-blue)]/15 bg-white/75 px-4 text-sm font-semibold text-[var(--color-hero-heading)] shadow-sm backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--color-hero-blue)]/30 hover:bg-[var(--color-hero-blue)]/6 hover:text-[var(--color-hero-blue)] hover:shadow-[0_16px_32px_-24px_rgba(51,153,204,0.75)]"
       >
         <LogIn className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
-        Log in
+        {t("auth.login")}
       </Link>
       <Button
         asChild
@@ -267,13 +282,13 @@ function AuthButtons({ isLoggedIn }: { isLoggedIn: boolean }) {
           onClick={() => {
             trackCta({
               ctaId: "header_signup",
-              ctaLabel: "Sign up",
+              ctaLabel: t("auth.signup"),
               ctaPlacement: "header_auth",
               destination: ROUTES.SIGNUP,
             });
           }}
         >
-          Sign up
+          {t("auth.signup")}
           <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
         </Link>
       </Button>
@@ -284,11 +299,14 @@ function AuthButtons({ isLoggedIn }: { isLoggedIn: boolean }) {
 function DesktopHeader({
   isLoggedIn,
   isActive,
+  navItems,
 }: {
   isLoggedIn: boolean;
   isActive: (href: string) => boolean;
+  navItems: ReturnType<typeof useNavItems>;
 }) {
   const { direction, isAtTop } = useScrollDirection(15);
+  const t = useTranslations("common");
 
   return (
     <motion.header
@@ -326,7 +344,7 @@ function DesktopHeader({
       >
         <Link href={ROUTES.HOME} className="shrink-0">
           <Image
-            alt="ScholarX logo"
+            alt={t("header.logoAlt")}
             src={SCHOLARX_HORIZONTAL_LOGO}
             width={180}
             height={32}
@@ -335,11 +353,12 @@ function DesktopHeader({
           />
         </Link>
 
-        <nav aria-label="Main Navigation" className="flex items-center gap-1">
-          <NavLinks isActive={isActive} />
+        <nav aria-label={t("header.mainNavigation")} className="flex items-center gap-1">
+          <NavLinks isActive={isActive} navItems={navItems} />
         </nav>
 
         <div className="flex items-center gap-2">
+          <LocaleSwitcher className="hidden xl:inline-flex" />
           <AuthButtons isLoggedIn={isLoggedIn} />
         </div>
       </motion.div>
@@ -350,10 +369,13 @@ function DesktopHeader({
 function MobileCollapsibleHeader({
   isLoggedIn,
   isActive,
+  navItems,
 }: {
   isLoggedIn: boolean;
   isActive: (href: string) => boolean;
+  navItems: ReturnType<typeof useNavItems>;
 }) {
+  const t = useTranslations("common");
   const [isExpanded, setIsExpanded] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { scrollY } = useScroll();
@@ -418,9 +440,9 @@ function MobileCollapsibleHeader({
                 : "opacity-0 -translate-x-6 -rotate-180",
             )}
           >
-            <Link href={ROUTES.HOME} onClick={(e) => e.stopPropagation()}>
+            <Link href={ROUTES.HOME} onClick={(event) => event.stopPropagation()}>
               <Image
-                alt="ScholarX"
+                alt={t("header.logoAlt")}
                 src={SCHOLARX_HORIZONTAL_LOGO}
                 width={135}
                 height={24}
@@ -437,15 +459,17 @@ function MobileCollapsibleHeader({
                 : "opacity-0 -translate-x-5 pointer-events-none",
             )}
           >
-            {navItems.map((item, i) => (
+            {navItems.map((item, index) => (
               <div
                 key={item.label}
                 className="shrink-0"
-                style={{ transitionDelay: isExpanded ? `${100 + i * 50}ms` : "0ms" }}
+                style={{
+                  transitionDelay: isExpanded ? `${100 + index * 50}ms` : "0ms",
+                }}
               >
                 <Link
                   href={item.href}
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={(event) => event.stopPropagation()}
                   className={cn(
                     "text-xs lg:text-sm font-medium px-2 lg:px-3 py-1 rounded-full transition-colors whitespace-nowrap",
                     isActive(item.href)
@@ -462,7 +486,7 @@ function MobileCollapsibleHeader({
           <div className={cn("flex items-center pr-3 md:hidden", !isExpanded && "sr-only")}>
             <HamburgerIcon
               open={mobileMenuOpen}
-              onToggle={() => setMobileMenuOpen((prev) => !prev)}
+              onToggle={() => setMobileMenuOpen((previous) => !previous)}
             />
           </div>
 
@@ -484,6 +508,7 @@ function MobileCollapsibleHeader({
         isLoggedIn={isLoggedIn}
         open={mobileMenuOpen}
         onOpenChange={setMobileMenuOpen}
+        navItems={navItems.map(({ label, href }) => ({ label, href }))}
       />
     </>
   );
@@ -495,6 +520,7 @@ export default function PremiumHeaderClient({
   isLoggedIn: boolean;
 }) {
   const pathname = usePathname();
+  const navItems = useNavItems();
 
   const isActive = (href: string) => {
     if (href === ROUTES.HOME) return pathname === href;
@@ -503,8 +529,16 @@ export default function PremiumHeaderClient({
 
   return (
     <>
-      <DesktopHeader isLoggedIn={isLoggedIn} isActive={isActive} />
-      <MobileCollapsibleHeader isLoggedIn={isLoggedIn} isActive={isActive} />
+      <DesktopHeader
+        isLoggedIn={isLoggedIn}
+        isActive={isActive}
+        navItems={navItems}
+      />
+      <MobileCollapsibleHeader
+        isLoggedIn={isLoggedIn}
+        isActive={isActive}
+        navItems={navItems}
+      />
     </>
   );
 }

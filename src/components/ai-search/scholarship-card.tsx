@@ -2,8 +2,11 @@
 
 import { SearchResult } from "@/lib/ai-search/types";
 import { Badge } from "@/components/ai-search/ui/badge";
-import { Calendar, DollarSign, ArrowRight } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { Calendar, DollarSign, ArrowRight, Star } from "lucide-react";
 import { motion } from "framer-motion";
+import { cardVariants, buttonVariants } from "@/lib/ai-search-animations";
+import { useState } from "react";
 
 interface ScholarshipCardProps {
   result: SearchResult;
@@ -20,24 +23,19 @@ function getCategory(result: SearchResult): string | null {
 export function ScholarshipCard({
   result,
   onViewDetails,
-  isSelected,
+  isSelected = false,
 }: ScholarshipCardProps) {
+  const t = useTranslations("aiSearch.card");
   const category = getCategory(result);
-  const cardId = `scholarship-card-${result.id}`;
+  const [isHovered, setIsHovered] = useState(false);
 
   return (
     <motion.div
-      layout
-      layoutId={cardId}
-      animate={{
-        opacity: isSelected ? 0 : 1,
-      }}
-      transition={{
-        type: "spring",
-        stiffness: 400,
-        damping: 26,
-        mass: 0.5,
-      }}
+      variants={cardVariants}
+      whileHover="hover"
+      whileTap="tap"
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
       onClick={() => onViewDetails(result)}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -47,95 +45,150 @@ export function ScholarshipCard({
       }}
       role="button"
       tabIndex={0}
-      className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-[20px] sm:rounded-2xl border border-slate-200/60 dark:border-white/10 flex flex-col h-full min-h-[280px] overflow-hidden shadow-sm hover:shadow-xl hover:cursor-pointer hover:-translate-y-1 transition-all duration-300 group"
+      className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl border flex flex-col h-full min-h-[280px] overflow-hidden hover:cursor-pointer transition-all duration-300 group relative"
+      style={{
+        borderColor: isSelected
+          ? "rgba(51, 153, 204, 0.6)"
+          : "rgba(255, 255, 255, 0.2)",
+        boxShadow: isSelected
+          ? "0 0 0 2px rgba(51, 153, 204, 0.3), 0 20px 60px rgba(51, 153, 204, 0.15)"
+          : isHovered
+          ? "0 20px 60px rgba(51, 153, 204, 0.15)"
+          : "0 4px 20px rgba(0, 0, 0, 0.05)",
+      }}
     >
-      {/* Top Accent Line */}
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-scholar-blue/40 via-scholar-blue to-purple-500/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      {/* Gradient border effect on hover / selected */}
+      {(isHovered || isSelected) && (
+        <motion.div
+          layoutId={isSelected ? `selected-${result.id}` : undefined}
+          className="absolute inset-0 rounded-2xl pointer-events-none"
+          style={{
+            background:
+              "linear-gradient(135deg, rgba(51, 153, 204, 0.2), transparent)",
+          }}
+        />
+      )}
+
       {/* Top: category badge + match % */}
-      <div className="relative flex items-start justify-between px-4 sm:px-5 pt-4 sm:pt-5 pb-3">
+      <div className="flex items-start justify-between px-5 pt-5 pb-3 relative z-10">
         <div className="flex flex-wrap gap-1.5">
           {category && (
-            <Badge
-              className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full h-auto"
-              style={{
-                backgroundColor: "var(--scholar-blue-light)",
-                color: "var(--scholar-blue-dark)",
-                border: "none",
-              }}
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.1 }}
             >
-              {category}
-            </Badge>
+              <Badge className="text-[11px] font-semibold px-3 py-1 rounded-full h-auto bg-gradient-to-r from-scholar-blue/20 to-purple-500/10 border border-scholar-blue/30 text-scholar-blue">
+                {category}
+              </Badge>
+            </motion.div>
           )}
           {result.tags &&
-            result.tags.slice(1, 3).map((tag) => (
-              <Badge
+            result.tags.slice(1, 2).map((tag) => (
+              <motion.div
                 key={tag}
-                className="text-[11px] font-medium px-2 py-0.5 rounded-full h-auto"
-                style={{
-                  backgroundColor: "var(--x-purple-light)",
-                  color: "var(--x-purple)",
-                  border: "none",
-                }}
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.15 }}
               >
-                {tag}
-              </Badge>
+                <Badge className="text-[11px] font-medium px-2.5 py-0.5 rounded-full h-auto bg-purple-100/80 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border border-purple-200/50 dark:border-purple-800/50">
+                  {tag}
+                </Badge>
+              </motion.div>
             ))}
         </div>
+
+        {result.match_percentage && (
+          <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", delay: 0.2 }}
+            className="flex items-center gap-1 px-3 py-1 rounded-full bg-green-100/80 dark:bg-green-900/30"
+          >
+            <Star className="w-3.5 h-3.5 fill-green-600 text-green-600" />
+            <span className="text-xs font-semibold text-green-700 dark:text-green-300">
+              {Math.round(result.match_percentage)}%
+            </span>
+          </motion.div>
+        )}
       </div>
 
       {/* Content */}
-      <div className="px-4 sm:px-5 flex-1 flex flex-col gap-3">
+      <div className="px-5 flex-1 flex flex-col gap-3 relative z-10">
         <div>
           <motion.h3
-            layoutId={`${cardId}-title`}
-            className="font-bold text-lg sm:text-xl text-slate-900 dark:text-white leading-tight mb-2 group-hover:text-scholar-blue transition-colors line-clamp-2 min-h-[3.5rem]"
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 }}
+            className="font-bold text-base text-foreground leading-snug mb-1.5 group-hover:text-scholar-blue transition-colors"
           >
             {result.title}
           </motion.h3>
-          <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-3">
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.1 }}
+            className="text-sm text-muted-foreground leading-relaxed line-clamp-2"
+          >
             {result.description}
-          </p>
+          </motion.p>
         </div>
 
-        <div className="flex flex-col gap-1.5 text-sm pt-2">
+        <motion.div
+          className="flex flex-col gap-2 text-sm"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.15 }}
+        >
           {(result.fundingLevel || result.funding) && (
-            <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300 font-medium">
-              <DollarSign
-                className="size-4 shrink-0"
-                style={{ color: "var(--scholar-blue)" }}
-              />
-              <span>
+            <motion.div
+              className="flex items-center gap-2 text-foreground/80 group-hover:text-scholar-blue transition-colors"
+              whileHover={{ x: 4 }}
+            >
+              <div className="p-1.5 rounded-lg bg-scholar-blue/10">
+                <DollarSign className="w-4 h-4 text-scholar-blue" />
+              </div>
+              <span className="font-semibold">
                 {result.fundingLevel || result.funding}
               </span>
-            </div>
+            </motion.div>
           )}
           {result.deadline && (
-            <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300 font-medium">
-              <Calendar
-                className="size-4 shrink-0"
-                style={{ color: "var(--scholar-blue)" }}
-              />
-              <span>Deadline: {result.deadline}</span>
-            </div>
+            <motion.div
+              className="flex items-center gap-2 text-foreground/80 group-hover:text-scholar-blue transition-colors"
+              whileHover={{ x: 4 }}
+            >
+              <div className="p-1.5 rounded-lg bg-scholar-blue/10">
+                <Calendar className="w-4 h-4 text-scholar-blue" />
+              </div>
+              <span className="text-xs">{t("deadline", { date: result.deadline })}</span>
+            </motion.div>
           )}
-        </div>
+        </motion.div>
       </div>
 
-      {/* CTA — text link style */}
-      <div className="px-4 sm:px-5 pb-4 sm:pb-5 pt-4 mt-2 border-t border-slate-100 dark:border-slate-800/50">
-        <div className="flex justify-between items-center">
-          <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-            Explore
-          </span>
-          <button
-            className="inline-flex items-center gap-1.5 text-sm font-bold transition-all hover:gap-2.5"
-            style={{ color: "var(--scholar-blue)" }}
-          >
-            View Details
-            <ArrowRight className="size-4" />
-          </button>
-        </div>
-      </div>
+      {/* Bottom: View Details button */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+        className="px-5 pb-5 pt-3 relative z-10"
+      >
+        <motion.button
+          variants={buttonVariants}
+          initial="rest"
+          whileHover="hover"
+          whileTap="tap"
+          onClick={(e) => {
+            e.stopPropagation();
+            onViewDetails(result);
+          }}
+          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-gradient-to-r from-scholar-blue/10 to-purple-500/10 text-scholar-blue font-semibold hover:from-scholar-blue/20 hover:to-purple-500/20 border border-scholar-blue/20 transition-all group/btn"
+        >
+          {t("viewDetails")}
+          <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+        </motion.button>
+      </motion.div>
     </motion.div>
   );
 }

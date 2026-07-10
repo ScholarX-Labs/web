@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
+import type { LucideIcon } from "lucide-react"
 import { ArrowRight, Link, Zap } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -12,7 +13,7 @@ interface TimelineItem {
   date: string
   content: string
   category: string
-  icon: React.ElementType
+  icon: LucideIcon
   relatedIds: number[]
   status: "completed" | "in-progress" | "pending"
   energy: number

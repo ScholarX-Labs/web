@@ -1,14 +1,15 @@
 "use client";
 
-import Link from "next/link";
 import { ArrowRight, LogIn, X } from "lucide-react";
 import { useCallback } from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
-import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import SignoutButton from "@/app/auth/_components/SignoutButton";
 import Image from "next/image";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
+import { Link, usePathname } from "@/lib/i18n/navigation";
+import { LocaleSwitcher } from "@/components/locale-switcher";
 
 const SCHOLARX_HORIZONTAL_LOGO =
   "/ScholarX-Logo-horizontal-Blue-Solid-Small_ScholarX.png";
@@ -17,16 +18,8 @@ interface PremiumMobileMenuProps {
   isLoggedIn: boolean;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  navItems: Array<{ label: string; href: string }>;
 }
-
-const navItems = [
-  { label: "Home", href: ROUTES.HOME },
-  { label: "About us", href: ROUTES.ABOUT },
-  { label: "Courses", href: ROUTES.COURSES },
-  { label: "Opportunities", href: ROUTES.OPPORTUNITIES },
-  { label: "AI Search", href: ROUTES.AI_SEARCH },
-  { label: "Contact us", href: ROUTES.CONTACT },
-];
 
 const backdropVariants: Variants = {
   hidden: { opacity: 0 },
@@ -62,8 +55,14 @@ const itemVariants: Variants = {
   },
 };
 
-export default function PremiumMobileMenu({ isLoggedIn, open, onOpenChange }: PremiumMobileMenuProps) {
+export default function PremiumMobileMenu({
+  isLoggedIn,
+  open,
+  onOpenChange,
+  navItems,
+}: PremiumMobileMenuProps) {
   const pathname = usePathname();
+  const t = useTranslations("common");
 
   const close = useCallback(() => onOpenChange(false), [onOpenChange]);
 
@@ -84,7 +83,7 @@ export default function PremiumMobileMenu({ isLoggedIn, open, onOpenChange }: Pr
           />
           <motion.nav
             role="navigation"
-            aria-label="Mobile Navigation"
+            aria-label={t("menu.mobileNavigation")}
             className={cn(
               "relative w-[calc(100%-2rem)] max-w-sm",
               "bg-background/80 dark:bg-[#0a0f1e]/85 backdrop-blur-2xl",
@@ -99,7 +98,7 @@ export default function PremiumMobileMenu({ isLoggedIn, open, onOpenChange }: Pr
             <div className="flex items-center justify-between px-5 pt-5 pb-3">
               <Link href={ROUTES.HOME} onClick={close}>
                 <Image
-                  alt="ScholarX logo"
+                  alt={t("header.logoAlt")}
                   src={SCHOLARX_HORIZONTAL_LOGO}
                   width={100}
                   height={32}
@@ -109,7 +108,7 @@ export default function PremiumMobileMenu({ isLoggedIn, open, onOpenChange }: Pr
               <button
                 onClick={close}
                 className="p-1.5 rounded-full hover:bg-muted transition-colors"
-                aria-label="Close menu"
+                aria-label={t("menu.close")}
               >
                 <X className="h-4 w-4" />
               </button>
@@ -166,12 +165,14 @@ export default function PremiumMobileMenu({ isLoggedIn, open, onOpenChange }: Pr
                     className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-foreground/70 hover:text-foreground hover:bg-muted/50 transition-colors duration-200"
                   >
                     <span className="h-1.5 w-1.5 rounded-full shrink-0 bg-transparent" />
-                    Profile
+                    {t("nav.profile")}
                   </Link>
                   <SignoutButton
                     onClick={close}
                     className="flex w-full items-center justify-center gap-2 rounded-xl border border-[var(--color-hero-blue)]/15 bg-white/80 px-4 py-3 text-sm font-semibold text-[var(--color-hero-heading)] shadow-sm backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--color-hero-blue)]/30 hover:bg-white hover:text-[var(--color-hero-blue)]"
-                  />
+                  >
+                    {t("auth.logout")}
+                  </SignoutButton>
                 </div>
               ) : (
                 <div className="space-y-2 pt-1">
@@ -181,18 +182,21 @@ export default function PremiumMobileMenu({ isLoggedIn, open, onOpenChange }: Pr
                     className="flex w-full items-center justify-center gap-2 rounded-xl border border-[var(--color-hero-blue)]/15 bg-white/80 px-4 py-3 text-sm font-semibold text-[var(--color-hero-heading)] shadow-sm backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--color-hero-blue)]/30 hover:bg-[var(--color-hero-blue)]/6 hover:text-[var(--color-hero-blue)]"
                   >
                     <LogIn className="h-4 w-4" />
-                    Log in
+                    {t("auth.login")}
                   </Link>
                   <Link
                     href={ROUTES.SIGNUP}
                     onClick={close}
                     className="flex w-full items-center justify-center gap-2 rounded-xl bg-[linear-gradient(135deg,var(--color-hero-blue)_0%,#2563eb_60%,var(--color-hero-orange)_100%)] px-4 py-3 text-sm font-semibold text-white shadow-[0_18px_36px_-18px_rgba(51,153,204,0.9)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_22px_44px_-20px_rgba(51,153,204,1)]"
                   >
-                    Sign up
+                    {t("auth.signup")}
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                 </div>
               )}
+              <div className="pt-3">
+                <LocaleSwitcher className="w-full justify-center" />
+              </div>
             </motion.div>
           </motion.nav>
         </motion.div>

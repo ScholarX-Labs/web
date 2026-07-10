@@ -1,0 +1,40 @@
+{
+  "meta": {
+    "title": "دورات اسكولار اكس",
+    "description": "استكشف دورات يقودها خبراء لمساعدتك على التطور بشكل أسرع."
+  },
+  "card": {
+    "goToCourse": "الذهاب إلى الدورة",
+    "enroll": "التسجيل",
+    "lessonsCount": "{count} درسًا",
+    "studentsCount": "{count} طالبًا",
+    "paid": "مدفوع",
+    "free": "مجاني",
+    "resumeLearning": "متابعة التعلم",
+    "enrollNow": "سجل الآن",
+    "details": "التفاصيل"
+  },
+  "detailSheet": {
+    "enrolled": "{count} مسجل",
+    "duration": "{duration}",
+    "enrollmentPreview": "معاينة التسجيل",
+    "courseDetail": "تفاصيل الدورة",
+    "close": "إغلاق تفاصيل الدورة",
+    "overview": "نظرة عامة",
+    "whatYouWillLearn": "ما ستتعلمه",
+    "investment": "الاستثمار",
+    "lifetimeAccess": "وصول مدى الحياة للمحتوى",
+    "officialCertificate": "شهادة إتمام رسمية",
+    "premiumExperience": "تجربة تعليمية ممتازة",
+    "continueToEnrollment": "متابعة التسجيل",
+    "enrollForFree": "سجل مجانًا",
+    "free": "مجاني",
+    "resumeLearning": "متابعة التعلم",
+    "enrollNow": "سجل الآن"
+  },
+  "hero": {
+    "ourCourses": "دوراتنا",
+    "latestCourses": "أحدث <blue>الدورات</blue>",
+    "seeMore": "عرض المزيد ←"
+  }
+}

@@ -58,7 +58,41 @@
 
   --shadow-elevated: 0 30px 90px -15px rgba(0, 0, 0, 0.7),
     0 10px 30px -5px rgba(0, 0, 0, 0.4);
+
+  --animate-meteor-effect: meteor 5s linear infinite;
+  --animate-gradient: gradient 8s linear infinite;
+  --animate-background-position-spin: background-position-spin 3000ms infinite alternate;
+
+  @keyframes meteor {
+    0% {
+      transform: rotate(215deg) translateX(0);
+      opacity: 1;
+    }
+    70% {
+      opacity: 1;
+    }
+    100% {
+      transform: rotate(215deg) translateX(-500px);
+      opacity: 0;
+    }
+  }
+
+  @keyframes gradient {
+    to {
+      background-position: 300% 0%;
+    }
+  }
+
+  @keyframes background-position-spin {
+    0% {
+      background-position: top center;
+    }
+    100% {
+      background-position: bottom center;
+    }
+  }
 }
+
 
 :root {
   --component-inactive-color: var(--muted-foreground);
@@ -186,6 +220,11 @@
 
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  [dir="rtl"] body,
+  [dir="rtl"] {
+    font-family: var(--font-arabic), sans-serif;
   }
 }
 
@@ -844,4 +883,66 @@
   border-radius: 1px;
   transition: width 0.3s ease;
 }
+
+/* ── RTL & Arabic Typography ───────────────────────────────── */
+:root[dir="rtl"], [dir="rtl"] {
+  font-family: var(--font-arabic), ui-sans-serif, system-ui, sans-serif;
+}
+
+[dir="rtl"] {
+  line-height: 1.625;
+}
+
+/* ── RTL-Safe Logical Tailwind Utilities ────────────────────── */
+@utility dir-ml-0 { margin-inline-start: 0; }
+@utility dir-ml-1 { margin-inline-start: 0.25rem; }
+@utility dir-ml-2 { margin-inline-start: 0.5rem; }
+@utility dir-ml-3 { margin-inline-start: 0.75rem; }
+@utility dir-ml-4 { margin-inline-start: 1rem; }
+@utility dir-ml-6 { margin-inline-start: 1.5rem; }
+@utility dir-ml-8 { margin-inline-start: 2rem; }
+@utility dir-ml-auto { margin-inline-start: auto; }
+
+@utility dir-mr-0 { margin-inline-end: 0; }
+@utility dir-mr-1 { margin-inline-end: 0.25rem; }
+@utility dir-mr-2 { margin-inline-end: 0.5rem; }
+@utility dir-mr-3 { margin-inline-end: 0.75rem; }
+@utility dir-mr-4 { margin-inline-end: 1rem; }
+@utility dir-mr-6 { margin-inline-end: 1.5rem; }
+@utility dir-mr-8 { margin-inline-end: 2rem; }
+@utility dir-mr-auto { margin-inline-end: auto; }
+
+@utility dir-pl-0 { padding-inline-start: 0; }
+@utility dir-pl-1 { padding-inline-start: 0.25rem; }
+@utility dir-pl-2 { padding-inline-start: 0.5rem; }
+@utility dir-pl-3 { padding-inline-start: 0.75rem; }
+@utility dir-pl-4 { padding-inline-start: 1rem; }
+@utility dir-pl-6 { padding-inline-start: 1.5rem; }
+@utility dir-pl-8 { padding-inline-start: 2rem; }
+
+@utility dir-pr-0 { padding-inline-end: 0; }
+@utility dir-pr-1 { padding-inline-end: 0.25rem; }
+@utility dir-pr-2 { padding-inline-end: 0.5rem; }
+@utility dir-pr-3 { padding-inline-end: 0.75rem; }
+@utility dir-pr-4 { padding-inline-end: 1rem; }
+@utility dir-pr-6 { padding-inline-end: 1.5rem; }
+@utility dir-pr-8 { padding-inline-end: 2rem; }
+
+@utility dir-left-0 { inset-inline-start: 0; }
+@utility dir-left-1 { inset-inline-start: 0.25rem; }
+@utility dir-left-2 { inset-inline-start: 0.5rem; }
+@utility dir-left-3 { inset-inline-start: 0.75rem; }
+@utility dir-left-4 { inset-inline-start: 1rem; }
+
+@utility dir-right-0 { inset-inline-end: 0; }
+@utility dir-right-1 { inset-inline-end: 0.25rem; }
+@utility dir-right-2 { inset-inline-end: 0.5rem; }
+@utility dir-right-3 { inset-inline-end: 0.75rem; }
+@utility dir-right-4 { inset-inline-end: 1rem; }
+
+@utility dir-border-l { border-inline-start-width: 1px; }
+@utility dir-border-r { border-inline-end-width: 1px; }
+
+@utility dir-text-left { text-align: start; }
+@utility dir-text-right { text-align: end; }
 

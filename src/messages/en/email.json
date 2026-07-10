@@ -1,0 +1,24 @@
+{
+  "verification": {
+    "subject": "Your ScholarX email verification code",
+    "body": "Your ScholarX verification code is {otp}. It expires in {expiryMinutes} minutes."
+  },
+  "signin": {
+    "subject": "Your ScholarX sign-in code",
+    "body": "Your ScholarX sign-in code is {otp}. It expires in {expiryMinutes} minutes."
+  },
+  "passwordResetCode": {
+    "subject": "Your ScholarX password reset code",
+    "body": "Your ScholarX password reset code is {otp}. It expires in {expiryMinutes} minutes."
+  },
+  "passwordReset": {
+    "subject": "Reset your ScholarX password",
+    "body": "Use the button below to reset your ScholarX password.",
+    "textBody": "Click the link to reset your ScholarX password: {resetUrl}",
+    "ctaLabel": "Reset password"
+  },
+  "changeEmail": {
+    "subject": "Your ScholarX email change code",
+    "body": "Your ScholarX email change code is {otp}. It expires in {expiryMinutes} minutes."
+  }
+}

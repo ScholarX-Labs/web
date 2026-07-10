@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { SearchResult } from "@/lib/ai-search/types";
+import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -86,6 +87,7 @@ export function ScholarshipModal({
   isOpen,
   onClose,
 }: ScholarshipModalProps) {
+  const t = useTranslations("aiSearch.modal");
   const dialogOpen = typeof open === "boolean" ? open : Boolean(isOpen);
   const [isCopied, setIsCopied] = useState(false);
   useEffect(() => {
@@ -199,7 +201,7 @@ export function ScholarshipModal({
                       <BookOpen className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
                     </div>
                     <h3 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">
-                      Eligibility Overview
+                      {t("eligibilityOverview")}
                     </h3>
                   </div>
                   <div className="p-5 sm:p-8 rounded-2xl sm:rounded-3xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/50 dark:border-slate-700/50 leading-relaxed text-base sm:text-lg text-foreground/80">
@@ -222,7 +224,7 @@ export function ScholarshipModal({
                         <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 text-orange-600 dark:text-orange-400" />
                       </div>
                       <h3 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">
-                        Requirements
+                        {t("requirements")}
                       </h3>
                     </div>
                     <ul className="space-y-4">
@@ -256,7 +258,7 @@ export function ScholarshipModal({
                         <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600 dark:text-emerald-400" />
                       </div>
                       <h3 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">
-                        Benefits
+                        {t("benefits")}
                       </h3>
                     </div>
                     <ul className="space-y-4">
@@ -286,7 +288,7 @@ export function ScholarshipModal({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1, transition: { delay: 0.2 } }}
             exit={{ opacity: 0, transition: { duration: 0.1 } }}
-            className="w-full lg:w-[420px] bg-slate-50/80 dark:bg-slate-900/80 border-t lg:border-t-0 lg:border-l border-white/40 dark:border-white/10 lg:rounded-r-[2rem] flex flex-col flex-none lg:h-full lg:overflow-y-auto scholar-scrollbar"
+            className="w-full lg:w-[420px] bg-slate-50/80 dark:bg-slate-900/80 border-t lg:border-t-0 lg:dir-border-l border-white/40 dark:border-white/10 lg:rounded-e-[2rem] flex flex-col flex-none lg:h-full lg:overflow-y-auto scholar-scrollbar"
           >
             <motion.div
               variants={contentVariants}
@@ -304,7 +306,7 @@ export function ScholarshipModal({
                   <div className="relative z-10 flex items-center justify-between">
                     <div>
                       <p className="text-scholar-blue-light/80 text-sm font-medium uppercase tracking-wider mb-1">
-                        ScholarX AI Match Score
+                        {t("matchScore")}
                       </p>
                       <h4 className="text-4xl sm:text-5xl font-black tracking-tighter">
                         {Math.round(result.match_percentage)}%
@@ -330,7 +332,7 @@ export function ScholarshipModal({
                     </div>
                     <div>
                       <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
-                        Funding Amount
+                        {t("fundingAmount")}
                       </p>
                       <p className="text-lg sm:text-xl font-bold text-foreground">
                         {result.funding}
@@ -350,7 +352,7 @@ export function ScholarshipModal({
                     </div>
                     <div>
                       <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
-                        Deadline
+                        {t("deadline")}
                       </p>
                       <p className="text-lg sm:text-xl font-bold text-foreground">
                         {result.deadline}
@@ -370,7 +372,7 @@ export function ScholarshipModal({
                     </div>
                     <div>
                       <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
-                        Location
+                        {t("location")}
                       </p>
                       <p className="text-lg sm:text-xl font-bold text-foreground">
                         {result.location}
@@ -390,7 +392,7 @@ export function ScholarshipModal({
                     </div>
                     <div className="overflow-hidden">
                       <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
-                        Source Website
+                        {t("sourceWebsite")}
                       </p>
                       <a
                         href={result.url}
@@ -419,7 +421,7 @@ export function ScholarshipModal({
                     rel="noopener noreferrer"
                     className="w-full flex items-center justify-center gap-2 px-6 py-4 sm:px-8 sm:py-5 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg text-white bg-gradient-to-r from-scholar-blue to-scholar-blue-dark shadow-lg shadow-scholar-blue/30 transition-all"
                   >
-                    Proceed to Application
+                    {t("proceedToApplication")}
                     <ExternalLink className="w-5 h-5 ml-1" />
                   </motion.a>
                 )}
@@ -442,7 +444,7 @@ export function ScholarshipModal({
                         transition={{ duration: 0.2 }}
                         className="absolute flex items-center justify-center gap-2"
                       >
-                        <span>Copy Link</span>
+                        <span>{t("copyLink")}</span>
                         <Share2 className="w-5 h-5" />
                       </motion.div>
                       <motion.div
@@ -451,7 +453,7 @@ export function ScholarshipModal({
                         transition={{ duration: 0.2 }}
                         className="absolute flex items-center justify-center gap-2"
                       >
-                        <span>Copied!</span>
+                        <span>{t("copied")}</span>
                         <motion.div
                           animate={{
                             rotate: isCopied ? 360 : 0,
@@ -475,7 +477,7 @@ export function ScholarshipModal({
                   onClick={onClose}
                   className="w-full px-6 py-4 sm:px-8 sm:py-5 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg text-foreground bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition-all"
                 >
-                  Close & Continue Searching
+                  {t("closeContinue")}
                 </motion.button>
               </motion.div>
             </motion.div>

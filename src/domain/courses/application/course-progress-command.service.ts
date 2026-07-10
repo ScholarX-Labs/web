@@ -174,7 +174,11 @@ export class CourseProgressCommandService {
         },
       );
 
-      if (result) return result;
+      if (result) {
+        // Emit point events for leaderboard asynchronously
+        this.emitPointEvents(normalized, result).catch(console.error);
+        return result;
+      }
 
       await wait(BACKOFF_MS[attempt] ?? 150);
     }
@@ -186,6 +190,83 @@ export class CourseProgressCommandService {
       9106,
       { courseId: normalized.courseId, lessonId: normalized.lessonId },
     );
+  }
+
+  private async emitPointEvents(
+    normalized: SyncLessonProgressCommand,
+    result: CourseProgressResult
+  ) {
+    // Only emit point events when the lesson actually transitions to completed.
+    // Heartbeat, pause, and seek events should never emit points — even if the
+    // lesson is already marked complete from a prior request.
+    const isCompletionEvent =
+      normalized.eventType === "completion" ||
+      normalized.eventType === "manual_complete" ||
+      normalized.completed === true;
+
+    if (!isCompletionEvent && !result.lesson.completed) return;
+
+    const baseUrl = process.env.BETTER_AUTH_URL || "http://localhost:3000";
+    const secret = process.env.INTERNAL_API_SECRET;
+
+    if (!secret) {
+      console.warn(
+        "[course-progress] INTERNAL_API_SECRET is not set — leaderboard points cannot be awarded. " +
+          "Set INTERNAL_API_SECRET in your environment."
+      );
+      return;
+    }
+
+    const headers = {
+      "Content-Type": "application/json",
+      "x-internal-secret": secret,
+    };
+
+    const postPointEvent = async (payload: {
+      activityType: string;
+      points: number;
+      idempotencyKey: string;
+    }) => {
+      const res = await fetch(`${baseUrl}/api/leaderboard/point-events`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          userId: normalized.userId,
+          courseId: normalized.courseId,
+          ...payload,
+        }),
+      });
+      if (!res.ok) {
+        const text = await res.text().catch(() => "(no body)");
+        console.error(
+          `[course-progress] leaderboard point-event failed (${res.status}) for ` +
+            `${payload.activityType}/${payload.idempotencyKey}: ${text}`
+        );
+      } else {
+        console.info(
+          `[course-progress] awarded ${payload.points} pts for ${payload.activityType} ` +
+            `(key: ${payload.idempotencyKey})`
+        );
+      }
+    };
+
+    // Award lesson completion points (idempotent — DB rejects duplicate keys)
+    if (result.lesson.completed) {
+      await postPointEvent({
+        activityType: "lesson_completion",
+        points: 10,
+        idempotencyKey: `lesson_completion_${normalized.courseId}_${normalized.lessonId}_${normalized.userId}`,
+      });
+    }
+
+    // Award course completion bonus when the entire course is finished
+    if (result.course.status === "completed") {
+      await postPointEvent({
+        activityType: "course_completion",
+        points: 50,
+        idempotencyKey: `course_completion_${normalized.courseId}_${normalized.userId}`,
+      });
+    }
   }
 
   async getLatestProgress(

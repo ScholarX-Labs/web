@@ -11,11 +11,37 @@ export type AgentLogPayload = {
 const ENDPOINT = process.env.NEXT_PUBLIC_AGENT_LOG_INGEST_URL;
 const SESSION_ID = process.env.NEXT_PUBLIC_AGENT_LOG_SESSION_ID ?? "local";
 
+function sanitizeData(data?: Record<string, unknown>): Record<string, unknown> | undefined {
+  if (!data) return undefined;
+  const sanitized: Record<string, unknown> = {};
+  const sensitiveKeys = ["otp", "token", "password", "email", "url", "secret", "identifier", "value", "connectionString"];
+  for (const [key, val] of Object.entries(data)) {
+    if (sensitiveKeys.some(sensitive => key.toLowerCase().includes(sensitive))) {
+      sanitized[key] = "[REDACTED]";
+    } else if (Array.isArray(val)) {
+      sanitized[key] = val.map((item) =>
+        item && typeof item === "object" && !Array.isArray(item)
+          ? sanitizeData(item as Record<string, unknown>)
+          : item,
+      );
+    } else if (val && typeof val === "object") {
+      sanitized[key] = sanitizeData(val as Record<string, unknown>);
+    } else {
+      sanitized[key] = val;
+    }
+  }
+  return sanitized;
+}
+
 export function agentLog(payload: Omit<AgentLogPayload, "sessionId">) {
   if (typeof window === "undefined") return;
   if (!ENDPOINT) return;
 
-  const body = JSON.stringify({ sessionId: SESSION_ID, ...payload });
+  const sanitizedPayload = {
+    ...payload,
+    data: sanitizeData(payload.data),
+  };
+  const body = JSON.stringify({ sessionId: SESSION_ID, ...sanitizedPayload });
 
   // Prefer fetch w/ session header when allowed; fall back to beacon to avoid CORS/preflight issues.
   try {

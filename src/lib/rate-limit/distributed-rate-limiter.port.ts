@@ -24,7 +24,13 @@ export type RateLimitDecision =
     };
 
 export interface DistributedRateLimiter {
+  /** Atomically check and increment — spends a slot. */
   check(
+    rule: DistributedRateLimitRule,
+    subject: string,
+  ): Promise<RateLimitDecision>;
+  /** Read-only check — does NOT spend a slot. */
+  peek(
     rule: DistributedRateLimitRule,
     subject: string,
   ): Promise<RateLimitDecision>;

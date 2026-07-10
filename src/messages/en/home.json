@@ -1,0 +1,84 @@
+{
+  "meta": {
+    "title": "ScholarX - Premium Learning Platform",
+    "description": "Discover world-class courses, scholarships, and guided learning journeys."
+  },
+  "hero": {
+    "badge": "Verified & Premium Academic Standards",
+    "title": "Empowering Youth",
+    "subtitle": "Changing",
+    "highlight": "Lives.",
+    "description": "ScholarX helps students and young professionals unlock global opportunities",
+    "primaryCta": "Get Started",
+    "secondaryCta": "Explore Courses",
+    "studentsCountLabel": "students supported worldwide",
+    "partnersCountLabel": "verified partner institutions",
+    "expertTitle": "Expert-Led Courses",
+    "expertDescription": "Master new skills with industry leaders"
+  },
+  "features": {
+    "title": "Welcome to",
+    "highlight": "ScholarX",
+    "description": "ScholarX is dedicated to empowering students through education, mentorship, and community support. We believe in breaking down barriers and creating opportunities for ambitious learners worldwide",
+    "cta": "Take the First Step Today!",
+    "imageAlt": "ScholarX Education",
+    "items": {
+      "training": "Development Training Program",
+      "community": "Community Support",
+      "resources": "Resource Library"
+    }
+  },
+  "whyChoose": {
+    "title": "Why Choose",
+    "highlight": "ScholarX?",
+    "description": "We're dedicated to making education accessible and providing the resources students need to succeed globally.",
+    "items": {
+      "scholarship": {
+        "title": "Scholarship Research",
+        "description": "Access curated local and international scholarships"
+      },
+      "mentorship": {
+        "title": "Mentorship",
+        "description": "Connect with experienced mentors in your field"
+      },
+      "opportunities": {
+        "title": "Opportunities",
+        "description": "Discover global learning and career opportunities"
+      }
+    }
+  },
+  "whoWeHelp": {
+    "title": "Who We",
+    "highlight": "Help?",
+    "description": "We support students at every stage of their educational journey, providing tailored resources for their specific needs.",
+    "items": {
+      "highschool": {
+        "title": "High School Students",
+        "description": "Discover scholarships and prepare for university applications early."
+      },
+      "university": {
+        "title": "University Students",
+        "description": "Access mentorship, internships, and study-abroad opportunities."
+      },
+      "graduates": {
+        "title": "Recent Graduates",
+        "description": "Find career guidance, advanced degrees, and professional development."
+      }
+    }
+  },
+  "impact": {
+    "title": "Our",
+    "highlight": "Impact",
+    "description": "We're dedicated to making education accessible and providing the resources students need to succeed globally.",
+    "stats": {
+      "students": "Students attended our programs",
+      "partners": "Partners",
+      "events": "Events and Programs"
+    }
+  },
+  "cta": {
+    "headline": "Ready to transform your future?",
+    "subline": "Join thousands of students who have found their path with ScholarX.",
+    "buttonLabel": "Get Started Free"
+  }
+}

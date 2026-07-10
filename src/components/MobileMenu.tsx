@@ -1,7 +1,8 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/lib/i18n/navigation";
 import { ArrowRight, LogIn, Menu } from "lucide-react";
+import { LocaleSwitcher } from "@/components/locale-switcher";
 import { useState } from "react";
 import SignoutButton from "@/app/auth/_components/SignoutButton";
 import {
@@ -117,6 +118,9 @@ export default function MobileMenu({ isLoggedIn }: MobileMenuProps) {
               </Link>
             </div>
           )}
+          <div className="pt-3 border-t">
+            <LocaleSwitcher className="w-full justify-center" />
+          </div>
         </nav>
       </SheetContent>
     </Sheet>

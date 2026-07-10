@@ -1,0 +1,48 @@
+{
+  "meta": {
+    "title": "Your ScholarX Profile",
+    "description": "Manage your ScholarX profile, enrollments, and saved opportunities."
+  },
+  "popup": {
+    "myProfile": "My Profile",
+    "myCourses": "My Courses",
+    "certificates": "Certificates",
+    "savedOpportunities": "Saved Opportunities",
+    "signOut": "Sign out",
+    "ariaLabel": "Profile menu"
+  },
+  "settings": {
+    "changePassword": {
+      "title": "Change Password",
+      "description": "Update your account password.",
+      "currentPasswordLabel": "Current Password",
+      "newPasswordLabel": "New Password",
+      "confirmPasswordLabel": "Confirm New Password",
+      "button": "Change Password",
+      "changing": "Changing...",
+      "success": "Password changed successfully",
+      "errors": {
+        "mismatch": "Passwords do not match",
+        "tooShort": "Password must be at least 8 characters",
+        "fallback": "Failed to change password"
+      }
+    },
+    "dangerZone": {
+      "title": "Danger Zone",
+      "description": "Permanently delete your account and all associated data. This action cannot be undone.",
+      "button": "Delete Account",
+      "dialog": {
+        "title": "Are you absolutely sure?",
+        "description": "This will permanently delete your account, your profile, course progress, certificates, and all associated data. This action cannot be undone.",
+        "cancel": "Cancel",
+        "delete": "Delete My Account",
+        "deleting": "Deleting..."
+      },
+      "success": "Account deleted",
+      "errors": {
+        "fallback": "Failed to delete account",
+        "prepareFailed": "Failed to prepare account for deletion"
+      }
+    }
+  }
+}

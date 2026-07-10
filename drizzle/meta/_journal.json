@@ -141,6 +141,20 @@
       "when": 1780010000000,
       "tag": "0020_executive_indexes",
       "breakpoints": false
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1780854615508,
+      "tag": "0021_whole_giant_girl",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1783057714728,
+      "tag": "0022_solid_dorian_gray",
+      "breakpoints": true
     }
   ]
 }

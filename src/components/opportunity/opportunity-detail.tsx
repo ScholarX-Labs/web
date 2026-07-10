@@ -1,5 +1,6 @@
 import { SearchResult } from "@/lib/ai-search/types";
 import { Badge } from "@/components/ai-search/ui/badge";
+import Link from "next/link";
 
 interface OpportunityDetailProps {
   opportunity: SearchResult;
@@ -100,12 +101,12 @@ export function OpportunityDetail({
         <p className="text-muted-foreground mb-4">
           Want to explore more opportunities like this?
         </p>
-        <a
+        <Link
           href="/auth/signin"
           className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl font-bold text-white bg-gradient-to-r from-scholar-blue to-scholar-blue-dark shadow-lg shadow-scholar-blue/30 hover:shadow-xl transition-all"
         >
           Sign in to search all opportunities
-        </a>
+        </Link>
       </div>
 
       <script

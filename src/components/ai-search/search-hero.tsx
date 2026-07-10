@@ -7,21 +7,25 @@ import {
   Sparkles,
 } from "lucide-react";
 import { Textarea } from "@/components/ai-search/ui/textarea";
+import { useTranslations } from "next-intl";
 
 interface SearchHeroProps {
   onSearch: (query: string) => void;
   isLoading: boolean;
 }
 
-const SUGGESTION_CHIPS = [
-  "Fully funded masters in Europe",
-  "STEM scholarships with no essays",
-  "Study abroad with IELTS below 6.5",
-];
+// SUGGESTION_CHIPS moved inside SearchHero component body for i18n support
 
 export function SearchHero({ onSearch, isLoading }: SearchHeroProps) {
+  const t = useTranslations("aiSearch.hero");
   const [query, setQuery] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const suggestionChips = [
+    t("suggestions.mastersEurope"),
+    t("suggestions.stemNoEssays"),
+    t("suggestions.ieltsStudyAbroad"),
+  ];
 
   function handleSubmit() {
     const trimmed = query.trim();
@@ -49,17 +53,16 @@ export function SearchHero({ onSearch, isLoading }: SearchHeroProps) {
       {/* Hero Heading */}
       <div className="text-center mb-10 max-w-3xl animate-fade-in-up">
         <h1 className="text-5xl md:text-6xl font-extrabold text-foreground leading-tight mb-4">
-          Find your future with{" "}
+          {t("titlePrefix")}{" "}
           <span
             className="font-extrabold"
             style={{ color: "var(--scholar-blue)" }}
           >
-            ScholarX AI
+            {t("titleBrand")}
           </span>
         </h1>
         <p className="text-muted-foreground text-lg">
-          The premium discovery engine for global scholarships and academic
-          opportunities.
+          {t("description")}
         </p>
       </div>
 
@@ -78,9 +81,9 @@ export function SearchHero({ onSearch, isLoading }: SearchHeroProps) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Tell us about your dreams, your major, and where you want to go..."
+            placeholder={t("placeholder")}
             className="min-h-25 resize-none border-0 shadow-none focus-visible:ring-0 text-base p-2 bg-transparent placeholder:text-muted-foreground/70"
-            aria-label="Search query"
+            aria-label={t("searchAriaLabel")}
           />
         </div>
 
@@ -89,9 +92,9 @@ export function SearchHero({ onSearch, isLoading }: SearchHeroProps) {
           {/* Suggestion chips */}
           <div className="flex flex-wrap gap-1.5 items-center">
             <span className="text-[11px] font-medium text-muted-foreground mr-0.5">
-              Try:
+              {t("tryLabel")}
             </span>
-            {SUGGESTION_CHIPS.map((chip) => (
+            {suggestionChips.map((chip) => (
               <button
                 key={chip}
                 onClick={() => handleChipClick(chip)}
@@ -148,11 +151,11 @@ export function SearchHero({ onSearch, isLoading }: SearchHeroProps) {
             {isLoading ? (
               <>
                 <Loader2 className="size-4 animate-spin" />
-                Searching...
+                {t("submit")}...
               </>
             ) : (
               <>
-                Discover Matches
+                {t("submit")}
                 <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
               </>
             )}
@@ -165,7 +168,7 @@ export function SearchHero({ onSearch, isLoading }: SearchHeroProps) {
             className="size-3"
             style={{ color: "var(--scholar-blue)" }}
           />
-          <span>AI Search · By ScholarX AI</span>
+          <span>AI Search · {t("badge")}</span>
         </div>
       </div>
 

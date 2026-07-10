@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { Download, Loader2, AlertTriangle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -55,6 +56,7 @@ export function CertificateArtifactStatusPoller({
   initialStatus,
   isRevoked,
 }: CertificateArtifactStatusPollerProps) {
+  const t = useTranslations("certificates.poller");
   const [status, setStatus] = useState<string>(initialStatus);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(
     initialStatus === "ready"
@@ -139,7 +141,7 @@ export function CertificateArtifactStatusPoller({
         className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-teal-600 px-5 text-sm font-semibold text-white shadow-md shadow-teal-600/30 transition-all hover:bg-teal-500 hover:shadow-teal-500/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400"
       >
         <Download className="size-4 shrink-0" />
-        Download Certificate PDF
+        {t("download")}
       </a>
     );
   }
@@ -155,11 +157,10 @@ export function CertificateArtifactStatusPoller({
           <AlertTriangle className="mt-0.5 size-4 shrink-0 text-amber-400" />
           <div>
             <p className="text-sm font-semibold text-amber-200">
-              PDF generation failed
+              {t("failed")}
             </p>
             <p className="mt-1 text-xs text-amber-300/80">
-              Our system will automatically retry. You can also refresh the page
-              to check for updates, or contact support if this persists.
+              {t("failedDesc")}
             </p>
           </div>
         </div>
@@ -178,11 +179,10 @@ export function CertificateArtifactStatusPoller({
           <RefreshCw className="mt-0.5 size-4 shrink-0 text-slate-400" />
           <div>
             <p className="text-sm font-semibold text-slate-200">
-              Still generating…
+              {t("stillGenerating")}
             </p>
             <p className="mt-1 text-xs text-slate-400">
-              Large batches can take a few minutes. Refresh this page to check
-              if your PDF is ready.
+              {t("stillGeneratingDesc")}
             </p>
           </div>
         </div>
@@ -193,7 +193,7 @@ export function CertificateArtifactStatusPoller({
           onClick={() => window.location.reload()}
         >
           <RefreshCw className="mr-2 size-3" />
-          Refresh page
+          {t("refresh")}
         </Button>
       </div>
     );
@@ -210,11 +210,11 @@ export function CertificateArtifactStatusPoller({
         <div>
           <p className="text-sm font-semibold text-slate-200">
             {status === "generating"
-              ? "Generating your PDF…"
-              : "PDF queued for generation"}
+              ? t("generating")
+              : t("queued")}
           </p>
           <p className="mt-0.5 text-xs text-slate-400">
-            This usually takes under a minute. The page updates automatically.
+            {t("generatingDesc")}
           </p>
         </div>
       </div>

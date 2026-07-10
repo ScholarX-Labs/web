@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Award, ExternalLink, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslations, useLocale } from "next-intl";
 
 interface CourseCertificateLinkCardProps {
   certificateNumber: string;
@@ -11,13 +12,13 @@ interface CourseCertificateLinkCardProps {
   className?: string;
 }
 
-const formatIssuedDate = (value?: string) => {
+const formatIssuedDate = (value?: string, locale = "en") => {
   if (!value) return null;
 
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return null;
 
-  return new Intl.DateTimeFormat("en", {
+  return new Intl.DateTimeFormat(locale, {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -32,8 +33,10 @@ export function CourseCertificateLinkCard({
   variant = "light",
   className,
 }: CourseCertificateLinkCardProps) {
+  const t = useTranslations("certificates.card");
+  const locale = useLocale();
   const isDark = variant === "dark";
-  const issuedDate = formatIssuedDate(issuedAt);
+  const issuedDate = formatIssuedDate(issuedAt, locale);
 
   return (
     <section
@@ -69,7 +72,7 @@ export function CourseCertificateLinkCard({
               )}
             >
               <ShieldCheck className="size-3" />
-              Certificate issued
+              {t("issued")}
             </div>
 
             <h2
@@ -79,7 +82,7 @@ export function CourseCertificateLinkCard({
                 isDark ? "text-white" : "text-slate-950",
               )}
             >
-              Your course certificate is ready
+              {t("ready")}
             </h2>
 
             <p
@@ -88,7 +91,7 @@ export function CourseCertificateLinkCard({
                 isDark ? "text-emerald-50/75" : "text-slate-600",
               )}
             >
-              View and share your verified certificate for {courseTitle}.
+              {t("viewAndShare", { title: courseTitle })}
             </p>
 
             <div
@@ -98,7 +101,7 @@ export function CourseCertificateLinkCard({
               )}
             >
               <span className="break-all font-mono">{certificateNumber}</span>
-              {issuedDate ? <span>Issued {issuedDate}</span> : null}
+              {issuedDate ? <span>{t("issuedDate", { date: issuedDate })}</span> : null}
             </div>
           </div>
         </div>
@@ -112,7 +115,7 @@ export function CourseCertificateLinkCard({
               : "bg-emerald-600 text-white shadow-lg shadow-emerald-600/20 hover:bg-emerald-500",
           )}
         >
-          View certificate
+          {t("view")}
           <ExternalLink className="size-4" />
         </Link>
       </div>

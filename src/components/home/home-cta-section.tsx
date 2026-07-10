@@ -2,22 +2,16 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-const HOME_DATA = {
-  cta: {
-    headline: "Ready to transform your future?",
-    subline: "Join thousands of students who have found their path with ScholarX.",
-    buttonLabel: "Get Started Free",
-    buttonHref: "/auth/signup",
-  },
-};
+import { useTranslations } from "next-intl";
 import { sectionReveal, tapScale } from "@/lib/motion-variants";
 import Link from "next/link";
 import { GlassPanel } from "@/components/ui/glass-panel";
 import { useCtaTracking } from "@/components/analytics/use-cta-tracking";
 
 export function HomeCTASection() {
-  const { headline, subline, buttonLabel, buttonHref } = HOME_DATA.cta;
+  const t = useTranslations("home.cta");
   const trackCta = useCtaTracking();
+  const buttonHref = "/auth/signup";
 
   return (
     <section className="py-24 bg-background relative overflow-hidden flex flex-col items-center justify-center px-4">
@@ -34,10 +28,10 @@ export function HomeCTASection() {
           
           <GlassPanel className="p-12 md:p-20 text-center flex flex-col items-center rounded-[2rem] bg-[#0a0f1e]/85 backdrop-blur-[40px] border border-white/10 shadow-elevated">
             <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-6">
-              {headline}
+              {t("headline")}
             </h2>
             <p className="text-lg md:text-xl text-white/70 max-w-2xl mb-10">
-              {subline}
+              {t("subline")}
             </p>
             <motion.div whileHover={tapScale.whileHover} whileTap={tapScale.whileTap}>
               <Link 
@@ -45,14 +39,14 @@ export function HomeCTASection() {
                 onClick={() => {
                   trackCta({
                     ctaId: "home_bottom_cta",
-                    ctaLabel: buttonLabel,
+                    ctaLabel: t("buttonLabel"),
                     ctaPlacement: "home_footer_cta",
                     destination: buttonHref,
                   });
                 }}
                 className="inline-flex h-14 items-center justify-center rounded-xl bg-white px-10 text-base font-bold text-[#0a0f1e] transition-colors hover:bg-white/90 shadow-[0_0_20px_rgba(255,255,255,0.2)]"
               >
-                {buttonLabel}
+                {t("buttonLabel")}
               </Link>
             </motion.div>
           </GlassPanel>

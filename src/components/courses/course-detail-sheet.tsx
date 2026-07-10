@@ -17,6 +17,7 @@ import { CourseSurfaceIntent } from "@/stores/course-sheet.store";
 import { useFlipAnimation } from "@/hooks/use-flip-animation";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CourseRichText } from "./course-rich-text";
+import { useTranslations } from "next-intl";
 
 interface CourseDetailSheetProps {
   course: Course;
@@ -42,6 +43,7 @@ export function CourseDetailSheet({
   onClose,
   onEnrollIntent,
 }: CourseDetailSheetProps) {
+  const t = useTranslations("courses.detailSheet");
   const prefersReducedMotion = useReducedMotion();
   const { applyInverseFromRect, play, playReverse } = useFlipAnimation();
   const isPaid = (course.price ?? 0) > 0;
@@ -176,7 +178,7 @@ export function CourseDetailSheet({
     <motion.div
       role="dialog"
       aria-modal="true"
-      aria-label={`Course details: ${course.title}`}
+      aria-label={`${t("courseDetail")}: ${course.title}`}
       className={cn(
         "fixed inset-0 z-70 flex items-start justify-center px-4 py-4 sm:px-6 sm:py-6",
         intent === "enroll" && "pointer-events-none",
@@ -186,7 +188,7 @@ export function CourseDetailSheet({
       exit={{ opacity: 0, transition: { duration: 0.16 } }}
     >
       <button
-        aria-label="Close course details"
+        aria-label={t("close")}
         className="absolute inset-0 cursor-default bg-slate-950/58 backdrop-blur-2xl"
         onClick={handleDismiss}
       />
@@ -257,7 +259,7 @@ export function CourseDetailSheet({
                 </span>
                 <span className="inline-flex items-center gap-1.5">
                   <Users className="h-4 w-4" />
-                  {course.studentsCount?.toLocaleString() ?? "1,200"} enrolled
+                  {t("enrolled", { count: course.studentsCount ?? 1200 })}
                 </span>
                 <span className="inline-flex items-center gap-1.5">
                   <Clock3 className="h-4 w-4" />
@@ -271,7 +273,7 @@ export function CourseDetailSheet({
               <div className="relative z-20 flex items-start justify-between gap-4 border-b border-slate-100 bg-white/80 px-6 py-5 backdrop-blur-xl dark:border-slate-800/60 dark:bg-slate-950/70 sm:px-10">
                 <motion.div {...reveal(1)} className="min-w-0">
                   <p className="text-xs font-semibold uppercase tracking-[0.15em] text-slate-400">
-                    {intent === "enroll" ? "Enrollment preview" : "Course detail"}
+                    {intent === "enroll" ? t("enrollmentPreview") : t("courseDetail")}
                   </p>
                   <h3 className="mt-1.5 truncate text-2xl font-medium tracking-tight text-slate-900 dark:text-white">
                     {course.title}
@@ -282,7 +284,7 @@ export function CourseDetailSheet({
                   ref={closeButtonRef}
                   onClick={handleDismiss}
                   className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition-colors hover:bg-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
-                  aria-label="Close detail sheet"
+                  aria-label={t("close")}
                   style={{ opacity: flipComplete ? 1 : 0 }}
                 >
                   <X className="h-4 w-4" />
@@ -296,10 +298,10 @@ export function CourseDetailSheet({
                 <ScrollArea className="size-full premium-scrollbar">
               <div className="px-6 py-8 sm:px-10">
                 <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr]">
-                  <div className="space-y-8 pr-4">
+                  <div className="space-y-8 dir-pr-4">
                     <motion.div {...reveal(2)}>
                       <h4 className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-400">
-                        Overview
+                        {t("overview")}
                       </h4>
                       <CourseRichText
                         text={course.description}
@@ -314,7 +316,7 @@ export function CourseDetailSheet({
 
                     <motion.div {...reveal(4)}>
                       <h4 className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-400">
-                        What you&apos;ll learn
+                        {t("whatYouWillLearn")}
                       </h4>
                       <ul className="mt-4 space-y-4">
                         {learningOutcomes.map((item) => (
@@ -322,7 +324,7 @@ export function CourseDetailSheet({
                             key={item}
                             className="flex items-start text-[17px] leading-relaxed text-slate-700 dark:text-slate-300"
                           >
-                            <span className="mr-4 mt-1 block h-1.5 w-1.5 shrink-0 rounded-full bg-slate-300 dark:bg-slate-600" />
+                            <span className="dir-mr-4 mt-1 block h-1.5 w-1.5 shrink-0 rounded-full bg-slate-300 dark:bg-slate-600" />
                             {item}
                           </li>
                         ))}
@@ -336,25 +338,22 @@ export function CourseDetailSheet({
                   >
                     <div>
                       <h4 className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-400">
-                        Investment
+                        {t("investment")}
                       </h4>
                       <p className="mt-2 text-5xl font-light tracking-tight text-slate-900 dark:text-white">
-                        {isPaid ? `$${course.currentPrice}` : "Free"}
+                        {isPaid ? `$${course.currentPrice}` : t("free")}
                       </p>
                     </div>
 
                     <div className="space-y-4 text-[15px] text-slate-500 dark:text-slate-400">
                       <p className="flex items-center gap-3">
-                        <BookOpen className="h-5 w-5 text-slate-400" /> Lifetime
-                        access to content
+                        <BookOpen className="h-5 w-5 text-slate-400" /> {t("lifetimeAccess")}
                       </p>
                       <p className="flex items-center gap-3">
-                        <Sparkles className="h-5 w-5 text-slate-400" /> Official
-                        completion certificate
+                        <Sparkles className="h-5 w-5 text-slate-400" /> {t("officialCertificate")}
                       </p>
                       <p className="flex items-center gap-3">
-                        <Star className="h-5 w-5 text-slate-400" /> Premium
-                        learning experience
+                        <Star className="h-5 w-5 text-slate-400" /> {t("premiumExperience")}
                       </p>
                     </div>
 
@@ -364,26 +363,27 @@ export function CourseDetailSheet({
                           href={ROUTES.LESSON(course.slug, firstLessonId)}
                           className="inline-flex w-full items-center justify-center rounded-2xl bg-slate-900 px-6 py-4 text-[15px] font-medium text-white transition-transform hover:scale-[1.02] active:scale-[0.98] dark:bg-white dark:text-slate-900"
                         >
-                          Resume Learning
+                          {t("resumeLearning")}
                         </Link>
                       ) : (
                         <button
+                          type="button"
                           onClick={onEnrollIntent}
-                          className="inline-flex w-full items-center justify-center rounded-2xl bg-slate-900 px-6 py-4 text-[15px] font-medium text-white transition-transform hover:scale-[1.02] active:scale-[0.98] dark:bg-white dark:text-slate-900"
+                          className="inline-flex w-full items-center justify-center rounded-2xl bg-hero-blue px-6 py-4 text-[15px] font-medium text-white transition-transform hover:scale-[1.02] active:scale-[0.98]"
                         >
-                          {isPaid ? "Continue to Enrollment" : "Enroll for Free"}
+                          {t("enrollNow")}
                         </button>
                       )}
                     </div>
                   </motion.aside>
                 </div>
               </div>
-                </ScrollArea>
-              </div>
-            </div>
+            </ScrollArea>
+          </div>
         </div>
-        </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
+  </motion.div>
+</motion.div>
   );
 }

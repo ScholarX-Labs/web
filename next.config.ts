@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
+import createNextIntlPlugin from "next-intl/plugin";
 
 const nextConfig: NextConfig = {
   output: "standalone",
@@ -38,6 +39,8 @@ const nextConfig: NextConfig = {
   },
 };
 
+const withNextIntl = createNextIntlPlugin("./src/lib/i18n/messages.ts");
+
 const sentryVars = {
   SENTRY_ORG: process.env.SENTRY_ORG,
   SENTRY_PROJECT: process.env.SENTRY_PROJECT,
@@ -60,4 +63,4 @@ const sentryBuildOptions = hasSentryConfig
       silent: true,
     };
 
-export default withSentryConfig(nextConfig, sentryBuildOptions);
+export default withSentryConfig(withNextIntl(nextConfig), sentryBuildOptions);

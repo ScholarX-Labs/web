@@ -20,6 +20,8 @@ export interface SharedRedisStatus {
   cacheEnabled: boolean;
   configured: boolean;
   provider: "azure" | "generic" | "unconfigured";
+  host: string | null;
+  port: number | null;
   circuitOpen: boolean;
   circuitCooldownMs: number;
   consecutiveFailures: number;
@@ -123,7 +125,7 @@ function createRedisOptions(host: string, port: number): RedisOptions {
     keepAlive: 30_000,
     maxRetriesPerRequest: numberFromEnv(env.REDIS_MAX_RETRIES_PER_REQUEST, 2),
     enableReadyCheck: true,
-    enableOfflineQueue: false,
+    enableOfflineQueue: true,
     retryStrategy(times) {
       if (times > 5) return null;
       return Math.min(times * 100, 2_000);
@@ -278,6 +280,8 @@ export function getSharedRedisStatus(): SharedRedisStatus {
     cacheEnabled: isSharedCacheEnabled(),
     configured: isSharedRedisConfigured(),
     provider: getRedisProvider(),
+    host: isSharedRedisConfigured() ? getRedisHost() : null,
+    port: isSharedRedisConfigured() ? getRedisPort() : null,
     circuitOpen: redisDown && isCircuitOpen(),
     circuitCooldownMs: CIRCUIT_BREAKER_COOLDOWN_MS,
     consecutiveFailures,

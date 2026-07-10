@@ -1,0 +1,55 @@
+{
+  "meta": {
+    "title": "Contact ScholarX",
+    "description": "Share your questions, feedback, or partnership ideas with the ScholarX team."
+  },
+  "hero": {
+    "eyebrow": "Contact Us",
+    "title": "We would love to hear from you",
+    "description": "Share your question, feedback, or idea. Fill in the form and our team will review your message as soon as possible."
+  },
+  "form": {
+    "title": "Send us a message",
+    "ariaLabel": "Contact us form",
+    "toast": {
+      "success": "Your response was recorded.",
+      "error": "We could not record your response. Please try again."
+    },
+    "fields": {
+      "firstName": {
+        "label": "First name",
+        "placeholder": "Enter your first name"
+      },
+      "lastName": {
+        "label": "Last name",
+        "placeholder": "Enter your last name"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "you@example.com"
+      },
+      "phoneNumber": {
+        "label": "Phone number (optional)",
+        "placeholder": "+20 123 456 7890"
+      },
+      "message": {
+        "label": "Message",
+        "placeholder": "Tell us how we can help"
+      }
+    },
+    "submit": {
+      "idle": "Submit",
+      "submitting": "Submitting..."
+    },
+    "validation": {
+      "firstNameRequired": "First name is required",
+      "firstNameMax": "First name must be 50 characters or less",
+      "lastNameRequired": "Last name is required",
+      "lastNameMax": "Last name must be 50 characters or less",
+      "emailInvalid": "Enter a valid email address",
+      "phoneNumberMax": "Phone number must be 25 characters or less",
+      "messageMin": "Message must be at least 10 characters",
+      "messageMax": "Message must be 2000 characters or less"
+    }
+  }
+}

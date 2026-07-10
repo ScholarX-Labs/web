@@ -1,0 +1,70 @@
+{
+  "meta": {
+    "title": "البحث الذكي في اسكولار اكس",
+    "description": "استخدم الاكتشاف المدعوم بالذكاء الاصطناعي للعثور على المنح والفرص التعليمية بسرعة أكبر."
+  },
+  "hero": {
+    "badge": "بواسطة اسكولار اكس AI",
+    "titlePrefix": "اعثر على مستقبلك مع",
+    "titleBrand": "اسكولار اكس AI",
+    "description": "محرك اكتشاف متقدم للمنح والفرص الأكاديمية حول العالم. احصل على توصيات مخصصة خلال ثوانٍ.",
+    "placeholder": "أخبرنا عن طموحاتك وتخصصك والوجهة التي تريد الذهاب إليها...",
+    "searchAriaLabel": "استعلام البحث",
+    "tryLabel": "جرّب:",
+    "submit": "اكتشف الفرص",
+    "stats": {
+      "scholarships": "منحة",
+      "countries": "دولة",
+      "funding": "تمويل متاح"
+    },
+    "suggestions": {
+      "mastersEurope": "ماجستير ممول بالكامل في أوروبا",
+      "stemNoEssays": "منح STEM بدون مقالات",
+      "ieltsStudyAbroad": "الدراسة في الخارج مع آيلتس أقل من 6.5"
+    }
+  },
+  "results": {
+    "found": "وجدنا {count} فرصة. إليك أفضل النتائج المناسبة لملفك.",
+    "noResults": "لم يتم العثور على نتائج. جرّب استعلامًا مختلفًا.",
+    "loading": "جارٍ البحث عن الفرص...",
+    "newSearch": "بحث جديد",
+    "sortBy": "الترتيب حسب:",
+    "mostRelevant": "الأكثر صلة",
+    "nearestDeadline": "أقرب موعد نهائي",
+    "showMore": "عرض المزيد من النتائج"
+  },
+  "card": {
+    "deadline": "آخر موعد: {date}",
+    "explore": "استكشف",
+    "viewDetails": "عرض التفاصيل"
+  },
+  "modal": {
+    "eligibilityOverview": "نظرة عامة على الأهلية",
+    "requirements": "المتطلبات",
+    "benefits": "المزايا",
+    "matchScore": "درجة المطابقة من اسكولار اكس AI",
+    "fundingAmount": "قيمة التمويل",
+    "deadline": "آخر موعد",
+    "location": "الموقع",
+    "sourceWebsite": "الموقع المصدر",
+    "proceedToApplication": "الانتقال إلى التقديم",
+    "copyLink": "نسخ الرابط",
+    "copied": "تم النسخ!",
+    "closeContinue": "إغلاق ومتابعة البحث"
+  },
+  "chat": {
+    "headerTitle": "مساعد اسكولار اكس الذكي",
+    "headerStatus": "متصل • جاهز للمساعدة",
+    "liveSession": "جلسة مباشرة",
+    "mobileTitle": "البحث الذكي",
+    "emptyState": "اسأل عن المنح أو التدريب أو الزمالات أو المؤتمرات.",
+    "assistantFound": "إليك أفضل {count} فرص وجدتها بناءً على استعلامك الدلالي.",
+    "assistantError": "عذرًا، حدث خطأ أثناء البحث في قاعدة البيانات. يرجى المحاولة لاحقًا.",
+    "unknownOpportunity": "فرصة غير معروفة",
+    "global": "عالمي",
+    "rolling": "مفتوح طوال العام",
+    "fullyFunded": "ممولة بالكامل",
+    "funded": "ممولة",
+    "matchReason": "تمت المطابقة بناءً على تشابه دلالي بنسبة {percent}%."
+  }
+}

@@ -24,6 +24,7 @@ export interface AnalyticsEventRepository {
 }
 
 type AnalyticsQueryClient = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   select: (...args: unknown[]) => any;
 };
 

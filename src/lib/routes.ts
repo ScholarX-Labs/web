@@ -17,6 +17,7 @@ export const ROUTES = {
   COURSES: "/courses",
   COURSE_DETAIL: (slug: string) => `/courses/${slug}`,
   COURSE_LESSONS: (slug: string) => `/courses/${slug}/lessons`,
+  COURSE_LEADERBOARD: (slug: string) => `/courses/${slug}/leaderboard`,
   LESSON: (courseSlug: string, lessonId: string) =>
     `/courses/${courseSlug}/lessons/${lessonId}`,
   MY_COURSES: "/my-courses",
