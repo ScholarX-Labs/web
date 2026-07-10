@@ -90,7 +90,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
       {
         success: false,
         error: {
-          code: (err as any).code || "INTERNAL_ERROR",
+          code: (err as { code?: string }).code || "INTERNAL_ERROR",
           statusCode: 500,
           message: err.message || "Failed to fetch leaderboard",
         },
