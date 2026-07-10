@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("Language Switcher Journey", () => {
-  test("switches language correctly and persists selection", async ({ page, context }) => {
+  test("switches language correctly and persists selection", async ({ page }) => {
     // Visit home page (default English)
     await page.goto("/");
     await expect(page.locator("html")).toHaveAttribute("lang", "en-US");
