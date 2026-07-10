@@ -66,12 +66,6 @@ containerapp.yaml
 .env.local
 
 
-.opencode
-.agent*
-.claude
-.codex
-.config*
 .cursor
-.gemini*
 .specify*
 /task-manager
