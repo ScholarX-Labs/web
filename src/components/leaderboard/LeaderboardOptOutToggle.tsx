@@ -74,6 +74,7 @@ export function LeaderboardOptOutToggle({ courseId, isAnonymous, isGloballyPriva
                   id="opt-out" 
                   checked={true} 
                   disabled={true}
+                  onCheckedChange={() => {}}
                   className="data-[state=checked]:bg-primary opacity-50 cursor-not-allowed"
                 />
               </div>
