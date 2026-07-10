@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 process.env.DATABASE_URL = "postgres://localhost:5432/scholarx";
 process.env.BETTER_AUTH_URL = "http://localhost:3000";
 process.env.BETTER_AUTH_SECRET = "test-secret-value-longer-than-32-chars-for-safety";
