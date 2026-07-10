@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { execSync } from "node:child_process";
 import { expect, test, describe } from "vitest";
 import path from "node:path";
