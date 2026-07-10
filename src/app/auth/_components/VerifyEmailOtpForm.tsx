@@ -16,7 +16,7 @@ type AuthError = {
   code?: string;
 };
 
-function getFriendlyError(t: any, error?: AuthError): string {
+function getFriendlyError(t: (key: string) => string, error?: AuthError): string {
   if (!error) {
     return t("errors.fallback");
   }
