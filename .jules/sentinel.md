@@ -1,0 +1,4 @@
+## 2024-05-24 - Prevent Timing Attacks in Internal API Routes
+**Vulnerability:** Comparing secret keys/tokens (like `x-internal-key` against `INTERNAL_API_KEY`) using standard string equality (`===`) exposes the application to timing attacks, as string equality checks fail early.
+**Learning:** Node's `crypto.timingSafeEqual` should always be used to compare secret credentials in constant time. Note that since `timingSafeEqual` requires inputs to be Buffers of identical length, you must manually assert the byte lengths are equal (e.g. `providedBuffer.length === expectedBuffer.length`) before calling it to prevent `TypeError` exceptions.
+**Prevention:** Always use constant-time comparisons (`crypto.timingSafeEqual`) with matching length buffers when comparing sensitive values like API keys, hashes, or signatures in backend code.
