@@ -1,21 +1,26 @@
 import { z } from "zod";
 
+const secureUrlSchema = z.string().url().refine(
+  (val) => /^https?:\/\//i.test(val),
+  { message: "Must be a valid HTTP/HTTPS URL" }
+);
+
 const envSchema = z.object({
   NEXT_PUBLIC_API_URL: z.string().min(1).default("/api"),
   NEXT_PUBLIC_API_BASE_URL: z.string().min(1).default("/api"),
 
-  R2_ENDPOINT: z.string().url().optional(),
+  R2_ENDPOINT: secureUrlSchema.optional(),
   R2_ACCESS_KEY: z.string().optional(),
   R2_SECRET_KEY: z.string().optional(),
   R2_BUCKET_NAME: z.string().optional(),
-  R2_PUBLIC_URL: z.string().url().optional(),
+  R2_PUBLIC_URL: secureUrlSchema.optional(),
 
-  UPSTASH_REDIS_URL: z.string().url().optional(),
+  UPSTASH_REDIS_URL: secureUrlSchema.optional(),
   UPSTASH_REDIS_TOKEN: z.string().optional(),
 
   AVATAR_UPLOAD_ENABLED: z.enum(["true", "false"]).optional(),
 
-  BETTER_AUTH_URL: z.string().url().optional(),
+  BETTER_AUTH_URL: secureUrlSchema.optional(),
   BETTER_AUTH_SECRET: z.string().min(32).optional(),
 });
 
