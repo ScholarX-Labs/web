@@ -1,0 +1,4 @@
+## 2025-02-20 - [Timing Attack Risk in Internal API Key Checks]
+**Vulnerability:** The application used strict string equality (`===`) to compare the `x-internal-key` header with `process.env.INTERNAL_API_KEY`. This is vulnerable to timing attacks, as strict equality returns early on the first non-matching character, allowing an attacker to theoretically guess the key character by character by measuring response times. Also, if the environment variable is missing and the user sends an empty string, an auth bypass could occur.
+**Learning:** Comparing sensitive secrets like API keys or passwords requires constant-time comparison algorithms to prevent time-based side-channel attacks.
+**Prevention:** Always use `crypto.timingSafeEqual` to compare secrets. Ensure the values are first converted to Buffers, verify both the provided key and expected key are not empty or missing, and check their lengths match before performing the constant-time check.
