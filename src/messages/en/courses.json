@@ -35,6 +35,30 @@
   "hero": {
     "ourCourses": "Our Courses",
     "latestCourses": "Latest <blue>Courses</blue>",
-    "seeMore": "See more →"
+    "seeMore": "See more →",
+    "titleLine1": "Discover",
+    "titleLine2": "Our Courses",
+    "subtitle": "Scholarships, Mentorship & Skill Development Opportunities",
+    "searchPlaceholder": "Search anything",
+    "categories": "Categories",
+    "noCategories": "No categories yet",
+    "clearAll": "Clear All",
+    "searchAriaLabel": "Search",
+    "instructorAlt": "Instructor",
+    "studentAlt": "Student",
+    "studentsAvatarsAlt": "students avatars",
+    "filterTags": {
+      "careerPreparation": "Career Preparation",
+      "skillDevelopment": "Skill Development",
+      "freePaid": "Free / Paid",
+      "onlineInPerson": "Online / In-Person",
+      "internationalOpportunities": "International Opportunities"
+    },
+    "badges": {
+      "coursesCount": "5.8k",
+      "successCourses": "Success Courses",
+      "studentsCount": "10k+",
+      "student": "Student"
+    }
   }
 }
