@@ -46,7 +46,11 @@ export const createAdminCoursesService = (
     const existing = await repo.getCourse(id);
     if (!existing) throw AdminErrors.notFound("Course");
 
-    const course = await repo.updateCourse(id, parsed as UpdateCourseInput, new Date(parsed.expectedVersion));
+    const course = await repo.updateCourse(
+      id,
+      parsed as UpdateCourseInput,
+      parsed.expectedVersion ? new Date(parsed.expectedVersion) : new Date(NaN),
+    );
     await invalidatePublicCourseListCache();
     await invalidatePublicCourseDetailCache({
       courseId: id,
