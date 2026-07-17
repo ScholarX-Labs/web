@@ -66,6 +66,7 @@ import { cn } from "@/lib/utils";
 import ProgressIndicator from "@/components/ui/progress-indicator";
 import { UnsavePopup } from "@/components/ui/unsave-popup";
 import { LessonEditor } from "./_components/lesson-editor";
+import { ImageCropper } from "@/components/ui/image-cropper";
 import { 
   Dialog, 
   DialogContent, 
@@ -701,6 +702,8 @@ function MediaTab({ course, courseId }: { course: AdminCourse; courseId: string 
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [cropperOpen, setCropperOpen] = useState(false);
+  const [cropperImageSrc, setCropperImageSrc] = useState<string>("");
   const [previewUrl, setPreviewUrl] = useState<string | null>(course.imageUrl || null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const objectUrlRef = useRef<string | null>(null);
@@ -757,7 +760,7 @@ function MediaTab({ course, courseId }: { course: AdminCourse; courseId: string 
           setIsSuccess(true);
           toast.success("Course image updated successfully.");
           queryClient.invalidateQueries({ queryKey: queryKeys.admin.courses.detail(courseId) });
-          queryClient.invalidateQueries({ queryKey: queryKeys.admin.courses.list() });
+          queryClient.invalidateQueries({ queryKey: queryKeys.admin.courses.lists() });
           setTimeout(() => setIsSuccess(false), 2500);
         } else {
           toast.error(data.error || "Upload failed.");
@@ -780,9 +783,28 @@ function MediaTab({ course, courseId }: { course: AdminCourse; courseId: string 
     xhr.send(formData);
   };
 
+  const openCropper = (file: File) => {
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      toast.error("Invalid file type. Please upload a JPEG, PNG, or WebP.");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File exceeds 5MB limit.");
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(file);
+    setCropperImageSrc(objectUrl);
+    setCropperOpen(true);
+  };
+
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) processFile(file);
+    if (file) {
+      openCropper(file);
+      e.target.value = "";
+    }
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -799,7 +821,7 @@ function MediaTab({ course, courseId }: { course: AdminCourse; courseId: string 
     e.preventDefault();
     setIsDragging(false);
     const file = e.dataTransfer.files?.[0];
-    if (file) processFile(file);
+    if (file) openCropper(file);
   };
 
   return (
@@ -976,6 +998,20 @@ function MediaTab({ course, courseId }: { course: AdminCourse; courseId: string 
           </div>
         </div>
       </div>
+      <ImageCropper
+        open={cropperOpen}
+        imageSrc={cropperImageSrc}
+        aspectRatio={16 / 10}
+        onClose={() => {
+          setCropperOpen(false);
+          URL.revokeObjectURL(cropperImageSrc);
+        }}
+        onCropComplete={(croppedFile) => {
+          setCropperOpen(false);
+          URL.revokeObjectURL(cropperImageSrc);
+          processFile(croppedFile);
+        }}
+      />
     </Card>
   );
 }
