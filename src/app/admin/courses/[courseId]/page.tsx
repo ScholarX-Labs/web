@@ -122,8 +122,14 @@ export default function AdminCourseDetailPage({ params }: { params: Promise<{ co
       return;
     }
 
+    setActiveTab(id);
+  };
+
+  const handleSaveAll = async () => {
+    let dataToSave: Record<string, unknown> = pendingData ? { ...pendingData } : {};
+
     // Auto-fix missing slug if needed
-    if (c && !c.slug) {
+    if (c && !c.slug && !dataToSave.slug) {
         const generatedSlug = String(c.title ?? "")
             .toLowerCase()
             .trim()
@@ -132,23 +138,17 @@ export default function AdminCourseDetailPage({ params }: { params: Promise<{ co
             .replace(/^-+|-+$/g, "");
         
         if (generatedSlug) {
-            setPendingData({ ...pendingData, slug: generatedSlug });
-            setHasChanges(true);
-            toast.warning("Registry detected missing URL slug. Protocol auto-generated. Please save to synchronize.");
-            return;
+            dataToSave.slug = generatedSlug;
         }
     }
 
-    setActiveTab(id);
-  };
-
-  const handleSaveAll = async () => {
-    if (!pendingData) {
+    if (Object.keys(dataToSave).length === 0) {
         setHasChanges(false);
         return;
     }
+
     try {
-      await updateCourse.mutateAsync({ id: courseId, data: pendingData });
+      await updateCourse.mutateAsync({ id: courseId, data: dataToSave });
       toast.success("Curriculum node synchronized with registry core");
       setHasChanges(false);
       setPendingData(null);
@@ -639,7 +639,8 @@ function PricingTab({ course, onChanges }: { course: AdminCourse; onChanges: (da
   const handleChange = (field: string, value: string) => {
     if (field === "currentPrice") setPrice(value);
     if (field === "originalPrice") setDiscountPrice(value);
-    onChanges({ [field]: value ? Math.round(Number(value) * 100) : undefined });
+    const schemaKey = field === "currentPrice" ? "price" : field;
+    onChanges({ [schemaKey]: value ? Math.round(Number(value) * 100) : undefined });
   };
 
   return (
