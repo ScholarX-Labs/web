@@ -2,6 +2,7 @@ export type LeaderboardErrorCode =
   | "LEADERBOARD_DISABLED"
   | "NOT_ENROLLED"
   | "CACHE_UNAVAILABLE"
+  | "CACHE_NOT_READY"
   | "INVALID_WINDOW"
   | "USER_NOT_FOUND"
   | "INTERNAL_ERROR"
