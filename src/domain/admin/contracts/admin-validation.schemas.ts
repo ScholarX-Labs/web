@@ -21,7 +21,7 @@ export const CreateCourseSchema = z.object({
 });
 
 export const UpdateCourseSchema = CreateCourseSchema.partial().extend({
-  expectedVersion: z.string().datetime(),
+  expectedVersion: z.string().datetime().optional(),
 });
 
 export const CourseStatusSchema = z.object({
@@ -43,7 +43,7 @@ export const CreateLessonSchema = z.object({
 });
 
 export const UpdateLessonSchema = CreateLessonSchema.partial().extend({
-  expectedVersion: z.string().datetime(),
+  expectedVersion: z.string().datetime().optional(),
 });
 
 export const ReorderLessonsSchema = z.object({
