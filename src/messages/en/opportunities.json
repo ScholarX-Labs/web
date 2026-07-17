@@ -3,6 +3,21 @@
     "title": "ScholarX Opportunities",
     "description": "Browse scholarships and opportunities curated for ambitious learners."
   },
+  "hero": {
+    "badge": "Global Scholarship Database",
+    "title": "Browse {highlight}Opportunities{/highlight}",
+    "description": "Discover your next big step with our curated list of scholarships, grants, and programs worldwide.",
+    "aiSearch": "Try AI Search Matching",
+    "poweredBy": "Powered By ScholarX AI",
+    "ariaLabel": "Header section that includes search box"
+  },
+  "results": {
+    "found": "{count} Opportunities Found",
+    "errorTitle": "Error loading opportunities",
+    "errorDescription": "Please try again later or refresh the page.",
+    "emptyTitle": "No opportunities found",
+    "emptyDescription": "Try adjusting your search query or filters."
+  },
   "card": {
     "fullyFunded": "Fully Funded",
     "partiallyFunded": "Partially Funded",
