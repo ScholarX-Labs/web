@@ -1,0 +1,4 @@
+## 2026-07-17 - Prevent Strict Equality in Security String Comparisons
+**Vulnerability:** Comparing API keys using strict equality (`===`) instead of a timing-safe function opens up endpoints to timing attacks. Relying solely on environment variables without handling empty string/undefined values can allow a bypass if the environment is misconfigured.
+**Learning:** Found a direct string comparison for an internal API key (`INTERNAL_API_KEY`). Even internal keys should use timing-safe comparisons (`crypto.timingSafeEqual`). Crucially, if checking keys where missing env vars are possible, we must assert both sides of the comparison are present before comparing.
+**Prevention:** Use `crypto.timingSafeEqual` for secrets, and wrap it with existence and length validation checks first to avoid throwing exceptions and prevent empty string bypasses.
