@@ -60,14 +60,21 @@ export async function consumeAvatarUploadSlot(
 ): Promise<RateLimitResult> {
   const subject = buildRateLimitSubject(["avatar", userId]);
 
+  // Phase 1: Atomically peek all windows to see if any deny the request
+  const peekResults = await Promise.all(
+    AVATAR_RULES.map((rule) => peekDistributedRateLimit(rule, subject)),
+  );
+
+  const denied = peekResults.find((r) => !r.allowed);
+  if (denied && !denied.allowed) {
+    // If ANY window is exhausted, deny the request entirely without consuming quota
+    return { allowed: false, remaining: 0, reset: denied.resetAt };
+  }
+
+  // Phase 2: All windows are clear; consume a slot in every window
   const results = await Promise.all(
     AVATAR_RULES.map((rule) => checkDistributedRateLimit(rule, subject)),
   );
-
-  const denied = results.find((r) => !r.allowed);
-  if (denied && !denied.allowed) {
-    return { allowed: false, remaining: 0, reset: denied.resetAt };
-  }
 
   const bottleneck = results.reduce((min, r) =>
     r.remaining < min.remaining ? r : min,
@@ -108,14 +115,21 @@ export async function consumeCourseImageUploadSlot(
 ): Promise<RateLimitResult> {
   const subject = buildRateLimitSubject(["course-image", adminId]);
 
+  // Phase 1: Atomically peek all windows to see if any deny the request
+  const peekResults = await Promise.all(
+    COURSE_IMAGE_ADMIN_RULES.map((rule) => peekDistributedRateLimit(rule, subject)),
+  );
+
+  const denied = peekResults.find((r) => !r.allowed);
+  if (denied && !denied.allowed) {
+    // If ANY window is exhausted, deny the request entirely without consuming quota
+    return { allowed: false, remaining: 0, reset: denied.resetAt };
+  }
+
+  // Phase 2: All windows are clear; consume a slot in every window
   const results = await Promise.all(
     COURSE_IMAGE_ADMIN_RULES.map((rule) => checkDistributedRateLimit(rule, subject)),
   );
-
-  const denied = results.find((r) => !r.allowed);
-  if (denied && !denied.allowed) {
-    return { allowed: false, remaining: 0, reset: denied.resetAt };
-  }
 
   const bottleneck = results.reduce((min, r) =>
     r.remaining < min.remaining ? r : min,
