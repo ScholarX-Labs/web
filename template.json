@@ -415,6 +415,11 @@
               "name": "kv-internal-api-secret",
               "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/INTERNAL-API-SECRET",
               "identity": "system"
+            },
+            {
+              "name": "kv-course-image-upload-enabled",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/COURSE-IMAGE-UPLOAD-ENABLED",
+              "identity": "system"
             }
           ],
           "activeRevisionsMode": "Single",
@@ -693,6 +698,10 @@
                 {
                   "name": "INTERNAL_API_SECRET",
                   "secretRef": "kv-internal-api-secret"
+                },
+                {
+                  "name": "COURSE_IMAGE_UPLOAD_ENABLED",
+                  "secretRef": "kv-course-image-upload-enabled"
                 }
               ],
               "resources": {
@@ -1135,6 +1144,11 @@
               "name": "kv-internal-api-secret",
               "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/INTERNAL-API-SECRET",
               "identity": "system"
+            },
+            {
+              "name": "kv-course-image-upload-enabled",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/COURSE-IMAGE-UPLOAD-ENABLED",
+              "identity": "system"
             }
           ],
           "activeRevisionsMode": "Single",
@@ -1413,6 +1427,10 @@
                 {
                   "name": "INTERNAL_API_SECRET",
                   "secretRef": "kv-internal-api-secret"
+                },
+                {
+                  "name": "COURSE_IMAGE_UPLOAD_ENABLED",
+                  "secretRef": "kv-course-image-upload-enabled"
                 }
               ],
               "resources": {
