@@ -114,7 +114,7 @@ export interface UpdateCourseInput {
   instructorId?: string;
   seoDescription?: string;
   seoKeywords?: string;
-  expectedVersion: string;
+  expectedVersion?: string;
 }
 
 export interface CreateLessonInput {
@@ -135,7 +135,7 @@ export interface UpdateLessonInput {
   duration?: number;
   isPrivate?: boolean;
   status?: "draft" | "staging" | "published" | "archived";
-  expectedVersion: string;
+  expectedVersion?: string;
 }
 
 export interface UpdateUserInput {
