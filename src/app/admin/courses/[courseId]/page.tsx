@@ -703,7 +703,16 @@ function MediaTab({ course, courseId }: { course: AdminCourse; courseId: string 
   const [isDragging, setIsDragging] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(course.imageUrl || null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const objectUrlRef = useRef<string | null>(null);
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    return () => {
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current);
+      }
+    };
+  }, []);
 
   const processFile = (file: File) => {
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
@@ -716,7 +725,12 @@ function MediaTab({ course, courseId }: { course: AdminCourse; courseId: string 
       return;
     }
 
+    if (objectUrlRef.current) {
+      URL.revokeObjectURL(objectUrlRef.current);
+    }
+
     const objectUrl = URL.createObjectURL(file);
+    objectUrlRef.current = objectUrl;
     setPreviewUrl(objectUrl);
     setIsUploading(true);
     setUploadProgress(0);
@@ -799,14 +813,22 @@ function MediaTab({ course, courseId }: { course: AdminCourse; courseId: string 
         <div className="space-y-4">
           <label className="text-[11px] font-[900] text-slate-400 uppercase tracking-[0.25em] ml-1 block">Cover Artifact</label>
           <motion.div 
+            role="button"
+            tabIndex={isUploading ? -1 : 0}
             whileHover={!isUploading ? { scale: 1.02 } : {}}
             whileTap={!isUploading ? { scale: 0.98 } : {}}
             onClick={() => !isUploading && fileInputRef.current?.click()}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                if (!isUploading) fileInputRef.current?.click();
+              }
+            }}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             className={cn(
-              "relative aspect-[16/10] rounded-[32px] border-2 border-dashed flex flex-col items-center justify-center text-center p-8 transition-all overflow-hidden cursor-pointer group shadow-inner",
+              "relative aspect-[16/10] rounded-[32px] border-2 border-dashed flex flex-col items-center justify-center text-center p-8 transition-all overflow-hidden cursor-pointer group shadow-inner focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
               previewUrl ? "border-transparent" : "border-slate-200 bg-slate-50/50 hover:bg-white hover:border-blue-400 hover:shadow-xl hover:shadow-blue-500/5",
               isDragging && "border-blue-500 bg-blue-50/50 scale-105",
               isUploading && "opacity-90 pointer-events-none"
