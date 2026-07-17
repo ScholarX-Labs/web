@@ -59,8 +59,8 @@ export async function GET(request: NextRequest) {
         if (tier.action === "disable") {
           await setConfig("avatar_upload_enabled", "false", "system:storage-check");
           await clearConfigCache("avatar_upload_enabled");
-          await setConfig("course_image_upload_enabled", "false", "system:storage-check");
-          await clearConfigCache("course_image_upload_enabled");
+          await setConfig("course_image_upload_disabled", "true", "system:storage-check");
+          await clearConfigCache("course_image_upload_disabled");
           await sendAlert(
             `Azure Blob storage at ${totalGB.toFixed(1)}GB (${tier.label}) — auto-disabled uploads`
           );
@@ -81,7 +81,7 @@ export async function GET(request: NextRequest) {
       usagePercent: Math.round(usagePercent * 10) / 10,
       freeTierGB: FREE_TIER_GB,
       actionTaken,
-      status: actionTaken === "avatar_upload_disabled" ? "uploads_disabled" : "ok",
+      status: actionTaken === "uploads_disabled" ? "uploads_disabled" : "ok",
     });
   } catch (error) {
     console.error("[storage-check] Error:", error);
