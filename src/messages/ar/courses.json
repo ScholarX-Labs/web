@@ -35,6 +35,30 @@
   "hero": {
     "ourCourses": "دوراتنا",
     "latestCourses": "أحدث <blue>الدورات</blue>",
-    "seeMore": "عرض المزيد ←"
+    "seeMore": "عرض المزيد ←",
+    "titleLine1": "اكتشف",
+    "titleLine2": "دوراتنا",
+    "subtitle": "منح دراسية وإرشاد وفرص تطوير المهارات",
+    "searchPlaceholder": "ابحث عن أي شيء",
+    "categories": "التصنيفات",
+    "noCategories": "لا توجد تصنيفات بعد",
+    "clearAll": "مسح الكل",
+    "searchAriaLabel": "بحث",
+    "instructorAlt": "مدرب",
+    "studentAlt": "طالب",
+    "studentsAvatarsAlt": "صور الطلاب",
+    "filterTags": {
+      "careerPreparation": "الإعداد المهني",
+      "skillDevelopment": "تطوير المهارات",
+      "freePaid": "مجاني / مدفوع",
+      "onlineInPerson": "عبر الإنترنت / حضوري",
+      "internationalOpportunities": "فرص دولية"
+    },
+    "badges": {
+      "coursesCount": "٥٫٨ ألف",
+      "successCourses": "دورة ناجحة",
+      "studentsCount": "١٠ آلاف+",
+      "student": "طالب"
+    }
   }
 }

@@ -9,6 +9,7 @@ import { useOpportunitiesSearch as useOpportunitiesQuery } from "@/hooks/queries
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 const outfit = Outfit({ subsets: ["latin"] });
 
@@ -55,6 +56,8 @@ const containerVariants = {
 };
 
 function OpportunitySection() {
+  const t = useTranslations("opportunities");
+
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -93,8 +96,8 @@ function OpportunitySection() {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center p-20 text-red-500">
-        <h3 className="text-xl font-semibold">Error loading opportunities</h3>
-        <p>Please try again later or refresh the page.</p>
+        <h3 className="text-xl font-semibold">{t("results.errorTitle")}</h3>
+        <p>{t("results.errorDescription")}</p>
       </div>
     );
   }
@@ -128,10 +131,7 @@ function OpportunitySection() {
         transition={{ duration: 0.5 }}
       >
         <h2 className={`text-4xl font-extrabold tracking-tight ${outfit.className}`}>
-          {formattedTotal}{" "}
-          <span className="text-primary bg-primary/10 px-4 py-1 rounded-2xl">
-            Opportunities Found
-          </span>
+          {t("results.found", { count: formattedTotal })}
         </h2>
       </motion.div>
 
@@ -158,8 +158,8 @@ function OpportunitySection() {
              <Search size={48} />
           </div>
           <div className="text-center">
-            <h3 className="text-2xl font-bold text-slate-900 dark:text-white">No opportunities found</h3>
-            <p>Try adjusting your search query or filters.</p>
+            <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{t("results.emptyTitle")}</h3>
+            <p>{t("results.emptyDescription")}</p>
           </div>
         </motion.div>
       )}

@@ -17,6 +17,11 @@ const AVATAR_RULES = [
   { id: "avatar.upload.user.month", windowSeconds: 30 * 24 * 60 * 60,  maxRequests: 10, failureMode: "fail-closed" as const },
 ];
 
+const COURSE_IMAGE_ADMIN_RULES = [
+  { id: "course.image.upload.admin.hour",  windowSeconds: 60 * 60,      maxRequests: 20,  failureMode: "fail-closed" as const },
+  { id: "course.image.upload.admin.day",   windowSeconds: 24 * 60 * 60, maxRequests: 50,  failureMode: "fail-closed" as const },
+];
+
 /**
  * Read-only budget check — does NOT consume a rate-limit slot.
  * Call this at the start of the request to gate it cheaply.
@@ -55,14 +60,76 @@ export async function consumeAvatarUploadSlot(
 ): Promise<RateLimitResult> {
   const subject = buildRateLimitSubject(["avatar", userId]);
 
+  // Phase 1: Atomically peek all windows to see if any deny the request
+  const peekResults = await Promise.all(
+    AVATAR_RULES.map((rule) => peekDistributedRateLimit(rule, subject)),
+  );
+
+  const denied = peekResults.find((r) => !r.allowed);
+  if (denied && !denied.allowed) {
+    // If ANY window is exhausted, deny the request entirely without consuming quota
+    return { allowed: false, remaining: 0, reset: denied.resetAt };
+  }
+
+  // Phase 2: All windows are clear; consume a slot in every window
   const results = await Promise.all(
     AVATAR_RULES.map((rule) => checkDistributedRateLimit(rule, subject)),
+  );
+
+  const bottleneck = results.reduce((min, r) =>
+    r.remaining < min.remaining ? r : min,
+  );
+  return {
+    allowed: true,
+    remaining: bottleneck.remaining,
+    reset: bottleneck.resetAt,
+  };
+}
+
+export async function peekCourseImageUploadLimit(
+  adminId: string
+): Promise<RateLimitResult> {
+  const subject = buildRateLimitSubject(["course-image", adminId]);
+
+  const results = await Promise.all(
+    COURSE_IMAGE_ADMIN_RULES.map((rule) => peekDistributedRateLimit(rule, subject)),
   );
 
   const denied = results.find((r) => !r.allowed);
   if (denied && !denied.allowed) {
     return { allowed: false, remaining: 0, reset: denied.resetAt };
   }
+
+  const bottleneck = results.reduce((min, r) =>
+    r.remaining < min.remaining ? r : min,
+  );
+  return {
+    allowed: true,
+    remaining: bottleneck.remaining,
+    reset: bottleneck.resetAt,
+  };
+}
+
+export async function consumeCourseImageUploadSlot(
+  adminId: string
+): Promise<RateLimitResult> {
+  const subject = buildRateLimitSubject(["course-image", adminId]);
+
+  // Phase 1: Atomically peek all windows to see if any deny the request
+  const peekResults = await Promise.all(
+    COURSE_IMAGE_ADMIN_RULES.map((rule) => peekDistributedRateLimit(rule, subject)),
+  );
+
+  const denied = peekResults.find((r) => !r.allowed);
+  if (denied && !denied.allowed) {
+    // If ANY window is exhausted, deny the request entirely without consuming quota
+    return { allowed: false, remaining: 0, reset: denied.resetAt };
+  }
+
+  // Phase 2: All windows are clear; consume a slot in every window
+  const results = await Promise.all(
+    COURSE_IMAGE_ADMIN_RULES.map((rule) => checkDistributedRateLimit(rule, subject)),
+  );
 
   const bottleneck = results.reduce((min, r) =>
     r.remaining < min.remaining ? r : min,

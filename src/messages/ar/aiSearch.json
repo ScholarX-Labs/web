@@ -12,6 +12,10 @@
     "searchAriaLabel": "استعلام البحث",
     "tryLabel": "جرّب:",
     "submit": "اكتشف الفرص",
+    "searching": "جارٍ البحث...",
+    "submitAlt": "اكتشاف التطابقات",
+    "poweredBy": "بحث ذكي \u00B7 بواسطة اسكولار اكس AI",
+    "tryChipLabel": "جرّب \"{text}\"",
     "stats": {
       "scholarships": "منحة",
       "countries": "دولة",
@@ -31,7 +35,16 @@
     "sortBy": "الترتيب حسب:",
     "mostRelevant": "الأكثر صلة",
     "nearestDeadline": "أقرب موعد نهائي",
-    "showMore": "عرض المزيد من النتائج"
+    "showMore": "عرض المزيد من النتائج",
+    "title": "النتائج",
+    "foundDescription": "تم العثور على {count} فرصة مطابقة",
+    "sortLabel": "ترتيب:",
+    "bestMatch": "أفضل تطابق",
+    "deadline": "الموعد النهائي",
+    "loadMore": "تحميل المزيد من النتائج",
+    "noResultsTitle": "لم يتم العثور على نتائج",
+    "noResultsDescription": "حاول تعديل معايير البحث أو استكشف اقتراحاتنا للعثور على الفرصة المثالية.",
+    "tryNewSearch": "جرب بحثًا جديدًا"
   },
   "card": {
     "deadline": "آخر موعد: {date}",
@@ -54,7 +67,7 @@
   },
   "chat": {
     "headerTitle": "مساعد اسكولار اكس الذكي",
-    "headerStatus": "متصل • جاهز للمساعدة",
+    "headerStatus": "متصل \u2022 جاهز للمساعدة",
     "liveSession": "جلسة مباشرة",
     "mobileTitle": "البحث الذكي",
     "emptyState": "اسأل عن المنح أو التدريب أو الزمالات أو المؤتمرات.",

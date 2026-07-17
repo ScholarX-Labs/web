@@ -1,0 +1,1486 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "containerapps_scholarx_web_aca_name": {
+      "defaultValue": "scholarx-web-aca",
+      "type": "String"
+    },
+    "containerapps_scholarx_worker_name": {
+      "defaultValue": "scholarx-worker",
+      "type": "String"
+    },
+    "managedEnvironments_ScholarX_Production_externalid": {
+      "defaultValue": "/subscriptions/17a9feec-1693-4172-baee-d775ee485433/resourceGroups/ScholarX_Production/providers/Microsoft.App/managedEnvironments/ScholarX-Production",
+      "type": "String"
+    },
+    "imageTag": {
+      "defaultValue": "latest",
+      "type": "String",
+      "metadata": {
+        "description": "Immutable image tag or digest for scholarx-web and scholarx-certificate-worker. Set to a specific SHA tag or digest at deploy-time; never leave as 'latest' in production."
+      }
+    }
+  },
+  "variables": {},
+  "resources": [
+    {
+      "type": "Microsoft.App/containerapps",
+      "apiVersion": "2025-10-02-preview",
+      "name": "[parameters('containerapps_scholarx_web_aca_name')]",
+      "location": "France Central",
+      "tags": {
+        "Project": "ScholarX",
+        "Environment": "Production",
+        "Role": "Frontend"
+      },
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "managedEnvironmentId": "[parameters('managedEnvironments_ScholarX_Production_externalid')]",
+        "environmentId": "[parameters('managedEnvironments_ScholarX_Production_externalid')]",
+        "workloadProfileName": "Consumption",
+        "configuration": {
+          "secrets": [
+            {
+              "name": "kv-abstract-api-key",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/ABSTRACT-API-KEY",
+              "identity": "system"
+            },
+            {
+              "name": "kv-admin-email",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/ADMIN-EMAIL",
+              "identity": "system"
+            },
+            {
+              "name": "kv-azure-redis-cluster",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/AZURE-REDIS-CLUSTER",
+              "identity": "system"
+            },
+            {
+              "name": "kv-azure-redis-host",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/AZURE-REDIS-HOST",
+              "identity": "system"
+            },
+            {
+              "name": "kv-azure-redis-key",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/AZURE-REDIS-KEY",
+              "identity": "system"
+            },
+            {
+              "name": "kv-azure-redis-port",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/AZURE-REDIS-PORT",
+              "identity": "system"
+            },
+            {
+              "name": "kv-better-auth-secret",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/BETTER-AUTH-SECRET",
+              "identity": "system"
+            },
+            {
+              "name": "kv-better-auth-url",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/BETTER-AUTH-URL",
+              "identity": "system"
+            },
+            {
+              "name": "kv-cache-debug",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/CACHE-DEBUG",
+              "identity": "system"
+            },
+            {
+              "name": "kv-cache-enable-stats",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/CACHE-ENABLE-STATS",
+              "identity": "system"
+            },
+            {
+              "name": "kv-cache-ttl-course",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/CACHE-TTL-COURSE",
+              "identity": "system"
+            },
+            {
+              "name": "kv-cache-ttl-course-list",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/CACHE-TTL-COURSE-LIST",
+              "identity": "system"
+            },
+            {
+              "name": "kv-cache-ttl-default",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/CACHE-TTL-DEFAULT",
+              "identity": "system"
+            },
+            {
+              "name": "kv-cache-ttl-subscription",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/CACHE-TTL-SUBSCRIPTION",
+              "identity": "system"
+            },
+            {
+              "name": "kv-cache-ttl-user",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/CACHE-TTL-USER",
+              "identity": "system"
+            },
+            {
+              "name": "kv-cache-version",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/CACHE-VERSION",
+              "identity": "system"
+            },
+            {
+              "name": "kv-cloudinary-api-key",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/CLOUDINARY-API-KEY",
+              "identity": "system"
+            },
+            {
+              "name": "kv-cloudinary-api-secret",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/CLOUDINARY-API-SECRET",
+              "identity": "system"
+            },
+            {
+              "name": "kv-cloudinary-cloud-name",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/CLOUDINARY-CLOUD-NAME",
+              "identity": "system"
+            },
+            {
+              "name": "kv-cors-allowed-origins",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/CORS-ALLOWED-ORIGINS",
+              "identity": "system"
+            },
+            {
+              "name": "kv-database-url",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/DATABASE-URL",
+              "identity": "system"
+            },
+            {
+              "name": "kv-doppler-config",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/DOPPLER-CONFIG",
+              "identity": "system"
+            },
+            {
+              "name": "kv-doppler-environment",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/DOPPLER-ENVIRONMENT",
+              "identity": "system"
+            },
+            {
+              "name": "kv-doppler-project",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/DOPPLER-PROJECT",
+              "identity": "system"
+            },
+            {
+              "name": "kv-email-password",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/EMAIL-PASSWORD",
+              "identity": "system"
+            },
+            {
+              "name": "kv-email-service-enabled",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/EMAIL-SERVICE-ENABLED",
+              "identity": "system"
+            },
+            {
+              "name": "kv-email-user",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/EMAIL-USER",
+              "identity": "system"
+            },
+            {
+              "name": "kv-email-validation-enabled",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/EMAIL-VALIDATION-ENABLED",
+              "identity": "system"
+            },
+            {
+              "name": "kv-email-verification-mode",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/EMAIL-VERIFICATION-MODE",
+              "identity": "system"
+            },
+            {
+              "name": "kv-front-end-url",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/FRONT-END-URL",
+              "identity": "system"
+            },
+            {
+              "name": "kv-frontend-url",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/FRONTEND-URL",
+              "identity": "system"
+            },
+            {
+              "name": "kv-google-client-id",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/GOOGLE-CLIENT-ID",
+              "identity": "system"
+            },
+            {
+              "name": "kv-google-client-secret",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/GOOGLE-CLIENT-SECRET",
+              "identity": "system"
+            },
+            {
+              "name": "kv-infrastructure-signature",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/INFRASTRUCTURE-SIGNATURE",
+              "identity": "system"
+            },
+            {
+              "name": "kv-internal-auth-bridge-secret",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/INTERNAL-AUTH-BRIDGE-SECRET",
+              "identity": "system"
+            },
+            {
+              "name": "kv-jwt-secret",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/JWT-SECRET",
+              "identity": "system"
+            },
+            {
+              "name": "kv-maintenance-allow-health",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/MAINTENANCE-ALLOW-HEALTH",
+              "identity": "system"
+            },
+            {
+              "name": "kv-maintenance-end-time",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/MAINTENANCE-END-TIME",
+              "identity": "system"
+            },
+            {
+              "name": "kv-maintenance-message",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/MAINTENANCE-MESSAGE",
+              "identity": "system"
+            },
+            {
+              "name": "kv-maintenance-mode",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/MAINTENANCE-MODE",
+              "identity": "system"
+            },
+            {
+              "name": "kv-mongodb-uri",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/MONGODB-URI",
+              "identity": "system"
+            },
+            {
+              "name": "kv-next-public-api-base-url",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/NEXT-PUBLIC-API-BASE-URL",
+              "identity": "system"
+            },
+            {
+              "name": "kv-paymob-api-key",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/PAYMOB-API-KEY",
+              "identity": "system"
+            },
+            {
+              "name": "kv-paymob-iframe-id",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/PAYMOB-IFRAME-ID",
+              "identity": "system"
+            },
+            {
+              "name": "kv-paymob-integration-id",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/PAYMOB-INTEGRATION-ID",
+              "identity": "system"
+            },
+            {
+              "name": "kv-remote-config-url",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/REMOTE-CONFIG-URL",
+              "identity": "system"
+            },
+            {
+              "name": "kv-session-secret",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/SESSION-SECRET",
+              "identity": "system"
+            },
+            {
+              "name": "kv-tz",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/TZ",
+              "identity": "system"
+            },
+            {
+              "name": "kv-next-public-sentry-dsn",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/NEXT-PUBLIC-SENTRY-DSN",
+              "identity": "system"
+            },
+            {
+              "name": "kv-sentry-dsn",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/SENTRY-DSN",
+              "identity": "system"
+            },
+            {
+              "name": "kv-sentry-org",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/SENTRY-ORG",
+              "identity": "system"
+            },
+            {
+              "name": "kv-sentry-project",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/SENTRY-PROJECT",
+              "identity": "system"
+            },
+            {
+              "name": "kv-sentry-auth-token",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/SENTRY-AUTH-TOKEN",
+              "identity": "system"
+            },
+            {
+              "name": "kv-azure-storage-connection-string",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/AZURE-STORAGE-CONNECTION-STRING",
+              "identity": "system"
+            },
+            {
+              "name": "kv-certificate-storage-container",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/CERTIFICATE-STORAGE-CONTAINER",
+              "identity": "system"
+            },
+            {
+              "name": "kv-certificate-storage-account-name",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/CERTIFICATE-STORAGE-ACCOUNT-NAME",
+              "identity": "system"
+            },
+            {
+              "name": "kv-certificate-queue-adapter",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/CERTIFICATE-QUEUE-ADAPTER",
+              "identity": "system"
+            },
+            {
+              "name": "kv-certificate-storage-adapter",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/CERTIFICATE-STORAGE-ADAPTER",
+              "identity": "system"
+            },
+            {
+              "name": "kv-azure-service-bus-connection-string",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/AZURE-SERVICE-BUS-CONNECTION-STRING",
+              "identity": "system"
+            },
+            {
+              "name": "kv-certificate-renderer-adapter",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/CERTIFICATE-RENDERER-ADAPTER",
+              "identity": "system"
+            },
+            {
+              "name": "kv-azure-redis-tls",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/AZURE-REDIS-TLS",
+              "identity": "system"
+            },
+            {
+              "name": "kv-redis-key-prefix",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/REDIS-KEY-PREFIX",
+              "identity": "system"
+            },
+            {
+              "name": "kv-cache-enabled",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/CACHE-ENABLED",
+              "identity": "system"
+            },
+            {
+              "name": "kv-distributed-rate-limits-enabled",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/DISTRIBUTED-RATE-LIMITS-ENABLED",
+              "identity": "system"
+            },
+            {
+              "name": "kv-redis-connect-timeout-ms",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/REDIS-CONNECT-TIMEOUT-MS",
+              "identity": "system"
+            },
+            {
+              "name": "kv-redis-command-timeout-ms",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/REDIS-COMMAND-TIMEOUT-MS",
+              "identity": "system"
+            },
+            {
+              "name": "kv-redis-max-retries-per-request",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/REDIS-MAX-RETRIES-PER-REQUEST",
+              "identity": "system"
+            },
+            {
+              "name": "kv-scholarx-executive-dashboard-enabled",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/SCHOLARX-EXECUTIVE-DASHBOARD-ENABLED",
+              "identity": "system"
+            },
+            {
+              "name": "kv-scholarx-executive-team-ops-enabled",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/SCHOLARX-EXECUTIVE-TEAM-OPS-ENABLED",
+              "identity": "system"
+            },
+            {
+              "name": "kv-scholarx-executive-finance-enabled",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/SCHOLARX-EXECUTIVE-FINANCE-ENABLED",
+              "identity": "system"
+            },
+            {
+              "name": "kv-scholarx-executive-governance-enabled",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/SCHOLARX-EXECUTIVE-GOVERNANCE-ENABLED",
+              "identity": "system"
+            },
+            {
+              "name": "kv-scholarx-executive-ai-heatmap-enabled",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/SCHOLARX-EXECUTIVE-AI-HEATMAP-ENABLED",
+              "identity": "system"
+            },
+            {
+              "name": "kv-next-public-posthog-key",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/NEXT-PUBLIC-POSTHOG-KEY",
+              "identity": "system"
+            },
+            {
+              "name": "kv-next-public-posthog-host",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/NEXT-PUBLIC-POSTHOG-HOST",
+              "identity": "system"
+            },
+            {
+              "name": "kv-next-public-posthog-ui-host",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/NEXT-PUBLIC-POSTHOG-UI-HOST",
+              "identity": "system"
+            },
+            {
+              "name": "kv-internal-api-secret",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/INTERNAL-API-SECRET",
+              "identity": "system"
+            },
+            {
+              "name": "kv-course-image-upload-enabled",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/COURSE-IMAGE-UPLOAD-ENABLED",
+              "identity": "system"
+            }
+          ],
+          "activeRevisionsMode": "Single",
+          "ingress": {
+            "external": true,
+            "targetPort": 3000,
+            "exposedPort": 0,
+            "transport": "Auto",
+            "traffic": [
+              {
+                "weight": 100,
+                "latestRevision": true
+              }
+            ],
+            "allowInsecure": false
+          },
+          "registries": [
+            {
+              "server": "scholarxregistry.azurecr.io",
+              "identity": "system"
+            }
+          ],
+          "identitySettings": [],
+          "maxInactiveRevisions": 100
+        },
+        "template": {
+          "containers": [
+            {
+              "image": "[concat('scholarxregistry.azurecr.io/scholarx-web:', parameters('imageTag'))]",
+              "imageType": "ContainerImage",
+              "name": "scholarx-web-container",
+              "env": [
+                {
+                  "name": "ABSTRACT_API_KEY",
+                  "secretRef": "kv-abstract-api-key"
+                },
+                { "name": "ADMIN_EMAIL", "secretRef": "kv-admin-email" },
+                {
+                  "name": "AZURE_REDIS_CLUSTER",
+                  "secretRef": "kv-azure-redis-cluster"
+                },
+                {
+                  "name": "AZURE_REDIS_HOST",
+                  "secretRef": "kv-azure-redis-host"
+                },
+                {
+                  "name": "AZURE_REDIS_KEY",
+                  "secretRef": "kv-azure-redis-key"
+                },
+                {
+                  "name": "AZURE_REDIS_PORT",
+                  "secretRef": "kv-azure-redis-port"
+                },
+                {
+                  "name": "BETTER_AUTH_SECRET",
+                  "secretRef": "kv-better-auth-secret"
+                },
+                {
+                  "name": "BETTER_AUTH_URL",
+                  "secretRef": "kv-better-auth-url"
+                },
+                { "name": "CACHE_DEBUG", "secretRef": "kv-cache-debug" },
+                {
+                  "name": "CACHE_ENABLE_STATS",
+                  "secretRef": "kv-cache-enable-stats"
+                },
+                {
+                  "name": "CACHE_TTL_COURSE",
+                  "secretRef": "kv-cache-ttl-course"
+                },
+                {
+                  "name": "CACHE_TTL_COURSE_LIST",
+                  "secretRef": "kv-cache-ttl-course-list"
+                },
+                {
+                  "name": "CACHE_TTL_DEFAULT",
+                  "secretRef": "kv-cache-ttl-default"
+                },
+                {
+                  "name": "CACHE_TTL_SUBSCRIPTION",
+                  "secretRef": "kv-cache-ttl-subscription"
+                },
+                { "name": "CACHE_TTL_USER", "secretRef": "kv-cache-ttl-user" },
+                { "name": "CACHE_VERSION", "secretRef": "kv-cache-version" },
+                {
+                  "name": "CLOUDINARY_API_KEY",
+                  "secretRef": "kv-cloudinary-api-key"
+                },
+                {
+                  "name": "CLOUDINARY_API_SECRET",
+                  "secretRef": "kv-cloudinary-api-secret"
+                },
+                {
+                  "name": "CLOUDINARY_CLOUD_NAME",
+                  "secretRef": "kv-cloudinary-cloud-name"
+                },
+                {
+                  "name": "CORS_ALLOWED_ORIGINS",
+                  "secretRef": "kv-cors-allowed-origins"
+                },
+                { "name": "DATABASE_URL", "secretRef": "kv-database-url" },
+                { "name": "DOPPLER_CONFIG", "secretRef": "kv-doppler-config" },
+                {
+                  "name": "DOPPLER_ENVIRONMENT",
+                  "secretRef": "kv-doppler-environment"
+                },
+                {
+                  "name": "DOPPLER_PROJECT",
+                  "secretRef": "kv-doppler-project"
+                },
+                { "name": "EMAIL_PASSWORD", "secretRef": "kv-email-password" },
+                {
+                  "name": "EMAIL_SERVICE_ENABLED",
+                  "secretRef": "kv-email-service-enabled"
+                },
+                { "name": "EMAIL_USER", "secretRef": "kv-email-user" },
+                {
+                  "name": "EMAIL_VALIDATION_ENABLED",
+                  "secretRef": "kv-email-validation-enabled"
+                },
+                {
+                  "name": "EMAIL_VERIFICATION_MODE",
+                  "secretRef": "kv-email-verification-mode"
+                },
+                { "name": "FRONT_END_URL", "secretRef": "kv-front-end-url" },
+                { "name": "FRONTEND_URL", "secretRef": "kv-frontend-url" },
+                {
+                  "name": "GOOGLE_CLIENT_ID",
+                  "secretRef": "kv-google-client-id"
+                },
+                {
+                  "name": "GOOGLE_CLIENT_SECRET",
+                  "secretRef": "kv-google-client-secret"
+                },
+                {
+                  "name": "INFRASTRUCTURE_SIGNATURE",
+                  "secretRef": "kv-infrastructure-signature"
+                },
+                {
+                  "name": "INTERNAL_AUTH_BRIDGE_SECRET",
+                  "secretRef": "kv-internal-auth-bridge-secret"
+                },
+                { "name": "JWT_SECRET", "secretRef": "kv-jwt-secret" },
+                {
+                  "name": "MAINTENANCE_ALLOW_HEALTH",
+                  "secretRef": "kv-maintenance-allow-health"
+                },
+                {
+                  "name": "MAINTENANCE_END_TIME",
+                  "secretRef": "kv-maintenance-end-time"
+                },
+                {
+                  "name": "MAINTENANCE_MESSAGE",
+                  "secretRef": "kv-maintenance-message"
+                },
+                {
+                  "name": "MAINTENANCE_MODE",
+                  "secretRef": "kv-maintenance-mode"
+                },
+                { "name": "MONGODB_URI", "secretRef": "kv-mongodb-uri" },
+                {
+                  "name": "NEXT_PUBLIC_API_BASE_URL",
+                  "secretRef": "kv-next-public-api-base-url"
+                },
+                { "name": "PAYMOB_API_KEY", "secretRef": "kv-paymob-api-key" },
+                {
+                  "name": "PAYMOB_IFRAME_ID",
+                  "secretRef": "kv-paymob-iframe-id"
+                },
+                {
+                  "name": "PAYMOB_INTEGRATION_ID",
+                  "secretRef": "kv-paymob-integration-id"
+                },
+                {
+                  "name": "REMOTE_CONFIG_URL",
+                  "secretRef": "kv-remote-config-url"
+                },
+                { "name": "SESSION_SECRET", "secretRef": "kv-session-secret" },
+                { "name": "TZ", "secretRef": "kv-tz" },
+                {
+                  "name": "NEXT_PUBLIC_SENTRY_DSN",
+                  "secretRef": "kv-next-public-sentry-dsn"
+                },
+                { "name": "SENTRY_DSN", "secretRef": "kv-sentry-dsn" },
+                { "name": "SENTRY_ORG", "secretRef": "kv-sentry-org" },
+                { "name": "SENTRY_PROJECT", "secretRef": "kv-sentry-project" },
+                {
+                  "name": "SENTRY_AUTH_TOKEN",
+                  "secretRef": "kv-sentry-auth-token"
+                },
+                {
+                  "name": "AZURE_STORAGE_CONNECTION_STRING",
+                  "secretRef": "kv-azure-storage-connection-string"
+                },
+                {
+                  "name": "CERTIFICATE_STORAGE_CONTAINER",
+                  "secretRef": "kv-certificate-storage-container"
+                },
+                {
+                  "name": "CERTIFICATE_STORAGE_ACCOUNT_NAME",
+                  "secretRef": "kv-certificate-storage-account-name"
+                },
+                {
+                  "name": "CERTIFICATE_QUEUE_ADAPTER",
+                  "secretRef": "kv-certificate-queue-adapter"
+                },
+                {
+                  "name": "CERTIFICATE_STORAGE_ADAPTER",
+                  "secretRef": "kv-certificate-storage-adapter"
+                },
+                {
+                  "name": "AZURE_SERVICE_BUS_CONNECTION_STRING",
+                  "secretRef": "kv-azure-service-bus-connection-string"
+                },
+                {
+                  "name": "CERTIFICATE_RENDERER_ADAPTER",
+                  "secretRef": "kv-certificate-renderer-adapter"
+                },
+                {
+                  "name": "AZURE_REDIS_TLS",
+                  "secretRef": "kv-azure-redis-tls"
+                },
+                {
+                  "name": "REDIS_KEY_PREFIX",
+                  "secretRef": "kv-redis-key-prefix"
+                },
+                { "name": "CACHE_ENABLED", "secretRef": "kv-cache-enabled" },
+                {
+                  "name": "DISTRIBUTED_RATE_LIMITS_ENABLED",
+                  "secretRef": "kv-distributed-rate-limits-enabled"
+                },
+                {
+                  "name": "REDIS_CONNECT_TIMEOUT_MS",
+                  "secretRef": "kv-redis-connect-timeout-ms"
+                },
+                {
+                  "name": "REDIS_COMMAND_TIMEOUT_MS",
+                  "secretRef": "kv-redis-command-timeout-ms"
+                },
+                {
+                  "name": "REDIS_MAX_RETRIES_PER_REQUEST",
+                  "secretRef": "kv-redis-max-retries-per-request"
+                },
+                {
+                  "name": "SCHOLARX_EXECUTIVE_DASHBOARD_ENABLED",
+                  "secretRef": "kv-scholarx-executive-dashboard-enabled"
+                },
+                {
+                  "name": "SCHOLARX_EXECUTIVE_TEAM_OPS_ENABLED",
+                  "secretRef": "kv-scholarx-executive-team-ops-enabled"
+                },
+                {
+                  "name": "SCHOLARX_EXECUTIVE_FINANCE_ENABLED",
+                  "secretRef": "kv-scholarx-executive-finance-enabled"
+                },
+                {
+                  "name": "SCHOLARX_EXECUTIVE_GOVERNANCE_ENABLED",
+                  "secretRef": "kv-scholarx-executive-governance-enabled"
+                },
+                {
+                  "name": "SCHOLARX_EXECUTIVE_AI_HEATMAP_ENABLED",
+                  "secretRef": "kv-scholarx-executive-ai-heatmap-enabled"
+                },
+                {
+                  "name": "NEXT_PUBLIC_POSTHOG_KEY",
+                  "secretRef": "kv-next-public-posthog-key"
+                },
+                {
+                  "name": "NEXT_PUBLIC_POSTHOG_HOST",
+                  "secretRef": "kv-next-public-posthog-host"
+                },
+                {
+                  "name": "NEXT_PUBLIC_POSTHOG_UI_HOST",
+                  "secretRef": "kv-next-public-posthog-ui-host"
+                },
+                {
+                  "name": "INTERNAL_API_SECRET",
+                  "secretRef": "kv-internal-api-secret"
+                },
+                {
+                  "name": "COURSE_IMAGE_UPLOAD_ENABLED",
+                  "secretRef": "kv-course-image-upload-enabled"
+                }
+              ],
+              "resources": {
+                "cpu": 0.25,
+                "memory": "0.5Gi"
+              },
+              "probes": [
+                {
+                  "type": "Liveness",
+                  "failureThreshold": 3,
+                  "periodSeconds": 10,
+                  "successThreshold": 1,
+                  "tcpSocket": { "port": 3000 },
+                  "timeoutSeconds": 5
+                },
+                {
+                  "type": "Readiness",
+                  "failureThreshold": 48,
+                  "periodSeconds": 5,
+                  "successThreshold": 1,
+                  "tcpSocket": { "port": 3000 },
+                  "timeoutSeconds": 5
+                },
+                {
+                  "type": "Startup",
+                  "failureThreshold": 240,
+                  "initialDelaySeconds": 1,
+                  "periodSeconds": 1,
+                  "successThreshold": 1,
+                  "tcpSocket": { "port": 3000 },
+                  "timeoutSeconds": 3
+                }
+              ]
+            }
+          ],
+          "scale": {
+            "minReplicas": 0,
+            "maxReplicas": 10,
+            "cooldownPeriod": 300,
+            "pollingInterval": 30
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.App/containerapps",
+      "apiVersion": "2025-10-02-preview",
+      "name": "[parameters('containerapps_scholarx_worker_name')]",
+      "location": "France Central",
+      "tags": {
+        "Project": "ScholarX",
+        "Environment": "Production",
+        "Role": "Worker"
+      },
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "managedEnvironmentId": "[parameters('managedEnvironments_ScholarX_Production_externalid')]",
+        "environmentId": "[parameters('managedEnvironments_ScholarX_Production_externalid')]",
+        "workloadProfileName": "Consumption",
+        "configuration": {
+          "secrets": [
+            {
+              "name": "kv-abstract-api-key",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/ABSTRACT-API-KEY",
+              "identity": "system"
+            },
+            {
+              "name": "kv-admin-email",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/ADMIN-EMAIL",
+              "identity": "system"
+            },
+            {
+              "name": "kv-azure-redis-cluster",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/AZURE-REDIS-CLUSTER",
+              "identity": "system"
+            },
+            {
+              "name": "kv-azure-redis-host",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/AZURE-REDIS-HOST",
+              "identity": "system"
+            },
+            {
+              "name": "kv-azure-redis-key",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/AZURE-REDIS-KEY",
+              "identity": "system"
+            },
+            {
+              "name": "kv-azure-redis-port",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/AZURE-REDIS-PORT",
+              "identity": "system"
+            },
+            {
+              "name": "kv-better-auth-secret",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/BETTER-AUTH-SECRET",
+              "identity": "system"
+            },
+            {
+              "name": "kv-better-auth-url",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/BETTER-AUTH-URL",
+              "identity": "system"
+            },
+            {
+              "name": "kv-cache-debug",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/CACHE-DEBUG",
+              "identity": "system"
+            },
+            {
+              "name": "kv-cache-enable-stats",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/CACHE-ENABLE-STATS",
+              "identity": "system"
+            },
+            {
+              "name": "kv-cache-ttl-course",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/CACHE-TTL-COURSE",
+              "identity": "system"
+            },
+            {
+              "name": "kv-cache-ttl-course-list",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/CACHE-TTL-COURSE-LIST",
+              "identity": "system"
+            },
+            {
+              "name": "kv-cache-ttl-default",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/CACHE-TTL-DEFAULT",
+              "identity": "system"
+            },
+            {
+              "name": "kv-cache-ttl-subscription",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/CACHE-TTL-SUBSCRIPTION",
+              "identity": "system"
+            },
+            {
+              "name": "kv-cache-ttl-user",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/CACHE-TTL-USER",
+              "identity": "system"
+            },
+            {
+              "name": "kv-cache-version",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/CACHE-VERSION",
+              "identity": "system"
+            },
+            {
+              "name": "kv-cloudinary-api-key",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/CLOUDINARY-API-KEY",
+              "identity": "system"
+            },
+            {
+              "name": "kv-cloudinary-api-secret",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/CLOUDINARY-API-SECRET",
+              "identity": "system"
+            },
+            {
+              "name": "kv-cloudinary-cloud-name",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/CLOUDINARY-CLOUD-NAME",
+              "identity": "system"
+            },
+            {
+              "name": "kv-cors-allowed-origins",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/CORS-ALLOWED-ORIGINS",
+              "identity": "system"
+            },
+            {
+              "name": "kv-database-url",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/DATABASE-URL",
+              "identity": "system"
+            },
+            {
+              "name": "kv-doppler-config",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/DOPPLER-CONFIG",
+              "identity": "system"
+            },
+            {
+              "name": "kv-doppler-environment",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/DOPPLER-ENVIRONMENT",
+              "identity": "system"
+            },
+            {
+              "name": "kv-doppler-project",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/DOPPLER-PROJECT",
+              "identity": "system"
+            },
+            {
+              "name": "kv-email-password",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/EMAIL-PASSWORD",
+              "identity": "system"
+            },
+            {
+              "name": "kv-email-service-enabled",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/EMAIL-SERVICE-ENABLED",
+              "identity": "system"
+            },
+            {
+              "name": "kv-email-user",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/EMAIL-USER",
+              "identity": "system"
+            },
+            {
+              "name": "kv-email-validation-enabled",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/EMAIL-VALIDATION-ENABLED",
+              "identity": "system"
+            },
+            {
+              "name": "kv-email-verification-mode",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/EMAIL-VERIFICATION-MODE",
+              "identity": "system"
+            },
+            {
+              "name": "kv-front-end-url",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/FRONT-END-URL",
+              "identity": "system"
+            },
+            {
+              "name": "kv-frontend-url",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/FRONTEND-URL",
+              "identity": "system"
+            },
+            {
+              "name": "kv-google-client-id",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/GOOGLE-CLIENT-ID",
+              "identity": "system"
+            },
+            {
+              "name": "kv-google-client-secret",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/GOOGLE-CLIENT-SECRET",
+              "identity": "system"
+            },
+            {
+              "name": "kv-infrastructure-signature",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/INFRASTRUCTURE-SIGNATURE",
+              "identity": "system"
+            },
+            {
+              "name": "kv-internal-auth-bridge-secret",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/INTERNAL-AUTH-BRIDGE-SECRET",
+              "identity": "system"
+            },
+            {
+              "name": "kv-jwt-secret",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/JWT-SECRET",
+              "identity": "system"
+            },
+            {
+              "name": "kv-maintenance-allow-health",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/MAINTENANCE-ALLOW-HEALTH",
+              "identity": "system"
+            },
+            {
+              "name": "kv-maintenance-end-time",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/MAINTENANCE-END-TIME",
+              "identity": "system"
+            },
+            {
+              "name": "kv-maintenance-message",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/MAINTENANCE-MESSAGE",
+              "identity": "system"
+            },
+            {
+              "name": "kv-maintenance-mode",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/MAINTENANCE-MODE",
+              "identity": "system"
+            },
+            {
+              "name": "kv-mongodb-uri",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/MONGODB-URI",
+              "identity": "system"
+            },
+            {
+              "name": "kv-next-public-api-base-url",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/NEXT-PUBLIC-API-BASE-URL",
+              "identity": "system"
+            },
+            {
+              "name": "kv-paymob-api-key",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/PAYMOB-API-KEY",
+              "identity": "system"
+            },
+            {
+              "name": "kv-paymob-iframe-id",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/PAYMOB-IFRAME-ID",
+              "identity": "system"
+            },
+            {
+              "name": "kv-paymob-integration-id",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/PAYMOB-INTEGRATION-ID",
+              "identity": "system"
+            },
+            {
+              "name": "kv-remote-config-url",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/REMOTE-CONFIG-URL",
+              "identity": "system"
+            },
+            {
+              "name": "kv-session-secret",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/SESSION-SECRET",
+              "identity": "system"
+            },
+            {
+              "name": "kv-tz",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/TZ",
+              "identity": "system"
+            },
+            {
+              "name": "kv-next-public-sentry-dsn",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/NEXT-PUBLIC-SENTRY-DSN",
+              "identity": "system"
+            },
+            {
+              "name": "kv-sentry-dsn",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/SENTRY-DSN",
+              "identity": "system"
+            },
+            {
+              "name": "kv-sentry-org",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/SENTRY-ORG",
+              "identity": "system"
+            },
+            {
+              "name": "kv-sentry-project",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/SENTRY-PROJECT",
+              "identity": "system"
+            },
+            {
+              "name": "kv-sentry-auth-token",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/SENTRY-AUTH-TOKEN",
+              "identity": "system"
+            },
+            {
+              "name": "kv-azure-storage-connection-string",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/AZURE-STORAGE-CONNECTION-STRING",
+              "identity": "system"
+            },
+            {
+              "name": "kv-certificate-storage-container",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/CERTIFICATE-STORAGE-CONTAINER",
+              "identity": "system"
+            },
+            {
+              "name": "kv-certificate-storage-account-name",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/CERTIFICATE-STORAGE-ACCOUNT-NAME",
+              "identity": "system"
+            },
+            {
+              "name": "kv-certificate-queue-adapter",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/CERTIFICATE-QUEUE-ADAPTER",
+              "identity": "system"
+            },
+            {
+              "name": "kv-certificate-storage-adapter",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/CERTIFICATE-STORAGE-ADAPTER",
+              "identity": "system"
+            },
+            {
+              "name": "kv-azure-service-bus-connection-string",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/AZURE-SERVICE-BUS-CONNECTION-STRING",
+              "identity": "system"
+            },
+            {
+              "name": "kv-certificate-renderer-adapter",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/CERTIFICATE-RENDERER-ADAPTER",
+              "identity": "system"
+            },
+            {
+              "name": "kv-azure-redis-tls",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/AZURE-REDIS-TLS",
+              "identity": "system"
+            },
+            {
+              "name": "kv-redis-key-prefix",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/REDIS-KEY-PREFIX",
+              "identity": "system"
+            },
+            {
+              "name": "kv-cache-enabled",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/CACHE-ENABLED",
+              "identity": "system"
+            },
+            {
+              "name": "kv-distributed-rate-limits-enabled",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/DISTRIBUTED-RATE-LIMITS-ENABLED",
+              "identity": "system"
+            },
+            {
+              "name": "kv-redis-connect-timeout-ms",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/REDIS-CONNECT-TIMEOUT-MS",
+              "identity": "system"
+            },
+            {
+              "name": "kv-redis-command-timeout-ms",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/REDIS-COMMAND-TIMEOUT-MS",
+              "identity": "system"
+            },
+            {
+              "name": "kv-redis-max-retries-per-request",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/REDIS-MAX-RETRIES-PER-REQUEST",
+              "identity": "system"
+            },
+            {
+              "name": "kv-scholarx-executive-dashboard-enabled",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/SCHOLARX-EXECUTIVE-DASHBOARD-ENABLED",
+              "identity": "system"
+            },
+            {
+              "name": "kv-scholarx-executive-team-ops-enabled",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/SCHOLARX-EXECUTIVE-TEAM-OPS-ENABLED",
+              "identity": "system"
+            },
+            {
+              "name": "kv-scholarx-executive-finance-enabled",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/SCHOLARX-EXECUTIVE-FINANCE-ENABLED",
+              "identity": "system"
+            },
+            {
+              "name": "kv-scholarx-executive-governance-enabled",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/SCHOLARX-EXECUTIVE-GOVERNANCE-ENABLED",
+              "identity": "system"
+            },
+            {
+              "name": "kv-scholarx-executive-ai-heatmap-enabled",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/SCHOLARX-EXECUTIVE-AI-HEATMAP-ENABLED",
+              "identity": "system"
+            },
+            {
+              "name": "kv-next-public-posthog-key",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/NEXT-PUBLIC-POSTHOG-KEY",
+              "identity": "system"
+            },
+            {
+              "name": "kv-next-public-posthog-host",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/NEXT-PUBLIC-POSTHOG-HOST",
+              "identity": "system"
+            },
+            {
+              "name": "kv-next-public-posthog-ui-host",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/NEXT-PUBLIC-POSTHOG-UI-HOST",
+              "identity": "system"
+            },
+            {
+              "name": "kv-internal-api-secret",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/INTERNAL-API-SECRET",
+              "identity": "system"
+            },
+            {
+              "name": "kv-course-image-upload-enabled",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/COURSE-IMAGE-UPLOAD-ENABLED",
+              "identity": "system"
+            }
+          ],
+          "activeRevisionsMode": "Single",
+          "ingress": {
+            "external": false,
+            "targetPort": 3001,
+            "exposedPort": 0,
+            "transport": "Auto",
+            "traffic": [
+              {
+                "weight": 100,
+                "latestRevision": true
+              }
+            ],
+            "allowInsecure": false
+          },
+          "registries": [
+            {
+              "server": "scholarxregistry.azurecr.io",
+              "identity": "system"
+            }
+          ],
+          "identitySettings": [],
+          "maxInactiveRevisions": 100
+        },
+        "template": {
+          "containers": [
+            {
+              "image": "[concat('scholarxregistry.azurecr.io/scholarx-certificate-worker:', parameters('imageTag'))]",
+              "imageType": "ContainerImage",
+              "name": "scholarx-worker-container",
+              "env": [
+                {
+                  "name": "ABSTRACT_API_KEY",
+                  "secretRef": "kv-abstract-api-key"
+                },
+                { "name": "ADMIN_EMAIL", "secretRef": "kv-admin-email" },
+                {
+                  "name": "AZURE_REDIS_CLUSTER",
+                  "secretRef": "kv-azure-redis-cluster"
+                },
+                {
+                  "name": "AZURE_REDIS_HOST",
+                  "secretRef": "kv-azure-redis-host"
+                },
+                {
+                  "name": "AZURE_REDIS_KEY",
+                  "secretRef": "kv-azure-redis-key"
+                },
+                {
+                  "name": "AZURE_REDIS_PORT",
+                  "secretRef": "kv-azure-redis-port"
+                },
+                {
+                  "name": "BETTER_AUTH_SECRET",
+                  "secretRef": "kv-better-auth-secret"
+                },
+                {
+                  "name": "BETTER_AUTH_URL",
+                  "secretRef": "kv-better-auth-url"
+                },
+                { "name": "CACHE_DEBUG", "secretRef": "kv-cache-debug" },
+                {
+                  "name": "CACHE_ENABLE_STATS",
+                  "secretRef": "kv-cache-enable-stats"
+                },
+                {
+                  "name": "CACHE_TTL_COURSE",
+                  "secretRef": "kv-cache-ttl-course"
+                },
+                {
+                  "name": "CACHE_TTL_COURSE_LIST",
+                  "secretRef": "kv-cache-ttl-course-list"
+                },
+                {
+                  "name": "CACHE_TTL_DEFAULT",
+                  "secretRef": "kv-cache-ttl-default"
+                },
+                {
+                  "name": "CACHE_TTL_SUBSCRIPTION",
+                  "secretRef": "kv-cache-ttl-subscription"
+                },
+                { "name": "CACHE_TTL_USER", "secretRef": "kv-cache-ttl-user" },
+                { "name": "CACHE_VERSION", "secretRef": "kv-cache-version" },
+                {
+                  "name": "CLOUDINARY_API_KEY",
+                  "secretRef": "kv-cloudinary-api-key"
+                },
+                {
+                  "name": "CLOUDINARY_API_SECRET",
+                  "secretRef": "kv-cloudinary-api-secret"
+                },
+                {
+                  "name": "CLOUDINARY_CLOUD_NAME",
+                  "secretRef": "kv-cloudinary-cloud-name"
+                },
+                {
+                  "name": "CORS_ALLOWED_ORIGINS",
+                  "secretRef": "kv-cors-allowed-origins"
+                },
+                { "name": "DATABASE_URL", "secretRef": "kv-database-url" },
+                { "name": "DOPPLER_CONFIG", "secretRef": "kv-doppler-config" },
+                {
+                  "name": "DOPPLER_ENVIRONMENT",
+                  "secretRef": "kv-doppler-environment"
+                },
+                {
+                  "name": "DOPPLER_PROJECT",
+                  "secretRef": "kv-doppler-project"
+                },
+                { "name": "EMAIL_PASSWORD", "secretRef": "kv-email-password" },
+                {
+                  "name": "EMAIL_SERVICE_ENABLED",
+                  "secretRef": "kv-email-service-enabled"
+                },
+                { "name": "EMAIL_USER", "secretRef": "kv-email-user" },
+                {
+                  "name": "EMAIL_VALIDATION_ENABLED",
+                  "secretRef": "kv-email-validation-enabled"
+                },
+                {
+                  "name": "EMAIL_VERIFICATION_MODE",
+                  "secretRef": "kv-email-verification-mode"
+                },
+                { "name": "FRONT_END_URL", "secretRef": "kv-front-end-url" },
+                { "name": "FRONTEND_URL", "secretRef": "kv-frontend-url" },
+                {
+                  "name": "GOOGLE_CLIENT_ID",
+                  "secretRef": "kv-google-client-id"
+                },
+                {
+                  "name": "GOOGLE_CLIENT_SECRET",
+                  "secretRef": "kv-google-client-secret"
+                },
+                {
+                  "name": "INFRASTRUCTURE_SIGNATURE",
+                  "secretRef": "kv-infrastructure-signature"
+                },
+                {
+                  "name": "INTERNAL_AUTH_BRIDGE_SECRET",
+                  "secretRef": "kv-internal-auth-bridge-secret"
+                },
+                { "name": "JWT_SECRET", "secretRef": "kv-jwt-secret" },
+                {
+                  "name": "MAINTENANCE_ALLOW_HEALTH",
+                  "secretRef": "kv-maintenance-allow-health"
+                },
+                {
+                  "name": "MAINTENANCE_END_TIME",
+                  "secretRef": "kv-maintenance-end-time"
+                },
+                {
+                  "name": "MAINTENANCE_MESSAGE",
+                  "secretRef": "kv-maintenance-message"
+                },
+                {
+                  "name": "MAINTENANCE_MODE",
+                  "secretRef": "kv-maintenance-mode"
+                },
+                { "name": "MONGODB_URI", "secretRef": "kv-mongodb-uri" },
+                {
+                  "name": "NEXT_PUBLIC_API_BASE_URL",
+                  "secretRef": "kv-next-public-api-base-url"
+                },
+                { "name": "PAYMOB_API_KEY", "secretRef": "kv-paymob-api-key" },
+                {
+                  "name": "PAYMOB_IFRAME_ID",
+                  "secretRef": "kv-paymob-iframe-id"
+                },
+                {
+                  "name": "PAYMOB_INTEGRATION_ID",
+                  "secretRef": "kv-paymob-integration-id"
+                },
+                {
+                  "name": "REMOTE_CONFIG_URL",
+                  "secretRef": "kv-remote-config-url"
+                },
+                { "name": "SESSION_SECRET", "secretRef": "kv-session-secret" },
+                { "name": "TZ", "secretRef": "kv-tz" },
+                {
+                  "name": "NEXT_PUBLIC_SENTRY_DSN",
+                  "secretRef": "kv-next-public-sentry-dsn"
+                },
+                { "name": "SENTRY_DSN", "secretRef": "kv-sentry-dsn" },
+                { "name": "SENTRY_ORG", "secretRef": "kv-sentry-org" },
+                { "name": "SENTRY_PROJECT", "secretRef": "kv-sentry-project" },
+                {
+                  "name": "SENTRY_AUTH_TOKEN",
+                  "secretRef": "kv-sentry-auth-token"
+                },
+                {
+                  "name": "AZURE_STORAGE_CONNECTION_STRING",
+                  "secretRef": "kv-azure-storage-connection-string"
+                },
+                {
+                  "name": "CERTIFICATE_STORAGE_CONTAINER",
+                  "secretRef": "kv-certificate-storage-container"
+                },
+                {
+                  "name": "CERTIFICATE_STORAGE_ACCOUNT_NAME",
+                  "secretRef": "kv-certificate-storage-account-name"
+                },
+                {
+                  "name": "CERTIFICATE_QUEUE_ADAPTER",
+                  "secretRef": "kv-certificate-queue-adapter"
+                },
+                {
+                  "name": "CERTIFICATE_STORAGE_ADAPTER",
+                  "secretRef": "kv-certificate-storage-adapter"
+                },
+                {
+                  "name": "AZURE_SERVICE_BUS_CONNECTION_STRING",
+                  "secretRef": "kv-azure-service-bus-connection-string"
+                },
+                {
+                  "name": "CERTIFICATE_RENDERER_ADAPTER",
+                  "secretRef": "kv-certificate-renderer-adapter"
+                },
+                {
+                  "name": "AZURE_REDIS_TLS",
+                  "secretRef": "kv-azure-redis-tls"
+                },
+                {
+                  "name": "REDIS_KEY_PREFIX",
+                  "secretRef": "kv-redis-key-prefix"
+                },
+                { "name": "CACHE_ENABLED", "secretRef": "kv-cache-enabled" },
+                {
+                  "name": "DISTRIBUTED_RATE_LIMITS_ENABLED",
+                  "secretRef": "kv-distributed-rate-limits-enabled"
+                },
+                {
+                  "name": "REDIS_CONNECT_TIMEOUT_MS",
+                  "secretRef": "kv-redis-connect-timeout-ms"
+                },
+                {
+                  "name": "REDIS_COMMAND_TIMEOUT_MS",
+                  "secretRef": "kv-redis-command-timeout-ms"
+                },
+                {
+                  "name": "REDIS_MAX_RETRIES_PER_REQUEST",
+                  "secretRef": "kv-redis-max-retries-per-request"
+                },
+                {
+                  "name": "SCHOLARX_EXECUTIVE_DASHBOARD_ENABLED",
+                  "secretRef": "kv-scholarx-executive-dashboard-enabled"
+                },
+                {
+                  "name": "SCHOLARX_EXECUTIVE_TEAM_OPS_ENABLED",
+                  "secretRef": "kv-scholarx-executive-team-ops-enabled"
+                },
+                {
+                  "name": "SCHOLARX_EXECUTIVE_FINANCE_ENABLED",
+                  "secretRef": "kv-scholarx-executive-finance-enabled"
+                },
+                {
+                  "name": "SCHOLARX_EXECUTIVE_GOVERNANCE_ENABLED",
+                  "secretRef": "kv-scholarx-executive-governance-enabled"
+                },
+                {
+                  "name": "SCHOLARX_EXECUTIVE_AI_HEATMAP_ENABLED",
+                  "secretRef": "kv-scholarx-executive-ai-heatmap-enabled"
+                },
+                {
+                  "name": "NEXT_PUBLIC_POSTHOG_KEY",
+                  "secretRef": "kv-next-public-posthog-key"
+                },
+                {
+                  "name": "NEXT_PUBLIC_POSTHOG_HOST",
+                  "secretRef": "kv-next-public-posthog-host"
+                },
+                {
+                  "name": "NEXT_PUBLIC_POSTHOG_UI_HOST",
+                  "secretRef": "kv-next-public-posthog-ui-host"
+                },
+                {
+                  "name": "INTERNAL_API_SECRET",
+                  "secretRef": "kv-internal-api-secret"
+                },
+                {
+                  "name": "COURSE_IMAGE_UPLOAD_ENABLED",
+                  "secretRef": "kv-course-image-upload-enabled"
+                }
+              ],
+              "resources": {
+                "cpu": 0.25,
+                "memory": "0.5Gi"
+              },
+              "probes": [
+                {
+                  "type": "Liveness",
+                  "failureThreshold": 3,
+                  "periodSeconds": 10,
+                  "successThreshold": 1,
+                  "tcpSocket": { "port": 3001 },
+                  "timeoutSeconds": 5
+                },
+                {
+                  "type": "Readiness",
+                  "failureThreshold": 48,
+                  "periodSeconds": 5,
+                  "successThreshold": 1,
+                  "tcpSocket": { "port": 3001 },
+                  "timeoutSeconds": 5
+                },
+                {
+                  "type": "Startup",
+                  "failureThreshold": 240,
+                  "initialDelaySeconds": 1,
+                  "periodSeconds": 1,
+                  "successThreshold": 1,
+                  "tcpSocket": { "port": 3001 },
+                  "timeoutSeconds": 3
+                }
+              ]
+            }
+          ],
+          "scale": {
+            "minReplicas": 1,
+            "maxReplicas": 10,
+            "cooldownPeriod": 300,
+            "pollingInterval": 30
+          }
+        }
+      }
+    }
+  ]
+}

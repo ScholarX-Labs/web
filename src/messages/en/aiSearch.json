@@ -12,6 +12,10 @@
     "searchAriaLabel": "Search query",
     "tryLabel": "Try:",
     "submit": "Discover Opportunities",
+    "searching": "Searching...",
+    "submitAlt": "Discover Matches",
+    "poweredBy": "AI Search \u00B7 By ScholarX AI",
+    "tryChipLabel": "Try \"{text}\"",
     "stats": {
       "scholarships": "Scholarships",
       "countries": "Countries",
@@ -31,7 +35,16 @@
     "sortBy": "Sort by:",
     "mostRelevant": "Most relevant",
     "nearestDeadline": "Nearest deadline",
-    "showMore": "Show more results"
+    "showMore": "Show more results",
+    "title": "Results",
+    "foundDescription": "Found {count} matching opportunities",
+    "sortLabel": "Sort:",
+    "bestMatch": "Best Match",
+    "deadline": "Deadline",
+    "loadMore": "Load More Results",
+    "noResultsTitle": "No results found",
+    "noResultsDescription": "Try adjusting your search criteria or explore our suggestions to find the perfect opportunity.",
+    "tryNewSearch": "Try a New Search"
   },
   "card": {
     "deadline": "Deadline: {date}",
@@ -54,7 +67,7 @@
   },
   "chat": {
     "headerTitle": "ScholarX AI Assistant",
-    "headerStatus": "Online • Ready to help",
+    "headerStatus": "Online \u2022 Ready to help",
     "liveSession": "Live Session",
     "mobileTitle": "AI Search",
     "emptyState": "Ask for scholarships, internships, fellowships, or conferences.",

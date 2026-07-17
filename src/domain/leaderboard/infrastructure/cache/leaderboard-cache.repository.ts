@@ -5,17 +5,42 @@ import {
   CachedRankEntry,
 } from "../../contracts/leaderboard.types";
 import { LeaderboardError } from "../../application/leaderboard.errors";
-import { getSharedRedisClient } from "@/lib/cache/shared-redis";
+import {
+  getSharedRedisClient,
+  isSharedRedisConfigured,
+} from "@/lib/cache/shared-redis";
 
 export class LeaderboardCacheRepository implements ILeaderboardCacheRepository {
+  /**
+   * Returns the Redis client if it is ready, or throws a typed LeaderboardError.
+   *
+   * Two distinct failure modes are surfaced:
+   *  - CACHE_UNAVAILABLE – Redis is not configured, or the circuit breaker is
+   *    open after repeated failures.  Treat as a degraded-mode signal.
+   *  - CACHE_NOT_READY  – Redis is configured and healthy but the connection
+   *    handshake (including TLS) has not yet completed (common at container
+   *    startup).  Rebuild callers should skip silently; query callers should
+   *    fall back to PostgreSQL.
+   */
   private getClient() {
-    const client = getSharedRedisClient();
-    if (!client) {
+    if (!isSharedRedisConfigured()) {
       throw new LeaderboardError(
         "CACHE_UNAVAILABLE",
-        "Redis cache is unavailable for leaderboard operations."
+        "Redis is not configured for leaderboard operations."
       );
     }
+
+    const client = getSharedRedisClient();
+    if (!client) {
+      // getSharedRedisClient returns null either because the circuit is open
+      // OR because the client status is not yet "ready".  At this point Redis
+      // IS configured, so a null result means "not ready yet" (transient).
+      throw new LeaderboardError(
+        "CACHE_NOT_READY",
+        "Redis client is not yet ready for leaderboard operations."
+      );
+    }
+
     return client;
   }
 

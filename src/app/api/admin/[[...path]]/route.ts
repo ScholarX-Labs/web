@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { ZodError } from "zod";
 import { createAdminDomain, isAdminError, AdminError } from "@/domain/admin";
 import { checkRateLimit } from "@/lib/admin/rate-limiter";
 
@@ -51,6 +52,13 @@ const errorResponse = (error: unknown) => {
         ...(error.details ? { data: error.details } : {}),
       },
       { status: error.statusCode },
+    );
+  }
+
+  if (error instanceof ZodError || (error && typeof error === 'object' && 'issues' in error)) {
+    return NextResponse.json(
+      { status: "error", code: "VALIDATION_ERROR", message: "Invalid request body" },
+      { status: 422 },
     );
   }
 

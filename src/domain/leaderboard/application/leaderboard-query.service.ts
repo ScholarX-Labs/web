@@ -6,6 +6,7 @@ import {
   LeaderboardEntryDto,
   MyRankDto,
 } from "../contracts/leaderboard.types";
+import { LeaderboardError } from "./leaderboard.errors";
 import { LeaderboardPrivacyPolicy } from "./leaderboard-privacy.policy";
 import { db } from "@/db";
 import { user } from "@/db/schema/auth-schema";
@@ -35,10 +36,10 @@ export class LeaderboardQueryService {
       cachedEntries = await this.cacheRepo.getTopEntries(courseId, window, limit);
       updatedAt = await this.cacheRepo.getUpdatedAt(courseId, window);
     } catch (err: unknown) {
-      const error = err as { code?: string; message?: string };
-      const isRedisError = error.code === 'ECONNREFUSED' || error.code === 'CACHE_UNAVAILABLE' || error.message?.includes('ECONNREFUSED') || error.message?.includes('ClosedClient');
-      if (isRedisError) {
-        console.warn("[LeaderboardQueryService] Redis unavailable, falling back to PostgreSQL for top entries");
+      if (this.isCacheFallbackError(err)) {
+        console.warn(
+          `[LeaderboardQueryService] Redis unavailable (${(err as LeaderboardError).code}), falling back to PostgreSQL for top entries`
+        );
         const windowStart = this.getWindowStart(window);
         const aggregates = await this.pointEventRepo.aggregateByCourseAndWindow(courseId, windowStart);
         
@@ -116,10 +117,10 @@ export class LeaderboardQueryService {
     try {
       cachedRank = await this.cacheRepo.getUserRank(courseId, window, userId);
     } catch (err: unknown) {
-      const error = err as { code?: string; message?: string };
-      const isRedisError = error.code === 'ECONNREFUSED' || error.code === 'CACHE_UNAVAILABLE' || error.message?.includes('ECONNREFUSED') || error.message?.includes('ClosedClient');
-      if (isRedisError) {
-        console.warn("[LeaderboardQueryService] Redis unavailable, falling back to PostgreSQL for my rank");
+      if (this.isCacheFallbackError(err)) {
+        console.warn(
+          `[LeaderboardQueryService] Redis unavailable (${(err as LeaderboardError).code}), falling back to PostgreSQL for my rank`
+        );
         isDegraded = true;
       } else {
         throw err;
@@ -163,6 +164,20 @@ export class LeaderboardQueryService {
       isAnonymous,
       isGloballyPrivate,
     };
+  }
+
+  /**
+   * Returns true for any LeaderboardError that should trigger a graceful
+   * PostgreSQL fallback instead of propagating to the caller.
+   *
+   * - CACHE_UNAVAILABLE: Redis is not configured or the circuit breaker is open.
+   * - CACHE_NOT_READY:   Redis handshake is still in progress (container startup).
+   */
+  private isCacheFallbackError(err: unknown): err is LeaderboardError {
+    return (
+      LeaderboardError.isLeaderboardError(err) &&
+      (err.code === "CACHE_UNAVAILABLE" || err.code === "CACHE_NOT_READY")
+    );
   }
 
   private getWindowStart(window: LeaderboardWindow): Date | null {

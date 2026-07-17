@@ -23,18 +23,21 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { getCategoryStyle } from "@/lib/course-categories";
 import type { CourseCategory } from "@/domain/courses";
+import { useTranslations } from "next-intl";
 
-const FILTER_TAGS = [
-  { label: "Career Preparation", icon: Briefcase, value: "Career Preparation" },
-  { label: "Skill Development", icon: TrendingUp, value: "Skill Development" },
-  { label: "Free / Paid", icon: DollarSign, value: "Free / Paid" },
-  { label: "Online / In-Person", icon: Laptop, value: "Online / In-Person" },
-  {
-    label: "International Opportunities",
-    icon: Globe,
-    value: "International Opportunities",
-  },
-] as const;
+interface FilterTag {
+  tKey: string;
+  icon: React.ComponentType<{ className?: string }>;
+  value: string;
+}
+
+const FILTER_TAGS: FilterTag[] = [
+  { tKey: "careerPreparation", icon: Briefcase, value: "Career Preparation" },
+  { tKey: "skillDevelopment", icon: TrendingUp, value: "Skill Development" },
+  { tKey: "freePaid", icon: DollarSign, value: "Free / Paid" },
+  { tKey: "onlineInPerson", icon: Laptop, value: "Online / In-Person" },
+  { tKey: "internationalOpportunities", icon: Globe, value: "International Opportunities" },
+];
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -58,6 +61,8 @@ interface CoursesHeroProps {
 }
 
 export function CoursesHero({ categories }: CoursesHeroProps) {
+  const t = useTranslations("courses");
+
   const {
     courseSearch,
     activeCourseFilters,
@@ -149,16 +154,16 @@ export function CoursesHero({ categories }: CoursesHeroProps) {
               variants={itemVariants}
               className="text-5xl lg:text-7xl font-extrabold text-hero-heading leading-[1.1] tracking-tight mb-6"
             >
-              Discover
+              {t("hero.titleLine1")}
               <br />
-              Our Courses
+              {t("hero.titleLine2")}
             </motion.h1>
 
             <motion.p 
               variants={itemVariants}
               className="text-lg md:text-xl text-hero-body mb-10 font-medium max-w-lg leading-relaxed"
             >
-              Scholarships, Mentorship &amp; Skill Development Opportunities
+              {t("hero.subtitle")}
             </motion.p>
 
             {/* Search Bar */}
@@ -174,7 +179,7 @@ export function CoursesHero({ categories }: CoursesHeroProps) {
                     whileTap={{ scale: 0.96 }}
                     className="flex items-center gap-1.5 bg-hero-blue/90 hover:bg-hero-blue backdrop-blur-md text-white px-5 py-3 rounded-full font-semibold text-sm transition-all duration-300 shadow-[0_2px_10px_rgba(59,130,246,0.2)] shrink-0 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-hero-blue/50"
                   >
-                    {activeCategory ? activeCategory.label : "Categories"}
+                    {activeCategory ? activeCategory.label : t("hero.categories")}
                     <ChevronDown className={cn("w-4 h-4 transition-transform duration-300", activeCategory && "rotate-180")} />
                   </motion.button>
                 </DropdownMenuTrigger>
@@ -223,14 +228,14 @@ export function CoursesHero({ categories }: CoursesHeroProps) {
                     )
                   ) : (
                     <DropdownMenuItem disabled className="px-3 py-2.5 text-sm">
-                      No categories yet
+                      {t("hero.noCategories")}
                     </DropdownMenuItem>
                   )}
                 </DropdownMenuContent>
               </DropdownMenu>
               <input
                 type="text"
-                placeholder="Search anything"
+                placeholder={t("hero.searchPlaceholder")}
                 value={courseSearch}
                 onChange={(e) => setCourseSearch(e.target.value)}
                 className="flex-1 bg-transparent border-none px-5 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-0 min-w-0"
@@ -241,7 +246,7 @@ export function CoursesHero({ categories }: CoursesHeroProps) {
                 onClick={() => {
                   window.scrollBy({ top: 600, behavior: "smooth" });
                 }}
-                aria-label="Search"
+                aria-label={t("hero.searchAriaLabel")}
                 className="p-3 bg-white/50 dark:bg-white/10 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/80 transition-colors shrink-0 shadow-sm"
               >
                 <Search className="w-5 h-5" />
@@ -253,7 +258,7 @@ export function CoursesHero({ categories }: CoursesHeroProps) {
               variants={itemVariants}
               className="flex flex-wrap gap-3"
             >
-              {FILTER_TAGS.map(({ label, icon: Icon, value }) => {
+              {FILTER_TAGS.map(({ tKey, icon: Icon, value }) => {
                 const isActive = activeCourseFilters.includes(value);
                 return (
                   <motion.button
@@ -269,7 +274,7 @@ export function CoursesHero({ categories }: CoursesHeroProps) {
                     )}
                   >
                     <Icon className={cn("w-3.5 h-3.5", isActive ? "text-white" : "opacity-70")} />
-                    <span className="relative z-10">{label}</span>
+                    <span className="relative z-10">{t(`hero.filterTags.${tKey}`)}</span>
                     {isActive && (
                       <motion.div
                         layoutId="activeFilterGlow"
@@ -316,7 +321,7 @@ export function CoursesHero({ categories }: CoursesHeroProps) {
                   className="text-xs font-bold text-hero-blue hover:text-hero-blue/80 px-2 py-2 transition-colors cursor-pointer flex items-center gap-1"
                 >
                   <X className="w-3.5 h-3.5" />
-                  Clear All
+                  {t("hero.clearAll")}
                 </motion.button>
               )}
             </motion.div>
@@ -350,7 +355,7 @@ export function CoursesHero({ categories }: CoursesHeroProps) {
               />
               <Image
                 src="/thumb-2-1.4b9d026878e55263d488.png.svg"
-                alt="Instructor"
+                alt={t("hero.instructorAlt")}
                 width={228}
                 height={345}
                 className="relative drop-shadow-sm"
@@ -375,7 +380,7 @@ export function CoursesHero({ categories }: CoursesHeroProps) {
             >
               <Image
                 src="/thumb-2-2.ff7e4b702e36c420d1e4.png.svg"
-                alt="Student"
+                alt={t("hero.studentAlt")}
                 width={270}
                 height={314}
                 className="drop-shadow-lg"
@@ -385,10 +390,10 @@ export function CoursesHero({ categories }: CoursesHeroProps) {
             {/* ── "5.8k Success Courses" floating badge ── */}
             <div className="absolute top-[7%] right-[1%] bg-white shadow-xl rounded-full px-6 py-3 border border-gray-100 flex flex-col justify-center z-40 animate-in slide-in-from-right fade-in duration-700 delay-300">
               <span className="text-[#fca01e] font-extrabold text-xl leading-none">
-                5.8k
+                {t("hero.badges.coursesCount")}
               </span>
               <span className="text-gray-500 text-xs font-semibold">
-                Success Courses
+                {t("hero.badges.successCourses")}
               </span>
             </div>
 
@@ -397,15 +402,15 @@ export function CoursesHero({ categories }: CoursesHeroProps) {
               <div className="bg-white shadow-xl rounded-full pl-5 pr-4 py-3 border border-gray-100 flex items-center gap-4">
                 <div className="flex flex-col leading-none gap-0.5">
                   <span className="text-hero-blue font-extrabold text-lg leading-none">
-                    10k+
+                    {t("hero.badges.studentsCount")}
                   </span>
                   <span className="text-gray-600 text-sm font-semibold">
-                    Student
+                    {t("hero.badges.student")}
                   </span>
                 </div>
                 <Image
                   src="/courses-hero-10k_students.svg"
-                  alt="students avatars"
+                  alt={t("hero.studentsAvatarsAlt")}
                   width={102}
                   height={30}
                 />

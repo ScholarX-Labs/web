@@ -15,6 +15,7 @@ import {
   emptyStateVariants,
   buttonVariants,
 } from "@/lib/ai-search-animations";
+import { useTranslations } from "next-intl";
 
 interface SearchResultsProps {
   query: string;
@@ -56,6 +57,7 @@ export function SearchResults({
   currentStage,
   progress,
 }: SearchResultsProps) {
+  const t = useTranslations("aiSearch");
   const searchParams = useSearchParams();
   const router = useRouter();
   const [selectedResult, setSelectedResult] = useState<SearchResult | null>(
@@ -131,6 +133,11 @@ export function SearchResults({
   const hasResults = !isLoading && results.length > 0;
   const hasNoResults = !isLoading && results.length === 0;
 
+  const computedCount =
+    results.length < 10
+      ? results.length
+      : `${Math.floor(results.length / 10) * 10}${results.length >= 10 && results.length % 10 !== 0 ? "+" : ""}`;
+
   return (
     <LayoutGroup>
       <div className="relative bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 min-h-screen">
@@ -161,12 +168,7 @@ export function SearchResults({
                     transition={{ delay: 0.2 }}
                     className="text-muted-foreground mt-2 text-base max-w-xl"
                   >
-                    We&apos;ve found{" "}
-                    {results.length < 10
-                      ? results.length
-                      : Math.floor(results.length / 10) * 10}
-                    {results.length >= 10 && results.length % 10 !== 0 && "+"}{" "}
-                    opportunities. Here are the best matches for your profile.
+                    {t("results.found", { count: computedCount })}
                   </motion.p>
                 </motion.div>
 
@@ -182,8 +184,8 @@ export function SearchResults({
                     background:
                       "linear-gradient(135deg, var(--scholar-blue) 0%, var(--scholar-blue-dark) 100%)",
                   }}
-                  aria-label="New search"
-                  title="New search"
+                  aria-label={t("results.newSearch")}
+                  title={t("results.newSearch")}
                 >
                   <ArrowUp className="w-5 h-5" />
                 </motion.button>
@@ -208,10 +210,10 @@ export function SearchResults({
             >
               <div>
                 <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                  Results
+                  {t("results.title")}
                 </h2>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Found {results.length} matching opportunities
+                  {t("results.foundDescription", { count: results.length })}
                 </p>
               </div>
 
@@ -225,9 +227,9 @@ export function SearchResults({
                     className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/20 dark:border-white/10 bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm text-sm font-medium text-foreground hover:bg-white/70 dark:hover:bg-slate-700/70 transition-all"
                   >
                     <Filter className="w-4 h-4" />
-                    Sort:{" "}
+                    {t("results.sortLabel")}{" "}
                     <span className="text-scholar-blue font-semibold">
-                      {sortBy === "match" ? "Best Match" : "Deadline"}
+                      {sortBy === "match" ? t("results.bestMatch") : t("results.deadline")}
                     </span>
                   </motion.button>
 
@@ -239,11 +241,11 @@ export function SearchResults({
                         exit={{ opacity: 0, y: -10 }}
                         className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-xl border border-white/20 dark:border-white/10 shadow-xl z-50 overflow-hidden"
                       >
-                        {["match", "deadline"].map((option) => (
+                        {(["match", "deadline"] as const).map((option) => (
                           <motion.button
                             key={option}
                             onClick={() => {
-                              setSortBy(option as SortOption);
+                              setSortBy(option);
                               setShowSortMenu(false);
                             }}
                             whileHover={{
@@ -255,7 +257,9 @@ export function SearchResults({
                                 : "text-foreground hover:text-scholar-blue"
                             }`}
                           >
-                            {option === "match" ? "✓ Best Match" : "✓ Deadline"}
+                            {option === "match"
+                              ? `\u2713 ${t("results.bestMatch")}`
+                              : `\u2713 ${t("results.deadline")}`}
                           </motion.button>
                         ))}
                       </motion.div>
@@ -310,7 +314,7 @@ export function SearchResults({
                 whileTap={{ scale: 0.95 }}
                 className="px-8 py-3 rounded-full border border-scholar-blue/30 text-scholar-blue font-semibold hover:bg-scholar-blue/10 transition-all"
               >
-                Load More Results
+                {t("results.loadMore")}
               </motion.button>
             </motion.div>
           )}
@@ -327,11 +331,10 @@ export function SearchResults({
                 <Filter className="w-10 h-10 text-muted-foreground/50" />
               </div>
               <h2 className="text-2xl font-bold text-foreground mb-2">
-                No results found
+                {t("results.noResultsTitle")}
               </h2>
               <p className="text-muted-foreground max-w-md mb-6">
-                Try adjusting your search criteria or explore our suggestions to
-                find the perfect opportunity.
+                {t("results.noResultsDescription")}
               </p>
               <motion.button
                 onClick={onScrollToTop}
@@ -339,7 +342,7 @@ export function SearchResults({
                 whileTap={{ scale: 0.95 }}
                 className="px-6 py-2.5 rounded-lg bg-scholar-blue text-white font-semibold hover:bg-scholar-blue-dark transition-all"
               >
-                Try a New Search
+                {t("results.tryNewSearch")}
               </motion.button>
             </motion.div>
           )}

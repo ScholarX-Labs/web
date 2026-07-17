@@ -4,6 +4,7 @@ import {
   LeaderboardWindow,
   CacheEntry,
 } from "../contracts/leaderboard.types";
+import { LeaderboardError } from "./leaderboard.errors";
 import { LeaderboardScoringPolicy } from "./leaderboard-scoring.policy";
 
 export class LeaderboardCacheRebuildJob {
@@ -23,7 +24,22 @@ export class LeaderboardCacheRebuildJob {
     );
 
     if (aggregates.length === 0) {
-      await this.cacheRepo.rebuildLeaderboard(courseId, window, []);
+      try {
+        await this.cacheRepo.rebuildLeaderboard(courseId, window, []);
+      } catch (err) {
+        if (
+          LeaderboardError.isLeaderboardError(err) &&
+          err.code === "CACHE_NOT_READY"
+        ) {
+          // Redis is still completing its TLS handshake at startup — skip
+          // silently.  The cache will be populated on the next awardPoints call.
+          console.debug(
+            `[LeaderboardCacheRebuildJob] Redis not yet ready, skipping rebuild for ${courseId}/${window}`
+          );
+          return;
+        }
+        throw err;
+      }
       return;
     }
 
@@ -47,7 +63,20 @@ export class LeaderboardCacheRebuildJob {
     }
 
     // 4. Update Cache
-    await this.cacheRepo.rebuildLeaderboard(courseId, window, entries);
+    try {
+      await this.cacheRepo.rebuildLeaderboard(courseId, window, entries);
+    } catch (err) {
+      if (
+        LeaderboardError.isLeaderboardError(err) &&
+        err.code === "CACHE_NOT_READY"
+      ) {
+        console.debug(
+          `[LeaderboardCacheRebuildJob] Redis not yet ready, skipping rebuild for ${courseId}/${window}`
+        );
+        return;
+      }
+      throw err;
+    }
   }
 
   private getWindowStart(window: LeaderboardWindow): Date | null {

@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState, useEffect } from "react";
+import { use, useState, useEffect, useRef } from "react";
 
 interface AdminLesson {
   id: string;
@@ -21,9 +21,13 @@ interface AdminCourse {
   status?: string;
   requiresForm?: boolean;
   autoApproveApplications?: boolean;
+  imageUrl?: string;
+  videoPreviewUrl?: string;
 }
 import Link from "next/link";
 import { useAdminCourse, useUpdateCourse, useUpdateCourseStatus } from "@/hooks/admin/use-admin-courses";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/config/query-keys";
 import { useAdminLessons, useCreateLesson, useReorderLessons, useToggleLessonVisibility } from "@/hooks/admin/use-admin-lessons";
 import { statusLabel } from "@/lib/admin/admin-utils";
 import { Button } from "@/components/ui/button";
@@ -53,7 +57,8 @@ import {
   PlayCircle,
   Zap,
   Clock,
-  ArrowRight
+  ArrowRight,
+  Loader2
 } from "lucide-react";
 import { toast } from "sonner";
 import { motion, Reorder, AnimatePresence } from "framer-motion";
@@ -122,8 +127,14 @@ export default function AdminCourseDetailPage({ params }: { params: Promise<{ co
       return;
     }
 
+    setActiveTab(id);
+  };
+
+  const handleSaveAll = async () => {
+    let dataToSave: Record<string, unknown> = pendingData ? { ...pendingData } : {};
+
     // Auto-fix missing slug if needed
-    if (c && !c.slug) {
+    if (c && !c.slug && !dataToSave.slug) {
         const generatedSlug = String(c.title ?? "")
             .toLowerCase()
             .trim()
@@ -132,23 +143,17 @@ export default function AdminCourseDetailPage({ params }: { params: Promise<{ co
             .replace(/^-+|-+$/g, "");
         
         if (generatedSlug) {
-            setPendingData({ ...pendingData, slug: generatedSlug });
-            setHasChanges(true);
-            toast.warning("Registry detected missing URL slug. Protocol auto-generated. Please save to synchronize.");
-            return;
+            dataToSave.slug = generatedSlug;
         }
     }
 
-    setActiveTab(id);
-  };
-
-  const handleSaveAll = async () => {
-    if (!pendingData) {
+    if (Object.keys(dataToSave).length === 0) {
         setHasChanges(false);
         return;
     }
+
     try {
-      await updateCourse.mutateAsync({ id: courseId, data: pendingData });
+      await updateCourse.mutateAsync({ id: courseId, data: dataToSave });
       toast.success("Curriculum node synchronized with registry core");
       setHasChanges(false);
       setPendingData(null);
@@ -298,7 +303,7 @@ export default function AdminCourseDetailPage({ params }: { params: Promise<{ co
                   }} 
                 />
               )}
-              {activeTab === "media" && <MediaTab />}
+              {activeTab === "media" && <MediaTab course={editableCourse} courseId={courseId} />}
               {activeTab === "settings" && (
                 <SettingsTab 
                   course={editableCourse} 
@@ -639,7 +644,8 @@ function PricingTab({ course, onChanges }: { course: AdminCourse; onChanges: (da
   const handleChange = (field: string, value: string) => {
     if (field === "currentPrice") setPrice(value);
     if (field === "originalPrice") setDiscountPrice(value);
-    onChanges({ [field]: value ? Math.round(Number(value) * 100) : undefined });
+    const schemaKey = field === "currentPrice" ? "price" : field;
+    onChanges({ [schemaKey]: value ? Math.round(Number(value) * 100) : undefined });
   };
 
   return (
@@ -690,7 +696,112 @@ function PricingTab({ course, onChanges }: { course: AdminCourse; onChanges: (da
   );
 }
 
-function MediaTab() {
+function MediaTab({ course, courseId }: { course: AdminCourse; courseId: string }) {
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(course.imageUrl || null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const objectUrlRef = useRef<string | null>(null);
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    return () => {
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current);
+      }
+    };
+  }, []);
+
+  const processFile = (file: File) => {
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      toast.error("Invalid file type. Please upload a JPEG, PNG, or WebP.");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File exceeds 5MB limit.");
+      return;
+    }
+
+    if (objectUrlRef.current) {
+      URL.revokeObjectURL(objectUrlRef.current);
+    }
+
+    const objectUrl = URL.createObjectURL(file);
+    objectUrlRef.current = objectUrl;
+    setPreviewUrl(objectUrl);
+    setIsUploading(true);
+    setUploadProgress(0);
+    setIsSuccess(false);
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("courseId", courseId);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "/api/upload/course-image");
+
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) {
+        const percent = Math.round((event.loaded / event.total) * 100);
+        setUploadProgress(percent);
+      }
+    };
+
+    xhr.onload = () => {
+      try {
+        const data = JSON.parse(xhr.responseText);
+        if (xhr.status >= 200 && xhr.status < 300 && data.success) {
+          setIsSuccess(true);
+          toast.success("Course image updated successfully.");
+          queryClient.invalidateQueries({ queryKey: queryKeys.admin.courses.detail(courseId) });
+          queryClient.invalidateQueries({ queryKey: queryKeys.admin.courses.list() });
+          setTimeout(() => setIsSuccess(false), 2500);
+        } else {
+          toast.error(data.error || "Upload failed.");
+          setPreviewUrl(course.imageUrl || null);
+        }
+      } catch (err) {
+        toast.error("Invalid server response.");
+        setPreviewUrl(course.imageUrl || null);
+      } finally {
+        setIsUploading(false);
+      }
+    };
+
+    xhr.onerror = () => {
+      toast.error("A network error occurred during upload.");
+      setPreviewUrl(course.imageUrl || null);
+      setIsUploading(false);
+    };
+
+    xhr.send(formData);
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) processFile(file);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) processFile(file);
+  };
+
   return (
     <Card className="p-12 bg-white/70 backdrop-blur-3xl border border-white rounded-[40px] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)] space-y-12">
       <div className="space-y-1.5">
@@ -701,26 +812,166 @@ function MediaTab() {
       <div className="grid md:grid-cols-2 gap-12">
         <div className="space-y-4">
           <label className="text-[11px] font-[900] text-slate-400 uppercase tracking-[0.25em] ml-1 block">Cover Artifact</label>
-          <div className="aspect-[16/10] rounded-[32px] border-2 border-dashed border-slate-200 bg-slate-50/50 flex flex-col items-center justify-center text-center p-8 transition-all hover:bg-white hover:border-blue-400 hover:shadow-xl hover:shadow-blue-500/5 cursor-pointer group shadow-inner">
-            <div className="size-16 rounded-[20px] bg-white shadow-md flex items-center justify-center mb-6 group-hover:scale-110 transition-all duration-500 ring-1 ring-slate-100">
-              <UploadCloud className="size-8 text-slate-400 group-hover:text-blue-600 transition-colors stroke-[2]" />
-            </div>
-            <p className="text-base font-[900] text-slate-900 tracking-tight">Upload Asset</p>
-            <p className="text-[10px] text-slate-400 font-black uppercase mt-2 tracking-[0.1em] opacity-80">UHD standard (3840x2160)</p>
-          </div>
+          <motion.div 
+            role="button"
+            tabIndex={isUploading ? -1 : 0}
+            whileHover={!isUploading ? { scale: 1.02 } : {}}
+            whileTap={!isUploading ? { scale: 0.98 } : {}}
+            onClick={() => !isUploading && fileInputRef.current?.click()}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                if (!isUploading) fileInputRef.current?.click();
+              }
+            }}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            className={cn(
+              "relative aspect-[16/10] rounded-[32px] border-2 border-dashed flex flex-col items-center justify-center text-center p-8 transition-all overflow-hidden cursor-pointer group shadow-inner focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
+              previewUrl ? "border-transparent" : "border-slate-200 bg-slate-50/50 hover:bg-white hover:border-blue-400 hover:shadow-xl hover:shadow-blue-500/5",
+              isDragging && "border-blue-500 bg-blue-50/50 scale-105",
+              isUploading && "opacity-90 pointer-events-none"
+            )}
+          >
+            <input 
+              type="file" 
+              className="hidden" 
+              ref={fileInputRef} 
+              accept="image/jpeg,image/png,image/webp" 
+              onChange={handleFileSelect} 
+            />
+            <AnimatePresence mode="wait">
+              {previewUrl ? (
+                <motion.div 
+                  key="preview"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="absolute inset-0 w-full h-full"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={previewUrl} alt="Course cover" className="absolute inset-0 w-full h-full object-cover rounded-[30px]" />
+                  
+                  {!isUploading && !isSuccess && (
+                    <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex flex-col items-center justify-center">
+                      <motion.div 
+                        whileHover={{ scale: 1.1, rotate: 180 }}
+                        className="size-16 rounded-[20px] bg-white shadow-md flex items-center justify-center mb-6 ring-1 ring-slate-100"
+                      >
+                        <UploadCloud className="size-8 text-blue-600 stroke-[2]" />
+                      </motion.div>
+                      <p className="text-base font-[900] text-white tracking-tight">Change Asset</p>
+                    </div>
+                  )}
+
+                  <AnimatePresence>
+                    {isUploading && (
+                      <motion.div 
+                        initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
+                        animate={{ opacity: 1, backdropFilter: "blur(8px)" }}
+                        exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
+                        className="absolute inset-0 bg-white/60 flex flex-col items-center justify-center rounded-[30px]"
+                      >
+                        <div className="relative size-16 mb-4">
+                          <svg className="size-16 -rotate-90" viewBox="0 0 100 100">
+                            <circle
+                              className="text-slate-200 stroke-current"
+                              strokeWidth="8"
+                              cx="50"
+                              cy="50"
+                              r="40"
+                              fill="transparent"
+                            ></circle>
+                            <motion.circle
+                              className="text-blue-600 stroke-current"
+                              strokeWidth="8"
+                              strokeLinecap="round"
+                              cx="50"
+                              cy="50"
+                              r="40"
+                              fill="transparent"
+                              initial={{ strokeDasharray: "251.2", strokeDashoffset: "251.2" }}
+                              animate={{ strokeDashoffset: 251.2 - (251.2 * uploadProgress) / 100 }}
+                              transition={{ ease: "easeOut", duration: 0.2 }}
+                            ></motion.circle>
+                          </svg>
+                          <div className="absolute inset-0 flex items-center justify-center text-blue-700 font-bold text-[12px]">
+                            {uploadProgress}%
+                          </div>
+                        </div>
+                        <p className="text-xs font-bold text-slate-800 tracking-wider uppercase">
+                          Uploading...
+                        </p>
+                      </motion.div>
+                    )}
+                    {isSuccess && (
+                      <motion.div 
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="absolute inset-0 bg-emerald-500/90 backdrop-blur-sm flex flex-col items-center justify-center rounded-[30px]"
+                      >
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          transition={{ type: "spring", bounce: 0.5 }}
+                          className="size-20 bg-white rounded-full flex items-center justify-center mb-4 shadow-xl"
+                        >
+                          <CheckCircle2 className="size-10 text-emerald-500" />
+                        </motion.div>
+                        <p className="text-white font-bold tracking-widest uppercase text-sm">Perfect</p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              ) : (
+                <motion.div 
+                  key="empty"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="flex flex-col items-center"
+                >
+                  <motion.div 
+                    animate={isDragging ? { y: [0, -10, 0] } : {}}
+                    transition={{ repeat: Infinity, duration: 1 }}
+                    className={cn(
+                      "size-16 rounded-[20px] bg-white shadow-md flex items-center justify-center mb-6 transition-all duration-500 ring-1 ring-slate-100",
+                      isDragging ? "ring-blue-400 shadow-blue-500/20" : "group-hover:scale-110"
+                    )}
+                  >
+                    <UploadCloud className={cn(
+                      "size-8 transition-colors stroke-[2]",
+                      isDragging ? "text-blue-600" : "text-slate-400 group-hover:text-blue-600"
+                    )} />
+                  </motion.div>
+                  <p className="text-base font-[900] text-slate-900 tracking-tight">
+                    {isDragging ? "Drop artifact here" : "Upload Asset"}
+                  </p>
+                  <p className="text-[10px] text-slate-400 font-black uppercase mt-2 tracking-[0.1em] opacity-80">
+                    Drag & Drop or Click (3840x2160)
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
         </div>
 
         <div className="space-y-4">
-          <label className="text-[11px] font-[900] text-slate-400 uppercase tracking-[0.25em] ml-1 block">Video Stream Probe</label>
-          <div className="aspect-[16/10] rounded-[32px] bg-slate-900 flex flex-col items-center justify-center text-center p-8 shadow-2xl relative overflow-hidden group cursor-pointer">
-            <div className="absolute inset-0 opacity-30 bg-[url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center group-hover:scale-110 transition-transform duration-[2000ms] ease-out" />
+          <label className="text-[11px] font-[900] text-slate-400 uppercase tracking-[0.25em] ml-1 flex items-center gap-2">
+            Video Stream Probe
+            <Badge variant="outline" className="text-[9px] border-blue-200 text-blue-600 bg-blue-50 px-1.5 py-0">COMING SOON</Badge>
+          </label>
+          <div className="aspect-[16/10] rounded-[32px] bg-slate-900 flex flex-col items-center justify-center text-center p-8 shadow-2xl relative overflow-hidden opacity-80">
+            <div className="absolute inset-0 opacity-30 bg-[url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center" />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-60" />
             <div className="relative z-10 flex flex-col items-center">
-              <div className="size-20 rounded-full bg-white/10 backdrop-blur-xl flex items-center justify-center mb-6 group-hover:bg-blue-600 group-hover:scale-110 transition-all duration-500 ring-1 ring-white/20">
-                <PlayCircle className="size-10 text-white stroke-[1.5]" />
+              <div className="size-20 rounded-full bg-white/10 backdrop-blur-xl flex items-center justify-center mb-6 ring-1 ring-white/20">
+                <PlayCircle className="size-10 text-white/50 stroke-[1.5]" />
               </div>
-              <p className="text-base font-[900] text-white tracking-tight">Configure Trailer</p>
-              <p className="text-[10px] text-white/40 font-black uppercase mt-2 tracking-[0.1em]">Encrypted stream required</p>
+              <p className="text-base font-[900] text-white/50 tracking-tight">Configure Trailer</p>
+              <p className="text-[10px] text-white/30 font-black uppercase mt-2 tracking-[0.1em]">Feature coming soon</p>
             </div>
           </div>
         </div>

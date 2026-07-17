@@ -74,6 +74,16 @@ export async function isAvatarUploadEnabled(): Promise<boolean> {
   return value !== "false";
 }
 
+export async function isCourseImageUploadEnabled(): Promise<boolean> {
+  const rolloutEnabled = process.env.COURSE_IMAGE_UPLOAD_ENABLED === "true";
+  if (!rolloutEnabled) return false;
+
+  const runtimeDisabled = await getConfig("course_image_upload_disabled");
+  if (runtimeDisabled === "true") return false;
+
+  return true;
+}
+
 export async function setConfig(
   key: string,
   value: string,
