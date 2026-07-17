@@ -698,13 +698,14 @@ function PricingTab({ course, onChanges }: { course: AdminCourse; onChanges: (da
 
 function MediaTab({ course, courseId }: { course: AdminCourse; courseId: string }) {
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(course.imageUrl || null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
 
-  const processFile = async (file: File) => {
+  const processFile = (file: File) => {
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
       toast.error("Invalid file type. Please upload a JPEG, PNG, or WebP.");
       return;
@@ -718,36 +719,51 @@ function MediaTab({ course, courseId }: { course: AdminCourse; courseId: string 
     const objectUrl = URL.createObjectURL(file);
     setPreviewUrl(objectUrl);
     setIsUploading(true);
+    setUploadProgress(0);
     setIsSuccess(false);
 
     const formData = new FormData();
     formData.append("file", file);
     formData.append("courseId", courseId);
 
-    try {
-      const res = await fetch("/api/upload/course-image", {
-        method: "POST",
-        body: formData,
-      });
-      const data = await res.json();
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "/api/upload/course-image");
 
-      if (res.ok && data.success) {
-        setIsSuccess(true);
-        toast.success("Course image updated successfully.");
-        queryClient.invalidateQueries({ queryKey: queryKeys.admin.courses.detail(courseId) });
-        queryClient.invalidateQueries({ queryKey: queryKeys.admin.courses.list() });
-        setTimeout(() => setIsSuccess(false), 2500);
-      } else {
-        toast.error(data.error || "Upload failed.");
-        setPreviewUrl(course.imageUrl || null);
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) {
+        const percent = Math.round((event.loaded / event.total) * 100);
+        setUploadProgress(percent);
       }
-    } catch (error) {
-      console.error(error);
+    };
+
+    xhr.onload = () => {
+      try {
+        const data = JSON.parse(xhr.responseText);
+        if (xhr.status >= 200 && xhr.status < 300 && data.success) {
+          setIsSuccess(true);
+          toast.success("Course image updated successfully.");
+          queryClient.invalidateQueries({ queryKey: queryKeys.admin.courses.detail(courseId) });
+          queryClient.invalidateQueries({ queryKey: queryKeys.admin.courses.list() });
+          setTimeout(() => setIsSuccess(false), 2500);
+        } else {
+          toast.error(data.error || "Upload failed.");
+          setPreviewUrl(course.imageUrl || null);
+        }
+      } catch (err) {
+        toast.error("Invalid server response.");
+        setPreviewUrl(course.imageUrl || null);
+      } finally {
+        setIsUploading(false);
+      }
+    };
+
+    xhr.onerror = () => {
       toast.error("A network error occurred during upload.");
       setPreviewUrl(course.imageUrl || null);
-    } finally {
       setIsUploading(false);
-    }
+    };
+
+    xhr.send(formData);
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -833,16 +849,38 @@ function MediaTab({ course, courseId }: { course: AdminCourse; courseId: string 
                         initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
                         animate={{ opacity: 1, backdropFilter: "blur(8px)" }}
                         exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
-                        className="absolute inset-0 bg-white/40 flex flex-col items-center justify-center"
+                        className="absolute inset-0 bg-white/60 flex flex-col items-center justify-center rounded-[30px]"
                       >
-                        <Loader2 className="size-12 text-blue-600 animate-spin mb-4" />
-                        <motion.p 
-                          animate={{ opacity: [0.5, 1, 0.5] }} 
-                          transition={{ repeat: Infinity, duration: 1.5 }}
-                          className="text-sm font-bold text-slate-800 tracking-wider uppercase"
-                        >
+                        <div className="relative size-16 mb-4">
+                          <svg className="size-16 -rotate-90" viewBox="0 0 100 100">
+                            <circle
+                              className="text-slate-200 stroke-current"
+                              strokeWidth="8"
+                              cx="50"
+                              cy="50"
+                              r="40"
+                              fill="transparent"
+                            ></circle>
+                            <motion.circle
+                              className="text-blue-600 stroke-current"
+                              strokeWidth="8"
+                              strokeLinecap="round"
+                              cx="50"
+                              cy="50"
+                              r="40"
+                              fill="transparent"
+                              initial={{ strokeDasharray: "251.2", strokeDashoffset: "251.2" }}
+                              animate={{ strokeDashoffset: 251.2 - (251.2 * uploadProgress) / 100 }}
+                              transition={{ ease: "easeOut", duration: 0.2 }}
+                            ></motion.circle>
+                          </svg>
+                          <div className="absolute inset-0 flex items-center justify-center text-blue-700 font-bold text-[12px]">
+                            {uploadProgress}%
+                          </div>
+                        </div>
+                        <p className="text-xs font-bold text-slate-800 tracking-wider uppercase">
                           Uploading...
-                        </motion.p>
+                        </p>
                       </motion.div>
                     )}
                     {isSuccess && (
