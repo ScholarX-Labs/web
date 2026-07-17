@@ -74,6 +74,12 @@ export async function isAvatarUploadEnabled(): Promise<boolean> {
   return value !== "false";
 }
 
+export async function isCourseImageUploadEnabled(): Promise<boolean> {
+  const value = await getConfig("course_image_upload_enabled");
+  if (value === null) return false; // fail-safe: off until explicitly enabled
+  return value !== "false";
+}
+
 export async function setConfig(
   key: string,
   value: string,
