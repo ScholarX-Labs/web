@@ -33,12 +33,22 @@ export class LeaderboardService {
     await this.pointEventRepo.insertPointEvent(event);
 
     if (this.rebuildJob) {
-      // Run cache rebuilds
-      await Promise.all([
-        this.rebuildJob.rebuild(event.courseId, "all"),
-        this.rebuildJob.rebuild(event.courseId, "week"),
-        this.rebuildJob.rebuild(event.courseId, "month"),
-      ]).catch((err) => console.error("[LeaderboardService] Cache rebuild failed:", err));
+      // Run all three window rebuilds independently so a failure in one window
+      // does not prevent the others from completing (Promise.allSettled vs .all).
+      const windows = ["all", "week", "month"] as const;
+      const results = await Promise.allSettled(
+        windows.map((w) => this.rebuildJob!.rebuild(event.courseId, w))
+      );
+
+      for (let i = 0; i < results.length; i++) {
+        const result = results[i];
+        if (result.status === "rejected") {
+          console.error(
+            `[LeaderboardService] Cache rebuild failed for window="${windows[i]}":`,
+            result.reason
+          );
+        }
+      }
     }
 
     return {
