@@ -6,6 +6,11 @@ const MAX_FILE_SIZE = 1 * 1024 * 1024;
 const AVATAR_MAX_DIMENSION = 512;
 const AVATAR_CONTAINER = "avatars";
 
+const COURSE_IMAGE_MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+const COURSE_IMAGE_MAX_DIMENSION = 1920;
+const COURSE_IMAGE_CONTAINER = "course-images";
+const COURSE_IMAGE_ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+
 const MAGIC_BYTES: Record<string, number[]> = {
   "image/jpeg": [0xFF, 0xD8, 0xFF],
   "image/png": [0x89, 0x50, 0x4E, 0x47],
@@ -160,19 +165,137 @@ export function getAvatarKeyFromUrl(url: string): string | null {
   }
 }
 
+export async function processCourseImage(inputBuffer: Buffer): Promise<Buffer> {
+  try {
+    return await sharp(inputBuffer)
+      .resize(COURSE_IMAGE_MAX_DIMENSION, null, {
+        fit: "inside",
+        withoutEnlargement: true,
+      })
+      .jpeg({ quality: 85 })
+      .toBuffer();
+  } catch {
+    throw new UploadError(
+      "SHARP_REENCODE_FAILED",
+      422,
+      "Image processing failed — file may be corrupt"
+    );
+  }
+}
+
+export async function uploadCourseImage(
+  courseId: string,
+  fileBuffer: Buffer,
+  mimeType: string
+): Promise<string> {
+  if (fileBuffer.length > COURSE_IMAGE_MAX_FILE_SIZE) {
+    throw new UploadError(
+      "FILE_TOO_LARGE",
+      413,
+      `File exceeds ${COURSE_IMAGE_MAX_FILE_SIZE / 1024 / 1024}MB limit`
+    );
+  }
+
+  if (!COURSE_IMAGE_ACCEPTED_TYPES.includes(mimeType)) {
+    throw new UploadError(
+      "INVALID_FILE_TYPE",
+      415,
+      `Accepted types: ${COURSE_IMAGE_ACCEPTED_TYPES.join(", ")}`
+    );
+  }
+
+  const detectedMime = detectMagicBytes(fileBuffer);
+  if (detectedMime !== mimeType) {
+    throw new UploadError(
+      "INVALID_MAGIC_BYTES",
+      415,
+      "File content does not match declared type"
+    );
+  }
+
+  const processedBuffer = await processCourseImage(fileBuffer);
+
+  const blobName = `${courseId}/${crypto.randomUUID()}.jpg`;
+
+  try {
+    const client = getBlobServiceClient();
+    const containerClient = client.getContainerClient(COURSE_IMAGE_CONTAINER);
+    const blobClient = containerClient.getBlockBlobClient(blobName);
+    await blobClient.uploadData(processedBuffer, {
+      blobHTTPHeaders: {
+        blobContentType: "image/jpeg",
+        blobCacheControl: "public, max-age=604800",
+      },
+    });
+    return blobClient.url;
+  } catch (error) {
+    if (error instanceof UploadError) throw error;
+    const azureCode = (error as { code?: string })?.code;
+    if (azureCode === "ContainerNotFound") {
+      throw new UploadError(
+        "CONTAINER_NOT_FOUND",
+        503,
+        `Azure Blob container '${COURSE_IMAGE_CONTAINER}' does not exist. Create it in the Azure Portal.`
+      );
+    }
+    if (azureCode === "PublicAccessNotPermitted") {
+      throw new UploadError(
+        "PUBLIC_ACCESS_DENIED",
+        503,
+        "Storage account has public blob access disabled."
+      );
+    }
+    console.error("[upload] Azure upload error:", error);
+    throw new UploadError("UPLOAD_FAILED", 500, "Failed to upload to storage");
+  }
+}
+
+export async function deleteCourseImage(blobUrl: string): Promise<void> {
+  try {
+    const client = getBlobServiceClient();
+    const containerClient = client.getContainerClient(COURSE_IMAGE_CONTAINER);
+    const url = new URL(blobUrl);
+    const segments = url.pathname.split("/").filter(Boolean);
+    const blobName = segments.slice(1).join("/");
+    if (blobName) {
+      await containerClient.deleteBlob(blobName);
+    }
+  } catch (error) {
+    console.error("[upload] Failed to delete old course image:", error);
+  }
+}
+
+export function getCourseImageKeyFromUrl(url: string): string | null {
+  try {
+    const parsed = new URL(url);
+    const segments = parsed.pathname.split("/").filter(Boolean);
+    if (segments.length < 2) return null;
+    return segments.slice(1).join("/");
+  } catch {
+    return null;
+  }
+}
+
 export async function calculateAzureStorageUsage(): Promise<number> {
   try {
     const client = getBlobServiceClient();
-    const containerClient = client.getContainerClient(AVATAR_CONTAINER);
+    const avatarContainer = client.getContainerClient(AVATAR_CONTAINER);
+    const courseContainer = client.getContainerClient(COURSE_IMAGE_CONTAINER);
     
-    if (!(await containerClient.exists())) {
-      return 0;
+    let totalBytes = 0;
+
+    if (await avatarContainer.exists()) {
+      for await (const blob of avatarContainer.listBlobsFlat()) {
+        totalBytes += blob.properties.contentLength || 0;
+      }
     }
 
-    let totalBytes = 0;
-    for await (const blob of containerClient.listBlobsFlat()) {
-      totalBytes += blob.properties.contentLength || 0;
+    if (await courseContainer.exists()) {
+      for await (const blob of courseContainer.listBlobsFlat()) {
+        totalBytes += blob.properties.contentLength || 0;
+      }
     }
+
     return totalBytes;
   } catch (error) {
     console.error("[upload] Failed to calculate Azure storage usage:", error);
