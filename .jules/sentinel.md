@@ -1,0 +1,4 @@
+## 2025-02-13 - [Fix Timing Attack in Storage Check API]
+**Vulnerability:** The internal API key in `src/app/api/admin/storage-check/route.ts` was checked using a strict equality (`===`), making it susceptible to timing attacks, where an attacker could deduce the API key character-by-character based on response times.
+**Learning:** Empty string fallbacks shouldn't be used when verifying secrets, as missing environment variables combined with an omitted header could bypass authentication completely. Also, string lengths could trigger a `RangeError` with multi-byte characters when converted to Buffers if not evaluated prior to `crypto.timingSafeEqual()`.
+**Prevention:** Always use `crypto.timingSafeEqual` with `Buffer.from()` and ensure buffer lengths match (`buf1.length === buf2.length`) before calling the function.
