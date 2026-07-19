@@ -1,1 +1,6 @@
-{ "plugin": ["@warp-dot-dev/opencode-warp"] }
+{
+  "plugin": [
+    "@warp-dot-dev/opencode-warp",
+    "nax-spec-kit@git+https://github.com/nathapp-io/nax-spec-kit-skills.git"
+  ]
+}
