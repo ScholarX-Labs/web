@@ -16,6 +16,126 @@ and seek-from tracking.
 
 ---
 
+## ARCHITECTURAL RULE — Dual Video Source Support (Non-Negotiable)
+
+> **This rule is permanent. No migration, refactor, or optimization may violate it.**
+
+### The Rule
+
+ScholarX must **always** support two video sources simultaneously through the
+**same Vidstack player**, with **zero security coupling** between them:
+
+| Source | Used For | Security | Token Signing | Rollback |
+|--------|----------|----------|---------------|----------|
+| **YouTube** | Free courses (public preview) | None | None — URLs pass through as-is | Already live — no changes |
+| **Bunny CDN** | Paid courses (enrolled users) | CDN Token Auth + Allowed Domains | Server-side HMAC signing | Change `video_url` back to YouTube URL |
+
+### Why This Rule Exists
+
+1. **Free courses stay on YouTube** — they're public, marketing-driven, and
+   benefit from YouTube's SEO, discovery, and zero-cost hosting.
+
+2. **Paid courses move to Bunny CDN** — they're protected, token-authenticated,
+   and restricted to enrolled users.
+
+3. **Rollback must be instant** — if Bunny CDN has issues (outage, pricing
+   change, feature gap), an admin changes `lessons.video_url` from a Bunny CDN
+   path to a YouTube URL, and playback works immediately with zero code deploy.
+
+4. **No feature parity requirement** — YouTube lessons don't get CDN token
+   signing. Bunny lessons don't get YouTube SEO. Each source runs its own
+   security model independently.
+
+### How It Works — The `toPlayerSrc()` Contract
+
+The `toPlayerSrc()` function in `video-player.tsx` is the **single point of
+routing**. It must detect the URL pattern and return the correct `PlayerSrc`:
+
+```
+URL contains youtube.com or youtu.be?
+  ├─ YES → Return { src, type: "video/youtube" }
+  │        (Vidstack YouTube provider — no token signing, no security)
+  │
+  └─ NO → URL contains b-cdn.net or .m3u8?
+           ├─ YES → Return { src, type: "application/x-mpegURL" }
+           │        (Vidstack HLS provider — CDN Token Auth required)
+           │
+           └─ NO → Return src as-is
+                    (Fallback — Vidstack auto-detects)
+```
+
+### The Data Flow — Both Sources
+
+```
+                        ┌─────────────────────────────────┐
+                        │     lessons.video_url (DB)       │
+                        │  Stores RAW URL — no tokens      │
+                        └──────────┬──────────────────────┘
+                                   │
+                    ┌──────────────┴──────────────┐
+                    │                             │
+            YouTube URL                   Bunny CDN URL
+            (free course)                 (paid course)
+                    │                             │
+                    ▼                             ▼
+          toPlayerSrc()                 toPlayerSrc()
+          detects YouTube               detects b-cdn.net
+                    │                             │
+                    ▼                             ▼
+          { src, type:                  API signs URL with
+            "video/youtube" }           CDN Token Auth
+                    │                             │
+                    ▼                             ▼
+          Vidstack plays it             Vidstack plays signed
+          directly — no signing         HLS URL — full security
+                    │                             │
+                    ▼                             ▼
+          No progress restrictions      Progress tracking +
+          No token validation           token validation
+```
+
+### The Rollback Contract
+
+**To roll back a lesson from Bunny CDN to YouTube:**
+
+1. Admin opens lesson editor in dashboard
+2. Changes `video_url` from `https://vz-xxx.b-cdn.net/lesson.m3u8`
+   to `https://www.youtube.com/watch?v=VIDEO_ID`
+3. Saves — lesson now plays from YouTube immediately
+4. No code deploy required. No server restart. No migration.
+
+**To roll forward from YouTube to Bunny CDN:**
+
+1. Upload video to Bunny Stream library
+2. Get the CDN path (e.g., `https://vz-xxx.b-cdn.net/lesson.m3u8`)
+3. Admin updates `video_url` in lesson editor
+4. CDN Token Auth kicks in automatically — no code changes
+
+### What Must NEVER Happen
+
+- ❌ YouTube URLs must never be signed with CDN Token Auth
+- ❌ Bunny CDN URLs must never be played without token signing
+- ❌ The player must never refuse to play a valid YouTube URL
+- ❌ The player must never play a Bunny CDN URL without a valid token
+- ❌ Free course lessons must never require authentication to play
+- ❌ Paid course lessons must ever be accessible without enrollment
+- ❌ Rolling back a lesson source must never require code changes
+- ❌ The `toPlayerSrc()` function must never hardcode a single source type
+
+### Validation Checklist
+
+Before any video-related code change, verify:
+
+- [ ] Does this change affect YouTube playback? If yes, test free course lesson.
+- [ ] Does this change affect Bunny CDN playback? If yes, test paid course lesson.
+- [ ] Does this change break the rollback path? (changing `video_url` in DB)
+- [ ] Does this change add security coupling between the two sources?
+- [ ] Does this change require both sources to be present for either to work?
+
+**If any answer is YES, the change violates this rule and must be redesigned.**
+
+---
+
 ## Current Architecture
 
 ### Tech Stack
@@ -95,6 +215,9 @@ They will work with Bunny.net without changes.
 
 **Status: INCOMPATIBLE — Must NOT be enabled**
 
+> **⚠️ Warning**: Bunny may auto-enable MediaCage Basic on new video libraries.
+> Check the Security tab immediately after creating your library and disable it.
+
 MediaCage Basic DRM uses Clear-Key encryption and is restricted to
 **Embed View Only**. This means:
 
@@ -109,6 +232,12 @@ MediaCage Basic DRM uses Clear-Key encryption and is restricted to
 - Only allows content through the embed player itself
 - Free tier — no additional cost
 
+**Clear-Key security limitation:**
+- Keys are transferred to the client in clear (plaintext) format
+- A sophisticated attacker can intercept and decrypt the keys
+- This is NOT hardware DRM — it's software-only encryption
+- Dynamic key generation (per-session) mitigates sharing, but not interception
+
 **Why we can't use it:**
 - ScholarX uses Vidstack (`@vidstack/react`) with `MediaPlayer` + `MediaProvider`
 - MediaCage Basic blocks all non-Bunny players at the API level
@@ -122,8 +251,13 @@ MediaCage Basic DRM uses Clear-Key encryption and is restricted to
 
 **Status: COMPATIBLE but COSTLY — Future consideration**
 
-MediaCage Enterprise offers real hardware DRM (Widevine L1 + FairPlay) that
-works with custom players like Vidstack.
+> **Key difference from Basic**: Enterprise uses hardware DRM (Widevine L1 +
+> FairPlay) where decryption keys stay in the GPU secure enclave. Unlike Basic,
+> keys are NOT sent to the client in clear format. This is the same DRM Netflix
+> and Prime Video use.
+
+MediaCage Enterprise offers real hardware DRM that works with custom players
+like Vidstack.
 
 **Requirements:**
 - Widevine license service endpoint configuration in Vidstack
@@ -136,6 +270,7 @@ works with custom players like Vidstack.
 - Screen recorders capture black frames
 - Same DRM Netflix and Prime Video use
 - Works with Vidstack's DRM support
+- Keys never leave the secure hardware environment
 
 **Why we're deferring it:**
 - $99/month + per-license fees are significant for current stage
@@ -181,6 +316,121 @@ https://vz-yourlibrary.b-cdn.net/lesson.m3u8?token=5a5de480...&expires=172138080
 
 **Important**: CDN Token Authentication applies to ALL direct URLs — MP4
 fallbacks, HLS playlists and segments, thumbnails, and previews.
+
+#### Path-Style Tokens — Required for HLS
+
+For HLS streams (`.m3u8` + `.ts` segments), you **must** use path-style tokens.
+Query-string tokens only sign the exact URL, but HLS players request segment
+files relative to the playlist path. Without path-style tokens, segment requests
+return 403.
+
+**How path-style tokens work:**
+```
+# Query string token (BROKEN for HLS) — only signs the playlist URL
+https://vz-123.b-cdn.net/videos/lesson.m3u8?token=abc&expires=1234
+
+# Path-style token (CORRECT for HLS) — signs the directory prefix
+https://vz-123.b-cdn.net/bcdn_token=abc&expires=1234/token_path=/videos//videos/lesson.m3u8
+```
+
+The `token_path` parameter tells Bunny which directory prefix to validate.
+All files under that prefix (playlist + segments) are covered by one token.
+
+**Directory token computation:**
+```ts
+function computeTokenPath(videoUrl: string, cdnHost: string): string {
+  // videoUrl: "https://vz-123.b-cdn.net/videos/lesson.m3u8"
+  // cdnHost: "vz-123.b-cdn.net"
+  const path = new URL(videoUrl).pathname;  // "/videos/lesson.m3u8"
+  const dir = path.substring(0, path.lastIndexOf("/") + 1);  // "/videos/"
+  return dir;  // This becomes the token_path
+}
+```
+
+**Signing with directory tokens (Advanced Token Auth):**
+```ts
+import { createHmac } from "crypto";
+
+function signHlsUrl(
+  videoUrl: string,
+  securityKey: string,
+  expiresAt: number
+): string {
+  const url = new URL(videoUrl);
+  const tokenPath = url.pathname.substring(0, url.pathname.lastIndexOf("/") + 1);
+
+  // For path-style: sign with token_path
+  const dataToSign = `${tokenPath}${expiresAt}`;
+  const signature = createHmac("sha256", securityKey)
+    .update(dataToSign)
+    .digest("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
+
+  const token = `HS256-${signature}`;
+  // Embed token in path, not query string
+  return `${url.origin}/bcdn_token=${token}&expires=${expiresAt}&token_path=${encodeURIComponent(tokenPath)}${url.pathname}`;
+}
+```
+
+#### Token Refresh Strategy for Long Videos
+
+**Problem**: If tokens expire in 5 minutes and a lesson is 30+ minutes,
+the HLS manifest request will fail mid-playback when hls.js re-fetches
+the playlist (typically every 6-12 seconds for live, or on seek/restart).
+
+**Solutions (pick one):**
+
+| Strategy | TTL | Pros | Cons |
+|----------|-----|------|------|
+| **Long initial TTL** | 1-2 hours | Simple, no refresh needed | Token valid for hours if leaked |
+| **Refresh endpoint** | 5 min + refresh API | Short-lived tokens, more secure | Extra network request, complexity |
+| **Server-side signing** | Per-request | Maximum security | Requires backend on every segment |
+
+**Recommended**: Long initial TTL (1 hour) for simplicity. The token is
+bound to the session anyway (via Allowed Domains + CDN Token Auth). If
+you need tighter security later, add a refresh endpoint.
+
+```ts
+// In the token endpoint — use 1-hour TTL for video playback
+const expires = Math.floor(Date.now() / 1000) + 3600; // 1 hour
+```
+
+#### Error Handling — CDN Token Auth Failures
+
+When a CDN Token Auth request fails (403), the player should handle it
+gracefully:
+
+**What happens without handling:**
+- hls.js shows a generic error or black screen
+- User has no way to recover
+- Progress tracking stops silently
+
+**Recommended error handling:**
+
+```ts
+// In video-player.tsx — add error handler to MediaPlayer
+<MediaPlayer
+  src={playerSrc}
+  onError={(event) => {
+    const error = event.detail?.error;
+    if (error?.code === 403 || error?.message?.includes("403")) {
+      // Token expired or invalid — request new token
+      refreshAndRetryPlayback();
+    }
+  }}
+>
+```
+
+**Retry flow:**
+1. Detect 403 error from hls.js or native player
+2. Request fresh token from `/api/bunny/token`
+3. Update `src` prop on `<MediaPlayer>` with new signed URL
+4. Vidstack/hls.js will re-fetch the manifest automatically
+
+**User-facing message**: Show "Session expired — reconnecting..." during
+retry, and "Unable to play — please refresh" if retry fails.
 
 ---
 
@@ -471,6 +721,49 @@ Vidstack uses `hls.js` internally for HLS playback. Verify it's in `package.json
 
 - Add production domain
 - Add localhost for development
+
+### 6. Implement Rate Limiting for Points/Awards Endpoint
+
+When awarding points for video completion, rate-limit the endpoint to prevent
+replay abuse (e.g., user replays the `ended` event to earn extra points).
+
+**Recommended rate limits:**
+
+| Limit | Window | Purpose |
+|-------|--------|---------|
+| 1 completion per user per lesson | 24 hours | Prevent duplicate point awards |
+| 5 token requests per user per lesson | 1 minute | Prevent token brute-force |
+| 10 progress updates per user per lesson | 1 minute | Prevent progress spam |
+
+**Implementation:**
+```ts
+// In the points/awards API route
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
+
+const ratelimit = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(1, "24 h"), // 1 completion per 24h
+  analytics: true,
+});
+
+export async function POST(request: Request) {
+  const { userId, lessonId } = await request.json();
+
+  const { success } = await ratelimit.limit(`${userId}:${lessonId}`);
+  if (!success) {
+    return NextResponse.json(
+      { error: "Already completed" },
+      { status: 429 }
+    );
+  }
+
+  // Award points...
+}
+```
+
+**Alternative without Redis**: Use a database table with a unique constraint
+on `(user_id, lesson_id, award_type)` and check before inserting.
 
 ---
 
