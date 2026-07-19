@@ -1,0 +1,4 @@
+## 2024-07-19 - [Timing Attack Risk on Internal API Route Auth]
+**Vulnerability:** A simple strict equality check (`===`) was used to validate an internal API key against an environment variable in an API route (`request.headers.get("x-internal-key") === process.env.INTERNAL_API_KEY`). This allows attackers to potentially guess the key character-by-character by observing response times (timing attack).
+**Learning:** Comparing sensitive secrets or tokens using strict string equality (`===` or `==`) exposes the application to timing attacks because string comparison often returns early upon encountering a mismatch.
+**Prevention:** Always use a constant-time comparison method (such as Node.js's `crypto.timingSafeEqual`) to compare secrets. Ensure the inputs are converted to Buffers, check that their byte lengths match, and verify that both values exist (e.g., environment variable is configured).
