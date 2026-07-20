@@ -21,7 +21,14 @@ export function PostLoginRedirect() {
 
   useEffect(() => {
     if (isPending || !session?.user) return;
+    
     if (SKIP_PATHS.has(pathname)) return;
+
+    // Prevent onboarding redirects for users already engaged in authenticated tasks
+    const isAuthSurface = ["/admin", "/profile", "/my-courses"].some(prefix => 
+      pathname.startsWith(prefix)
+    );
+    if (isAuthSurface) return;
 
     const user = session.user as Record<string, unknown>;
 
