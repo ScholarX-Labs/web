@@ -851,5 +851,111 @@ export const createAdminRepository = (): AdminRepository => {
         averageCompletionRate: 0,
       };
     },
+
+    async getUserByEmail(email: string) {
+      const results = await db
+        .select()
+        .from(dbUsers)
+        .where(eq(dbUsers.email, email))
+        .limit(1);
+      return results[0] ?? null;
+    },
+
+    async setMustChangePassword(userId: string, value: boolean) {
+      await db
+        .update(dbUsers)
+        .set({ mustChangePassword: value })
+        .where(eq(dbUsers.id, userId));
+    },
+
+    async enrollUserWithPayment(
+      courseId: string,
+      userId: string,
+      amount: number,
+      paymentMethod: string,
+      paymentId?: string,
+    ) {
+      const [enrollment] = await db
+        .insert(dbSubscriptions)
+        .values({
+          userId,
+          courseId,
+          amount,
+          paymentMethod,
+          paymentId,
+          status: "active",
+          isActive: true,
+          enrolledAt: new Date(),
+        })
+        .onConflictDoNothing()
+        .returning();
+
+      if (!enrollment) {
+        throw AdminErrors.conflict(
+          "User is already enrolled in this course",
+        );
+      }
+
+      return enrollment;
+    },
+
+    async listEnrollmentsByCourse(
+      courseId: string,
+      page = 1,
+      limit = 20,
+      search?: string,
+      status?: string,
+    ) {
+      const conditions: unknown[] = [eq(dbSubscriptions.courseId, courseId)];
+
+      if (status) {
+        conditions.push(eq(dbSubscriptions.status, status));
+      }
+
+      const where = and(...(conditions as SQL[]));
+
+      return paginate(
+        async (l, o) => {
+          const results = await db
+            .select({
+              id: dbSubscriptions.id,
+              userId: dbSubscriptions.userId,
+              courseId: dbSubscriptions.courseId,
+              amount: dbSubscriptions.amount,
+              paymentMethod: dbSubscriptions.paymentMethod,
+              paymentId: dbSubscriptions.paymentId,
+              status: dbSubscriptions.status,
+              isActive: dbSubscriptions.isActive,
+              enrolledAt: dbSubscriptions.enrolledAt,
+              user: {
+                id: dbUsers.id,
+                email: dbUsers.email,
+                firstName: dbUsers.firstName,
+                lastName: dbUsers.lastName,
+              },
+            })
+            .from(dbSubscriptions)
+            .innerJoin(dbUsers, eq(dbSubscriptions.userId, dbUsers.id))
+            .where(where)
+            .orderBy(desc(dbSubscriptions.enrolledAt))
+            .limit(l)
+            .offset(o);
+
+          if (!search) return results;
+
+          const q = search.toLowerCase();
+          return results.filter(
+            (r) =>
+              r.user.email?.toLowerCase().includes(q) ||
+              r.user.firstName?.toLowerCase().includes(q) ||
+              r.user.lastName?.toLowerCase().includes(q),
+          );
+        },
+        async () =>
+          db.select({ value: count() }).from(dbSubscriptions).where(where),
+        page,
+        limit,
+      );
+    },
   };
 };
