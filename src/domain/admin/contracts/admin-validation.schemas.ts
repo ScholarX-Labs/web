@@ -40,7 +40,7 @@ export const CreateUserSchema = z.object({
 });
 
 export const EnrollWithPaymentSchema = z.object({
-  courseId: z.string().uuid(),
+  courseId: z.string().regex(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/i, "Invalid UUID"),
   userId: z.string().min(1).optional(),
   email: z.string().email().optional(),
   amount: z.coerce.number().int().min(0),
@@ -57,7 +57,7 @@ export const CashEnrollmentSchema = z.object({
     phoneNumber: z.string().optional(),
   }),
   course: z.object({
-    courseId: z.string().uuid(),
+    courseId: z.string().regex(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/i, "Invalid UUID"),
     paymentMethod: z.enum(["cash", "card", "bank_transfer"]),
     amount: z.coerce.number().int().min(0),
     paymentId: z.string().max(255).optional(),
@@ -87,7 +87,7 @@ export const UpdateLessonSchema = CreateLessonSchema.partial().extend({
 });
 
 export const ReorderLessonsSchema = z.object({
-  lessonIds: z.array(z.string().uuid()),
+  lessonIds: z.array(z.string().regex(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/i, "Invalid UUID")),
 });
 
 export const UpdateUserSchema = z.object({
