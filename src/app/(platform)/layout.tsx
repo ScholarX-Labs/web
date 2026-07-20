@@ -1,4 +1,6 @@
 import React from "react";
+import { PostLoginRedirect } from "@/components/auth/post-login-redirect";
+import { EmailVerificationBanner } from "@/components/auth/email-verification-banner";
 
 /**
  * Platform Route Group Layout
@@ -12,6 +14,8 @@ export default function PlatformLayout({
 }) {
   return (
     <div className="flex flex-1 flex-col bg-background">
+      <PostLoginRedirect />
+      <EmailVerificationBanner />
       {/* <NavBar /> */}
       <div className="flex-1 w-full">{children}</div>
       {/* <Footer /> */}
