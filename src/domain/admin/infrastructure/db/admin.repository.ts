@@ -919,6 +919,10 @@ export const createAdminRepository = (): AdminRepository => {
             ilike(dbUsers.email, pattern),
             ilike(dbUsers.firstName, pattern),
             ilike(dbUsers.lastName, pattern),
+            ilike(
+              sql<string>`COALESCE(${dbUsers.firstName}, '') || ' ' || COALESCE(${dbUsers.lastName}, '')`,
+              pattern,
+            ),
           )
         );
       }
