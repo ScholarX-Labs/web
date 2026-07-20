@@ -2,6 +2,7 @@
 // [AUTO-FIXED] Array defaults and other Postgres-specific patches applied by scripts/fix-auth-schema.js
 // [AUTO-FIXED] Array defaults and other Postgres-specific patches applied by scripts/fix-auth-schema.js
 // [AUTO-FIXED] Array defaults and other Postgres-specific patches applied by scripts/fix-auth-schema.js
+// [AUTO-FIXED] Array defaults and other Postgres-specific patches applied by scripts/fix-auth-schema.js
 import { relations, sql } from "drizzle-orm";
 import {
   pgSchema,
@@ -57,6 +58,8 @@ export const user = authSchema.table("user", {
   twitterUrl: text("twitter_url"),
   linkedinUrl: text("linkedin_url"),
   isProfilePublic: boolean("is_profile_public").default(true).notNull(),
+  mustChangePassword: boolean("must_change_password").default(false).notNull(),
+  emailVerificationSkipped: boolean("email_verification_skipped").default(false).notNull(),
 });
 
 export const session = authSchema.table(
