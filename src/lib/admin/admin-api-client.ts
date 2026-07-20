@@ -37,10 +37,13 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   const json = await response.json();
 
   if (!response.ok) {
+    if (json.details) {
+      console.error("[AdminApiError Details]:", JSON.stringify(json.details, null, 2));
+    }
     throw new AdminApiError(
       response.status,
       json.code ?? "UNKNOWN",
-      json.message ?? "Request failed",
+      (json.message ?? "Request failed") + (json.details ? ` - Details: ${JSON.stringify(json.details)}` : ""),
     );
   }
 
