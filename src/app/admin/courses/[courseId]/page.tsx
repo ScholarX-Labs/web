@@ -58,7 +58,8 @@ import {
   Zap,
   Clock,
   ArrowRight,
-  Loader2
+  Loader2,
+  Users
 } from "lucide-react";
 import { toast } from "sonner";
 import { motion, Reorder, AnimatePresence } from "framer-motion";
@@ -66,6 +67,7 @@ import { cn } from "@/lib/utils";
 import ProgressIndicator from "@/components/ui/progress-indicator";
 import { UnsavePopup } from "@/components/ui/unsave-popup";
 import { LessonEditor } from "./_components/lesson-editor";
+import { EnrollmentsTab } from "./_components/enrollments-tab";
 import { ImageCropper } from "@/components/ui/image-cropper";
 import { 
   Dialog, 
@@ -77,6 +79,7 @@ import {
 
 const TABS = [
   { id: "curriculum", label: "Curriculum", icon: BookOpen },
+  { id: "enrollments", label: "Enrollments", icon: Users },
   { id: "basic", label: "General", icon: Layout },
   { id: "pricing", label: "Pricing", icon: DollarSign },
   { id: "media", label: "Media", icon: ImageIcon },
@@ -285,6 +288,9 @@ export default function AdminCourseDetailPage({ params }: { params: Promise<{ co
                     setIsEditorOpen(true);
                   }}
                 />
+              )}
+              {activeTab === "enrollments" && (
+                <EnrollmentsTab courseId={courseId} />
               )}
               {activeTab === "basic" && (
                 <BasicTab key={resetKey}
