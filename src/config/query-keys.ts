@@ -90,5 +90,10 @@ export const queryKeys = {
       courses: (range: Record<string, unknown>) =>
         [...queryKeys.admin.reports.all(), "courses", range] as const,
     },
+    enrollments: {
+      all: () => [...queryKeys.admin.all, "enrollments"] as const,
+      byCourse: (courseId: string, query: Record<string, unknown>) =>
+        [...queryKeys.admin.enrollments.all(), courseId, query] as const,
+    },
   },
 } as const;
