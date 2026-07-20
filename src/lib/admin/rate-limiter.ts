@@ -31,7 +31,7 @@ export const checkRateLimit = async (
       id: `admin.api.${path.replace(/[^a-z0-9]+/gi, ".").replace(/^\.+|\.+$/g, "").toLowerCase() || "root"}`,
       windowSeconds: Math.ceil(config.windowMs / 1000),
       maxRequests: config.maxRequests,
-      failureMode: "fail-open",
+      failureMode: "fail-closed",
     },
     buildRateLimitSubject(["admin", identifier, path]),
   );
