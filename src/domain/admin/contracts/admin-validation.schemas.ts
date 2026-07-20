@@ -15,7 +15,7 @@ export const CreateCourseSchema = z.object({
   videoPreviewUrl: z.string().url().optional().or(z.literal("")),
   tags: z.array(z.string()).optional(),
   status: z.enum(["active", "inactive", "draft"]).optional(),
-  instructorId: z.string().uuid().optional(),
+  instructorId: z.string().min(1).optional(),
   seoDescription: z.string().max(500).optional(),
   seoKeywords: z.string().max(500).optional(),
 });
@@ -41,12 +41,12 @@ export const CreateUserSchema = z.object({
 
 export const EnrollWithPaymentSchema = z.object({
   courseId: z.string().uuid(),
-  userId: z.string().uuid().optional(),
+  userId: z.string().min(1).optional(),
   email: z.string().email().optional(),
   amount: z.coerce.number().int().min(0),
   paymentMethod: z.enum(["cash", "card", "bank_transfer"]),
   paymentId: z.string().max(255).optional(),
-  enrolledBy: z.string().uuid(),
+  enrolledBy: z.string().min(1),
 });
 
 export const CashEnrollmentSchema = z.object({
@@ -62,7 +62,7 @@ export const CashEnrollmentSchema = z.object({
     amount: z.coerce.number().int().min(0),
     paymentId: z.string().max(255).optional(),
   }),
-  enrolledBy: z.string().uuid(),
+  enrolledBy: z.string().min(1),
 });
 
 export const AdminCashEnrollmentQuerySchema = z.object({
