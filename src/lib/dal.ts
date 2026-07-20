@@ -69,8 +69,14 @@ export async function requireSession() {
     redirect(ROUTES.SIGNIN);
   }
 
-  if (!session.user.emailVerified) {
+  const user = session.user as Record<string, unknown>;
+
+  if (!session.user.emailVerified && !user.emailVerificationSkipped) {
     redirect(ROUTES.VERIFY_EMAIL);
+  }
+
+  if (user.mustChangePassword) {
+    redirect(ROUTES.CHANGE_PASSWORD);
   }
 
   if (!session.user.phoneNumber) {
