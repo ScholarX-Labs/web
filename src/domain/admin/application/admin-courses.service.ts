@@ -1,6 +1,6 @@
 import type { AdminRepository } from "@/domain/admin/contracts/admin-repository.contract";
-import type { AdminSession, CreateCourseInput, UpdateCourseInput } from "@/domain/admin/contracts/admin-types";
-import { CreateCourseSchema, CourseStatusSchema, EnrollUserSchema, UpdateCourseSchema } from "@/domain/admin/contracts/admin-validation.schemas";
+import type { AdminSession, CreateCourseInput, EnrollmentQuery, UpdateCourseInput } from "@/domain/admin/contracts/admin-types";
+import { CreateCourseSchema, CourseStatusSchema, EnrollUserSchema, EnrollWithPaymentSchema, UpdateCourseSchema } from "@/domain/admin/contracts/admin-validation.schemas";
 import { AdminErrors } from "@/domain/admin/application/admin-errors";
 import type { AuditLogger } from "@/domain/admin/infrastructure/audit/audit-logger";
 import {
@@ -157,5 +157,67 @@ export const createAdminCoursesService = (
       ipAddress: session.ipAddress,
       userAgent: session.userAgent,
     });
+  },
+
+  async enrollUserWithPayment(session: AdminSession, data: unknown) {
+    const parsed = EnrollWithPaymentSchema.parse(data);
+
+    const course = await repo.getCourse(parsed.courseId);
+    if (!course) throw AdminErrors.notFound("Course");
+
+    let userId = parsed.userId;
+
+    if (!userId && parsed.email) {
+      const existingUser = await repo.getUserByEmail(parsed.email);
+      if (!existingUser) {
+        throw AdminErrors.notFound("User with this email");
+      }
+      userId = existingUser.id;
+    }
+
+    if (!userId) {
+      throw AdminErrors.validation({ message: "Either userId or email must be provided" });
+    }
+
+    const enrollment = await repo.enrollUserWithPayment(
+      parsed.courseId,
+      userId,
+      parsed.amount,
+      parsed.paymentMethod,
+      parsed.paymentId,
+    );
+
+    await audit.log({
+      adminId: session.userId,
+      action: "course.enroll_with_payment",
+      entityType: "enrollment",
+      entityId: enrollment.id,
+      after: {
+        courseId: parsed.courseId,
+        userId,
+        amount: parsed.amount,
+        paymentMethod: parsed.paymentMethod,
+      },
+      ipAddress: session.ipAddress,
+      userAgent: session.userAgent,
+    });
+
+    return enrollment;
+  },
+
+  async listEnrollmentsByCourse(
+    courseId: string,
+    query: EnrollmentQuery,
+  ) {
+    const course = await repo.getCourse(courseId);
+    if (!course) throw AdminErrors.notFound("Course");
+
+    return repo.listEnrollmentsByCourse(
+      courseId,
+      query.page,
+      query.limit,
+      query.search,
+      query.status,
+    );
   },
 });
