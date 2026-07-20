@@ -56,8 +56,9 @@ const errorResponse = (error: unknown) => {
   }
 
   if (error instanceof ZodError || (error && typeof error === 'object' && 'issues' in error)) {
+    console.error("[api/admin] Zod Validation Error:", JSON.stringify((error as any).issues, null, 2));
     return NextResponse.json(
-      { status: "error", code: "VALIDATION_ERROR", message: "Invalid request body" },
+      { status: "error", code: "VALIDATION_ERROR", message: "Invalid request body", details: (error as any).issues },
       { status: 422 },
     );
   }
