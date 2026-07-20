@@ -1,6 +1,8 @@
+import { TemporaryPasswordGenerator } from "@/lib/admin/temporary-password";
+import { createAdminUser } from "@/lib/admin/create-admin-user";
 import type { AdminRepository } from "@/domain/admin/contracts/admin-repository.contract";
 import type { AdminSession, UpdateUserInput } from "@/domain/admin/contracts/admin-types";
-import { UpdateUserSchema, UpdateUserRoleSchema, BlockUserSchema } from "@/domain/admin/contracts/admin-validation.schemas";
+import { UpdateUserSchema, UpdateUserRoleSchema, BlockUserSchema, CreateUserSchema } from "@/domain/admin/contracts/admin-validation.schemas";
 import { AdminErrors } from "@/domain/admin/application/admin-errors";
 import type { AuditLogger } from "@/domain/admin/infrastructure/audit/audit-logger";
 
@@ -109,6 +111,46 @@ export const createAdminUsersService = (
     });
 
     return user;
+  },
+
+  async createUser(session: AdminSession, data: unknown) {
+    const parsed = CreateUserSchema.parse(data);
+
+    const existing = await repo.getUserByEmail(parsed.email);
+    if (existing) {
+      throw AdminErrors.conflict("A user with this email already exists");
+    }
+
+    const password = TemporaryPasswordGenerator.generate();
+
+    const created = await createAdminUser({
+      email: parsed.email,
+      password,
+      firstName: parsed.firstName,
+      lastName: parsed.lastName,
+      phoneNumber: parsed.phoneNumber,
+      mustChangePassword: true,
+    });
+
+    await audit.log({
+      adminId: session.userId,
+      action: "user.create",
+      entityType: "user",
+      entityId: created.id,
+      after: { email: parsed.email, firstName: parsed.firstName, lastName: parsed.lastName },
+      ipAddress: session.ipAddress,
+      userAgent: session.userAgent,
+    });
+
+    return {
+      user: {
+        id: created.id,
+        email: created.email,
+        firstName: parsed.firstName,
+        lastName: parsed.lastName,
+      },
+      password,
+    };
   },
 
   async suspend(session: AdminSession, id: string) {
