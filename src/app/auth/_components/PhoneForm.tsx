@@ -6,10 +6,12 @@ import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
+import { useSession } from "@/lib/auth-client";
 
 export default function PhoneForm() {
   const t = useTranslations("auth.collectPhone");
   const router = useRouter();
+  const { refetch } = useSession();
   const [phone, setPhone] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -33,7 +35,9 @@ export default function PhoneForm() {
         setError(data?.error || t("errors.saveFailed"));
         return;
       }
+      await refetch();
       router.replace("/");
+      router.refresh();
     } catch {
       setError(t("errors.fallback"));
     } finally {
