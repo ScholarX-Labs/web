@@ -162,6 +162,13 @@
       "when": 1784486400000,
       "tag": "0023_admin_cash_enrollment",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1784553481781,
+      "tag": "0024_slippery_scarlet_witch",
+      "breakpoints": true
     }
   ]
 }

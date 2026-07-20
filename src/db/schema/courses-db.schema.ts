@@ -106,7 +106,9 @@ export const dbSubscriptions = coursesSchema.table(
   (table) => ({
     subscriptionsUserCourseUq: uniqueIndex(
       "subscriptions_user_course_uq",
-    ).on(table.userId, table.courseId),
+    )
+      .on(table.userId, table.courseId)
+      .where(sql`${table.isActive} = true`),
   }),
 );
 
