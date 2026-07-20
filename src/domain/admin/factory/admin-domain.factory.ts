@@ -7,6 +7,7 @@ import { createAdminSubscriptionsService } from "@/domain/admin/application/admi
 import { createAdminInquiriesService } from "@/domain/admin/application/admin-inquiries.service";
 import { createAdminStatsService } from "@/domain/admin/application/admin-stats.service";
 import { createAdminReportsService } from "@/domain/admin/application/admin-reports.service";
+import { createAdminCashEnrollmentService } from "@/domain/admin/application/admin-cash-enrollment.service";
 
 export const createAdminDomain = () => {
   const repo = createAdminRepository();
@@ -20,6 +21,7 @@ export const createAdminDomain = () => {
     inquiries: createAdminInquiriesService(repo, audit),
     stats: createAdminStatsService(repo),
     reports: createAdminReportsService(repo),
+    cashEnrollment: createAdminCashEnrollmentService(repo, audit),
   };
 };
 
