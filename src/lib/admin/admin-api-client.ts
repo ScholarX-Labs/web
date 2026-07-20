@@ -78,6 +78,28 @@ export const adminApi = {
     revokeUser: (id: string, data: unknown) =>
       request<void>(`/courses/${id}/enroll`, { method: "DELETE", body: data }),
 
+    enrollWithPayment: (courseId: string, data: {
+      userId?: string;
+      email?: string;
+      amount: number;
+      paymentMethod: string;
+      paymentId?: string;
+    }) =>
+      request<unknown>(`/courses/${courseId}/enroll-with-payment`, {
+        method: "POST",
+        body: data,
+      }),
+
+    listEnrollments: (courseId: string, params?: {
+      page?: number;
+      limit?: number;
+      search?: string;
+      status?: string;
+    }) =>
+      request<{ items: unknown[]; pagination: unknown }>(`/courses/${courseId}/enrollments`, {
+        params: params as Record<string, string | undefined>,
+      }),
+
     listLessons: (courseId: string) =>
       request<unknown[]>(`/courses/${courseId}/lessons`),
   },
@@ -118,6 +140,12 @@ export const adminApi = {
     },
 
     getById: (id: string) => request<unknown>(`/users/${id}`),
+
+    create: (data: { email: string; firstName: string; lastName: string; phoneNumber?: string }) =>
+      request<{ user: { id: string; email: string; firstName: string; lastName: string }; password: string }>(
+        "/users",
+        { method: "POST", body: data },
+      ),
 
     update: (id: string, data: unknown) =>
       request<unknown>(`/users/${id}`, { method: "PUT", body: data }),
@@ -168,5 +196,28 @@ export const adminApi = {
 
     courses: (params: { from: string; to: string }) =>
       request<unknown>("/reports/courses", { params }),
+  },
+
+  operations: {
+    cashEnrollment: (data: {
+      user: {
+        firstName: string;
+        lastName: string;
+        email: string;
+        phoneNumber?: string;
+      };
+      course: {
+        courseId: string;
+        paymentMethod: string;
+        amount: number;
+        paymentId?: string;
+      };
+    }) =>
+      request<{
+        user: { id: string; email: string; firstName: string; lastName: string };
+        password?: string;
+        course: { id: string; title: string };
+        enrollment: { id: string; courseId: string; amount: number; paymentMethod: string; status: string; enrolledAt: string };
+      }>("/operations/cash-enrollment", { method: "POST", body: data }),
   },
 };
