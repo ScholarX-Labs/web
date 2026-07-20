@@ -279,6 +279,17 @@ export const ROUTE_INVENTORY: readonly LocalizedRouteInventoryEntry[] = [
     migrationBatch: "D",
   },
   {
+    routeId: "auth.changePassword",
+    englishPath: "/auth/change-password",
+    arabicPath: "/ar/auth/change-password",
+    status: "localized",
+    authBoundary: "public",
+    messagesRequired: ["common", "auth"],
+    metadataRequired: false,
+    visualQaRequired: true,
+    migrationBatch: "D",
+  },
+  {
     routeId: "auth.collectPhone",
     englishPath: "/auth/collect-phone",
     arabicPath: "/ar/auth/collect-phone",

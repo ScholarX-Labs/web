@@ -53,6 +53,7 @@ export function EmailVerificationBanner() {
             variant="ghost"
             size="sm"
             className="h-6 w-6 p-0 text-amber-900 hover:text-amber-700 dark:text-amber-100 dark:hover:text-amber-300"
+            aria-label="Dismiss"
             onClick={() => {
               if (dismissedKey) {
                 localStorage.setItem(dismissedKey, "true");
