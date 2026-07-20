@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useCashEnrollment } from "@/hooks/admin/use-admin-enrollments";
 import { adminApi } from "@/lib/admin/admin-api-client";
+import { queryKeys } from "@/config/query-keys";
 import { PAYMENT_METHODS } from "@/domain/admin/contracts/admin-types";
 import { PasswordDisplay } from "@/components/admin/password-display";
 import { Button } from "@/components/ui/button";
@@ -41,7 +42,7 @@ export function CashEnrollmentForm() {
   const cashEnrollment = useCashEnrollment();
 
   const { data: coursesData } = useQuery({
-    queryKey: ["admin", "courses-for-enrollment"],
+    queryKey: queryKeys.admin.courses.list({ limit: 100, status: "active" }),
     queryFn: () => adminApi.courses.list({ limit: 100, status: "active" }),
   });
 
@@ -56,29 +57,33 @@ export function CashEnrollmentForm() {
   };
 
   const handleSubmit = async () => {
-    await cashEnrollment.mutateAsync({
-      user: {
-        firstName,
-        lastName,
-        email,
-        phoneNumber: phoneNumber || undefined,
-      },
-      course: {
-        courseId,
-        paymentMethod,
-        amount: Math.round(parseFloat(amount) * 100),
-        paymentId: paymentId || undefined,
-      },
-    });
-    setStep(1);
-    setFirstName("");
-    setLastName("");
-    setEmail("");
-    setPhoneNumber("");
-    setCourseId("");
-    setAmount("");
-    setPaymentMethod("");
-    setPaymentId("");
+    try {
+      await cashEnrollment.mutateAsync({
+        user: {
+          firstName,
+          lastName,
+          email,
+          phoneNumber: phoneNumber || undefined,
+        },
+        course: {
+          courseId,
+          paymentMethod,
+          amount: Math.round(parseFloat(amount) * 100),
+          paymentId: paymentId || undefined,
+        },
+      });
+      setStep(1);
+      setFirstName("");
+      setLastName("");
+      setEmail("");
+      setPhoneNumber("");
+      setCourseId("");
+      setAmount("");
+      setPaymentMethod("");
+      setPaymentId("");
+    } catch {
+      // mutateAsync rejection handled by react-query's isError/error state
+    }
   };
 
   if (cashEnrollment.isSuccess && cashEnrollment.data) {

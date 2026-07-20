@@ -40,16 +40,20 @@ export function EnrollUserModal({ open, onOpenChange, courseId }: EnrollUserModa
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await enrollUser.mutateAsync({
-      courseId,
-      data: {
-        email,
-        amount: Math.round(parseFloat(amount) * 100),
-        paymentMethod,
-        paymentId: paymentId || undefined,
-      },
-    });
-    handleClose();
+    try {
+      await enrollUser.mutateAsync({
+        courseId,
+        data: {
+          email,
+          amount: Math.round(parseFloat(amount) * 100),
+          paymentMethod,
+          paymentId: paymentId || undefined,
+        },
+      });
+      handleClose();
+    } catch {
+      // mutateAsync rejection handled by react-query's isError/error state
+    }
   };
 
   const handleClose = () => {
