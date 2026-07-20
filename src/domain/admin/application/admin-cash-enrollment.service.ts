@@ -19,14 +19,26 @@ export const createAdminCashEnrollmentService = (
     if (!user) {
       password = TemporaryPasswordGenerator.generate();
 
-      const created = await createAdminUser({
-        email: parsed.user.email,
-        password,
-        firstName: parsed.user.firstName,
-        lastName: parsed.user.lastName,
-        phoneNumber: parsed.user.phoneNumber,
-        mustChangePassword: true,
-      });
+      let created: { id: string; email: string };
+      try {
+        created = await createAdminUser({
+          email: parsed.user.email,
+          password,
+          firstName: parsed.user.firstName,
+          lastName: parsed.user.lastName,
+          phoneNumber: parsed.user.phoneNumber,
+          mustChangePassword: true,
+        });
+      } catch (error: any) {
+        if (
+          error?.code === "23505" || 
+          error?.message?.includes("already exists") ||
+          error?.message?.toLowerCase().includes("unique constraint")
+        ) {
+          throw AdminErrors.conflict("User with this email already exists");
+        }
+        throw error;
+      }
 
       user = {
         id: created.id,
@@ -38,11 +50,6 @@ export const createAdminCashEnrollmentService = (
         action: "cash_enrollment.user.create",
         entityType: "user",
         entityId: user.id,
-        after: {
-          email: parsed.user.email,
-          firstName: parsed.user.firstName,
-          lastName: parsed.user.lastName,
-        },
         ipAddress: session.ipAddress,
         userAgent: session.userAgent,
       });
