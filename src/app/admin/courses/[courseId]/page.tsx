@@ -57,9 +57,8 @@ import {
   PlayCircle,
   Zap,
   Clock,
-  ArrowRight,
-  Loader2,
-  Users
+   ArrowRight,
+   Users
 } from "lucide-react";
 import { toast } from "sonner";
 import { motion, Reorder, AnimatePresence } from "framer-motion";
@@ -135,7 +134,7 @@ export default function AdminCourseDetailPage({ params }: { params: Promise<{ co
   };
 
   const handleSaveAll = async () => {
-    let dataToSave: Record<string, unknown> = pendingData ? { ...pendingData } : {};
+    const dataToSave: Record<string, unknown> = pendingData ? { ...pendingData } : {};
 
     // Auto-fix missing slug if needed
     if (c && !c.slug && !dataToSave.slug) {
@@ -772,7 +771,7 @@ function MediaTab({ course, courseId }: { course: AdminCourse; courseId: string 
           toast.error(data.error || "Upload failed.");
           setPreviewUrl(course.imageUrl || null);
         }
-      } catch (err) {
+      } catch {
         toast.error("Invalid server response.");
         setPreviewUrl(course.imageUrl || null);
       } finally {

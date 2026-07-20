@@ -8,15 +8,24 @@ import { Button } from "@/components/ui/button";
 import { AlertTriangle, X } from "lucide-react";
 import { useState } from "react";
 
-const DISMISSED_KEY = "email-verification-banner-dismissed";
+const DISMISSED_PREFIX = "email-verification-banner-dismissed:";
 
 export function EmailVerificationBanner() {
   const { data: session } = useSession();
   const router = useRouter();
-  const [dismissed, setDismissed] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return localStorage.getItem(DISMISSED_KEY) === "true";
-  });
+
+  const userId = (session?.user as Record<string, unknown> | undefined)?.id as string | undefined;
+  const dismissedKey = userId ? `${DISMISSED_PREFIX}${userId}` : undefined;
+
+  const [dismissed, setDismissed] = useState(false);
+  const [syncedKey, setSyncedKey] = useState<string | undefined>(undefined);
+
+  if (dismissedKey && dismissedKey !== syncedKey) {
+    setSyncedKey(dismissedKey);
+    if (typeof window !== "undefined" && localStorage.getItem(dismissedKey) === "true") {
+      setDismissed(true);
+    }
+  }
 
   if (!session?.user) return null;
 
@@ -44,8 +53,11 @@ export function EmailVerificationBanner() {
             variant="ghost"
             size="sm"
             className="h-6 w-6 p-0 text-amber-900 hover:text-amber-700 dark:text-amber-100 dark:hover:text-amber-300"
+            aria-label="Dismiss"
             onClick={() => {
-              localStorage.setItem(DISMISSED_KEY, "true");
+              if (dismissedKey) {
+                localStorage.setItem(dismissedKey, "true");
+              }
               setDismissed(true);
             }}
           >

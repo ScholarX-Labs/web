@@ -7,6 +7,7 @@ import {
   invalidatePublicCourseDetailCache,
   invalidatePublicCourseListCache,
 } from "@/domain/courses/application/course-cache";
+import { invalidateEnrollmentCache } from "@/domain/admin/application/admin-cache";
 
 export const createAdminCoursesService = (
   repo: AdminRepository,
@@ -186,6 +187,10 @@ export const createAdminCoursesService = (
       parsed.paymentMethod,
       parsed.paymentId,
     );
+
+    await invalidatePublicCourseListCache();
+    await invalidatePublicCourseDetailCache({ courseId: parsed.courseId, slug: course.slug });
+    await invalidateEnrollmentCache(parsed.courseId);
 
     await audit.log({
       adminId: session.userId,

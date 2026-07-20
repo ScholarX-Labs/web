@@ -21,7 +21,10 @@ export function PostLoginRedirect() {
 
   useEffect(() => {
     if (isPending || !session?.user) return;
+    
     if (SKIP_PATHS.has(pathname)) return;
+
+
 
     const user = session.user as Record<string, unknown>;
 

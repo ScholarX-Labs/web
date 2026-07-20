@@ -48,7 +48,11 @@ export default function ChangePasswordForm() {
         return;
       }
 
-      await fetch("/api/complete-onboarding", { method: "POST" });
+      const onboardingRes = await fetch("/api/complete-onboarding", { method: "POST" });
+      if (!onboardingRes.ok) {
+        setError("Password changed but onboarding could not be completed. Please refresh.");
+        return;
+      }
 
       await refetch();
       router.replace("/");
@@ -84,6 +88,7 @@ export default function ChangePasswordForm() {
             onClick={() => setShowCurrent(!showCurrent)}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
             tabIndex={-1}
+            aria-label={showCurrent ? "Hide current password" : "Show current password"}
           >
             {showCurrent ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
           </button>
@@ -106,6 +111,7 @@ export default function ChangePasswordForm() {
             onClick={() => setShowNew(!showNew)}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
             tabIndex={-1}
+            aria-label={showNew ? "Hide new password" : "Show new password"}
           >
             {showNew ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
           </button>

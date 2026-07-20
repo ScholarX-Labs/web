@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, gte, like, lte, or, sql, SQL } from "drizzle-orm";
+import { and, asc, count, desc, eq, gte, ilike, like, lte, or, sql, SQL } from "drizzle-orm";
 import { db } from "@/db";
 import { user as dbUsers } from "@/db/schema/auth-schema";
 import { dbCourses, dbSubscriptions, dbInquiries } from "@/db/schema/courses-db.schema";
@@ -911,12 +911,27 @@ export const createAdminRepository = (): AdminRepository => {
       if (status) {
         conditions.push(eq(dbSubscriptions.status, status));
       }
+      
+      if (search) {
+        const pattern = sanitizeSearch(search.trim());
+        conditions.push(
+          or(
+            ilike(dbUsers.email, pattern),
+            ilike(dbUsers.firstName, pattern),
+            ilike(dbUsers.lastName, pattern),
+            ilike(
+              sql<string>`COALESCE(${dbUsers.firstName}, '') || ' ' || COALESCE(${dbUsers.lastName}, '')`,
+              pattern,
+            ),
+          )
+        );
+      }
 
       const where = and(...(conditions as SQL[]));
 
       return paginate(
         async (l, o) => {
-          const results = await db
+          return db
             .select({
               id: dbSubscriptions.id,
               userId: dbSubscriptions.userId,
@@ -940,19 +955,13 @@ export const createAdminRepository = (): AdminRepository => {
             .orderBy(desc(dbSubscriptions.enrolledAt))
             .limit(l)
             .offset(o);
-
-          if (!search) return results;
-
-          const q = search.toLowerCase();
-          return results.filter(
-            (r) =>
-              r.user.email?.toLowerCase().includes(q) ||
-              r.user.firstName?.toLowerCase().includes(q) ||
-              r.user.lastName?.toLowerCase().includes(q),
-          );
         },
         async () =>
-          db.select({ value: count() }).from(dbSubscriptions).where(where),
+          db
+            .select({ value: count() })
+            .from(dbSubscriptions)
+            .innerJoin(dbUsers, eq(dbSubscriptions.userId, dbUsers.id))
+            .where(where),
         page,
         limit,
       );

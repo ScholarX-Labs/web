@@ -36,13 +36,17 @@ export function CreateUserModal({ open, onOpenChange }: CreateUserModalProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const result = await createUser.mutateAsync({
-      email,
-      firstName,
-      lastName,
-      phoneNumber: phoneNumber || undefined,
-    });
-    setCreatedResult(result);
+    try {
+      const result = await createUser.mutateAsync({
+        email,
+        firstName,
+        lastName,
+        phoneNumber: phoneNumber || undefined,
+      });
+      setCreatedResult(result);
+    } catch {
+      // mutateAsync rejection handled by react-query's isError/error state
+    }
   };
 
   const handleClose = () => {
