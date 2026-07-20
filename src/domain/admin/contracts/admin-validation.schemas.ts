@@ -32,6 +32,46 @@ export const EnrollUserSchema = z.object({
   email: z.string().email(),
 });
 
+export const CreateUserSchema = z.object({
+  email: z.string().email(),
+  firstName: z.string().min(1).max(100),
+  lastName: z.string().min(1).max(100),
+  phoneNumber: z.string().optional(),
+});
+
+export const EnrollWithPaymentSchema = z.object({
+  courseId: z.string().uuid(),
+  userId: z.string().uuid().optional(),
+  email: z.string().email().optional(),
+  amount: z.coerce.number().int().min(0),
+  paymentMethod: z.enum(["cash", "card", "bank_transfer"]),
+  paymentId: z.string().max(255).optional(),
+  enrolledBy: z.string().uuid(),
+});
+
+export const CashEnrollmentSchema = z.object({
+  user: z.object({
+    firstName: z.string().min(1).max(100),
+    lastName: z.string().min(1).max(100),
+    email: z.string().email(),
+    phoneNumber: z.string().optional(),
+  }),
+  course: z.object({
+    courseId: z.string().uuid(),
+    paymentMethod: z.enum(["cash", "card", "bank_transfer"]),
+    amount: z.coerce.number().int().min(0),
+    paymentId: z.string().max(255).optional(),
+  }),
+  enrolledBy: z.string().uuid(),
+});
+
+export const AdminCashEnrollmentQuerySchema = z.object({
+  page: z.coerce.number().int().positive().default(1),
+  limit: z.coerce.number().int().positive().max(100).default(20),
+  search: z.string().optional(),
+  status: z.enum(["active", "cancelled", "expired"]).optional(),
+});
+
 export const CreateLessonSchema = z.object({
   title: z.string().min(1).max(255),
   description: z.string().max(2000).optional(),
