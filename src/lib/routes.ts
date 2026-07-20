@@ -27,6 +27,7 @@ export const ROUTES = {
   SEARCH: "/search",
   LOGIN: "/login",
   REGISTER: "/register",
+  CHANGE_PASSWORD: "/auth/change-password",
 };
 
 export const API_ROUTES = {
