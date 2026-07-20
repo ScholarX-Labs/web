@@ -37,15 +37,31 @@ export interface AdminRepository {
 
   listUsers(query: AdminUserQuery): Promise<PaginatedData<any>>;
   getUser(id: string): Promise<any>;
+  getUserByEmail(email: string): Promise<any>;
   updateUser(id: string, data: UpdateUserInput): Promise<any>;
   setUserRole(id: string, role: string): Promise<any>;
   blockUser(id: string, reason: string): Promise<any>;
   unblockUser(id: string): Promise<any>;
   suspendUser(id: string): Promise<void>;
+  setMustChangePassword(userId: string, value: boolean): Promise<void>;
 
   listSubscriptions(query: AdminSubscriptionQuery): Promise<PaginatedData<any>>;
   getSubscription(id: string): Promise<any>;
   updateSubscription(id: string, data: UpdateSubscriptionInput): Promise<any>;
+  enrollUserWithPayment(
+    courseId: string,
+    userId: string,
+    amount: number,
+    paymentMethod: string,
+    paymentId?: string,
+  ): Promise<any>;
+  listEnrollmentsByCourse(
+    courseId: string,
+    page?: number,
+    limit?: number,
+    search?: string,
+    status?: string,
+  ): Promise<PaginatedData<any>>;
 
   listInquiries(query: AdminInquiryQuery): Promise<PaginatedData<any>>;
   getInquiry(id: string): Promise<any>;
