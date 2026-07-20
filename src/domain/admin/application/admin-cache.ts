@@ -15,6 +15,16 @@ export function getAdminReportCacheKey(
   return cachePolicy.admin.reportKey(type, range);
 }
 
+export function getAdminEnrollmentCacheKey(
+  courseId: string,
+  page: number,
+  limit: number,
+  search?: string,
+  status?: string,
+): string {
+  return cachePolicy.admin.enrollmentKey(courseId, page, limit, search, status);
+}
+
 export async function getCachedAdminValue<T>(key: string): Promise<T | null> {
   try {
     return await cache.getJson<T>(key);
@@ -37,5 +47,22 @@ export async function setCachedAdminReport<T>(key: string, value: T): Promise<vo
     await cache.setJson(key, value, cachePolicy.admin.reportTtlSeconds);
   } catch (error) {
     markSharedRedisUnavailable(`admin-cache-report-set:${key}`, error);
+  }
+}
+
+export async function setCachedAdminEnrollment<T>(key: string, value: T): Promise<void> {
+  try {
+    await cache.setJson(key, value, cachePolicy.admin.enrollmentTtlSeconds);
+  } catch (error) {
+    markSharedRedisUnavailable(`admin-cache-enrollment-set:${key}`, error);
+  }
+}
+
+export async function invalidateEnrollmentCache(courseId: string): Promise<void> {
+  try {
+    const pattern = `admin:enrollments:${courseId}:*`;
+    await cache.delete(pattern);
+  } catch (error) {
+    markSharedRedisUnavailable(`admin-cache-enrollment-invalidate:${courseId}`, error);
   }
 }

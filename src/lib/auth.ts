@@ -186,6 +186,19 @@ export const auth = betterAuth({
         },
       },
     },
+    session: {
+      create: {
+        before: async (sessionData) => {
+          const userId = (sessionData as Record<string, unknown>).userId as string | undefined;
+          if (userId) {
+            await db
+              .update(schema.user)
+              .set({ emailVerificationSkipped: false })
+              .where(eq(schema.user.id, userId));
+          }
+        },
+      },
+    },
   },
   hooks: {
     before: createAuthMiddleware(async (ctx) => {
@@ -386,6 +399,16 @@ export const auth = betterAuth({
       linkedinUrl: { type: "string", required: false },
       isProfilePublic: { type: "boolean", required: false, defaultValue: true },
       locale: { type: "string", required: false, defaultValue: "en" },
+      mustChangePassword: {
+        type: "boolean",
+        required: false,
+        defaultValue: false,
+      },
+      emailVerificationSkipped: {
+        type: "boolean",
+        required: false,
+        defaultValue: false,
+      },
     },
   },
   plugins: [

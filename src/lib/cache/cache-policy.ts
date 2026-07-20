@@ -39,6 +39,7 @@ export const cachePolicy = {
   admin: {
     statsTtlSeconds: 30,
     reportTtlSeconds: 60,
+    enrollmentTtlSeconds: 30,
     statsKey(): string {
       return "admin:stats:overview";
     },
@@ -47,6 +48,9 @@ export const cachePolicy = {
       range: { from: string; to: string },
     ): string {
       return `admin:reports:${type}:${hashValue(`${range.from}:${range.to}`)}`;
+    },
+    enrollmentKey(courseId: string, page: number, limit: number, search?: string, status?: string): string {
+      return `admin:enrollments:${courseId}:${page}:${limit}:${search ?? ""}:${status ?? ""}`;
     },
   },
   courses: {

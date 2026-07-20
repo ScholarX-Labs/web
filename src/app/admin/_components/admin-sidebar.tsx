@@ -28,6 +28,7 @@ import {
   Settings,
   LogOut,
   Sparkles,
+  Wallet,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -38,6 +39,7 @@ const iconMap: Record<string, React.ReactNode> = {
   Users: <Users className="size-4.5" />,
   CreditCard: <CreditCard className="size-4.5" />,
   MessageSquare: <MessageSquare className="size-4.5" />,
+  Wallet: <Wallet className="size-4.5" />,
   BarChart: <BarChart className="size-4.5" />,
   Gauge: <Gauge className="size-4.5" />,
   Settings: <Settings className="size-4.5" />,
@@ -47,7 +49,7 @@ const sectionGroups = [
   { label: "Content", items: ["Courses"] },
   { label: "People", items: ["Users"] },
   { label: "Commerce", items: ["Subscriptions"] },
-  { label: "Operations", items: ["Inquiries"] },
+  { label: "Operations", items: ["Inquiries", "Cash Enrollment"] },
   { label: "Analytics", items: ["Reports", "Executive"] },
   { label: "System", items: ["Settings"] },
 ];

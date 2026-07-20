@@ -15,7 +15,7 @@ export const CreateCourseSchema = z.object({
   videoPreviewUrl: z.string().url().optional().or(z.literal("")),
   tags: z.array(z.string()).optional(),
   status: z.enum(["active", "inactive", "draft"]).optional(),
-  instructorId: z.string().uuid().optional(),
+  instructorId: z.string().min(1).optional(),
   seoDescription: z.string().max(500).optional(),
   seoKeywords: z.string().max(500).optional(),
 });
@@ -30,6 +30,46 @@ export const CourseStatusSchema = z.object({
 
 export const EnrollUserSchema = z.object({
   email: z.string().email(),
+});
+
+export const CreateUserSchema = z.object({
+  email: z.string().email(),
+  firstName: z.string().min(1).max(100),
+  lastName: z.string().min(1).max(100),
+  phoneNumber: z.string().optional(),
+});
+
+export const EnrollWithPaymentSchema = z.object({
+  courseId: z.string().regex(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/i, "Invalid UUID"),
+  userId: z.string().min(1).optional(),
+  email: z.string().email().optional(),
+  amount: z.coerce.number().int().min(0),
+  paymentMethod: z.enum(["cash", "card", "bank_transfer"]),
+  paymentId: z.string().max(255).optional(),
+  enrolledBy: z.string().min(1),
+});
+
+export const CashEnrollmentSchema = z.object({
+  user: z.object({
+    firstName: z.string().min(1).max(100),
+    lastName: z.string().min(1).max(100),
+    email: z.string().email(),
+    phoneNumber: z.string().optional(),
+  }),
+  course: z.object({
+    courseId: z.string().regex(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/i, "Invalid UUID"),
+    paymentMethod: z.enum(["cash", "card", "bank_transfer"]),
+    amount: z.coerce.number().int().min(0),
+    paymentId: z.string().max(255).optional(),
+  }),
+  enrolledBy: z.string().min(1),
+});
+
+export const AdminCashEnrollmentQuerySchema = z.object({
+  page: z.coerce.number().int().positive().default(1),
+  limit: z.coerce.number().int().positive().max(100).default(20),
+  search: z.string().optional(),
+  status: z.enum(["active", "cancelled", "expired"]).optional(),
 });
 
 export const CreateLessonSchema = z.object({
@@ -47,7 +87,7 @@ export const UpdateLessonSchema = CreateLessonSchema.partial().extend({
 });
 
 export const ReorderLessonsSchema = z.object({
-  lessonIds: z.array(z.string().uuid()),
+  lessonIds: z.array(z.string().regex(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/i, "Invalid UUID")),
 });
 
 export const UpdateUserSchema = z.object({

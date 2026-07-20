@@ -56,8 +56,9 @@ const errorResponse = (error: unknown) => {
   }
 
   if (error instanceof ZodError || (error && typeof error === 'object' && 'issues' in error)) {
+    console.error("[api/admin] Zod Validation Error:", JSON.stringify((error as any).issues, null, 2));
     return NextResponse.json(
-      { status: "error", code: "VALIDATION_ERROR", message: "Invalid request body" },
+      { status: "error", code: "VALIDATION_ERROR", message: "Invalid request body", details: (error as any).issues },
       { status: 422 },
     );
   }
@@ -151,6 +152,17 @@ const createAdminRouteHandlers = (deps: AdminRouteDeps) => {
       if (path.length === 2 && path[0] === "courses") {
         const course = await domain.courses.getById(path[1]);
         return NextResponse.json({ status: "success", data: course });
+      }
+
+      // /api/admin/courses/:courseId/enrollments
+      if (path.length === 3 && path[0] === "courses" && path[2] === "enrollments") {
+        const pagination = parsePagination(request);
+        const result = await domain.courses.listEnrollmentsByCourse(path[1], {
+          ...pagination,
+          search: request.nextUrl.searchParams.get("search") ?? undefined,
+          status: request.nextUrl.searchParams.get("status") ?? undefined,
+        });
+        return NextResponse.json({ status: "success", ...result });
       }
 
       // /api/admin/courses/:courseId/lessons
@@ -275,6 +287,31 @@ const createAdminRouteHandlers = (deps: AdminRouteDeps) => {
       if (path.length === 3 && path[0] === "courses" && path[2] === "lessons") {
         const lesson = await domain.lessons.create(admin, path[1], body ?? {});
         return NextResponse.json({ status: "success", data: lesson }, { status: 201 });
+      }
+
+      // /api/admin/users (create)
+      if (path.length === 1 && path[0] === "users") {
+        const result = await domain.users.createUser(admin, body ?? {});
+        return NextResponse.json({ status: "success", data: result }, { status: 201 });
+      }
+
+      // /api/admin/courses/:courseId/enroll-with-payment
+      if (path.length === 3 && path[0] === "courses" && path[2] === "enroll-with-payment") {
+        const enrollment = await domain.courses.enrollUserWithPayment(admin, {
+          ...(body ?? {}),
+          courseId: path[1],
+          enrolledBy: admin.userId,
+        });
+        return NextResponse.json({ status: "success", data: enrollment }, { status: 201 });
+      }
+
+      // /api/admin/operations/cash-enrollment
+      if (path.length === 2 && path[0] === "operations" && path[1] === "cash-enrollment") {
+        const result = await domain.cashEnrollment.execute(admin, {
+          ...(body ?? {}),
+          enrolledBy: admin.userId,
+        });
+        return NextResponse.json({ status: "success", data: result }, { status: 201 });
       }
 
       return NextResponse.json(

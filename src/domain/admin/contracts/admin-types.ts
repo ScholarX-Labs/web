@@ -1,3 +1,6 @@
+export const PAYMENT_METHODS = ["cash", "card", "bank_transfer"] as const;
+export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
+
 export interface AdminSession {
   userId: string;
   role: "admin";
@@ -148,4 +151,55 @@ export interface UpdateUserInput {
 export interface UpdateSubscriptionInput {
   status?: "active" | "cancelled" | "expired" | "refunded";
   amount?: number;
+}
+
+export interface CreateUserInput {
+  email: string;
+  firstName: string;
+  lastName: string;
+  phoneNumber?: string;
+}
+
+export interface EnrollWithPaymentInput {
+  courseId: string;
+  userId?: string;
+  email?: string;
+  amount: number;
+  paymentMethod: PaymentMethod;
+  paymentId?: string;
+  enrolledBy: string;
+}
+
+export interface CashEnrollmentResult {
+  user: { id: string; email: string; firstName: string; lastName: string };
+  password?: string;
+  course: { id: string; title: string };
+  enrollment: {
+    id: string;
+    courseId: string;
+    amount: number;
+    paymentMethod: string;
+    status: string;
+    enrolledAt: Date;
+  };
+}
+
+export interface AdminEnrollmentRecord {
+  id: string;
+  userId: string;
+  courseId: string;
+  amount: number | null;
+  paymentMethod: string | null;
+  paymentId: string | null;
+  status: string | null;
+  isActive: boolean | null;
+  enrolledAt: Date | null;
+  user: { id: string; email: string; firstName: string; lastName: string };
+}
+
+export interface EnrollmentQuery {
+  page?: number;
+  limit?: number;
+  search?: string;
+  status?: string;
 }

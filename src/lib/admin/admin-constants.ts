@@ -14,6 +14,7 @@ export const ADMIN_ROUTES = {
   REPORTS: "/admin/reports",
   EXECUTIVE: "/admin/executive",
   SETTINGS: "/admin/settings",
+  CASH_ENROLLMENT: "/admin/operations/cash-enrollment",
 } as const;
 
 export const ROLE_OPTIONS = [
@@ -58,6 +59,7 @@ export const SIDEBAR_NAV = [
   { label: "Users", href: ADMIN_ROUTES.USERS, icon: "Users" },
   { label: "Subscriptions", href: ADMIN_ROUTES.SUBSCRIPTIONS, icon: "CreditCard" },
   { label: "Inquiries", href: ADMIN_ROUTES.INQUIRIES, icon: "MessageSquare" },
+  { label: "Cash Enrollment", href: ADMIN_ROUTES.CASH_ENROLLMENT, icon: "Wallet" },
   { label: "Reports", href: ADMIN_ROUTES.REPORTS, icon: "BarChart" },
   { label: "Executive", href: ADMIN_ROUTES.EXECUTIVE, icon: "Gauge" },
   { label: "Settings", href: ADMIN_ROUTES.SETTINGS, icon: "Settings" },

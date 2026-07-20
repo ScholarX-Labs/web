@@ -86,20 +86,29 @@ export const dbCourses = coursesSchema.table("courses", {
   updatedAt: timestamp("updated_at"),
 });
 
-export const dbSubscriptions = coursesSchema.table("subscriptions", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => dbUsers.id, { onDelete: "cascade" }),
-  courseId: uuid("course_id")
-    .notNull()
-    .references(() => dbCourses.id),
-  amount: integer("amount"),
-  status: varchar("status", { length: 50 }),
-  isActive: boolean("is_active"),
-  paymentId: varchar("payment_id", { length: 255 }),
-  enrolledAt: timestamp("enrolled_at"),
-});
+export const dbSubscriptions = coursesSchema.table(
+  "subscriptions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => dbUsers.id, { onDelete: "cascade" }),
+    courseId: uuid("course_id")
+      .notNull()
+      .references(() => dbCourses.id),
+    amount: integer("amount"),
+    status: varchar("status", { length: 50 }),
+    isActive: boolean("is_active"),
+    paymentId: varchar("payment_id", { length: 255 }),
+    paymentMethod: varchar("payment_method", { length: 50 }),
+    enrolledAt: timestamp("enrolled_at"),
+  },
+  (table) => ({
+    subscriptionsUserCourseUq: uniqueIndex(
+      "subscriptions_user_course_uq",
+    ).on(table.userId, table.courseId),
+  }),
+);
 
 export const dbLessonProgress = coursesSchema.table(
   "lesson_progress",
