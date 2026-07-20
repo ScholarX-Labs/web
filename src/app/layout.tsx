@@ -11,6 +11,8 @@ import { GlobalShellExclusions } from "@/components/global-shell-exclusions";
 import { RootIntlProvider } from "@/components/root-intl-provider";
 import { AnalyticsTracker } from "@/components/analytics/analytics-tracker";
 import { Suspense } from "react";
+import { PostLoginRedirect } from "@/components/auth/post-login-redirect";
+import { EmailVerificationBanner } from "@/components/auth/email-verification-banner";
 import {
   DEFAULT_LOCALE,
   isLocale,
@@ -85,6 +87,8 @@ export default async function RootLayout({
               <PremiumHeader />
             </GlobalShellExclusions>
             <AppProviders>
+              <PostLoginRedirect />
+              <EmailVerificationBanner />
               <TooltipProvider>
                 <Suspense fallback={null}>
                   <AnalyticsTracker />
