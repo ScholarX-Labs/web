@@ -2,7 +2,7 @@
 
 **Feature**: `017-admin-cash-enrollment`  
 **Date**: 2026-07-20  
-**Status**: Analysis only — no implementation changes
+**Status**: Implemented (Database-backed)
 
 ---
 
@@ -230,48 +230,16 @@ Next day 2:00 PM (if not verified)
 
 ---
 
-## Recommendation
+## Implemented Decision: Database-Backed Flow
 
-**Redis with 24h TTL is the correct choice.** Here's why:
+Despite the initial Redis recommendation, the final implementation uses a persistent **database column** (`email_verification_skipped` on the user table).
 
-### 1. The data IS ephemeral
+### Rationale for DB-backed implementation
 
-This flag is not user profile data. It's a temporary session-level override that:
-- Lives for max 24 hours
-- Vanishes on expiry
-- Is never queried, joined, or reported on
-- Has zero value after verification
-
-That's the textbook Redis use case.
-
-### 2. TTL IS the re-prompt mechanism
-
-The DB approach requires:
-1. A `session.create.before` hook to clear the flag on sign-in
-2. Manual cleanup on email verification
-3. A schema migration
-
-Redis requires:
-1. `SET key EX 86400`
-
-That's it. TTL handles everything.
-
-### 3. No staleness
-
-The DB approach has a 15-minute staleness window (JWT lifetime). If a user verifies their email, they still see the banner for up to 15 minutes. Redis checks happen on every request — no stale data.
-
-### 4. The extra network call is negligible
-
-Redis read: ~0.5ms  
-DB query: ~5-15ms  
-
-And the DB query for the session **doesn't happen on every request**. It happens on JWT refresh. If you want the skip check to be tighter than "every 15 minutes," Redis is the only option.
-
-### 5. When Redis approach struggles
-
-- **Redis is unavailable**: Need fail-open (allow through, show banner as degraded experience)
-- **Redis restart**: Flag is lost — user gets re-prompted. Acceptable for ephemeral data.
-- **Dual source of truth**: DB has `email_verified`, Redis has `emailVerificationSkipped`. Need clear mental model.
+1. **Simplicity over TTL mechanisms**: While Redis TTL automatically handles the 24-hour expiration, relying on the database keeps the authentication and session state unified in Better Auth.
+2. **Persistence across sessions**: A database column ensures that the "skipped" state doesn't disappear simply because the Redis cache is flushed or restarted.
+3. **Lack of automatic 24-hour expiry**: The database implementation opts out of the strict 24-hour auto-reprompt. Instead, the flag persists until explicitly cleared (e.g., upon successful email verification or specific re-prompt workflows), providing a simpler lifecycle without the need for periodic re-prompting timers.
+4. **Integration with existing DB schema**: Using Drizzle ORM and Better Auth, adding a boolean column is a straightforward schema addition that flows natively through the existing user objects.
 
 ---
 
@@ -279,17 +247,8 @@ And the DB query for the session **doesn't happen on every request**. It happens
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| Storage | Redis | Ephemeral, TTL-driven, frequently-checked flag |
-| TTL | 24 hours | Matches product requirement for daily re-prompt |
-| Fail-open | Yes | Don't block users if Redis is down |
-| Cleanup on verify | Explicit `DEL` + TTL fallback | Belt and suspenders |
-| DB column | Not needed | Redis is the source of truth for this flag |
-
----
-
-## Open Questions
-
-1. **What if Redis is down when the user skips?** Fail-open: skip the check, show banner as degraded experience.
-2. **What if Redis is down on the next request?** Same fail-open. User gets through but banner shows.
-3. **Should we also clear on sign-in?** Optional belt-and-suspenders. TTL handles it, but an explicit `DEL` on sign-in is cleaner.
-4. **Redis key namespace**: Use existing `emailVerificationSkipped:{userId}` pattern consistent with other cache keys.
+| Storage | Database | Unified state with user data; avoids dual source of truth with Redis |
+| Expiry/TTL | Persistent (No automatic 24h TTL) | Simplifies lifecycle; persists until explicitly cleared or verified |
+| Fail-open | N/A | Database is the primary source of truth, no secondary cache to fail |
+| Cleanup on verify | Manual DB Update | `email_verification_skipped` is set to `false` when email is verified |
+| Schema change | Yes (`ALTER TABLE`) | Required to store the flag permanently alongside the user/session record |
