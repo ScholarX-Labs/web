@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useAdminUsers, useBlockUser, useUnblockUser } from "@/hooks/admin/use-admin-users";
 import { formatDate, statusLabel } from "@/lib/admin/admin-utils";
 import { DataTable } from "@/components/admin/data-table";
+import { CreateUserModal } from "@/components/admin/create-user-modal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,7 +17,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ColumnDef } from "@tanstack/react-table";
-import { ShieldBan, ShieldCheck } from "lucide-react";
+import { ShieldBan, ShieldCheck, UserPlus } from "lucide-react";
 
 interface User {
   id: string;
@@ -61,6 +62,7 @@ export function UsersTable({
     name: string;
     action: "block" | "unblock";
   } | null>(null);
+  const [createUserOpen, setCreateUserOpen] = useState(false);
 
   const users = (data as { items?: User[]; pagination?: { page: number; pages: number; total: number } }) ?? {};
   const items = users.items ?? [];
@@ -185,12 +187,20 @@ export function UsersTable({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Users</h1>
-        <p className="text-muted-foreground mt-1">
-          Manage platform users and their access
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Users</h1>
+          <p className="text-muted-foreground mt-1">
+            Manage platform users and their access
+          </p>
+        </div>
+        <Button onClick={() => setCreateUserOpen(true)}>
+          <UserPlus className="size-4 mr-2" />
+          Create User
+        </Button>
       </div>
+
+      <CreateUserModal open={createUserOpen} onOpenChange={setCreateUserOpen} />
 
       <DataTable
         columns={columns}
