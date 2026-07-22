@@ -1,0 +1,4 @@
+## 2026-07-22 - [Timing Attack Vulnerability in API Key Check]
+**Vulnerability:** The internal API endpoint `/api/admin/storage-check` checked the `x-internal-key` header against `process.env.INTERNAL_API_KEY` using strict equality (`===`). This allows timing attacks to incrementally guess the secret key character by character by measuring the response time.
+**Learning:** Checking secure values like API keys or secrets using `===` is insecure in Node.js/JavaScript because the comparison short-circuits on the first mismatch, varying execution time based on how much of the string matches.
+**Prevention:** Always use `crypto.timingSafeEqual()` to compare secrets. Both strings must be converted to `Buffer`s. Importantly, check that `buffer1.length === buffer2.length` before calling `timingSafeEqual()` as it requires matching lengths. Avoid using empty string fallbacks (e.g. `||""`) as they can enable authentication bypass if both sides end up empty.
