@@ -2,7 +2,10 @@
 
 import React, { useRef, useEffect, useCallback, useState } from "react";
 import { useLessonProgress } from "@/hooks/use-lesson-progress";
+import { useBunnyCdnToken } from "@/hooks/use-bunny-cdn-token";
 import { VideoPlayer } from "./video-player";
+import { VideoPlayerSkeleton } from "./video-player-skeleton";
+import { VideoErrorDisplay } from "./video-error-display";
 import { LessonMeta } from "./lesson-meta";
 import { LessonSidebar } from "./lesson-sidebar";
 import { useUILayoutStore } from "@/store/ui-layout-store";
@@ -83,6 +86,16 @@ export function LessonClientBridge({
     courseSlug,
     videoDuration: 0, // Will be updated via setVideoDuration
   });
+
+  // 2. Bunny CDN Token Management
+  const currentLesson = lessons.find((l) => l.id === lessonId);
+  const mediaSrc = currentLesson?.media?.src ?? "";
+  const {
+    signedUrl,
+    isLoading: isTokenLoading,
+    error: tokenError,
+    onTokenExpired,
+  } = useBunnyCdnToken(mediaSrc);
 
   const isLessonCompleted = initialIsCompleted || Boolean(progress?.completedAt);
 
@@ -272,8 +285,6 @@ export function LessonClientBridge({
         >
           {/* Video Player: use lesson-provided media when available */}
           {(() => {
-            const currentLesson = lessons.find((l) => l.id === lessonId);
-            const mediaSrc = currentLesson?.media?.src;
             const thumbnails = Array.isArray(currentLesson?.media?.thumbnails)
               ? currentLesson.media.thumbnails[0]
               : currentLesson?.media?.thumbnails;
@@ -288,12 +299,27 @@ export function LessonClientBridge({
               );
             }
 
+            // Show loading skeleton while token is being fetched
+            if (isTokenLoading) {
+              return <VideoPlayerSkeleton />;
+            }
+
+            // Show error display if token fetch failed permanently
+            if (tokenError && !signedUrl) {
+              return (
+                <VideoErrorDisplay
+                  message={tokenError}
+                  onRetry={() => window.location.reload()}
+                />
+              );
+            }
+
             return (
               <VideoPlayer
                 ref={playerRef}
                 key={lessonId}
                 title={lessonTitle}
-                src={mediaSrc}
+                src={signedUrl ?? mediaSrc}
                 thumbnails={thumbnails}
                 heatmapBuckets={heatmapBuckets}
                 onTimeUpdate={onTimeUpdate}
@@ -301,6 +327,7 @@ export function LessonClientBridge({
                 onSeeked={onSeeked}
                 onEnded={onEnded}
                 onDurationChange={setVideoDuration}
+                onTokenExpired={onTokenExpired}
               />
             );
           })()}

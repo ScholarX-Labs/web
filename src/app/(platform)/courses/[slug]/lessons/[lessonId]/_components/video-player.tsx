@@ -35,6 +35,8 @@ interface VideoPlayerProps {
   onSeeked?: (from: number, to: number) => void;
   onEnded?: () => void;
   onDurationChange?: (duration: number) => void;
+  /** Called when a Bunny CDN token expires (403 from HLS). Trigger token refresh. */
+  onTokenExpired?: () => void;
 }
 
 const getNumericDetail = (event: unknown): number | null => {
@@ -69,6 +71,10 @@ const toPlayerSrc = (src: string): PlayerSrc => {
     return { src, type: "video/youtube" };
   }
 
+  if (/b-cdn\.net|\.m3u8/i.test(src)) {
+    return { src, type: "application/x-mpegurl" };
+  }
+
   return src;
 };
 
@@ -84,6 +90,7 @@ export const VideoPlayer = React.forwardRef<MediaPlayerInstance, VideoPlayerProp
     onSeeked,
     onEnded,
     onDurationChange,
+    onTokenExpired,
   }, ref) => {
     const seekFromRef = useRef<number>(0);
     const { isFocusMode } = useUILayoutStore();
@@ -167,6 +174,15 @@ export const VideoPlayer = React.forwardRef<MediaPlayerInstance, VideoPlayerProp
           onDurationChange={(event) => {
             const duration = getNumericDetail(event);
             if (duration !== null) onDurationChange?.(duration);
+          }}
+          onError={(event) => {
+            const detail = (event as { detail?: { code?: string; message?: string } })?.detail;
+            if (
+              detail?.code === "403" ||
+              detail?.message?.includes("403")
+            ) {
+              onTokenExpired?.();
+            }
           }}
         >
           <MediaProvider />
