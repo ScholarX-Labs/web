@@ -5,23 +5,32 @@ import { createVideoSource } from "../video-source.types";
 /**
  * Detection strategy for Bunny CDN video URLs.
  *
- * Matches URLs containing `b-cdn.net` in the hostname OR ending with `.m3u8` extension:
+ * Only matches URLs whose parsed hostname ends with `.b-cdn.net`:
  * - https://vz-123.b-cdn.net/videos/lesson.m3u8
  * - https://library.b-cdn.net/lesson.m3u8
  * - https://vz-123.b-cdn.net/videos/lesson.mp4
- * - https://example.com/videos/lesson.m3u8 (by extension)
+ *
+ * External HLS URLs (*.m3u8 on other hosts) are NOT Bunny CDN and
+ * must NOT trigger token-auth or protection — they are unprotected fallback streams.
+ * Lookalike domains like b-cdn.net.evil.com are rejected.
  */
 export class BunnyCdnVideoSourceStrategy implements VideoSourceStrategy {
   readonly type = "bunny-cdn" as const;
 
-  private static readonly HOSTNAME_PATTERN = /b-cdn\.net/i;
-  private static readonly HLS_EXTENSION_PATTERN = /\.m3u8$/i;
+  private static readonly BUNNY_SUFFIX = ".b-cdn.net";
+
+  private static isBunnyHost(hostname: string): boolean {
+    const lower = hostname.toLowerCase();
+    return lower === "b-cdn.net" || lower.endsWith(BunnyCdnVideoSourceStrategy.BUNNY_SUFFIX);
+  }
 
   matches(url: string): boolean {
-    return (
-      BunnyCdnVideoSourceStrategy.HOSTNAME_PATTERN.test(url) ||
-      BunnyCdnVideoSourceStrategy.HLS_EXTENSION_PATTERN.test(url)
-    );
+    try {
+      const { hostname } = new URL(url);
+      return BunnyCdnVideoSourceStrategy.isBunnyHost(hostname);
+    } catch {
+      return false;
+    }
   }
 
   detect(url: string): VideoSource {
