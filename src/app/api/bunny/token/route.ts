@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
+import { and, eq } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { env } from "@/config/env";
+import { db } from "@/db";
+import { dbLessons } from "@/db/schema/admin-db.schema";
+import { dbSubscriptions } from "@/db/schema/courses-db.schema";
 import { BunnyCdnTokenSigner } from "@/lib/bunny/token-signer";
 import { BunnyTokenRequestSchema } from "./schemas";
 import {
@@ -51,11 +55,11 @@ export async function GET(request: NextRequest) {
 
     // 2. Input Validation
     const { searchParams } = new URL(request.url);
-    const videoUrlRaw = searchParams.get("videoUrl");
+    const lessonIdRaw = searchParams.get("lessonId");
     const expiresRaw = searchParams.get("expires");
 
     const parsed = BunnyTokenRequestSchema.safeParse({
-      videoUrl: videoUrlRaw,
+      lessonId: lessonIdRaw,
       expires: expiresRaw ? Number(expiresRaw) : undefined,
     });
 
@@ -69,7 +73,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const { videoUrl, expires } = parsed.data;
+    const { lessonId, expires } = parsed.data;
 
     // 3. Expiry validation (separate from Zod for clearer error messages)
     const nowSec = Math.floor(Date.now() / 1000);
@@ -102,10 +106,42 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // 5. Token Signing
-    const securityKey = env.BUNNY_VIDEO_LIBRARY_API_KEY;
+    // 5. Load lesson server-side
+    const [lesson] = await db
+      .select({ id: dbLessons.id, courseId: dbLessons.courseId, videoUrl: dbLessons.videoUrl })
+      .from(dbLessons)
+      .where(eq(dbLessons.id, lessonId))
+      .limit(1);
+
+    if (!lesson) {
+      return errorResponse("NOT_FOUND", 9006, 404, "Lesson not found");
+    }
+
+    if (!lesson.videoUrl) {
+      return errorResponse("BAD_REQUEST", 9005, 400, "Lesson has no video assigned");
+    }
+
+    // 6. Enrollment guard
+    const [subscription] = await db
+      .select({ id: dbSubscriptions.id })
+      .from(dbSubscriptions)
+      .where(
+        and(
+          eq(dbSubscriptions.userId, userId),
+          eq(dbSubscriptions.courseId, lesson.courseId),
+          eq(dbSubscriptions.isActive, true),
+        ),
+      )
+      .limit(1);
+
+    if (!subscription) {
+      return errorResponse("FORBIDDEN", 9003, 403, "You are not enrolled in this course");
+    }
+
+    // 7. Token Signing (server-derived URL only)
+    const securityKey = env.BUNNY_CDN_TOKEN_AUTH_KEY;
     if (!securityKey) {
-      console.error("[BUNNY] BUNNY_VIDEO_LIBRARY_API_KEY is not configured");
+      console.error("[BUNNY] BUNNY_CDN_TOKEN_AUTH_KEY is not configured");
       return errorResponse(
         "INTERNAL_SERVER_ERROR",
         9999,
@@ -115,9 +151,9 @@ export async function GET(request: NextRequest) {
     }
 
     const signer = new BunnyCdnTokenSigner({ securityKey });
-    const signedResult = signer.signUrl(videoUrl, expires);
+    const signedResult = signer.signUrl(lesson.videoUrl, expires);
 
-    // 6. Success Response
+    // 8. Success Response
     return NextResponse.json({
       success: true,
       data: {
