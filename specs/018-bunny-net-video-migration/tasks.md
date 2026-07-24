@@ -19,8 +19,8 @@
 
 **Purpose**: Environment configuration and domain types that ALL user stories depend on
 
-- [ ] T001 Add Bunny environment variables and NEXT_PUBLIC_ safety guard to `src/config/env.ts` per plan.md §7 Layer 1
-- [ ] T002 [P] Create all domain types, value objects, error types, and API contracts in `src/lib/bunny/video-source.types.ts` per data-model.md
+- [x] T001 Add Bunny environment variables and NEXT_PUBLIC_ safety guard to `src/config/env.ts` per plan.md §7 Layer 1
+- [x] T002 [P] Create all domain types, value objects, error types, and API contracts in `src/lib/bunny/video-source.types.ts` per data-model.md
 
 ---
 
@@ -30,8 +30,8 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T003 [P] Implement `BunnyCdnTokenSigner` class in `src/lib/bunny/token-signer.ts` per plan.md §7 Layer 2 — HMAC-SHA256 signing, path-style tokens, expiry clamping, `node:crypto` only
-- [ ] T004 [P] Implement `VideoSourceDetector` class with strategy pattern in `src/lib/bunny/video-source-detector.ts` and strategy files under `src/lib/bunny/strategies/` per plan.md §7 Layer 3 — `YouTubeVideoSourceStrategy`, `BunnyCdnVideoSourceStrategy`, frozen value objects, `VideoSourceDetector.default` singleton
+- [x] T003 [P] Implement `BunnyCdnTokenSigner` class in `src/lib/bunny/token-signer.ts` per plan.md §7 Layer 2 — HMAC-SHA256 signing, path-style tokens, expiry clamping, `node:crypto` only
+- [x] T004 [P] Implement `VideoSourceDetector` class with strategy pattern in `src/lib/bunny/video-source-detector.ts` and strategy files under `src/lib/bunny/strategies/` per plan.md §7 Layer 3 — `YouTubeVideoSourceStrategy`, `BunnyCdnVideoSourceStrategy`, frozen value objects, `VideoSourceDetector.default` singleton
 
 **Checkpoint**: Foundation ready — user story implementation can now begin
 
@@ -53,18 +53,18 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T005 [P] [US1] Write unit tests for `BunnyCdnTokenSigner` in `src/lib/bunny/token-signer.test.ts` per plan.md §7 Layer 6 — signing determinism, path computation, expiry clamping, error handling (13 test cases)
-- [ ] T006 [P] [US1] Write unit tests for `VideoSourceDetector` and both strategies in `src/lib/bunny/video-source-detector.test.ts` per plan.md §7 Layer 6 — URL patterns, INVARIANT tests, immutability (16 test cases)
+- [x] T005 [P] [US1] Write unit tests for `BunnyCdnTokenSigner` in `src/lib/bunny/token-signer.test.ts` per plan.md §7 Layer 6 — signing determinism, path computation, expiry clamping, error handling (13 test cases)
+- [x] T006 [P] [US1] Write unit tests for `VideoSourceDetector` and both strategies in `src/lib/bunny/video-source-detector.test.ts` per plan.md §7 Layer 6 — URL patterns, INVARIANT tests, immutability (16 test cases)
 
 ### Implementation for User Story 1
 
-- [ ] T007 [US1] Create Zod validation schema for token request in `src/app/api/bunny/token/schemas.ts` per contracts/cdn-token-api.md — `BunnyTokenRequestSchema` with videoUrl (valid URL, b-cdn.net hostname, .m3u8/.mp4 extension, no pre-signed) and expires (future, min now+5m, max now+24h)
-- [ ] T008 [US1] Implement `GET /api/bunny/token` route handler in `src/app/api/bunny/token/route.ts` per plan.md §7 Layer 4 and contracts/cdn-token-api.md — auth guard → Zod validation → rate limit check → `BunnyCdnTokenSigner.sign()` → JSON response with `{ success, data: { token, expires, signedUrl } }`
-- [ ] T009 [US1] Implement `useBunnyCdnToken` hook in `src/hooks/use-bunny-cdn-token.ts` per plan.md §7 Layer 5 — detect source type → fetch token on mount → pass signedUrl to player → handle 403 via `onTokenExpired` callback → exponential backoff (1s/2s/4s + jitter) → max 3 retries → error state
-- [ ] T010 [P] [US1] Create `VideoPlayerSkeleton` component in `src/app/(platform)/courses/[slug]/lessons/[lessonId]/_components/video-player-skeleton.tsx` per plan.md §7 Layer 5 — glassmorphism loading skeleton, zero CLS, ambilight pulse animation, 16:9 aspect ratio
-- [ ] T011 [P] [US1] Create `VideoErrorDisplay` component in `src/app/(platform)/courses/[slug]/lessons/[lessonId]/_components/video-error-display.tsx` per plan.md §7 Layer 5 — glassmorphism error card, accessible `role="alert"`, retry button, user-friendly messages
-- [ ] T012 [US1] Enhance `toPlayerSrc()` with HLS detection and add `onTokenExpired` prop in `src/app/(platform)/courses/[slug]/lessons/[lessonId]/_components/video-player.tsx` per contracts/video-source-routing.md — add Bunny CDN regex branch (`b-cdn.net|\.m3u8`), return `{ src, type: "application/x-mpegURL" }`, wire `onTokenExpired` to Vidstack `onError` 403 handler, import `VideoPlayerSkeleton` and `VideoErrorDisplay`
-- [ ] T013 [US1] Wire `useBunnyCdnToken` into `LessonClientBridge` in `src/app/(platform)/courses/[slug]/lessons/[lessonId]/_components/lesson-client-bridge.tsx` per plan.md §7 Layer 5 — import hook, call with `currentLesson.media.src`, conditional rendering: skeleton while loading → error display on failure → player with signed URL on success, pass `onTokenExpired` callback
+- [x] T007 [US1] Create Zod validation schema for token request in `src/app/api/bunny/token/schemas.ts` per contracts/cdn-token-api.md — `BunnyTokenRequestSchema` with videoUrl (valid URL, b-cdn.net hostname, .m3u8/.mp4 extension, no pre-signed) and expires (future, min now+5m, max now+24h)
+- [x] T008 [US1] Implement `GET /api/bunny/token` route handler in `src/app/api/bunny/token/route.ts` per plan.md §7 Layer 4 and contracts/cdn-token-api.md — auth guard → Zod validation → rate limit check → `BunnyCdnTokenSigner.sign()` → JSON response with `{ success, data: { token, expires, signedUrl } }`
+- [x] T009 [US1] Implement `useBunnyCdnToken` hook in `src/hooks/use-bunny-cdn-token.ts` per plan.md §7 Layer 5 — detect source type → fetch token on mount → pass signedUrl to player → handle 403 via `onTokenExpired` callback → exponential backoff (1s/2s/4s + jitter) → max 3 retries → error state
+- [x] T010 [P] [US1] Create `VideoPlayerSkeleton` component in `src/app/(platform)/courses/[slug]/lessons/[lessonId]/_components/video-player-skeleton.tsx` per plan.md §7 Layer 5 — glassmorphism loading skeleton, zero CLS, ambilight pulse animation, 16:9 aspect ratio
+- [x] T011 [P] [US1] Create `VideoErrorDisplay` component in `src/app/(platform)/courses/[slug]/lessons/[lessonId]/_components/video-error-display.tsx` per plan.md §7 Layer 5 — glassmorphism error card, accessible `role="alert"`, retry button, user-friendly messages
+- [x] T012 [US1] Enhance `toPlayerSrc()` with HLS detection and add `onTokenExpired` prop in `src/app/(platform)/courses/[slug]/lessons/[lessonId]/_components/video-player.tsx` per contracts/video-source-routing.md — add Bunny CDN regex branch (`b-cdn.net|\.m3u8`), return `{ src, type: "application/x-mpegURL" }`, wire `onTokenExpired` to Vidstack `onError` 403 handler, import `VideoPlayerSkeleton` and `VideoErrorDisplay`
+- [x] T013 [US1] Wire `useBunnyCdnToken` into `LessonClientBridge` in `src/app/(platform)/courses/[slug]/lessons/[lessonId]/_components/lesson-client-bridge.tsx` per plan.md §7 Layer 5 — import hook, call with `currentLesson.media.src`, conditional rendering: skeleton while loading → error display on failure → player with signed URL on success, pass `onTokenExpired` callback
 
 **Checkpoint**: At this point, User Story 1 should be fully functional — paid course videos play with CDN Token Auth, auto-refresh works, skeleton/error states render, YouTube regression-free
 
@@ -81,7 +81,7 @@
 
 ### Implementation for User Story 5
 
-- [ ] T014 [US5] Add rate limiting to `GET /api/bunny/token` in `src/app/api/bunny/token/route.ts` per spec.md §6 FR-8 and research.md Decision 6 — integrate `checkDistributedRateLimit` with key format `{userId}:token-request`, 5 req/60s sliding window, 429 response with `Retry-After` header, fail-open on Redis unavailable
+- [x] T014 [US5] Add rate limiting to `GET /api/bunny/token` in `src/app/api/bunny/token/route.ts` per spec.md §6 FR-8 and research.md Decision 6 — integrate `checkDistributedRateLimit` with key format `{userId}:token-request`, 5 req/60s sliding window, 429 response with `Retry-After` header, fail-open on Redis unavailable
 
 **Checkpoint**: Rate limiting active on token endpoint, abuse prevented
 
@@ -93,12 +93,12 @@
 
 ### Unit Tests
 
-- [ ] T015 [P] Run and verify `BunnyCdnTokenSigner` unit tests pass in `src/lib/bunny/token-signer.test.ts` — all 13 test cases green
-- [ ] T016 [P] Run and verify `VideoSourceDetector` unit tests pass in `src/lib/bunny/video-source-detector.test.ts` — all 16 test cases green including INVARIANT tests
+- [x] T015 [P] Run and verify `BunnyCdnTokenSigner` unit tests pass in `src/lib/bunny/token-signer.test.ts` — all 13 test cases green
+- [x] T016 [P] Run and verify `VideoSourceDetector` unit tests pass in `src/lib/bunny/video-source-detector.test.ts` — all 16 test cases green including INVARIANT tests
 
 ### Integration Tests
 
-- [ ] T017 Write and verify integration tests for `GET /api/bunny/token` in `tests/integration/api/bunny-token-route.test.ts` per plan.md §7 Layer 6 — 12 scenarios: auth (2), input validation (7), rate limiting (2), successful signing (4), configuration errors (2), error envelope format (2)
+- [x] T017 Write and verify integration tests for `GET /api/bunny/token` in `tests/integration/api/bunny-token-route.test.ts` per plan.md §7 Layer 6 — 12 scenarios: auth (2), input validation (7), rate limiting (2), successful signing (4), configuration errors (2), error envelope format (2)
 
 **Checkpoint**: All tests pass, type checking clean, lint clean
 
@@ -108,8 +108,8 @@
 
 **Purpose**: Quality assurance, type safety, and final validation
 
-- [ ] T018 [P] Run `pnpm typecheck` — zero new type errors in all video-related code paths
-- [ ] T019 [P] Run `pnpm lint` — zero new lint violations in all changed files
+- [x] T018 [P] Run `pnpm typecheck` — zero new type errors in all video-related code paths
+- [x] T019 [P] Run `pnpm lint` — zero new lint violations in all changed files
 - [ ] T020 Verify YouTube regression — free lesson plays without `/api/bunny/token` call, heatmap/quality/focus mode unchanged
 - [ ] T021 Verify Bunny CDN playback — paid lesson loads with signed URL, HLS quality levels visible, heatmap renders, progress tracking works
 - [ ] T022 Verify token lifecycle — expiry triggers auto-refresh, 3 failures show error card, rate limit returns 429
