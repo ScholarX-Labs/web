@@ -35,6 +35,8 @@ interface VideoPlayerProps {
   onSeeked?: (from: number, to: number) => void;
   onEnded?: () => void;
   onDurationChange?: (duration: number) => void;
+  /** Called when a Bunny CDN token expires (403 from HLS). Trigger token refresh. */
+  onTokenExpired?: () => void;
 }
 
 const getNumericDetail = (event: unknown): number | null => {
@@ -69,6 +71,10 @@ const toPlayerSrc = (src: string): PlayerSrc => {
     return { src, type: "video/youtube" };
   }
 
+  if (/b-cdn\.net|\.m3u8/i.test(src)) {
+    return { src, type: "application/x-mpegurl" };
+  }
+
   return src;
 };
 
@@ -84,10 +90,15 @@ export const VideoPlayer = React.forwardRef<MediaPlayerInstance, VideoPlayerProp
     onSeeked,
     onEnded,
     onDurationChange,
+    onTokenExpired,
   }, ref) => {
     const seekFromRef = useRef<number>(0);
     const { isFocusMode } = useUILayoutStore();
-    const playerSrc = toPlayerSrc(src);
+    
+    // CRITICAL FIX: Memoize playerSrc to prevent Vidstack from continuously remounting/destroying
+    // the provider on every React render. Changing object identity on the `src` prop causes
+    // internal race conditions throwing `this.$state[prop2] is not a function`.
+    const playerSrc = React.useMemo(() => toPlayerSrc(src), [src]);
 
     return (
       <div className="group relative w-full">
@@ -145,11 +156,13 @@ export const VideoPlayer = React.forwardRef<MediaPlayerInstance, VideoPlayerProp
             const currentTime = getCurrentTime(event);
             if (currentTime !== null) onTimeUpdate?.(currentTime);
           }}
-          onPause={() => {
-            const currentTime = ref && "current" in ref
-              ? ref.current?.currentTime
-              : null;
-            if (typeof currentTime === "number") onPause?.(currentTime);
+          onPause={(event) => {
+            let currentTime = getCurrentTime(event);
+            // MediaPauseEvent doesn't contain currentTime in detail, fallback to ref
+            if (currentTime === null && ref && typeof ref === "object" && ref.current) {
+              currentTime = ref.current.currentTime;
+            }
+            if (currentTime !== null) onPause?.(currentTime);
           }}
           onSeeked={(event) => {
             const currentTime = getNumericDetail(event);
@@ -167,6 +180,15 @@ export const VideoPlayer = React.forwardRef<MediaPlayerInstance, VideoPlayerProp
           onDurationChange={(event) => {
             const duration = getNumericDetail(event);
             if (duration !== null) onDurationChange?.(duration);
+          }}
+          onError={(event) => {
+            const detail = (event as { detail?: { code?: string; message?: string } })?.detail;
+            if (
+              detail?.code === "403" ||
+              detail?.message?.includes("403")
+            ) {
+              onTokenExpired?.();
+            }
           }}
         >
           <MediaProvider />

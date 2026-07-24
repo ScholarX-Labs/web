@@ -3,6 +3,7 @@ import posthog from "posthog-js";
 
 type PostHogInitConfigWithReplay = Parameters<typeof posthog.init>[1] & {
   enable_session_recording: boolean;
+  enable_recording_console_log: boolean;
 };
 
 if (typeof window !== "undefined") {
@@ -17,6 +18,7 @@ if (typeof window !== "undefined") {
       api_host: '/ingest',
       defaults: "2026-01-30",
       enable_session_recording: true,
+      enable_recording_console_log: false,
     } as PostHogInitConfigWithReplay);
   }
 }

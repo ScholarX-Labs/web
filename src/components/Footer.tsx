@@ -232,6 +232,7 @@ const Footer = () => {
                 alt={t("header.logoAlt")}
                 width={160}
                 height={120}
+                style={{ width: "auto", height: "auto" }}
                 className="dark:invert opacity-90 hover:opacity-100 transition-opacity"
               />
             </Link>

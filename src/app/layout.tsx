@@ -75,7 +75,7 @@ export default async function RootLayout({
     // suppressHydrationWarning: lang/dir are updated by RootIntlProvider's
     // useEffect on client navigation; the initial SSR value may differ from the
     // client-detected locale if the user navigates before hydration completes.
-    <html lang={localeConfig.bcp47Tag} dir={localeConfig.dir} suppressHydrationWarning>
+    <html lang={localeConfig.bcp47Tag} dir={localeConfig.dir} suppressHydrationWarning data-scroll-behavior="smooth">
       <body
         className={`${inter.variable} ${geistSans.variable} ${geistMono.variable} ${cairo.variable} antialiased flex flex-col min-h-dvh overflow-x-hidden`}
       >

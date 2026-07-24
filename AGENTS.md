@@ -4,7 +4,7 @@ This file is durable context for AI coding agents working on ScholarX. It should
 
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
-shell commands, and other important information, read `specs/016-course-leaderboard/plan.md` and `specs/017-admin-cash-enrollment/plan.md`.
+shell commands, and other important information, read `specs/016-course-leaderboard/plan.md`, `specs/017-admin-cash-enrollment/plan.md`, and `specs/018-bunny-net-video-migration/plan.md`.
 <!-- SPECKIT END -->
 
 ## Product Context
