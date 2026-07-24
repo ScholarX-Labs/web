@@ -66,6 +66,7 @@ if (typeof window !== "undefined") {
       ui_host: process.env.NEXT_PUBLIC_POSTHOG_UI_HOST,
       capture_pageview: false,
       capture_pageleave: true,
+      enable_recording_console_log: false,
     });
   }
 }
