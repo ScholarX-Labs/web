@@ -73,11 +73,15 @@ describe("BunnyTokenRequestSchema", () => {
     assert.equal(result.success, false);
   });
 
-  it("rejects URL that already contains bcdn_token=", () => {
+  it("automatically sanitizes and accepts URL that already contains bcdn_token=", () => {
     const result = BunnyTokenRequestSchema.safeParse({
-      videoUrl: "https://vz-123.b-cdn.net/bcdn_token=HS256-abc&expires=1721380800&token_path=%2F%2F/videos/lesson.m3u8",
+      videoUrl:
+        "https://vz-123.b-cdn.net/bcdn_token=HS256-abc&expires=1721380800&token_path=%2F%2F/videos/lesson.m3u8",
     });
-    assert.equal(result.success, false);
+    assert.equal(result.success, true);
+    if (result.success) {
+      assert.equal(result.data.videoUrl, "https://vz-123.b-cdn.net/videos/lesson.m3u8");
+    }
   });
 
   it("rejects negative expires", () => {
