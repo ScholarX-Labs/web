@@ -85,7 +85,7 @@ Represents a video URL and its detected source type.
 | Value | Pattern | Example |
 |-------|---------|---------|
 | `youtube` | Contains `youtube.com` or `youtu.be` | `https://www.youtube.com/watch?v=jNQXAC9IVRw` |
-| `bunny-cdn` | Contains `b-cdn.net` or `.m3u8` extension | `https://vz-123.b-cdn.net/videos/lesson.m3u8` |
+| `bunny-cdn` | Hostname contains `b-cdn.net` | `https://vz-123.b-cdn.net/videos/lesson.m3u8` |
 | `unknown` | No pattern match | `https://example.com/video.mp4` |
 
 #### Validation Rules
@@ -117,10 +117,41 @@ HS256-<base64-encoded-hmac-signature>
 
 #### Token Signing Procedure
 
+Bunny Advanced Token Auth (path-style / directory tokens). HMAC payload is
+folded in order — matching `BunnyCDN.TokenAuthentication` and `token-signer.ts`:
+
 ```
-data_to_sign = token_path + expires_at
-signature = HMAC-SHA256(security_key, data_to_sign)
-token = "HS256-" + base64url_encode(signature)
+signature_path = token_path          # directory prefix, e.g. "/videos/"
+signing_data   = "token_path=" + token_path
+ip_bytes       = empty (no IP lock)
+
+HMAC-SHA256 updates (in order):
+  1. signature_path
+  2. expires_at (decimal string)
+  3. ip_bytes
+  4. signing_data
+
+token = "HS256-" + base64url(hmac_digest)   # +→-, /→_, strip =
+```
+
+#### Fixed Reference Vector
+
+| Input | Value |
+|-------|-------|
+| `security_key` | `test-security-key-abc123` |
+| `video_url` | `https://vz-123.b-cdn.net/videos/lesson.m3u8` |
+| `token_path` | `/videos/` |
+| `expires_at` | `2000000000` (2033-05-18; fixed future timestamp) |
+
+| Output | Value |
+|--------|-------|
+| `token` | `HS256-WBqIz5Hj7Hl36wp-zxMHgjh3QUgwAGQ2nJPEluIyIzg` |
+| `signed_url` | `https://vz-123.b-cdn.net/bcdn_token=HS256-WBqIz5Hj7Hl36wp-zxMHgjh3QUgwAGQ2nJPEluIyIzg&token_path=%2Fvideos%2F&expires=2000000000/videos/lesson.m3u8` |
+
+Path-style URL shape (token embedded in path, not query string):
+
+```
+{origin}/bcdn_token={token}&token_path={urlencoded_path}&expires={expires}{pathname}
 ```
 
 #### Token Path Computation
@@ -433,16 +464,20 @@ The existing database schema already supports the Bunny.net migration:
 │     │                                                                       │
 │     ▼                                                                       │
 │  2. Frontend: Request token from /api/bunny/token                           │
-│     │  Query params: videoId, expires                                       │
+│     │  Query params: videoUrl (required), expires (optional)                │
+│     │  Canonical client identifier = unsigned Bunny CDN videoUrl            │
+│     │  expires default/behavior matches cdn-token-api.md (1h default)       │
 │     ▼                                                                       │
 │  3. API Route: Validate request                                             │
 │     │  Check authentication (session required)                              │
-│     │  Check rate limit (5 per user+lesson per minute)                      │
+│     │  Validate videoUrl (b-cdn.net, .m3u8/.mp4, not pre-signed)            │
+│     │  Check rate limit (5 per user per minute; v1 subject = userId)        │
+│     │  Enrollment is enforced at lesson page (Server Component), not here   │
 │     ▼                                                                       │
 │  4. Token Signing: Generate HMAC-SHA256                                     │
 │     │  Load security key from env                                           │
-│     │  Compute token_path from videoUrl                                     │
-│     │  Sign: HMAC(security_key, token_path + expires)                       │
+│     │  Compute token_path from validated videoUrl                           │
+│     │  Sign: HMAC(path → expires → ip → token_path=…) path-style            │
 │     ▼                                                                       │
 │  5. API Response: Return signed URL                                         │
 │     │  { token, expires, signedUrl }                                        │

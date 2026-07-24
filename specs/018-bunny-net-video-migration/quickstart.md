@@ -2,7 +2,7 @@
 
 **Feature**: 018-bunny-net-video-migration
 **Date**: 2026-07-24
-**Status**: Complete
+**Status**: QA pending
 
 ---
 
@@ -21,7 +21,8 @@
 Add these to your `.env.local`:
 
 ```bash
-# Bunny.net Stream
+# Bunny.net CDN & Stream
+BUNNY_CDN_TOKEN_KEY=your-token-auth-key
 BUNNY_VIDEO_LIBRARY_ID=your-library-id
 BUNNY_VIDEO_LIBRARY_API_KEY=your-api-key
 BUNNY_CDN_HOSTNAME=vz-123.b-cdn.net
@@ -31,7 +32,8 @@ REDIS_URL=redis://localhost:6379
 ```
 
 **Security Notes**:
-- `BUNNY_VIDEO_LIBRARY_API_KEY` is server-only (never expose to client)
+- `BUNNY_CDN_TOKEN_KEY` is server-only (never expose to client)
+- `BUNNY_VIDEO_LIBRARY_API_KEY` is server-only
 - `REDIS_URL` is server-only
 - Never commit these values to version control
 
@@ -139,7 +141,7 @@ curl "http://localhost:3000/api/bunny/token?videoUrl=https://vz-123.b-cdn.net/vi
 pnpm test
 
 # Run specific test files
-node --import tsx --test src/lib/bunny/token-signing.test.ts
+node --import tsx --test src/lib/bunny/token-signer.test.ts
 node --import tsx --test src/lib/bunny/video-source-detector.test.ts
 node --import tsx --test src/app/\(platform\)/courses/\[slug\]/lessons/\[lessonId\]/_components/to-player-src.test.ts
 ```
@@ -151,7 +153,7 @@ node --import tsx --test src/app/\(platform\)/courses/\[slug\]/lessons/\[lessonI
 pnpm test:api
 
 # Run specific integration test
-node --import tsx --test src/app/api/bunny/token/route.test.ts
+node --import tsx --test tests/integration/api/bunny-token-route.test.ts
 ```
 
 ### Type Checking
@@ -204,6 +206,7 @@ pnpm lint
 Set these in your deployment platform (Vercel, Cloudflare, etc.):
 
 ```bash
+BUNNY_CDN_TOKEN_KEY=your-token-auth-key
 BUNNY_VIDEO_LIBRARY_ID=your-library-id
 BUNNY_VIDEO_LIBRARY_API_KEY=your-api-key
 BUNNY_CDN_HOSTNAME=vz-123.b-cdn.net

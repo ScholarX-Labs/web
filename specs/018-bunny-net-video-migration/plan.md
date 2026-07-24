@@ -170,7 +170,7 @@ export interface SignedVideoUrl {
 
 /** Configuration derived from env for the Bunny integration. */
 export interface BunnyCdnConfig {
-  readonly securityKey: string;      // BUNNY_VIDEO_LIBRARY_API_KEY
+  readonly securityKey: string;      // BUNNY_CDN_TOKEN_KEY
   readonly cdnHostname: string;      // BUNNY_CDN_HOSTNAME — e.g. vz-123.b-cdn.net
   readonly defaultTtlSeconds: number; // Default: 3600 (1 hour)
   readonly maxTtlSeconds: number;     // Max: 86400 (24 hours)
@@ -834,7 +834,8 @@ Add to `envSchema` using the existing `optionalString` pattern (consistent with 
 
 ```typescript
 // Bunny.net Stream — SERVER ONLY, never prefix with NEXT_PUBLIC_
-BUNNY_VIDEO_LIBRARY_API_KEY: optionalString,  // HMAC-SHA256 signing key from Bunny dashboard
+BUNNY_CDN_TOKEN_KEY: optionalString,          // URL Token Authentication Key from Pull Zone Security tab
+BUNNY_VIDEO_LIBRARY_API_KEY: optionalString,  // Stream Library API Key (for backend management)
 BUNNY_CDN_HOSTNAME: optionalString,           // e.g. vz-123.b-cdn.net — CDN pull zone hostname
 BUNNY_VIDEO_LIBRARY_ID: optionalString,       // Video library ID — for embed token support (v2)
 ```
@@ -1683,7 +1684,11 @@ pnpm lint
 ```bash
 # .env.local — SERVER ONLY — never prefix with NEXT_PUBLIC_
 
-# Bunny Stream Video Library API Key (signing key)
+# Bunny Pull Zone URL Token Authentication Key (signing key)
+# Found in: Bunny Dashboard → Pull Zones → Security → Token Authentication Key
+BUNNY_CDN_TOKEN_KEY=your_token_auth_key_here
+
+# Bunny Stream Video Library API Key (for backend management)
 # Found in: Bunny Dashboard → Stream → Your Library → API
 BUNNY_VIDEO_LIBRARY_API_KEY=your_library_api_key_here
 
@@ -1700,11 +1705,12 @@ BUNNY_VIDEO_LIBRARY_ID=your_library_id_here
 
 - [ ] Create Bunny Stream video library (if not yet created)
 - [ ] Upload all paid course lesson videos to the library
-- [ ] **Enable CDN Token Authentication** (Security → CDN Token Auth → Enable)
+- [ ] **Enable CDN Token Authentication** (Pull Zones → Security → Token Authentication → Enable)
 - [ ] **Enable Allowed Domains** — add production domain + localhost
 - [ ] **Enable Block Direct URL File Access**
 - [ ] **Enable Embed View Token Authentication** (defense-in-depth)
 - [ ] **DO NOT enable MediaCage Basic DRM** — incompatible with Vidstack (blocks third-party players)
+- [ ] Copy the URL Token Authentication Key into `BUNNY_CDN_TOKEN_KEY`
 - [ ] Copy the Video Library API Key into `BUNNY_VIDEO_LIBRARY_API_KEY`
 - [ ] Note the CDN hostname (`vz-xxx.b-cdn.net`) for `BUNNY_CDN_HOSTNAME`
 

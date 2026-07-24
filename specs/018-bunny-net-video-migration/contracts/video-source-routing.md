@@ -61,13 +61,12 @@ Contract for detecting video source type from URL and routing playback according
 
 ### Rule 2: Bunny CDN Detection
 
-**Pattern**: URL contains `b-cdn.net` OR URL has `.m3u8` extension
+**Pattern**: URL hostname contains `b-cdn.net`
 
 **Examples**:
 - `https://vz-123.b-cdn.net/videos/lesson.m3u8` → Bunny CDN (HLS)
 - `https://library.b-cdn.net/lesson.m3u8` → Bunny CDN (HLS)
 - `https://vz-123.b-cdn.net/videos/lesson.mp4` → Bunny CDN (MP4)
-- `https://example.com/videos/lesson.m3u8` → Bunny CDN (HLS by extension)
 
 **Action**: Return `{ src, type: "application/x-mpegURL" }`
 
@@ -75,13 +74,14 @@ Contract for detecting video source type from URL and routing playback according
 
 ---
 
-### Rule 3: Fallback Detection
+### Rule 3: Fallback / Unprotected HLS
 
-**Pattern**: No pattern match
+**Pattern**: No pattern match (including external `.m3u8` URLs on non-Bunny hosts)
 
 **Examples**:
 - `https://example.com/video.mp4` → Unknown
 - `https://cdn.example.com/video.webm` → Unknown
+- `https://cdn.example.com/lesson.m3u8` → Unknown (external HLS, no token signing)
 - `video.mp4` → Unknown
 
 **Action**: Return `src` as raw string

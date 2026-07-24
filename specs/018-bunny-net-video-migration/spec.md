@@ -161,16 +161,17 @@ ScholarX must **always** support two video sources simultaneously through the sa
 
 **Expected Outcome**: Free content plays without any authentication or token requirements
 
-### Scenario 5: Concurrent Access Protection
+### Scenario 5: Concurrent Access and Token Sharing
 
 **Actor**: Multiple users accessing same paid lesson
 **Flow**:
 1. User A and User B both access the same paid lesson
 2. Each receives their own signed token with unique expiration
-3. Tokens are bound to the session (via Allowed Domains + CDN Token Auth)
-4. Shared tokens expire quickly, preventing unauthorized redistribution
+3. The signed URL is a bearer credential: anyone who possesses it can use it until expiry
+4. Bunny Allowed Domains restrict the embedding origin but do not prevent URL reuse from the same or an allowed origin
+5. If IP locking is needed, the implementation must bind the client IP into the HMAC signature and enable Bunny Advanced Token Authentication IP validation; this is not currently implemented
 
-**Expected Outcome**: Each user gets independent, time-limited access
+**Expected Outcome**: Each user gets independent, time-limited access tokens. Because tokens are bearer credentials without IP binding, a shared URL remains usable by others until it expires.
 
 ---
 
@@ -182,18 +183,19 @@ The system must automatically detect whether a video URL is a YouTube URL or a B
 
 **Acceptance Criteria**:
 - YouTube URLs (containing `youtube.com` or `youtu.be`) are routed to the YouTube provider
-- Bunny CDN URLs (containing `b-cdn.net` or `.m3u8` extension) are routed to the HLS provider
+- Bunny CDN URLs (hostname containing `b-cdn.net`) are routed to the HLS provider with token authentication
+- External HLS URLs (`.m3u8` on non-Bunny hosts) are routed as unprotected fallback streams
 - All other URLs are passed through as fallback
 - Detection must work with both `youtube.com/watch?v=` and `youtu.be/` formats
 - Detection must work with both `vz-xxx.b-cdn.net` and `library.b-cdn.net` CDN hosts
 
 ### FR-2: Server-Side Token Generation
 
-The system must generate time-limited, HMAC-signed tokens for Bunny CDN URLs on the server side. The Video Library API Key must never be exposed to client code.
+The system must generate time-limited, HMAC-signed tokens for Bunny CDN URLs on the server side. The Pull Zone token-authentication key (`BUNNY_CDN_TOKEN_AUTH_KEY`) must never be exposed to client code.
 
 **Acceptance Criteria**:
 - Token generation endpoint exists and is accessible to authenticated users
-- Tokens are HMAC-SHA256 signed using the Video Library API Key
+- Tokens are HMAC-SHA256 signed using the Pull Zone URL token-authentication key (`BUNNY_CDN_TOKEN_AUTH_KEY`), NOT the Video Library API key
 - Tokens include an expiration timestamp (recommended: 1 hour TTL)
 - Tokens use path-style authentication for HLS streams (covers playlist + segments)
 - The signing key is stored in environment variables, never in client bundles
