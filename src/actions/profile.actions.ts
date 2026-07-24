@@ -38,17 +38,12 @@ const updateProfileSchema = z.object({
   gpa: z.coerce.number().min(0).max(4).optional(),
 });
 
-// Define safe URL validation to prevent javascript: URI XSS
-const safeUrl = z.string().url().refine(val => /^https?:\/\//i.test(val), {
-  message: "URL must use http or https protocol"
-});
-
 const socialLinksSchema = z.object({
-  githubUrl: safeUrl.optional().or(z.literal("")),
-  facebookUrl: safeUrl.optional().or(z.literal("")),
-  instagramUrl: safeUrl.optional().or(z.literal("")),
-  twitterUrl: safeUrl.optional().or(z.literal("")),
-  linkedinUrl: safeUrl.optional().or(z.literal("")),
+  githubUrl: z.string().url().optional().or(z.literal("")),
+  facebookUrl: z.string().url().optional().or(z.literal("")),
+  instagramUrl: z.string().url().optional().or(z.literal("")),
+  twitterUrl: z.string().url().optional().or(z.literal("")),
+  linkedinUrl: z.string().url().optional().or(z.literal("")),
 });
 
 export async function getProfile(): Promise<ActionResponse<ProfileData>> {

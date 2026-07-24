@@ -1,7 +1,6 @@
+export const dynamic = "force-dynamic";
 import { createAdminDomain } from "@/domain/admin";
 import { InquiriesTable } from "./_components/inquiries-table";
-
-export const dynamic = "force-dynamic";
 
 export default async function AdminInquiriesPage() {
   const domain = createAdminDomain();
