@@ -13,30 +13,24 @@ import { VideoSourceDetector } from "../../../src/lib/bunny/video-source-detecto
  * Runner: node --import tsx --test
  */
 
+const VALID_LESSON_ID = "550e8400-e29b-41d4-a716-446655440000";
 const VALID_VIDEO_URL = "https://vz-123.b-cdn.net/videos/lesson.m3u8";
 const TEST_API_KEY = "test-api-key-abc123";
 
 describe("BunnyTokenRequestSchema", () => {
   // ── Valid Inputs ──────────────────────────────────────────────────────
 
-  it("accepts valid Bunny CDN .m3u8 URL", () => {
+  it("accepts valid UUID lessonId", () => {
     const result = BunnyTokenRequestSchema.safeParse({
-      videoUrl: VALID_VIDEO_URL,
+      lessonId: VALID_LESSON_ID,
     });
     assert.equal(result.success, true);
   });
 
-  it("accepts valid Bunny CDN .mp4 URL", () => {
-    const result = BunnyTokenRequestSchema.safeParse({
-      videoUrl: "https://vz-123.b-cdn.net/videos/lesson.mp4",
-    });
-    assert.equal(result.success, true);
-  });
-
-  it("accepts URL with expires parameter", () => {
+  it("accepts valid lessonId with expires", () => {
     const future = Math.floor(Date.now() / 1000) + 3600;
     const result = BunnyTokenRequestSchema.safeParse({
-      videoUrl: VALID_VIDEO_URL,
+      lessonId: VALID_LESSON_ID,
       expires: future,
     });
     assert.equal(result.success, true);
@@ -44,50 +38,33 @@ describe("BunnyTokenRequestSchema", () => {
 
   // ── Invalid Inputs ────────────────────────────────────────────────────
 
-  it("rejects missing videoUrl", () => {
+  it("rejects missing lessonId", () => {
     const result = BunnyTokenRequestSchema.safeParse({});
     assert.equal(result.success, false);
   });
 
-  it("rejects empty videoUrl", () => {
-    const result = BunnyTokenRequestSchema.safeParse({ videoUrl: "" });
+  it("rejects empty lessonId", () => {
+    const result = BunnyTokenRequestSchema.safeParse({ lessonId: "" });
     assert.equal(result.success, false);
   });
 
-  it("rejects non-URL videoUrl", () => {
-    const result = BunnyTokenRequestSchema.safeParse({ videoUrl: "not-a-url" });
+  it("rejects non-UUID lessonId", () => {
+    const result = BunnyTokenRequestSchema.safeParse({ lessonId: "not-a-uuid" });
     assert.equal(result.success, false);
-  });
-
-  it("rejects URL without b-cdn.net hostname", () => {
-    const result = BunnyTokenRequestSchema.safeParse({
-      videoUrl: "https://example.com/video.m3u8",
-    });
-    assert.equal(result.success, false);
-  });
-
-  it("rejects URL without .m3u8 or .mp4 extension", () => {
-    const result = BunnyTokenRequestSchema.safeParse({
-      videoUrl: "https://vz-123.b-cdn.net/videos/lesson.webm",
-    });
-    assert.equal(result.success, false);
-  });
-
-  it("automatically sanitizes and accepts URL that already contains bcdn_token=", () => {
-    const result = BunnyTokenRequestSchema.safeParse({
-      videoUrl:
-        "https://vz-123.b-cdn.net/bcdn_token=HS256-abc&expires=1721380800&token_path=%2F%2F/videos/lesson.m3u8",
-    });
-    assert.equal(result.success, true);
-    if (result.success) {
-      assert.equal(result.data.videoUrl, "https://vz-123.b-cdn.net/videos/lesson.m3u8");
-    }
   });
 
   it("rejects negative expires", () => {
     const result = BunnyTokenRequestSchema.safeParse({
-      videoUrl: VALID_VIDEO_URL,
+      lessonId: VALID_LESSON_ID,
       expires: -1,
+    });
+    assert.equal(result.success, false);
+  });
+
+  it("rejects non-integer expires", () => {
+    const result = BunnyTokenRequestSchema.safeParse({
+      lessonId: VALID_LESSON_ID,
+      expires: 1.5,
     });
     assert.equal(result.success, false);
   });
@@ -163,7 +140,7 @@ describe("Error Envelope Format", () => {
         code: "BAD_REQUEST",
         numericCode: 9005,
         statusCode: 400,
-        message: "Missing required parameter: videoUrl",
+        message: "lessonId is required",
       },
     };
 

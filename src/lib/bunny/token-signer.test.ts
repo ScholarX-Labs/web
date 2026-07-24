@@ -5,11 +5,35 @@ import { BunnyCdnTokenSigner } from "./token-signer.js";
 const TEST_SECURITY_KEY = "test-security-key-abc123";
 const TEST_VIDEO_URL = "https://vz-123.b-cdn.net/videos/lesson.m3u8";
 
+/**
+ * Fixed Bunny Advanced Token Auth reference vector.
+ * Matches BunnyCDN.TokenAuthentication (path-style directory token).
+ * @see specs/018-bunny-net-video-migration/data-model.md (CdnToken)
+ * @see specs/018-bunny-net-video-migration/contracts/cdn-token-api.md
+ */
+const REFERENCE = {
+  securityKey: TEST_SECURITY_KEY,
+  videoUrl: TEST_VIDEO_URL,
+  /** Fixed future unix seconds (2033-05-18) — stays unclamped under vectorSigner TTL bounds. */
+  expiresAt: 2_000_000_000,
+  tokenPath: "/videos/",
+  token: "HS256-WBqIz5Hj7Hl36wp-zxMHgjh3QUgwAGQ2nJPEluIyIzg",
+  signedUrl:
+    "https://vz-123.b-cdn.net/bcdn_token=HS256-WBqIz5Hj7Hl36wp-zxMHgjh3QUgwAGQ2nJPEluIyIzg&token_path=%2Fvideos%2F&expires=2000000000/videos/lesson.m3u8",
+} as const;
+
 describe("BunnyCdnTokenSigner", () => {
   let signer: BunnyCdnTokenSigner;
+  /** Signer with TTL clamps disabled so fixed expiresAt is used as-is. */
+  let vectorSigner: BunnyCdnTokenSigner;
 
   beforeEach(() => {
     signer = new BunnyCdnTokenSigner({ securityKey: TEST_SECURITY_KEY });
+    vectorSigner = new BunnyCdnTokenSigner({
+      securityKey: REFERENCE.securityKey,
+      minTtlSeconds: 0,
+      maxTtlSeconds: 4_102_444_800, // far-future ceiling; preserves fixed vector expires
+    });
   });
 
   describe("constructor", () => {
@@ -53,19 +77,33 @@ describe("BunnyCdnTokenSigner", () => {
       assert.equal(cdnToken.tokenPath, "/a/b/c/");
     });
 
+    it("matches fixed Bunny reference vector for (url, key, expires)", () => {
+      const cdnToken = vectorSigner.generateToken(
+        REFERENCE.videoUrl,
+        REFERENCE.expiresAt,
+      );
+      assert.equal(cdnToken.token, REFERENCE.token);
+      assert.equal(cdnToken.tokenPath, REFERENCE.tokenPath);
+      assert.equal(cdnToken.expires, REFERENCE.expiresAt);
+      assert.equal(cdnToken.videoUrl, REFERENCE.videoUrl);
+    });
+
     it("produces identical token for same (url, key, expires) inputs", () => {
-      const fixedExpiry = 1721380800;
-      const t1 = signer.generateToken(TEST_VIDEO_URL, fixedExpiry);
-      const t2 = signer.generateToken(TEST_VIDEO_URL, fixedExpiry);
+      const t1 = vectorSigner.generateToken(REFERENCE.videoUrl, REFERENCE.expiresAt);
+      const t2 = vectorSigner.generateToken(REFERENCE.videoUrl, REFERENCE.expiresAt);
       assert.equal(t1.token, t2.token);
       assert.equal(t1.tokenPath, t2.tokenPath);
+      assert.equal(t1.token, REFERENCE.token);
     });
 
     it("produces different tokens for different keys", () => {
-      const signer2 = new BunnyCdnTokenSigner({ securityKey: "different-key-xyz" });
-      const fixedExpiry = 1721380800;
-      const t1 = signer.generateToken(TEST_VIDEO_URL, fixedExpiry);
-      const t2 = signer2.generateToken(TEST_VIDEO_URL, fixedExpiry);
+      const signer2 = new BunnyCdnTokenSigner({
+        securityKey: "different-key-xyz",
+        minTtlSeconds: 0,
+        maxTtlSeconds: 4_102_444_800,
+      });
+      const t1 = vectorSigner.generateToken(REFERENCE.videoUrl, REFERENCE.expiresAt);
+      const t2 = signer2.generateToken(REFERENCE.videoUrl, REFERENCE.expiresAt);
       assert.notEqual(t1.token, t2.token);
     });
 
@@ -119,6 +157,47 @@ describe("BunnyCdnTokenSigner", () => {
   });
 
   describe("signUrl()", () => {
+    it("matches fixed path-style signed URL reference vector", () => {
+      const result = vectorSigner.signUrl(REFERENCE.videoUrl, REFERENCE.expiresAt);
+      assert.equal(result.token, REFERENCE.token);
+      assert.equal(result.expires, REFERENCE.expiresAt);
+      assert.equal(result.signedUrl, REFERENCE.signedUrl);
+    });
+
+    it("embeds token in path (not query string) for HLS directory coverage", () => {
+      const result = vectorSigner.signUrl(REFERENCE.videoUrl, REFERENCE.expiresAt);
+      const signed = new URL(result.signedUrl);
+
+      // Path-style: token block is part of the path, not ?query
+      assert.equal(signed.search, "", `path-style signedUrl must not use query string, got: ${result.signedUrl}`);
+      assert.ok(
+        signed.pathname.startsWith("/bcdn_token="),
+        `signedUrl path should start with /bcdn_token=, got: ${signed.pathname}`,
+      );
+      assert.ok(
+        result.signedUrl.includes("bcdn_token=" + REFERENCE.token),
+        `signedUrl should embed exact token, got: ${result.signedUrl}`,
+      );
+      assert.ok(
+        result.signedUrl.includes("token_path=%2Fvideos%2F"),
+        `signedUrl should include URL-encoded token_path, got: ${result.signedUrl}`,
+      );
+      assert.ok(
+        result.signedUrl.includes("expires=2000000000"),
+        `signedUrl should include fixed expires, got: ${result.signedUrl}`,
+      );
+      assert.ok(
+        result.signedUrl.endsWith("/videos/lesson.m3u8"),
+        `signedUrl should end with original pathname, got: ${result.signedUrl}`,
+      );
+      // Parameter order matches BunnyCDN.TokenAuthentication directory format
+      assert.match(
+        result.signedUrl,
+        /\/bcdn_token=HS256-[A-Za-z0-9_-]+&token_path=%2Fvideos%2F&expires=\d+\/videos\/lesson\.m3u8$/,
+        `signedUrl shape mismatch: ${result.signedUrl}`,
+      );
+    });
+
     it("returns signedUrl containing bcdn_token=", () => {
       const result = signer.signUrl(TEST_VIDEO_URL);
       assert.ok(result.signedUrl.includes("bcdn_token="), `signedUrl should contain bcdn_token=, got: ${result.signedUrl}`);

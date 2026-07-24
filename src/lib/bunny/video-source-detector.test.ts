@@ -36,9 +36,9 @@ describe("VideoSourceDetector.detect()", () => {
     assert.equal(source.type, "bunny-cdn");
   });
 
-  it("detects https://cdn.example.com/lesson.m3u8 → type='bunny-cdn' (by extension)", () => {
+  it("detects https://cdn.example.com/lesson.m3u8 → type='unknown' (not a Bunny host)", () => {
     const source = detector.detect("https://cdn.example.com/lesson.m3u8");
-    assert.equal(source.type, "bunny-cdn");
+    assert.equal(source.type, "unknown");
   });
 
   it("detects pre-signed Bunny CDN URL → type='bunny-cdn'", () => {
@@ -97,7 +97,6 @@ describe("VideoSourceDetector.detect()", () => {
     const bunnyUrls = [
       "https://vz-123.b-cdn.net/videos/lesson.m3u8",
       "https://library.b-cdn.net/lesson.m3u8",
-      "https://cdn.example.com/lesson.m3u8",
     ];
     for (const url of bunnyUrls) {
       const source = detector.detect(url);
@@ -119,6 +118,7 @@ describe("VideoSourceDetector.detect()", () => {
     const unknownUrls = [
       "https://example.com/video.mp4",
       "https://cdn.example.com/video.webm",
+      "https://cdn.example.com/lesson.m3u8",
     ];
     for (const url of unknownUrls) {
       const source = detector.detect(url);
@@ -170,8 +170,8 @@ describe("BunnyCdnVideoSourceStrategy", () => {
     assert.equal(strategy.matches("https://vz-123.b-cdn.net/videos/lesson.m3u8"), true);
   });
 
-  it("matches .m3u8 extension URLs", () => {
-    assert.equal(strategy.matches("https://example.com/lesson.m3u8"), true);
+  it("does not match external .m3u8 extension URLs (not a Bunny host)", () => {
+    assert.equal(strategy.matches("https://example.com/lesson.m3u8"), false);
   });
 
   it("does not match youtube.com URLs", () => {
