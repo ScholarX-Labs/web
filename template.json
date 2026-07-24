@@ -427,6 +427,21 @@
               "name": "kv-course-image-upload-enabled",
               "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/COURSE-IMAGE-UPLOAD-ENABLED",
               "identity": "system"
+            },
+            {
+              "name": "kv-bunny-video-library-api-key",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/BUNNY-VIDEO-LIBRARY-API-KEY",
+              "identity": "system"
+            },
+            {
+              "name": "kv-bunny-cdn-hostname",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/BUNNY-CDN-HOSTNAME",
+              "identity": "system"
+            },
+            {
+              "name": "kv-bunny-video-library-id",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/BUNNY-VIDEO-LIBRARY-ID",
+              "identity": "system"
             }
           ],
           "activeRevisionsMode": "Single",
@@ -709,6 +724,18 @@
                 {
                   "name": "COURSE_IMAGE_UPLOAD_ENABLED",
                   "secretRef": "kv-course-image-upload-enabled"
+                },
+                {
+                  "name": "BUNNY_VIDEO_LIBRARY_API_KEY",
+                  "secretRef": "kv-bunny-video-library-api-key"
+                },
+                {
+                  "name": "BUNNY_CDN_HOSTNAME",
+                  "secretRef": "kv-bunny-cdn-hostname"
+                },
+                {
+                  "name": "BUNNY_VIDEO_LIBRARY_ID",
+                  "secretRef": "kv-bunny-video-library-id"
                 }
               ],
               "resources": {
@@ -1156,6 +1183,21 @@
               "name": "kv-course-image-upload-enabled",
               "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/COURSE-IMAGE-UPLOAD-ENABLED",
               "identity": "system"
+            },
+            {
+              "name": "kv-bunny-video-library-api-key",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/BUNNY-VIDEO-LIBRARY-API-KEY",
+              "identity": "system"
+            },
+            {
+              "name": "kv-bunny-cdn-hostname",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/BUNNY-CDN-HOSTNAME",
+              "identity": "system"
+            },
+            {
+              "name": "kv-bunny-video-library-id",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/BUNNY-VIDEO-LIBRARY-ID",
+              "identity": "system"
             }
           ],
           "activeRevisionsMode": "Single",
@@ -1438,6 +1480,18 @@
                 {
                   "name": "COURSE_IMAGE_UPLOAD_ENABLED",
                   "secretRef": "kv-course-image-upload-enabled"
+                },
+                {
+                  "name": "BUNNY_VIDEO_LIBRARY_API_KEY",
+                  "secretRef": "kv-bunny-video-library-api-key"
+                },
+                {
+                  "name": "BUNNY_CDN_HOSTNAME",
+                  "secretRef": "kv-bunny-cdn-hostname"
+                },
+                {
+                  "name": "BUNNY_VIDEO_LIBRARY_ID",
+                  "secretRef": "kv-bunny-video-library-id"
                 }
               ],
               "resources": {
