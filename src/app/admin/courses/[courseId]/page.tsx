@@ -71,6 +71,7 @@ import { ImageCropper } from "@/components/ui/image-cropper";
 import { 
   Dialog, 
   DialogContent, 
+  DialogDescription,
   DialogHeader, 
   DialogTitle, 
   DialogTrigger 
@@ -419,6 +420,7 @@ function CurriculumTab({ courseId, lessons, onReorder, isLoading, onEditLesson }
   const createLesson = useCreateLesson();
   const toggleVisibility = useToggleLessonVisibility();
   const [newLessonTitle, setNewLessonTitle] = useState("");
+  const [isAddLessonOpen, setIsAddLessonOpen] = useState(false);
   const [movingId, setMovingId] = useState<string | null>(null);
 
   const handleReorderWithHighlight = (newLessons: AdminLesson[]) => {
@@ -434,6 +436,7 @@ function CurriculumTab({ courseId, lessons, onReorder, isLoading, onEditLesson }
         data: { title: newLessonTitle, status: "draft" } 
       });
       setNewLessonTitle("");
+      setIsAddLessonOpen(false);
       toast.success("Lesson node initialized");
     } catch {
       toast.error("Initialization protocol failure");
@@ -450,7 +453,7 @@ function CurriculumTab({ courseId, lessons, onReorder, isLoading, onEditLesson }
           <p className="text-[13px] text-slate-400 font-bold uppercase tracking-widest opacity-80">Sequence & Orchestrate Lessons</p>
         </div>
         
-        <Dialog>
+        <Dialog open={isAddLessonOpen} onOpenChange={setIsAddLessonOpen}>
             <DialogTrigger asChild>
                 <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-[18px] px-6 h-12 font-black uppercase tracking-[0.2em] text-[10px] shadow-[0_4px_12px_-2px_rgba(37,99,235,0.3)] transition-all flex items-center gap-2 active:scale-95 border-b-4 border-blue-800">
                     <Plus className="size-3.5 stroke-[4]" />
@@ -460,7 +463,7 @@ function CurriculumTab({ courseId, lessons, onReorder, isLoading, onEditLesson }
             <DialogContent className="sm:max-w-md rounded-[32px] border-slate-200 bg-white p-8">
                 <DialogHeader className="space-y-1 text-left">
                     <DialogTitle className="text-xl font-[900] text-slate-900 tracking-tight">Initialize Module</DialogTitle>
-                    <p className="text-[11px] text-slate-400 font-bold uppercase tracking-widest">Add new lesson node to registry</p>
+                    <DialogDescription className="text-[11px] text-slate-400 font-bold uppercase tracking-widest">Add new lesson node to registry</DialogDescription>
                 </DialogHeader>
                 <div className="space-y-6 pt-4">
                     <Input 

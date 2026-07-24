@@ -25,8 +25,9 @@ export function useCreateLesson() {
   return useMutation({
     mutationFn: ({ courseId, data }: { courseId: string; data: unknown }) =>
       adminApi.lessons.create(courseId, data),
-    onSuccess: () => {
+    onSuccess: (_result, { courseId }) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.admin.courses.lists() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.admin.lessons.all(courseId) });
     },
   });
 }

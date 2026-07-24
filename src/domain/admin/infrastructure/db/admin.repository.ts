@@ -298,22 +298,43 @@ export const createAdminRepository = (): AdminRepository => {
         try {
           return await db.transaction(async (tx) => {
             /*
-             * Atomically increment the per-course counter.
-             * The UPDATE acquires a row-level lock on the courses row,
-             * so two concurrent transactions will queue — the second sees
-             * the incremented value from the first.
+             * Read the current counter value and the true max sort_index
+             * in one shot.  If they disagree (counter drifted), we use the
+             * authoritative MAX(sort_index) + 1 so the insert cannot
+             * collide with an existing row.
              */
-            const [counter] = await tx
-              .update(dbCourses)
-              .set({ lastLessonIndex: sql`${dbCourses.lastLessonIndex} + 1` })
-              .where(eq(dbCourses.id, courseId))
-              .returning({ sortIndex: dbCourses.lastLessonIndex });
+            const [course, maxRow] = await Promise.all([
+              tx
+                .select({ lastLessonIndex: dbCourses.lastLessonIndex })
+                .from(dbCourses)
+                .where(eq(dbCourses.id, courseId))
+                .limit(1),
+              tx
+                .select({ maxSort: sql<number>`COALESCE(MAX(${dbLessons.sortIndex}), 0)` })
+                .from(dbLessons)
+                .where(eq(dbLessons.courseId, courseId))
+                .limit(1),
+            ]);
 
-            if (!counter) throw new Error(`Course ${courseId} not found`);
+            if (!course[0]) throw new Error(`Course ${courseId} not found`);
+
+            const nextSortIndex = Math.max(
+              course[0].lastLessonIndex,
+              maxRow[0].maxSort,
+            ) + 1;
+
+            /*
+             * Atomically advance the counter so concurrent callers get
+             * the next value.  The UPDATE acquires a row-level lock on
+             * the courses row, serialising concurrent transactions.
+             */
+            await tx
+              .update(dbCourses)
+              .set({ lastLessonIndex: nextSortIndex })
+              .where(eq(dbCourses.id, courseId));
 
             /*
              * Insert the lesson with the now-unique sortIndex.
-             * The RETURNING clause gives us back the full row in one shot.
              */
             const [lesson] = await tx
               .insert(dbLessons)
@@ -327,7 +348,7 @@ export const createAdminRepository = (): AdminRepository => {
                 duration: data.duration ?? null,
                 isPrivate: data.isPrivate ?? true,
                 status: data.status ?? "draft",
-                sortIndex: counter.sortIndex,
+                sortIndex: nextSortIndex,
               })
               .returning();
 
@@ -336,16 +357,17 @@ export const createAdminRepository = (): AdminRepository => {
         } catch (error) {
           /*
            * PostgreSQL error code 23505 = unique_violation.
-           * With the atomic counter above this should never fire, but
-           * we keep it as a safety net against truly rare edge cases
-           * (e.g. manual DB edits, concurrent reorder race).
+           * With the MAX-based approach above this should be extremely
+           * rare, but we keep it as a safety net for truly unusual
+           * race conditions (e.g. concurrent reorder between the read
+           * and the insert).
            */
-          if (
+          const isUniqueViolation =
             error instanceof Error &&
             "code" in error &&
-            (error as Record<string, unknown>).code === "23505" &&
-            attempt < MAX_RETRIES - 1
-          ) {
+            (error as Record<string, unknown>).code === "23505";
+
+          if (isUniqueViolation && attempt < MAX_RETRIES - 1) {
             continue;
           }
           throw error;
