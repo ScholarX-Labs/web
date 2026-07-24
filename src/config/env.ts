@@ -63,7 +63,8 @@ const envSchema = z.object({
     z.string().min(32).optional(),
   ),
 
-  // Bunny.net Stream — SERVER ONLY
+  // Bunny.net — SERVER ONLY
+  BUNNY_CDN_TOKEN_AUTH_KEY: optionalString,
   BUNNY_VIDEO_LIBRARY_API_KEY: optionalString,
   BUNNY_CDN_HOSTNAME: optionalString,
   BUNNY_VIDEO_LIBRARY_ID: optionalString,
