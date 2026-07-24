@@ -94,7 +94,11 @@ export const VideoPlayer = React.forwardRef<MediaPlayerInstance, VideoPlayerProp
   }, ref) => {
     const seekFromRef = useRef<number>(0);
     const { isFocusMode } = useUILayoutStore();
-    const playerSrc = toPlayerSrc(src);
+    
+    // CRITICAL FIX: Memoize playerSrc to prevent Vidstack from continuously remounting/destroying
+    // the provider on every React render. Changing object identity on the `src` prop causes
+    // internal race conditions throwing `this.$state[prop2] is not a function`.
+    const playerSrc = React.useMemo(() => toPlayerSrc(src), [src]);
 
     return (
       <div className="group relative w-full">
@@ -152,11 +156,13 @@ export const VideoPlayer = React.forwardRef<MediaPlayerInstance, VideoPlayerProp
             const currentTime = getCurrentTime(event);
             if (currentTime !== null) onTimeUpdate?.(currentTime);
           }}
-          onPause={() => {
-            const currentTime = ref && "current" in ref
-              ? ref.current?.currentTime
-              : null;
-            if (typeof currentTime === "number") onPause?.(currentTime);
+          onPause={(event) => {
+            let currentTime = getCurrentTime(event);
+            // MediaPauseEvent doesn't contain currentTime in detail, fallback to ref
+            if (currentTime === null && ref && typeof ref === "object" && ref.current) {
+              currentTime = ref.current.currentTime;
+            }
+            if (currentTime !== null) onPause?.(currentTime);
           }}
           onSeeked={(event) => {
             const currentTime = getNumericDetail(event);

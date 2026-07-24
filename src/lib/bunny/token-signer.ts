@@ -104,7 +104,13 @@ export class BunnyCdnTokenSigner {
 
   private parseVideoUrl(videoUrl: string): URL {
     try {
-      return new URL(videoUrl);
+      const url = new URL(videoUrl);
+      url.searchParams.delete("token");
+      url.searchParams.delete("expires");
+      url.searchParams.delete("token_path");
+      url.searchParams.delete("bcdn_token");
+      url.pathname = url.pathname.replace(/^\/bcdn_token=[^/]+\//, "/");
+      return url;
     } catch {
       throw new RangeError(`Invalid video URL: ${videoUrl}`);
     }
@@ -143,14 +149,22 @@ export class BunnyCdnTokenSigner {
   /**
    * HMAC-SHA256 signature using Bunny.net's specified format.
    *
-   * data_to_sign = token_path + expires_at
+   * data_to_sign = signaturePath + expiresAt + (ipBytes) + signingData
    * token = "HS256-" + base64url_encode(hmac)
    */
   private sign(tokenPath: string, expiresAt: number): string {
-    const dataToSign = `${tokenPath}${expiresAt}`;
-    const signature = createHmac("sha256", this.securityKey)
-      .update(dataToSign)
-      .digest("base64")
+    // For path-based directory tokens, token_path is both the signaturePath
+    // AND it must be included in the alphabetically sorted query parameters (signingData).
+    const signaturePath = tokenPath;
+    const signingData = `token_path=${tokenPath}`;
+
+    const hmac = createHmac("sha256", this.securityKey);
+    hmac.update(signaturePath);
+    hmac.update(expiresAt.toString());
+    hmac.update(Buffer.alloc(0)); // Empty IP bytes
+    hmac.update(signingData);
+    
+    const signature = hmac.digest("base64")
       .replace(/\+/g, "-")
       .replace(/\//g, "_")
       .replace(/=+$/, "");
@@ -159,9 +173,9 @@ export class BunnyCdnTokenSigner {
   }
 
   /**
-   * Build the complete signed URL with Bunny's query-string format.
+   * Build the complete signed URL with Bunny's path-based format.
    *
-   * Format: https://host/bcdn_token=<token>&expires=<expires>&token_path=<path><pathname>
+   * Format: https://host/bcdn_token=<token>&token_path=<encoded_path>&expires=<expires><pathname>
    */
   private buildSignedUrl(
     url: URL,
@@ -170,6 +184,9 @@ export class BunnyCdnTokenSigner {
     tokenPath: string,
   ): string {
     const encodedTokenPath = encodeURIComponent(tokenPath);
-    return `${url.origin}/bcdn_token=${token}&expires=${expiresAt}&token_path=${encodedTokenPath}${url.pathname}`;
+    // Note: bcdn_token must be the first parameter in the path block.
+    // The exact query-string order in the path doesn't strictly matter for the CDN parsing,
+    // but we follow Bunny's reference implementation pattern.
+    return `${url.origin}/bcdn_token=${token}&token_path=${encodedTokenPath}&expires=${expiresAt}${url.pathname}`;
   }
 }
