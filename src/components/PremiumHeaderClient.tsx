@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import { useRef, useState } from "react";
-import Scholarx_horizontal_logo from "../public/ScholarX-Logo-horizontal-Blue-Solid-Small_ScholarX.png";
+import Scholarx_horizontal_logo from "../../public/ScholarX-Logo-horizontal-Blue-Solid-Small_ScholarX.png";
 import Image from "next/image";
 import { User } from "lucide-react";
 import PremiumMobileMenu from "@/components/PremiumMobileMenu";
