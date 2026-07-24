@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import Scholarx_horizontal_logo from "../../public/ScholarX-Logo-horizontal-Blue-Solid-Small_ScholarX.png";
+import Scholarx_horizontal_logo from "../public/ScholarX-Logo-horizontal-Blue-Solid-Small_ScholarX.png";
 import { ROUTES } from "@/lib/routes";
 
 interface MobileMenuProps {

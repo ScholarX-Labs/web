@@ -154,7 +154,7 @@ export default function RadialOrbitalTimeline({ timelineData }: RadialOrbitalTim
             }
 
             return (
-              <button type="button"
+              <div
                 key={item.id}
                 ref={(el) => { nodeRefs.current[item.id] = el }}
                 className="absolute transition-all duration-700 cursor-pointer text-left"
@@ -245,7 +245,7 @@ export default function RadialOrbitalTimeline({ timelineData }: RadialOrbitalTim
                     </CardContent>
                   </Card>
                 )}
-              </button>
+              </div>
             )
           })}
         </div>

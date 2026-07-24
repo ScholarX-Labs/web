@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Scholarx_horizontal_logo from "../../public/ScholarX-Logo-horizontal-Blue-Solid-Small_ScholarX.png";
+import Scholarx_horizontal_logo from "../public/ScholarX-Logo-horizontal-Blue-Solid-Small_ScholarX.png";
 import Image from "next/image";
 import { getSession } from "@/lib/dal";
 import SignoutButton from "@/app/auth/_components/SignoutButton";

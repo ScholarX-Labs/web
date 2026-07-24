@@ -1,7 +1,7 @@
 import ResetPasswordForm from "@/app/auth/_components/ResetPasswordForm";
 import Image from "next/image";
 import { Suspense } from "react";
-import RESET_PASSWORD_IMG from "../../../../public/reset-password.png";
+import RESET_PASSWORD_IMG from "../../../public/reset-password.png";
 
 export default function ResetPasswordPage() {
   return (
