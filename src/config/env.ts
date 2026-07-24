@@ -62,6 +62,11 @@ const envSchema = z.object({
     normalizeOptionalString,
     z.string().min(32).optional(),
   ),
+
+  // Bunny.net Stream — SERVER ONLY
+  BUNNY_VIDEO_LIBRARY_API_KEY: optionalString,
+  BUNNY_CDN_HOSTNAME: optionalString,
+  BUNNY_VIDEO_LIBRARY_ID: optionalString,
 });
 
 type EnvInput = Record<string, string | undefined>;
@@ -175,6 +180,20 @@ export function validateEnv(input: EnvInput = process.env) {
 }
 
 export const env = validateEnv();
+
+// Safety guard: catch accidental exposure of Bunny signing key in client bundles
+if (typeof window === "undefined") {
+  const publicBunnyKeys = Object.keys(process.env).filter(
+    (key) => key.startsWith("NEXT_PUBLIC_BUNNY") || key.startsWith("NEXT_PUBLIC_bunny"),
+  );
+  if (publicBunnyKeys.length > 0) {
+    throw new Error(
+      `[ENV] CRITICAL: Bunny secrets must NOT be exposed to the client bundle. ` +
+        `Found NEXT_PUBLIC_BUNNY* variables: ${publicBunnyKeys.join(", ")}. ` +
+        `Remove them or rename without the NEXT_PUBLIC_ prefix.`,
+    );
+  }
+}
 
 if (typeof window !== "undefined") {
   console.log("[ENV] NEXT_PUBLIC_API_BASE_URL:", env.NEXT_PUBLIC_API_BASE_URL);
