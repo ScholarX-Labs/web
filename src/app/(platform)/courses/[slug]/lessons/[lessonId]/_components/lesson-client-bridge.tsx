@@ -95,7 +95,7 @@ export function LessonClientBridge({
     isLoading: isTokenLoading,
     error: tokenError,
     onTokenExpired,
-  } = useBunnyCdnToken(mediaSrc);
+  } = useBunnyCdnToken(lessonId, mediaSrc);
 
   const isLessonCompleted = initialIsCompleted || Boolean(progress?.completedAt);
 

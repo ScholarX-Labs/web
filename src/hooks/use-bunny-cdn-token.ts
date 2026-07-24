@@ -48,7 +48,7 @@ const TOKEN_REFRESH_MARGIN_MS = 30_000; // Refresh 30s before expiry
 
 // ── Hook ─────────────────────────────────────────────────────────────────────
 
-export function useBunnyCdnToken(videoSrc: string): UseBunnyCdnTokenResult {
+export function useBunnyCdnToken(lessonId: string, videoSrc: string): UseBunnyCdnTokenResult {
   const [signedUrl, setSignedUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -89,7 +89,7 @@ export function useBunnyCdnToken(videoSrc: string): UseBunnyCdnTokenResult {
         if (!isRetry) setIsLoading(true);
         setError(null);
 
-        const params = new URLSearchParams({ videoUrl: videoSrc });
+        const params = new URLSearchParams({ lessonId });
         const response = await fetch(`/api/bunny/token?${params.toString()}`);
 
         if (!response.ok) {
@@ -100,16 +100,19 @@ export function useBunnyCdnToken(videoSrc: string): UseBunnyCdnTokenResult {
 
           if (response.status === 429) {
             setError("Too many requests — please wait a moment");
+            if (mountedRef.current) setIsLoading(false);
             return false;
           }
 
           console.error("[BUNNY] Token fetch failed:", body.error?.message);
+          if (mountedRef.current) setIsLoading(false);
           return false;
         }
 
         const body: TokenResponse = await response.json();
         if (!body.success || !body.data) {
           console.error("[BUNNY] Token response missing data");
+          if (mountedRef.current) setIsLoading(false);
           return false;
         }
 
@@ -125,10 +128,11 @@ export function useBunnyCdnToken(videoSrc: string): UseBunnyCdnTokenResult {
         return true;
       } catch (err) {
         console.error("[BUNNY] Token fetch error:", err);
+        if (mountedRef.current) setIsLoading(false);
         return false;
       }
     },
-    [videoSrc, requiresToken, scheduleRefresh],
+    [lessonId, videoSrc, requiresToken, scheduleRefresh],
   );
 
   // ── Token Expired Handler (called by Vidstack onError 403) ───────────────
