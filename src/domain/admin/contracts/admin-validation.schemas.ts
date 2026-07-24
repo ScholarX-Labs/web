@@ -29,11 +29,11 @@ export const CourseStatusSchema = z.object({
 });
 
 export const EnrollUserSchema = z.object({
-  email: z.string().email(),
+  email: z.string().email().toLowerCase(),
 });
 
 export const CreateUserSchema = z.object({
-  email: z.string().email(),
+  email: z.string().email().toLowerCase(),
   firstName: z.string().min(1).max(100),
   lastName: z.string().min(1).max(100),
   phoneNumber: z.string().optional(),
@@ -42,7 +42,7 @@ export const CreateUserSchema = z.object({
 export const EnrollWithPaymentSchema = z.object({
   courseId: z.string().regex(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/i, "Invalid UUID"),
   userId: z.string().min(1).optional(),
-  email: z.string().email().optional(),
+  email: z.string().email().toLowerCase().optional(),
   amount: z.coerce.number().int().min(0),
   paymentMethod: z.enum(["cash", "card", "bank_transfer"]),
   paymentId: z.string().max(255).optional(),
@@ -53,7 +53,7 @@ export const CashEnrollmentSchema = z.object({
   user: z.object({
     firstName: z.string().min(1).max(100),
     lastName: z.string().min(1).max(100),
-    email: z.string().email(),
+    email: z.string().email().toLowerCase(),
     phoneNumber: z.string().optional(),
   }),
   course: z.object({
@@ -93,7 +93,7 @@ export const ReorderLessonsSchema = z.object({
 export const UpdateUserSchema = z.object({
   firstName: z.string().min(1).max(100).optional(),
   lastName: z.string().min(1).max(100).optional(),
-  email: z.string().email().optional(),
+  email: z.string().email().toLowerCase().optional(),
   phoneNumber: z.string().optional(),
 });
 
