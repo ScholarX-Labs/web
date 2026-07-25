@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { calculateR2Usage } from "@/lib/upload";
 import { clearConfigCache, setConfig } from "@/lib/app-config";
-import crypto from "crypto";
+import { timingSafeEqual } from "node:crypto";
 
 const FREE_TIER_GB = 10;
 
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
       const expectedBuf = Buffer.from(expectedKey);
 
       return providedBuf.length === expectedBuf.length &&
-             crypto.timingSafeEqual(providedBuf, expectedBuf);
+             timingSafeEqual(providedBuf, expectedBuf);
     })();
 
     if (!isAdmin && !isInternal) {
