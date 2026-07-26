@@ -1,0 +1,4 @@
+## 2025-02-14 - Prevent empty string fallback bypass with crypto.timingSafeEqual
+**Vulnerability:** Authentication bypass via timing-safe comparison logic errors.
+**Learning:** When transitioning strict equality checks (`===`) of secrets/keys to `crypto.timingSafeEqual` to prevent timing attacks, a naive implementation might use empty string fallbacks (e.g., `provided || ""` and `expected || ""`) to satisfy Buffer.from(). If the environment variable (`expected`) is undefined (e.g. in dev) and the attacker omits the header, both become empty strings, generating identical empty Buffers. `timingSafeEqual(Buffer.from(""), Buffer.from(""))` returns true, bypassing authentication completely.
+**Prevention:** Always verify that both the provided key and expected key are strictly truthy (and ideally have a minimum length requirement) before constructing Buffers. Do not rely on OR (`||`) fallbacks for sensitive environment variables or inputs during crypto operations.
