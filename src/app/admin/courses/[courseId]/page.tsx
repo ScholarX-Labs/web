@@ -1,4 +1,6 @@
+
 "use client";
+export const dynamic = "force-dynamic";
 
 import { use, useState, useEffect } from "react";
 

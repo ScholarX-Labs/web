@@ -1,4 +1,6 @@
+
 "use client";
+export const dynamic = "force-dynamic";
 
 import { use, useMemo } from "react";
 import Link from "next/link";
