@@ -39,6 +39,7 @@ const StatCard = memo(function StatCard({
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true);
+          observer.disconnect();
         }
       },
       { threshold: 0.3 }
@@ -48,11 +49,7 @@ const StatCard = memo(function StatCard({
       observer.observe(element);
     }
 
-    return () => {
-      if (element) {
-        observer.unobserve(element);
-      }
-    };
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {

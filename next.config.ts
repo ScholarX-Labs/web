@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
   output: "standalone",
   images: {
     unoptimized: process.env.NODE_ENV === "development",
+    formats: ["image/avif", "image/webp"],
     remotePatterns: [
       {
         protocol: "https",
@@ -28,6 +29,22 @@ const nextConfig: NextConfig = {
         hostname: "*.blob.core.windows.net",
       },
     ],
+  },
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=()",
+          },
+        ],
+      },
+    ];
   },
   async rewrites() {
     const posthogHost = process.env.NEXT_PUBLIC_POSTHOG_HOST;

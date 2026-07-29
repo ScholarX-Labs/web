@@ -81,6 +81,7 @@ export const FeaturesSection = memo(function FeaturesSection() {
               alt={t("imageAlt")}
               width={540}
               height={400}
+              sizes="(max-width: 1023px) 100vw, 540px"
               className="block h-auto w-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
             {/* Decorative Circles */}
