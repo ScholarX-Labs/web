@@ -103,10 +103,25 @@ export class CertificateArtifactGenerationService {
         return;
       }
 
+      if (!existing) {
+        // Artifact row does not exist in the database at all.
+        // This can happen when a queue message is delivered to the wrong
+        // environment (staging → production) or the artifact was deleted.
+        // Throwing lets the worker abandon/nack the message so Azure Service
+        // Bus retries it and eventually moves it to the dead-letter queue
+        // instead of silently consuming it.
+        throw new CertificateError(
+          "ARTIFACT_NOT_FOUND",
+          404,
+          `Artifact ${message.artifactId} not found in database. Possible cross-environment message or deleted artifact.`,
+          { artifactId: message.artifactId, certificateNumber: message.certificateNumber },
+        );
+      }
+
       // Unexpected state — log for visibility but don't throw (message will complete cleanly).
       console.warn("[CertificateArtifactGenerationService] Artifact claim failed — unexpected state", {
         artifactId: message.artifactId,
-        status: existing?.status ?? "not_found",
+        status: existing.status,
       });
       return;
     }
