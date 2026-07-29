@@ -16,6 +16,8 @@ const eslintConfig = defineConfig([
     "node_modules/**",
     "*.min.js",
     "next-env.d.ts",
+    ".agents/**",
+    ".agent/**",
   ]),
 ]);
 
