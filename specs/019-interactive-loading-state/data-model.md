@@ -278,12 +278,32 @@ export function loaderReducer(
 
 ---
 
-## 3. Storage & Persistence Schema
+## 3. Storage & Persistence Schema (Repository Implementations)
 
-- **Key**: `scholarx_loader_preferences`  
-  **Storage Type**: `localStorage`  
-  **Payload**: `JSON.stringify(UserLoaderPreferences)`
+### `infrastructure/storage/preferences.repository.ts`
+- **Storage Key**: `scholarx_loader_preferences`
+- **Type**: `localStorage`
+- **Payload**: Zod-validated `UserLoaderPreferences`
+- **Default**: `{ soundEnabled: true, hapticsEnabled: true, gameModeEnabled: true, simplifiedAnimations: false }`
+- **Zod Schema** (runtime guard at IO boundary):
+  ```typescript
+  const PreferencesSchema = z.object({
+    soundEnabled: z.boolean(),
+    hapticsEnabled: z.boolean(),
+    gameModeEnabled: z.boolean(),
+    simplifiedAnimations: z.boolean(),
+  });
+  ```
 
-- **Key**: `scholarx_loader_stats`  
-  **Storage Type**: `sessionStorage`  
-  **Payload**: `JSON.stringify(LearnerSessionStats)`
+### `infrastructure/storage/stats.repository.ts`
+- **Storage Key**: `scholarx_loader_stats`
+- **Type**: `sessionStorage`
+- **Payload**: Zod-validated `LearnerSessionStats`
+- **Default**: `{ triviaAnswered: 0, triviaCorrect: 0, bubblesPopped: 0, totalProductiveWaitTimeMs: 0 }`
+- **Domain-safe mutations**: Repository exposes `recordTriviaAnswer()`, `recordBubblePop()`, `recordWaitTime()` — never raw writes.
+
+### `infrastructure/static-trivia.repository.ts`
+- **Source**: Imports static `trivia-data.ts` from `lib/interactive-loader/`
+- **Implements**: `ITriviaRepository`
+- **Filtering**: `getQuestionsByDomain(domain, limit)` returns shuffled, domain-filtered questions.
+- **Zero network calls**: Guarantees trivia is available during loading without additional requests.
