@@ -18,6 +18,7 @@ import {
   SUPPORTED_LOCALES,
 } from "@/lib/i18n/locales";
 import { loadMessages } from "@/lib/i18n/messages";
+import NextTopLoader from "nextjs-toploader";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -79,6 +80,7 @@ export default async function RootLayout({
       <body
         className={`${inter.variable} ${geistSans.variable} ${geistMono.variable} ${cairo.variable} antialiased flex flex-col min-h-dvh overflow-x-hidden`}
       >
+        <NextTopLoader color="#4F46E5" height={3} showSpinner={false} />
         <RootIntlProvider localeMessages={localeMessages}>
           <div vaul-drawer-wrapper="" className="min-h-dvh flex flex-col">
             <GlobalShellExclusions>
