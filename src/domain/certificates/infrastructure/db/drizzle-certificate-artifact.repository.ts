@@ -71,6 +71,18 @@ export class DrizzleCertificateArtifactRepository
     return rows[0] ? mapRow(rows[0]) : null;
   }
 
+  async findById(
+    artifactId: string,
+  ): Promise<CertificateArtifactRecord | null> {
+    const rows = await db
+      .select()
+      .from(dbCertificateArtifacts)
+      .where(eq(dbCertificateArtifacts.id, artifactId))
+      .limit(1);
+
+    return rows[0] ? mapRow(rows[0]) : null;
+  }
+
   async createPending(
     input: CreateArtifactInput,
   ): Promise<CertificateArtifactRecord> {
