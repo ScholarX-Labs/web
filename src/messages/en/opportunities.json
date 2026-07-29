@@ -5,7 +5,7 @@
   },
   "hero": {
     "badge": "Global Scholarship Database",
-    "title": "Browse {highlight}Opportunities{/highlight}",
+    "title": "Browse <highlight>Opportunities</highlight>",
     "description": "Discover your next big step with our curated list of scholarships, grants, and programs worldwide.",
     "aiSearch": "Try AI Search Matching",
     "poweredBy": "Powered By ScholarX AI",
