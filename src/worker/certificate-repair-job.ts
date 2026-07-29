@@ -35,10 +35,10 @@ import { DrizzleCertificateQueueRepository } from "@/domain/certificates/infrast
 const UNPUBLISHED_OUTBOX_AGE_MS = 2 * 60 * 1000; // 2 minutes
 
 /** Artifacts stuck in 'pending' with no outbox row for this long get re-queued */
-const PENDING_ARTIFACT_STALE_MS = 5 * 60 * 1000; // 5 minutes
+const PENDING_ARTIFACT_STALE_MS = 2 * 60 * 1000; // 2 minutes
 
 /** Artifacts stuck in 'generating' beyond this are assumed to have lost their lock */
-const GENERATING_ARTIFACT_STALE_MS = 15 * 60 * 1000; // 15 minutes
+const GENERATING_ARTIFACT_STALE_MS = 3 * 60 * 1000; // 3 minutes
 
 /** Batch size per repair pass */
 const BATCH_SIZE = 100;
