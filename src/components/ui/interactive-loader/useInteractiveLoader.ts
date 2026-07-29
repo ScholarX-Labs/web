@@ -22,7 +22,7 @@ const DEFAULT_PREFERENCES: UserLoaderPreferences = {
 
 export function useInteractiveLoader({
   isLoading,
-  domain = 'general',
+  domain: _domain = 'general',
   stages = [],
   currentStageIndex = 0,
   delayThresholdMs = 300,
@@ -32,48 +32,62 @@ export function useInteractiveLoader({
 }: UseInteractiveLoaderOptions) {
   const [phase, setPhase] = useState<LoadingPhase>('idle');
   const [elapsedMs, setElapsedMs] = useState(0);
-  const [preferences, setPreferences] = useState<UserLoaderPreferences>(DEFAULT_PREFERENCES);
-  const startTimeRef = useRef<number>(0);
-
-  // Load preferences from localStorage on mount
-  useEffect(() => {
+  const [preferences, setPreferences] = useState<UserLoaderPreferences>(() => {
+    if (typeof window === 'undefined') return DEFAULT_PREFERENCES;
     try {
       const stored = localStorage.getItem('scholarx_loader_preferences');
-      if (stored) {
-        setPreferences(JSON.parse(stored));
-      }
-      
-      // Check OS reduced motion preference
+      const initial: UserLoaderPreferences = stored ? JSON.parse(stored) : { ...DEFAULT_PREFERENCES };
       const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
       if (mediaQuery.matches) {
-        setPreferences(prev => ({ ...prev, simplifiedAnimations: true }));
+        initial.simplifiedAnimations = true;
       }
-    } catch (e) {
-      // Ignore errors if localStorage is unavailable
+      return initial;
+    } catch {
+      return DEFAULT_PREFERENCES;
     }
-  }, []);
+  });
+  const startTimeRef = useRef<number>(0);
+
+  // Track previous inputs for render-phase state adjustments
+  const [prevIsLoading, setPrevIsLoading] = useState(isLoading);
+  const [prevError, setPrevError] = useState(error);
+
+  // 1. Adjust state during render when isLoading changes
+  if (isLoading !== prevIsLoading) {
+    setPrevIsLoading(isLoading);
+    if (isLoading && (phase === 'idle' || phase === 'dismissed')) {
+      setPhase('threshold_wait');
+      startTimeRef.current = Date.now();
+    } else if (!isLoading) {
+      if (phase === 'active_loading' && !error) {
+        setPhase('completing');
+      } else if (phase === 'threshold_wait') {
+        setPhase('dismissed');
+      }
+    }
+  }
+
+  // 2. Adjust state during render when error changes
+  if (error !== prevError) {
+    setPrevError(error);
+    if (error && phase !== 'error' && phase !== 'dismissed' && phase !== 'idle') {
+      setPhase('error');
+    }
+  }
 
   const updatePreferences = useCallback((updates: Partial<UserLoaderPreferences>) => {
     setPreferences(prev => {
       const newPrefs = { ...prev, ...updates };
       try {
         localStorage.setItem('scholarx_loader_preferences', JSON.stringify(newPrefs));
-      } catch (e) {
-        // Ignore errors
+      } catch {
+        // Ignore storage errors
       }
       return newPrefs;
     });
   }, []);
 
-  // 1. Idle/Dismissed -> Threshold Wait
-  useEffect(() => {
-    if (isLoading && (phase === 'idle' || phase === 'dismissed')) {
-      setPhase('threshold_wait');
-      startTimeRef.current = Date.now();
-    }
-  }, [isLoading, phase]);
-
-  // 2. Threshold Wait -> Active Loading
+  // Handle threshold_wait -> active_loading transition
   useEffect(() => {
     if (isLoading && phase === 'threshold_wait') {
       const timer = setTimeout(() => {
@@ -84,37 +98,26 @@ export function useInteractiveLoader({
     }
   }, [isLoading, phase, delayThresholdMs]);
 
-  // 3. Active Loading -> Completing OR Threshold Wait -> Dismissed
-  useEffect(() => {
-    if (!isLoading) {
-      if (phase === 'active_loading' && !error) {
-        setPhase('completing');
-        audioHapticController.playSuccessSound(preferences);
-        audioHapticController.triggerSuccessHaptic(preferences);
-      } else if (phase === 'threshold_wait') {
-        setPhase('dismissed');
-        if (onComplete) onComplete();
-      }
-    }
-  }, [isLoading, phase, error, preferences, onComplete]);
-
-  // 4. Completing -> Dismissed
+  // Handle side effects and completion when entering 'completing' or 'dismissed'
   useEffect(() => {
     if (phase === 'completing') {
+      audioHapticController.playSuccessSound(preferences);
+      audioHapticController.triggerSuccessHaptic(preferences);
+
       const timer = setTimeout(() => {
         setPhase('dismissed');
         if (onComplete) onComplete();
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [phase, onComplete]);
+  }, [phase, preferences, onComplete]);
 
-  // 5. Any -> Error
+  // Handle onComplete when dismissed from threshold_wait
   useEffect(() => {
-    if (error && phase !== 'error' && phase !== 'dismissed' && phase !== 'idle') {
-      setPhase('error');
+    if (phase === 'dismissed' && !isLoading) {
+      if (onComplete) onComplete();
     }
-  }, [error, phase]);
+  }, [phase, isLoading, onComplete]);
 
   // Elapsed time counter
   useEffect(() => {
