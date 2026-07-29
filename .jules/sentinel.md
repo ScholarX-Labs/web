@@ -1,0 +1,4 @@
+## 2024-07-29 - [Timing attack prevention on internal API key]
+**Vulnerability:** Comparing internal API keys using strict equality (`===`) instead of `crypto.timingSafeEqual` introduces a timing attack vulnerability where attackers can guess the length and characters of the internal API key.
+**Learning:** We need to use `timingSafeEqual` and not strict equality (`===`) when verifying internal API keys or passwords. Also, do not use an empty fallback string in the expected key (i.e., `process.env.INTERNAL_API_KEY || ""`) or provided key if it is not provided because that could lead to an authentication bypass if the environmental variables are missing or omitted.
+**Prevention:** Using `crypto.timingSafeEqual` to verify the internal API key securely in a constant time limit to protect against a timing attack. And also check for byte length match for multi-byte characters and null checking on the expected key and provided key before casting it as a `Buffer`.
