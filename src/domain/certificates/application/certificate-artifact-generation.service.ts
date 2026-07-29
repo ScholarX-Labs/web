@@ -4,7 +4,6 @@ import type { ICertificateEventRepository } from "../contracts/certificate-event
 import type { ICertificateRendererPort } from "../contracts/certificate-renderer.port";
 import type { ICertificateStoragePort } from "../contracts/certificate-storage.port";
 import type { CertificateArtifactJobMessage } from "../contracts/certificate-queue.port";
-import type { ArtifactType } from "@/db/schema/certificates-db.schema";
 import { buildArtifactStorageKey } from "../contracts/certificate-storage.port";
 import { CertificateError } from "../domain/certificate-errors";
 import type { CertificateTemplateVersion } from "../domain/certificate-template";
@@ -43,20 +42,71 @@ export class CertificateArtifactGenerationService {
     });
 
     if (!claimed) {
-      // Already ready, non-retryable failed, or claimed by another worker
-      const existing = await this.artifactRepo.findRequiredArtifact({
-        certificateId: message.certificateId,
-        artifactType: message.artifactType as ArtifactType,
-        templateVersion: message.templateVersion,
-      });
+      // markGenerating returned null: the artifact is in a state that cannot
+      // be claimed — either 'ready', 'generating' (taken by another worker or
+      // a crashed one), or nextAttemptAt is still in the future.
+      // Look up by artifactId directly so we don't need certificateId here.
+      const existing = await this.artifactRepo.findById(message.artifactId);
+
       if (existing?.status === "ready") {
         console.info("[CertificateArtifactGenerationService] Artifact already ready — skipping", {
           artifactId: message.artifactId,
         });
         return;
       }
-      console.warn("[CertificateArtifactGenerationService] Artifact claim failed — another worker may have it", {
+
+      if (existing?.status === "generating") {
+        // If the worker crashed after uploading but before marking ready, the blob
+        // will be in storage. We check for it to recover immediately without waiting
+        // for the repair job.
+        const storageKey = buildArtifactStorageKey(
+          message.certificateNumber,
+          message.templateVersion,
+          message.artifactType,
+        );
+        const metadata = await this.storage.getMetadata(storageKey, ARTIFACT_STORAGE_CONTAINER);
+
+        if (metadata && metadata.byteSize > 0) {
+          console.info("[CertificateArtifactGenerationService] Artifact found in storage despite 'generating' status. Repairing inline.", {
+            artifactId: message.artifactId,
+          });
+
+          await this.artifactRepo.markReady({
+            artifactId: message.artifactId,
+            storageContainer: ARTIFACT_STORAGE_CONTAINER,
+            storageKey,
+            contentType: metadata.contentType,
+            byteSize: metadata.byteSize,
+            checksumSha256: "recovered-no-hash",
+            generatedAt: new Date(),
+          });
+
+          await invalidatePublicCertificateCache(message.certificateNumber);
+          return;
+        }
+
+        // Another live worker claimed it, or a crashed worker left it in 'generating'
+        // before upload. The repair job will reset it after STALE_GENERATING_MS.
+        console.warn("[CertificateArtifactGenerationService] Artifact already claimed by another worker (generating) — skipping", {
+          artifactId: message.artifactId,
+          updatedAt: existing.updatedAt,
+        });
+        return;
+      }
+
+      if (existing?.status === "failed" && existing.nextAttemptAt) {
+        // Back-off still active — message was re-delivered too early.
+        console.info("[CertificateArtifactGenerationService] Artifact claim skipped — backoff not elapsed", {
+          artifactId: message.artifactId,
+          nextAttemptAt: existing.nextAttemptAt,
+        });
+        return;
+      }
+
+      // Unexpected state — log for visibility but don't throw (message will complete cleanly).
+      console.warn("[CertificateArtifactGenerationService] Artifact claim failed — unexpected state", {
         artifactId: message.artifactId,
+        status: existing?.status ?? "not_found",
       });
       return;
     }
