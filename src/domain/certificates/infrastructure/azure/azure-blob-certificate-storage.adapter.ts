@@ -87,11 +87,25 @@ export class AzureBlobCertificateStorageAdapter
         blobName: input.key,
         permissions: BlobSASPermissions.parse("r"),
         expiresOn,
+        contentDisposition: input.filename
+          ? `attachment; filename="${input.filename}"`
+          : "attachment; filename=\"certificate.pdf\"",
+        contentType: "application/pdf",
       },
       credential,
     ).toString();
 
     return `${blobClient.url}?${sasToken}`;
+  }
+
+  async downloadBuffer(input: {
+    key: string;
+    container: string;
+  }): Promise<Buffer> {
+    const client = await this.getClient();
+    const containerClient = client.getContainerClient(input.container);
+    const blobClient = containerClient.getBlockBlobClient(input.key);
+    return blobClient.downloadToBuffer();
   }
 
   async delete(key: string, container: string): Promise<void> {

@@ -14,11 +14,14 @@ export interface CertificateStorageDownloadUrlInput {
   container: string;
   /** TTL in seconds for signed URLs */
   expiresInSeconds?: number;
+  /** Filename hint for Content-Disposition header in generated signed URLs */
+  filename?: string;
 }
 
 export interface ICertificateStoragePort {
   upload(input: CertificateStorageUploadInput): Promise<void>;
   getDownloadUrl(input: CertificateStorageDownloadUrlInput): Promise<string>;
+  downloadBuffer(input: { key: string; container: string }): Promise<Buffer>;
   delete(key: string, container: string): Promise<void>;
 }
 

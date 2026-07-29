@@ -136,7 +136,7 @@ export function CertificateArtifactStatusPoller({
     return (
       <a
         href={downloadUrl}
-        download
+        download={`ScholarX-Certificate-${certificateNumber}.pdf`}
         id="certificate-download-link"
         className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-teal-600 px-5 text-sm font-semibold text-white shadow-md shadow-teal-600/30 transition-all hover:bg-teal-500 hover:shadow-teal-500/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400"
       >

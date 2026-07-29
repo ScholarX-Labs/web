@@ -32,6 +32,18 @@ export class MemoryCertificateStorageAdapter
     return `/api/__dev__/certificate-artifact?key=${encodeURIComponent(input.key)}&container=${encodeURIComponent(input.container)}`;
   }
 
+  async downloadBuffer(input: {
+    key: string;
+    container: string;
+  }): Promise<Buffer> {
+    const mapKey = `${input.container}/${input.key}`;
+    const entry = this.store.get(mapKey);
+    if (!entry) {
+      throw new Error(`MemoryStorage: key not found: ${mapKey}`);
+    }
+    return entry.content;
+  }
+
   async delete(key: string, container: string): Promise<void> {
     this.store.delete(`${container}/${key}`);
   }
