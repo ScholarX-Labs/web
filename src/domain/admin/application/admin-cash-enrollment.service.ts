@@ -29,11 +29,12 @@ export const createAdminCashEnrollmentService = (
           phoneNumber: parsed.user.phoneNumber,
           mustChangePassword: true,
         });
-      } catch (error: any) {
+      } catch (error: unknown) {
+        const err = error as { code?: string; message?: string };
         if (
-          error?.code === "23505" || 
-          error?.message?.includes("already exists") ||
-          error?.message?.toLowerCase().includes("unique constraint")
+          err?.code === "23505" || 
+          err?.message?.includes("already exists") ||
+          err?.message?.toLowerCase().includes("unique constraint")
         ) {
           throw AdminErrors.conflict("User with this email already exists");
         }
