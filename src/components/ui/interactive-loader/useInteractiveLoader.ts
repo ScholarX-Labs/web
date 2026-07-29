@@ -22,7 +22,6 @@ const DEFAULT_PREFERENCES: UserLoaderPreferences = {
 
 export function useInteractiveLoader({
   isLoading,
-  domain: _domain = 'general',
   stages = [],
   currentStageIndex = 0,
   delayThresholdMs = 300,
@@ -57,7 +56,6 @@ export function useInteractiveLoader({
     setPrevIsLoading(isLoading);
     if (isLoading && (phase === 'idle' || phase === 'dismissed')) {
       setPhase('threshold_wait');
-      startTimeRef.current = Date.now();
     } else if (!isLoading) {
       if (phase === 'active_loading' && !error) {
         setPhase('completing');
@@ -90,6 +88,7 @@ export function useInteractiveLoader({
   // Handle threshold_wait -> active_loading transition
   useEffect(() => {
     if (isLoading && phase === 'threshold_wait') {
+      startTimeRef.current = Date.now();
       const timer = setTimeout(() => {
         setPhase('active_loading');
         audioHapticController.init();

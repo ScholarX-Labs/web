@@ -52,7 +52,7 @@ export function InteractiveLoader({
   const triviaBank = React.useMemo(() => getTriviaForDomain(domain), [domain]);
   
   // Track local stats
-  const handleStatsUpdate = (_isCorrect: boolean) => {
+  const handleStatsUpdate = () => {
     // In a real app, save to sessionStorage or global store
   };
   
