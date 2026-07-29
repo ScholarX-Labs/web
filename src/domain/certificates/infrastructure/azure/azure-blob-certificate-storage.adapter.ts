@@ -98,19 +98,31 @@ export class AzureBlobCertificateStorageAdapter
     return `${blobClient.url}?${sasToken}`;
   }
 
-  async downloadBuffer(input: {
-    key: string;
-    container: string;
-  }): Promise<Buffer> {
-    const client = await this.getClient();
-    const containerClient = client.getContainerClient(input.container);
-    const blobClient = containerClient.getBlockBlobClient(input.key);
-    return blobClient.downloadToBuffer();
-  }
-
   async delete(key: string, container: string): Promise<void> {
     const client = await this.getClient();
     const containerClient = client.getContainerClient(container);
     await containerClient.deleteBlob(key);
+  }
+
+  async getMetadata(
+    key: string,
+    container: string,
+  ): Promise<{ byteSize: number; contentType: string } | null> {
+    const client = await this.getClient();
+    const containerClient = client.getContainerClient(container);
+    const blobClient = containerClient.getBlockBlobClient(key);
+
+    try {
+      const properties = await blobClient.getProperties();
+      return {
+        byteSize: properties.contentLength ?? 0,
+        contentType: properties.contentType ?? "application/octet-stream",
+      };
+    } catch (error: any) {
+      if (error?.statusCode === 404) {
+        return null;
+      }
+      throw error;
+    }
   }
 }
