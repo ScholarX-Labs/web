@@ -118,8 +118,8 @@ export class AzureBlobCertificateStorageAdapter
         byteSize: properties.contentLength ?? 0,
         contentType: properties.contentType ?? "application/octet-stream",
       };
-    } catch (error: any) {
-      if (error?.statusCode === 404) {
+    } catch (error: unknown) {
+      if ((error as { statusCode?: number })?.statusCode === 404) {
         return null;
       }
       throw error;
