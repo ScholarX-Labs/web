@@ -84,6 +84,7 @@ export class AzureBlobCertificateStorageAdapter
     const signedVersion = "2025-01-05"; // Azure Storage API Version
     const signedResource = "b"; // Blob
     const snapshotTime = "";
+    const encryptionScope = "";
     const rscc = "";
     const rscd = input.filename
       ? `attachment; filename="${input.filename}"`
@@ -103,6 +104,7 @@ export class AzureBlobCertificateStorageAdapter
       signedVersion,
       signedResource,
       snapshotTime,
+      encryptionScope,
       rscc,
       rscd,
       rsce,
