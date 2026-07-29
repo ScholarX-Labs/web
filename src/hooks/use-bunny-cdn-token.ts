@@ -132,7 +132,7 @@ export function useBunnyCdnToken(lessonId: string, videoSrc: string): UseBunnyCd
         return false;
       }
     },
-    [lessonId, videoSrc, requiresToken, scheduleRefresh],
+    [lessonId, requiresToken, scheduleRefresh],
   );
 
   // ── Token Expired Handler (called by Vidstack onError 403) ───────────────
