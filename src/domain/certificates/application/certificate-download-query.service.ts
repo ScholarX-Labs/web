@@ -139,10 +139,30 @@ export class CertificateDownloadQueryService {
       );
     }
 
-    const buffer = await this.storagePort.downloadBuffer({
+    const filename = `ScholarX-Certificate-${certificateNumber}.pdf`;
+
+    // Obtain a signed URL from the storage adapter (SAS for Azure, synthetic
+    // URL for the in-memory adapter in dev/test) then fetch it server-side.
+    // This avoids a separate downloadBuffer port method and works identically
+    // across all storage backends.
+    const signedUrl = await this.storagePort.getDownloadUrl({
       key: artifact.storageKey,
       container: artifact.storageContainer,
+      expiresInSeconds: 60, // short TTL — only for this server-side fetch
+      filename,
     });
+
+    const fetchRes = await fetch(signedUrl, { cache: "no-store" });
+    if (!fetchRes.ok) {
+      throw new CertificateError(
+        "ARTIFACT_FETCH_FAILED",
+        502,
+        `Storage fetch failed with status ${fetchRes.status}.`,
+        { certificateNumber },
+      );
+    }
+    const arrayBuffer = await fetchRes.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
 
     // Fire-and-forget download event — don't block the response
     this.eventRepo
@@ -159,8 +179,6 @@ export class CertificateDownloadQueryService {
         // Non-critical
       });
 
-    const filename = `ScholarX-Certificate-${certificateNumber}.pdf`;
-
     return {
       buffer,
       filename,
@@ -168,3 +186,4 @@ export class CertificateDownloadQueryService {
     };
   }
 }
+
