@@ -7,8 +7,6 @@ import { BubblePopGame } from './BubblePopGame';
 import { getTriviaForDomain } from './trivia-data';
 import { LoadingContextDomain, LoadingStage } from './types';
 import { AlertCircle, RotateCcw, Volume2, VolumeX } from 'lucide-react';
-import { clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
 
 export interface InteractiveLoaderProps {
   isLoading: boolean;
@@ -37,7 +35,6 @@ export function InteractiveLoader({
 }: InteractiveLoaderProps) {
   const { 
     phase, 
-    currentStage, 
     preferences, 
     updatePreferences,
     triggerRetry
@@ -55,7 +52,7 @@ export function InteractiveLoader({
   const triviaBank = React.useMemo(() => getTriviaForDomain(domain), [domain]);
   
   // Track local stats
-  const handleStatsUpdate = (isCorrect: boolean) => {
+  const handleStatsUpdate = (_isCorrect: boolean) => {
     // In a real app, save to sessionStorage or global store
   };
   
