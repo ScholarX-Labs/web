@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Cairo, Geist, Geist_Mono, Inter } from "next/font/google";
+import { Cairo, Geist_Mono, Inter } from "next/font/google";
 import { AppProviders } from "@/providers/app-providers";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { getLocale } from "next-intl/server";
@@ -21,11 +21,6 @@ import { loadMessages } from "@/lib/i18n/messages";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
@@ -38,12 +33,41 @@ const cairo = Cairo({
   display: "swap",
 });
 
+function resolveMetadataBase(): URL {
+  const rawBase = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+  if (rawBase) {
+    try {
+      const parsed = new URL(rawBase);
+      return new URL("/", parsed);
+    } catch {
+      // Ignore invalid or relative API base values, and fall back to a safe origin.
+    }
+  }
+
+  return new URL("https://scholarx.com");
+}
+
 export const metadata: Metadata = {
+  metadataBase: resolveMetadataBase(),
   title: {
     default: "ScholarX",
     template: "%s | ScholarX",
   },
   description: "ScholarX - Premium learning and scholarship discovery platform.",
+  applicationName: "ScholarX",
+  formatDetection: { telephone: false, email: false, address: false },
+  openGraph: {
+    type: "website",
+    siteName: "ScholarX",
+    title: "ScholarX",
+    description: "Premium learning and scholarship discovery platform.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ScholarX",
+    description: "Premium learning and scholarship discovery platform.",
+  },
   icons: {
     icon: [
       {
@@ -77,7 +101,7 @@ export default async function RootLayout({
     // client-detected locale if the user navigates before hydration completes.
     <html lang={localeConfig.bcp47Tag} dir={localeConfig.dir} suppressHydrationWarning data-scroll-behavior="smooth">
       <body
-        className={`${inter.variable} ${geistSans.variable} ${geistMono.variable} ${cairo.variable} antialiased flex flex-col min-h-dvh overflow-x-hidden`}
+        className={`${inter.variable} ${geistMono.variable} ${cairo.variable} antialiased flex flex-col min-h-dvh overflow-x-hidden`}
       >
         <RootIntlProvider localeMessages={localeMessages}>
           <div vaul-drawer-wrapper="" className="min-h-dvh flex flex-col">

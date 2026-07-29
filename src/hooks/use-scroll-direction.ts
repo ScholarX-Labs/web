@@ -6,30 +6,46 @@ type ScrollDirection = "up" | "down";
 
 export function useScrollDirection(
   threshold = 10,
-): { direction: ScrollDirection; isAtTop: boolean; scrollY: number } {
+): { direction: ScrollDirection; isAtTop: boolean } {
   const [direction, setDirection] = useState<ScrollDirection>("up");
   const [isAtTop, setIsAtTop] = useState(true);
-  const [scrollY, setScrollY] = useState(0);
   const prevScrollY = useRef(0);
+  const frameRef = useRef<number | null>(null);
 
   useEffect(() => {
-    const handleScroll = () => {
+    const updateScrollState = () => {
+      frameRef.current = null;
       const currentY = window.scrollY;
       const delta = currentY - prevScrollY.current;
 
-      setIsAtTop(currentY < 10);
+      setIsAtTop((previous) => {
+        const next = currentY < 10;
+        return previous === next ? previous : next;
+      });
 
       if (Math.abs(delta) > threshold) {
-        setDirection(delta > 0 ? "down" : "up");
+        const nextDirection = delta > 0 ? "down" : "up";
+        setDirection((previous) =>
+          previous === nextDirection ? previous : nextDirection,
+        );
       }
 
       prevScrollY.current = currentY;
-      setScrollY(currentY);
+    };
+
+    const handleScroll = () => {
+      if (frameRef.current !== null) return;
+      frameRef.current = window.requestAnimationFrame(updateScrollState);
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (frameRef.current !== null) {
+        window.cancelAnimationFrame(frameRef.current);
+      }
+    };
   }, [threshold]);
 
-  return { direction, isAtTop, scrollY };
+  return { direction, isAtTop };
 }

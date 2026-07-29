@@ -1,6 +1,7 @@
 import { SearchResult } from "@/lib/ai-search/types";
 import { Badge } from "@/components/ai-search/ui/badge";
 import Link from "next/link";
+import { serializeJsonLd } from "@/lib/seo/json-ld";
 
 interface OpportunityDetailProps {
   opportunity: SearchResult;
@@ -112,7 +113,7 @@ export function OpportunityDetail({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
+          __html: serializeJsonLd({
             "@context": "https://schema.org",
             "@type": "EducationalOccupationalProgram",
             name: title,

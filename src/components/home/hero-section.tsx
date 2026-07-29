@@ -1,6 +1,7 @@
 "use client";
 
 import React, { memo } from "react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -168,7 +169,14 @@ export const HeroSection = memo(function HeroSection() {
         <div className="relative mx-auto w-full max-w-[500px] lg:max-w-none">
           <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] bg-gray-50 border border-border shadow-2xl shadow-[var(--color-hero-blue)]/5">
             {/* The image wrapper */}
-            <div className="absolute inset-0 bg-[url('/home-page/hero1.png')] bg-cover bg-center transition-transform duration-700 hover:scale-105" />
+            <Image
+              src="/home-page/hero1.png"
+              alt=""
+              fill
+              priority
+              sizes="(max-width: 1023px) 100vw, 50vw"
+              className="object-cover object-center transition-transform duration-700 hover:scale-105"
+            />
 
             {/* Minimalist Floating Card */}
             <div className="absolute bottom-8 left-8 right-8 rounded-2xl border border-white/40 bg-white/80 p-5 backdrop-blur-xl shadow-lg transition-transform hover:-translate-y-1">
