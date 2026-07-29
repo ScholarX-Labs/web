@@ -25,13 +25,20 @@ export async function GET(
     const { certificateNumber } = await context.params;
 
     const certDomain = createCertificateDomain();
-    const downloadUrl = await certDomain.downloadQuery.getDownloadUrl(
-      certificateNumber,
-      { actorId: undefined }, // public download — no actor tracking
-    );
+    const { buffer, filename, contentType } =
+      await certDomain.downloadQuery.getDownloadFile(certificateNumber, {
+        actorId: undefined, // public download — no actor tracking
+      });
 
-    // Redirect to the signed URL or public CDN URL
-    return NextResponse.redirect(downloadUrl, { status: 302 });
+    return new Response(new Uint8Array(buffer), {
+      status: 200,
+      headers: {
+        "Content-Type": contentType,
+        "Content-Disposition": `attachment; filename="${filename}"`,
+        "Content-Length": buffer.length.toString(),
+        "Cache-Control": "private, no-transform, max-age=300",
+      },
+    });
   } catch (error) {
     if (isCertificateError(error)) {
       if (error.code === "CERTIFICATE_NOT_FOUND") {
