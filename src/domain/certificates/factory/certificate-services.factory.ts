@@ -6,8 +6,6 @@
  * infrastructure or SDK types directly.
  *
  * Environment selection:
- * - CERTIFICATE_QUEUE_ADAPTER=noop   → NoopCertificateQueueAdapter (default in dev/test)
- * - CERTIFICATE_QUEUE_ADAPTER=azure  → AzureServiceBusCertificateQueueAdapter
  * - CERTIFICATE_STORAGE_ADAPTER=memory → MemoryCertificateStorageAdapter
  * - CERTIFICATE_STORAGE_ADAPTER=azure  → AzureBlobCertificateStorageAdapter (default in prod)
  * - CERTIFICATE_RENDERER_ADAPTER=fake       → FakeCertificateRendererAdapter (default in dev/test)
@@ -17,7 +15,6 @@ import { DrizzleCertificateRepository } from "../infrastructure/db/drizzle-certi
 import { DrizzleCertificateArtifactRepository } from "../infrastructure/db/drizzle-certificate-artifact.repository";
 import { DrizzleCertificateEventRepository } from "../infrastructure/db/drizzle-certificate-event.repository";
 import { DrizzleCertificateQueueRepository } from "../infrastructure/db/drizzle-certificate-queue.repository";
-import { NoopCertificateQueueAdapter } from "../infrastructure/fake/noop-certificate-queue.adapter";
 import { MemoryCertificateStorageAdapter } from "../infrastructure/fake/memory-certificate-storage.adapter";
 import { FakeCertificateRendererAdapter } from "../infrastructure/fake/fake-certificate-renderer.adapter";
 import { CertificateIssueService } from "../application/certificate-issue.service";
@@ -25,7 +22,6 @@ import { CertificateVerificationQueryService } from "../application/certificate-
 import { CertificateDownloadQueryService } from "../application/certificate-download-query.service";
 import { CertificateRevocationService } from "../application/certificate-revocation.service";
 import { CertificateArtifactGenerationService } from "../application/certificate-artifact-generation.service";
-import type { ICertificateQueuePort } from "../contracts/certificate-queue.port";
 import type { ICertificateStoragePort } from "../contracts/certificate-storage.port";
 import type { ICertificateRendererPort } from "../contracts/certificate-renderer.port";
 
@@ -47,21 +43,6 @@ export interface CertificateWorkerServices {
 // ---------------------------------------------------------------------------
 // Factory helpers
 // ---------------------------------------------------------------------------
-
-function buildQueuePort(): ICertificateQueuePort {
-  const adapter = process.env.CERTIFICATE_QUEUE_ADAPTER ?? "noop";
-
-  if (adapter === "azure") {
-    // Lazy require prevents Azure SDK from being bundled by Next.js
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { AzureServiceBusCertificateQueueAdapter } = require(
-      "../infrastructure/azure/azure-service-bus-certificate-queue.adapter",
-    );
-    return new AzureServiceBusCertificateQueueAdapter();
-  }
-
-  return new NoopCertificateQueueAdapter();
-}
 
 function buildStoragePort(): ICertificateStoragePort {
   const adapter =
@@ -109,7 +90,6 @@ export function createCertificateDomain(): CertificateDomainServices {
   const artifactRepo = new DrizzleCertificateArtifactRepository();
   const eventRepo = new DrizzleCertificateEventRepository();
   const queueRepo = new DrizzleCertificateQueueRepository();
-  const queuePort = buildQueuePort();
   const storagePort = buildStoragePort();
 
   return {
@@ -118,7 +98,6 @@ export function createCertificateDomain(): CertificateDomainServices {
       artifactRepo,
       eventRepo,
       queueRepo,
-      queuePort,
     ),
     verificationQuery: new CertificateVerificationQueryService(
       certRepo,
