@@ -2,7 +2,6 @@ import type { ICertificateRepository } from "../contracts/certificate.repository
 import type { ICertificateArtifactRepository } from "../contracts/certificate-artifact.repository";
 import type { ICertificateEventRepository } from "../contracts/certificate-event.repository";
 import type { ICertificateQueueRepository } from "../contracts/certificate-queue.repository";
-import type { ICertificateQueuePort } from "../contracts/certificate-queue.port";
 import type {
   CertificateEligibilitySnapshot,
   CompletionSource,
@@ -55,9 +54,8 @@ const MAX_ARTIFACT_REPAIR_ATTEMPTS = 5;
  * - If found, ensures the required PDF artifact exists and is queued.
  * - If not found, generates certificate number, creates certificate, creates
  *   artifact, writes event, and writes outbox row — all in one DB transaction.
- * - After the transaction commits, publishes to Azure Service Bus.
- * - If Service Bus publish fails, the durable outbox row ensures a repair job
- *   can re-enqueue without losing the work.
+ * - The durable outbox row ensures the repair job in the worker container
+ *   can publish to Azure Service Bus without losing the work.
  */
 export class CertificateIssueService {
   constructor(
@@ -65,7 +63,6 @@ export class CertificateIssueService {
     private readonly artifactRepo: ICertificateArtifactRepository,
     private readonly eventRepo: ICertificateEventRepository,
     private readonly queueRepo: ICertificateQueueRepository,
-    private readonly queuePort: ICertificateQueuePort,
   ) {}
 
   async issueForCourseCompletion(
@@ -188,8 +185,8 @@ export class CertificateIssueService {
     // Derive stable Service Bus message ID (idempotent for duplicate detection)
     const messageId = `${artifact.id}:pdf:${CURRENT_TEMPLATE_VERSION}`;
 
-    // Write outbox row for durable publish tracking
-    const outboxRow = await this.queueRepo.createOutboxRow({
+    // Write outbox row for durable publish tracking (repair job picks it up)
+    await this.queueRepo.createOutboxRow({
       artifactId: artifact.id,
       certificateId: certificate.id,
       messageId,
@@ -209,10 +206,15 @@ export class CertificateIssueService {
     });
 
     // -------------------------------------------------------------------------
-    // Step 3: Publish to Service Bus AFTER the DB transaction commits.
-    // If this fails, the outbox row allows the repair job to re-enqueue.
+    // Step 3: Record artifact generation requested event.
+    // The outbox row will be picked up by the repair job in the worker
+    // container, which handles publishing to Azure Service Bus.
     // -------------------------------------------------------------------------
-    await this.publishArtifactJob(artifact, certificate, messageId, outboxRow.id);
+    await this.eventRepo.append({
+      certificateId: certificate.id,
+      eventType: "certificate.artifact_generation_requested",
+      metadata: { artifactId: artifact.id, messageId },
+    });
     await invalidatePublicCertificateCache(certificate.certificateNumber);
 
     return {
@@ -243,18 +245,17 @@ export class CertificateIssueService {
 
         const artifact = repaired ?? existing;
         const messageId = `${artifact.id}:pdf:${CURRENT_TEMPLATE_VERSION}:repair-${Date.now()}-${randomUUID()}`;
-        const outboxRow = await this.queueRepo.createOutboxRow({
+        await this.queueRepo.createOutboxRow({
           artifactId: artifact.id,
           certificateId: certificate.id,
           messageId,
         });
 
-        await this.publishArtifactJob(
-          artifact,
-          certificate,
-          messageId,
-          outboxRow.id,
-        );
+        await this.eventRepo.append({
+          certificateId: certificate.id,
+          eventType: "certificate.artifact_generation_requested",
+          metadata: { artifactId: artifact.id, messageId },
+        });
 
         return artifact;
       }
@@ -270,13 +271,17 @@ export class CertificateIssueService {
     });
 
     const messageId = `${artifact.id}:pdf:${CURRENT_TEMPLATE_VERSION}`;
-    const outboxRow = await this.queueRepo.createOutboxRow({
+    await this.queueRepo.createOutboxRow({
       artifactId: artifact.id,
       certificateId: certificate.id,
       messageId,
     });
 
-    await this.publishArtifactJob(artifact, certificate, messageId, outboxRow.id);
+    await this.eventRepo.append({
+      certificateId: certificate.id,
+      eventType: "certificate.artifact_generation_requested",
+      metadata: { artifactId: artifact.id, messageId },
+    });
 
     return artifact;
   }
@@ -324,44 +329,4 @@ export class CertificateIssueService {
     return "STALE_PENDING_REPAIR";
   }
 
-  private async publishArtifactJob(
-    artifact: CertificateArtifactRecord,
-    certificate: CertificateRecord,
-    messageId: string,
-    outboxId: string,
-  ): Promise<void> {
-    try {
-      await this.queuePort.publish({
-        messageId,
-        body: {
-          schemaVersion: 1,
-          artifactId: artifact.id,
-          certificateId: certificate.id,
-          certificateNumber: certificate.certificateNumber,
-          artifactType: "pdf",
-          templateVersion: CURRENT_TEMPLATE_VERSION,
-          requestedAt: new Date().toISOString(),
-        },
-      });
-
-      // Mark the outbox row as successfully published
-      await this.queueRepo.markPublished({
-        outboxId,
-        publishedAt: new Date(),
-      });
-
-      await this.eventRepo.append({
-        certificateId: certificate.id,
-        eventType: "certificate.artifact_generation_requested",
-        metadata: { artifactId: artifact.id, messageId },
-      });
-    } catch (publishError) {
-      // Service Bus publish failed — outbox row remains unpublished.
-      // The repair job will re-enqueue this within 5 minutes.
-      console.error(
-        "[CertificateIssueService] Service Bus publish failed; outbox row will be picked up by repair job",
-        { artifactId: artifact.id, messageId, error: publishError },
-      );
-    }
-  }
 }
