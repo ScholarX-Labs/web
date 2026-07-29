@@ -18,11 +18,17 @@ export interface CertificateStorageDownloadUrlInput {
   filename?: string;
 }
 
+export interface CertificateStorageMetadata {
+  byteSize: number;
+  contentType: string;
+}
+
 export interface ICertificateStoragePort {
   upload(input: CertificateStorageUploadInput): Promise<void>;
   getDownloadUrl(input: CertificateStorageDownloadUrlInput): Promise<string>;
-  downloadBuffer(input: { key: string; container: string }): Promise<Buffer>;
   delete(key: string, container: string): Promise<void>;
+  /** Check if a blob exists and return its metadata, or null if not found */
+  getMetadata(key: string, container: string): Promise<CertificateStorageMetadata | null>;
 }
 
 /**

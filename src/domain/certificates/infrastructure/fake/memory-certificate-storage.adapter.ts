@@ -32,18 +32,6 @@ export class MemoryCertificateStorageAdapter
     return `/api/__dev__/certificate-artifact?key=${encodeURIComponent(input.key)}&container=${encodeURIComponent(input.container)}`;
   }
 
-  async downloadBuffer(input: {
-    key: string;
-    container: string;
-  }): Promise<Buffer> {
-    const mapKey = `${input.container}/${input.key}`;
-    const entry = this.store.get(mapKey);
-    if (!entry) {
-      throw new Error(`MemoryStorage: key not found: ${mapKey}`);
-    }
-    return entry.content;
-  }
-
   async delete(key: string, container: string): Promise<void> {
     this.store.delete(`${container}/${key}`);
   }
@@ -51,5 +39,19 @@ export class MemoryCertificateStorageAdapter
   /** Test helper — retrieve uploaded content */
   getContent(key: string, container: string): Buffer | undefined {
     return this.store.get(`${container}/${key}`)?.content;
+  }
+
+  async getMetadata(
+    key: string,
+    container: string,
+  ): Promise<{ byteSize: number; contentType: string } | null> {
+    const mapKey = `${container}/${key}`;
+    const stored = this.store.get(mapKey);
+    if (!stored) return null;
+
+    return {
+      byteSize: stored.content.length,
+      contentType: stored.contentType,
+    };
   }
 }

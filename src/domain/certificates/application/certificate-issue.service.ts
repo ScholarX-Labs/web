@@ -40,7 +40,7 @@ export interface IssueCertificateResult {
 
 const MIN_BROWSER_LOADABLE_PDF_BYTES = 500;
 const STALE_PENDING_MS = 2 * 60 * 1000;
-const STALE_GENERATING_MS = 15 * 60 * 1000;
+const STALE_GENERATING_MS = 3 * 60 * 1000; // Azure SB default lock is 60s, Playwright render is <2min
 const MAX_ARTIFACT_REPAIR_ATTEMPTS = 5;
 
 // ---------------------------------------------------------------------------

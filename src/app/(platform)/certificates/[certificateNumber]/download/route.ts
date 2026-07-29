@@ -12,8 +12,9 @@ interface RouteContext {
  * GET /certificates/:certificateNumber/download
  *
  * Public PDF download route.
- * Validates certificate and artifact readiness, then redirects to a
- * short-lived SAS URL or streams through if needed.
+ * Validates certificate and artifact readiness, then fetches the PDF
+ * server-side from the storage backend and streams it to the client with
+ * Content-Disposition: attachment so the browser saves it as a file.
  *
  * Auth: not required for public certificates.
  */
@@ -57,6 +58,12 @@ export async function GET(
         return NextResponse.json(
           { error: error.code, message: error.message },
           { status: 403 },
+        );
+      }
+      if (error.code === "ARTIFACT_FETCH_FAILED") {
+        return NextResponse.json(
+          { error: error.code, message: error.message },
+          { status: 502 },
         );
       }
       return NextResponse.json(
