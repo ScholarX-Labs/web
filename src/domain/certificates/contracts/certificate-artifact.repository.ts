@@ -72,6 +72,8 @@ export interface MarkPendingForRegenerationInput {
 
 export interface ICertificateArtifactRepository {
   findRequiredArtifact(key: ArtifactKey): Promise<CertificateArtifactRecord | null>;
+  /** Look up a single artifact row by its primary key. */
+  findById(artifactId: string): Promise<CertificateArtifactRecord | null>;
   createPending(input: CreateArtifactInput): Promise<CertificateArtifactRecord>;
   /**
    * Atomically claim an artifact for generation.
