@@ -24,6 +24,7 @@ import { db } from "@/db";
 import {
   dbCanonicalCertificates,
   dbCertificateArtifacts,
+  dbCertificateArtifactQueue,
 } from "@/db/schema/certificates-db.schema";
 import { DrizzleCertificateQueueRepository } from "@/domain/certificates/infrastructure/db/drizzle-certificate-queue.repository";
 
@@ -58,12 +59,53 @@ interface RepairMetrics {
   staleGeneratingResetFailed: number;
   failedArtifactsRequeued: number;
   failedArtifactsRequeuedFailed: number;
+  orphanedOutboxReset: number;
   totalDurationMs: number;
 }
 
 // ---------------------------------------------------------------------------
 // Repair steps
 // ---------------------------------------------------------------------------
+
+/**
+ * Step 0: Reset orphaned outbox rows that were marked "published" by the old
+ * noop adapter but whose artifact is still "pending". This handles certificates
+ * issued before the queue fix — the outbox was marked as sent but the message
+ * never reached the worker.
+ */
+async function resetOrphanedPublishedOutboxes(): Promise<number> {
+  try {
+    const result = await db
+      .update(dbCertificateArtifactQueue)
+      .set({
+        status: "pending",
+        publishedAt: null,
+        updatedAt: new Date(),
+      })
+      .from(dbCertificateArtifacts)
+      .where(
+        and(
+          eq(dbCertificateArtifactQueue.artifactId, dbCertificateArtifacts.id),
+          eq(dbCertificateArtifactQueue.status, "published"),
+          eq(dbCertificateArtifacts.status, "pending"),
+        ),
+      )
+      .returning({ id: dbCertificateArtifactQueue.id });
+
+    if (result.length) {
+      console.info(
+        `[CertificateRepairJob] Reset ${result.length} orphaned published outboxes`,
+      );
+    }
+
+    return result.length;
+  } catch (error) {
+    console.error("[CertificateRepairJob] Failed to reset orphaned published outboxes", {
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return 0;
+  }
+}
 
 /**
  * Step 1: Find unpublished outbox rows and re-publish them to Service Bus.
@@ -158,7 +200,7 @@ async function resetStaleGeneratingArtifacts(): Promise<
       .where(
         and(
           eq(dbCertificateArtifacts.status, "generating"),
-          lt(dbCertificateArtifacts.updatedAt, cutoff),
+          lt(dbCertificateArtifacts.createdAt, cutoff),
         ),
       )
       .returning({ id: dbCertificateArtifacts.id });
@@ -220,10 +262,11 @@ async function requeueRetryableFailedArtifacts(): Promise<
               lte(dbCertificateArtifacts.nextAttemptAt, now),
             ),
           ),
-          // Stale pending artifacts with no recent update (fallback for lost outbox)
+          // Stale pending artifacts (using createdAt — updatedAt is bumped by
+          // ensureArtifactExists on every page visit, which would reset the clock)
           and(
             eq(dbCertificateArtifacts.status, "pending"),
-            lt(dbCertificateArtifacts.updatedAt, stalePendingCutoff),
+            lt(dbCertificateArtifacts.createdAt, stalePendingCutoff),
           ),
         ),
       ),
@@ -286,6 +329,9 @@ async function runRepairJob(): Promise<void> {
 
   const queueRepo = new DrizzleCertificateQueueRepository();
 
+  // Step 0: Reset orphaned published outboxes before the other steps
+  const orphanedOutboxReset = await resetOrphanedPublishedOutboxes();
+
   const [outboxMetrics, staleMetrics, retryMetrics] = await Promise.all([
     repairUnpublishedOutboxRows(queueRepo),
     resetStaleGeneratingArtifacts(),
@@ -296,6 +342,7 @@ async function runRepairJob(): Promise<void> {
     ...outboxMetrics,
     ...staleMetrics,
     ...retryMetrics,
+    orphanedOutboxReset,
     totalDurationMs: Date.now() - startedAt,
   };
 
