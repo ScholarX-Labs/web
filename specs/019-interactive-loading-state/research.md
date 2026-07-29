@@ -30,7 +30,8 @@
 
 ## 2. Best Practices & Constitution Compliance
 
-- **SOLID Principles**: Split the loading system into distinct single-responsibility modules (`InteractiveLoaderContainer`, `TriviaOverlay`, `ProgressStageTrack`, `BubblePopGame`, `AudioHapticController`, `useInteractiveLoader`).
-- **Type Safety**: Strictly typed TypeScript interfaces for all stage events, trivia items, user preferences, and loader lifecycle hooks. Zero usage of `any`.
-- **Accessibility (WCAG 2.1 AA)**: Focus trapping on modal/overlay view, ARIA live region (`aria-live="polite"`) for stage progress announcements, complete keyboard navigation (Tab, Arrow keys, Enter, Esc), and automated `prefers-reduced-motion` detection.
-- **Performance**: Zero re-render leaks by isolating mini-game physics frames from React state updates using `requestAnimationFrame` and `useRef`.
+- **SOLID Principles**: Hexagonal architecture with strict layer separation. Domain layer (`domain/interactive-loader/`) contains state machine reducer, command/query services, and repository ports. React layer (`components/interactive-loader/`) contains only presentation logic. Hook layer (`hooks/use-interactive-loader`) bridges domain services to React lifecycle. Library layer (`lib/interactive-loader/`) provides utility adapters (audio synthesis, static trivia data).
+- **Type Safety**: Discriminated unions for all loading phases and state machine events. Branded types (`SessionId`, `TriviaId`) prevent primitive confusion. Exhaustive `never` check in reducer ensures every event is handled. Zod schemas at the localStorage boundary for runtime validation.
+- **Design Patterns**: Reducer pattern (state machine), Repository pattern (data access behind interfaces), Adapter pattern (audio/haptic behind `IAudioController`), Factory pattern (composition root in `factory/`), Mapper pattern (domain → DTO), Specification pattern (domain policies).
+- **Accessibility (WCAG 2.1 AA)**: Focus trapping on overlay, ARIA live region (`role="status"` + `aria-live="polite"`) for stage announcements, keyboard navigation (Tab, Arrow keys, Enter, Space, Esc), and automated `prefers-reduced-motion` detection via `useMediaQuery`.
+- **Performance**: Canvas physics loop isolated from React render cycle via `requestAnimationFrame` + `useRef`. Mini-game lazily loaded via `React.lazy()`. State machine is a pure function with zero side effects — no unnecessary re-renders.
