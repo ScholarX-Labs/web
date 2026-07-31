@@ -185,7 +185,7 @@ export const ROUTE_INVENTORY: readonly LocalizedRouteInventoryEntry[] = [
     routeId: "certificates.download",
     englishPath: "/certificates/[certificateNumber]/download",
     status: "english_only",
-    authBoundary: "authenticated",
+    authBoundary: "public",
     messagesRequired: [],
     metadataRequired: false,
     visualQaRequired: false,
