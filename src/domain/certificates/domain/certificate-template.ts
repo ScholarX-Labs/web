@@ -14,7 +14,7 @@ export type CertificateTemplateVersion =
 
 /** The template version used for new certificate issuances */
 export const CURRENT_TEMPLATE_VERSION: CertificateTemplateVersion =
-  CERTIFICATE_TEMPLATE_VERSIONS.V2;
+  CERTIFICATE_TEMPLATE_VERSIONS.V1;
 
 /** Input data required to render a certificate from any template version */
 export interface CertificateRenderData {

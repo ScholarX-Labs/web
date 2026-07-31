@@ -46,6 +46,12 @@ const EXCLUDED_PREFIXES = [
   "/sentry-test",
 ];
 
+// Route-handler sub-paths that live outside /api/ but are not pages.
+// We check these with an endsWith match so dynamic segments are handled.
+const EXCLUDED_SUFFIXES: readonly string[] = [
+  "/download", // /certificates/[id]/download — public PDF download handler
+];
+
 function hasSessionCookie(request: NextRequest) {
   return Boolean(
     request.cookies.get(SESSION_COOKIE_NAME)?.value ||
@@ -56,6 +62,7 @@ function hasSessionCookie(request: NextRequest) {
 function isExcluded(pathname: string) {
   return (
     EXCLUDED_PREFIXES.some((prefix) => pathname.startsWith(prefix)) ||
+    EXCLUDED_SUFFIXES.some((suffix) => pathname.endsWith(suffix)) ||
     /\.[a-z0-9]+$/i.test(pathname)
   );
 }
@@ -183,5 +190,9 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|.*\\..*).*)"],
+  // Exclude API routes, Next.js internals, static assets, and route-handler
+  // sub-paths that use non-page route.ts files (download, etc.).
+  matcher: [
+    "/((?!api|_next/static|_next/image|.*\\..*|certificates/.*/download).*)",
+  ],
 };
