@@ -429,6 +429,11 @@
               "identity": "system"
             },
             {
+              "name": "kv-bunny-cdn-token-auth-key",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/BUNNY-CDN-TOKEN-AUTH-KEY",
+              "identity": "system"
+            },
+            {
               "name": "kv-bunny-video-library-api-key",
               "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/BUNNY-VIDEO-LIBRARY-API-KEY",
               "identity": "system"
@@ -456,7 +461,14 @@
                 "latestRevision": true
               }
             ],
-            "allowInsecure": false
+            "allowInsecure": false,
+            "customDomains": [
+              {
+                "name": "scholar-x.org",
+                "bindingType": "SniEnabled",
+                "certificateId": "[concat(parameters('managedEnvironments_ScholarX_Production_externalid'), '/managedCertificates/scholar-x.org-scholarx-260524205158')]"
+              }
+            ]
           },
           "registries": [
             {
@@ -726,6 +738,10 @@
                   "secretRef": "kv-course-image-upload-enabled"
                 },
                 {
+                  "name": "BUNNY_CDN_TOKEN_AUTH_KEY",
+                  "secretRef": "kv-bunny-cdn-token-auth-key"
+                },
+                {
                   "name": "BUNNY_VIDEO_LIBRARY_API_KEY",
                   "secretRef": "kv-bunny-video-library-api-key"
                 },
@@ -772,7 +788,7 @@
             }
           ],
           "scale": {
-            "minReplicas": 0,
+            "minReplicas": 1,
             "maxReplicas": 10,
             "cooldownPeriod": 300,
             "pollingInterval": 30
@@ -1185,6 +1201,11 @@
               "identity": "system"
             },
             {
+              "name": "kv-bunny-cdn-token-auth-key",
+              "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/BUNNY-CDN-TOKEN-AUTH-KEY",
+              "identity": "system"
+            },
+            {
               "name": "kv-bunny-video-library-api-key",
               "keyVaultUrl": "https://scholarx-production.vault.azure.net/secrets/BUNNY-VIDEO-LIBRARY-API-KEY",
               "identity": "system"
@@ -1480,6 +1501,10 @@
                 {
                   "name": "COURSE_IMAGE_UPLOAD_ENABLED",
                   "secretRef": "kv-course-image-upload-enabled"
+                },
+                {
+                  "name": "BUNNY_CDN_TOKEN_AUTH_KEY",
+                  "secretRef": "kv-bunny-cdn-token-auth-key"
                 },
                 {
                   "name": "BUNNY_VIDEO_LIBRARY_API_KEY",
