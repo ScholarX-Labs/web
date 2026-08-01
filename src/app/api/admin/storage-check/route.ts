@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
 import crypto from "crypto";
+import { db } from "@/db";
+import { appConfig } from "@/db/schema/app-config-schema";
 import { auth } from "@/lib/auth";
 import { calculateR2Usage } from "@/lib/upload";
 import { clearConfigCache, setConfig } from "@/lib/app-config";
