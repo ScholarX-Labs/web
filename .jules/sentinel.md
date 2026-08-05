@@ -1,0 +1,4 @@
+## 2024-03-24 - [Fix timing attack in internal auth]
+**Vulnerability:** A strict string equality check (`===`) was used in an internal API endpoint (`src/app/api/admin/storage-check/route.ts`) to verify an API key against an environment variable (`process.env.INTERNAL_API_KEY`).
+**Learning:** Comparing secrets with `===` is vulnerable to timing attacks as string comparison bails early on the first mismatched character. Attackers can measure the response time to guess the secret character by character. Furthermore, blindly converting inputs to buffers for `timingSafeEqual` with empty string fallbacks (e.g. `|| ""`) can lead to auth bypasses if the environment variable is not defined and the request omits the header.
+**Prevention:** Use `crypto.timingSafeEqual` to compare secrets in constant time. Always ensure both the expected and provided keys exist and have identical length before performing the buffer comparison, avoiding empty string fallbacks.
