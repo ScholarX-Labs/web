@@ -69,3 +69,7 @@ containerapp.yaml
 .cursor
 .specify*
 /task-manager
+
+# pnpm local store
+/.pnpm-store/
+
