@@ -50,7 +50,7 @@ function validateEnv() {
     }
   }
 
-  for (const key of ["REDIS_URL", "R2_ENDPOINT", "R2_PUBLIC_URL", "BETTER_AUTH_URL"]) {
+  for (const key of ["REDIS_URL", "UPSTASH_REDIS_REST_URL", "R2_ENDPOINT", "R2_PUBLIC_URL", "BETTER_AUTH_URL"]) {
     if (!isUrl(readEnv(key))) {
       issues.push(`${key} must be a valid URL.`);
     }
