@@ -47,6 +47,10 @@ const envSchema = z.object({
   CACHE_ENABLED: optionalBooleanString,
   DISTRIBUTED_RATE_LIMITS_ENABLED: optionalBooleanString,
 
+  // Upstash Redis — SERVER ONLY (optional REST-based Redis client)
+  UPSTASH_REDIS_REST_URL: optionalUrl,
+  UPSTASH_REDIS_REST_TOKEN: optionalString,
+
   AVATAR_UPLOAD_ENABLED: optionalBooleanString,
 
   SCHOLARX_EXECUTIVE_DASHBOARD_ENABLED: optionalBooleanString,
