@@ -1,0 +1,4 @@
+## 2025-02-23 - [Timing Attack in API Key Comparison]
+**Vulnerability:** Comparing `x-internal-key` with `process.env.INTERNAL_API_KEY` using strict equality (`===`) in `src/app/api/admin/storage-check/route.ts`. This allows an attacker to potentially deduce the expected API key by measuring response times.
+**Learning:** In string comparisons for authentication, operations return early on the first mismatched character. This allows attackers to brute-force secrets character by character by measuring execution time differences.
+**Prevention:** Always use `node:crypto`'s `timingSafeEqual` function instead of strict equality `===` when comparing secrets, passwords, or API keys. To avoid edge cases, ensure the lengths match, convert string to `Buffer`, and test for empty or missing inputs safely without generating an authentication bypass.
