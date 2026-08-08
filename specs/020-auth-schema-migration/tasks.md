@@ -36,8 +36,8 @@ graph TD
 
 **Purpose**: Establish canonical namespace resolution module and static analysis lint rules.
 
-- [ ] T001 Create canonical database namespace resolution module in `src/db/schema/namespaces.ts`
-- [ ] T002 Configure ESLint rule `import/no-cycle` for `src/db/schema/` in `eslint.config.mjs`
+- [x] T001 Create canonical database namespace resolution module in `src/db/schema/namespaces.ts`
+- [x] T002 Configure ESLint rule `import/no-cycle` for `src/db/schema/` in `eslint.config.mjs`
 
 ---
 
@@ -47,9 +47,9 @@ graph TD
 
 **⚠️ CRITICAL**: Must complete before user story work begins.
 
-- [ ] T003 [P] Create automated schema literal verification script in `scripts/audit-schema-literals.mjs`
-- [ ] T004 Add `"audit:schema-literals"` script entry in `package.json`
-- [ ] T005 [P] Update `drizzle.config.ts` to derive `schemaFilter` dynamically via `[...Object.values(DB_SCHEMAS), "public"]`
+- [x] T003 [P] Create automated schema literal verification script in `scripts/audit-schema-literals.mjs`
+- [x] T004 Add `"audit:schema-literals"` script entry in `package.json`
+- [x] T005 [P] Update `drizzle.config.ts` to derive `schemaFilter` dynamically via `[...Object.values(DB_SCHEMAS), "public"]`
 
 ---
 
@@ -59,14 +59,14 @@ graph TD
 
 **Independent Test**: Sign in with existing credentials, navigate courses/dashboard, sign out, sign back in, and run authentication integration test suite against `app_auth`.
 
-- [ ] T006 [P] [US1] Update `src/db/schema/auth-schema.ts` to import `authSchema` from `namespaces.ts` and clean up legacy banner comments
-- [ ] T007 [P] [US1] Update `src/db/schema/admin-db.schema.ts` to import `authSchema` and `coursesSchema` from `namespaces.ts`
-- [ ] T008 [P] [US1] Update `src/db/schema/courses-db.schema.ts` to import `coursesSchema` from `namespaces.ts`
-- [ ] T009 [P] [US1] Update `src/db/schema/certificates-db.schema.ts` to import `certificatesSchema` from `namespaces.ts`
-- [ ] T010 [P] [US1] Update `src/db/schema/email-db.schema.ts` to import `emailSchema` from `namespaces.ts`
-- [ ] T011 [P] [US1] Update `src/db/schema/executive-analytics.schema.ts` to import `executiveSchema` from `namespaces.ts`
-- [ ] T012 [US1] Implement startup readiness canary probe in `src/app/api/health/route.ts` checking `SELECT 1 FROM app_auth.user LIMIT 1`
-- [ ] T013 [US1] Delete obsolete script `scripts/fix-auth-schema.js` and verify `src/lib/auth.ts` resolves `app_auth` cleanly
+- [x] T006 [P] [US1] Update `src/db/schema/auth-schema.ts` to import `authSchema` from `namespaces.ts` and clean up legacy banner comments
+- [x] T007 [P] [US1] Update `src/db/schema/admin-db.schema.ts` to import `authSchema` and `coursesSchema` from `namespaces.ts`
+- [x] T008 [P] [US1] Update `src/db/schema/courses-db.schema.ts` to import `coursesSchema` from `namespaces.ts`
+- [x] T009 [P] [US1] Update `src/db/schema/certificates-db.schema.ts` to import `certificatesSchema` from `namespaces.ts`
+- [x] T010 [P] [US1] Update `src/db/schema/email-db.schema.ts` to import `emailSchema` from `namespaces.ts`
+- [x] T011 [P] [US1] Update `src/db/schema/executive-analytics.schema.ts` to import `executiveSchema` from `namespaces.ts`
+- [x] T012 [US1] Implement startup readiness canary probe in `src/app/api/health/route.ts` checking `SELECT 1 FROM app_auth.user LIMIT 1`
+- [x] T013 [US1] Delete obsolete script `scripts/fix-auth-schema.js` and verify `src/lib/auth.ts` resolves `app_auth` cleanly
 
 **Checkpoint**: Core auth schema definitions updated and active sessions/sign-ins independently verified.
 
@@ -78,8 +78,8 @@ graph TD
 
 **Independent Test**: Execute `pnpm audit:schema-literals` and run full query and integration suite verifying zero residual hardcoded schema literals.
 
-- [ ] T014 [US4] Run `pnpm audit:schema-literals` to identify and verify all schema literal replacements across `src/` and `scripts/`
-- [ ] T015 [P] [US4] Update documentation guidance in `docs/frontend-nextjs-schema-auth-guide.md` to reference `app_auth` and `contracts/db-namespace.md`
+- [x] T014 [US4] Run `pnpm audit:schema-literals` to identify and verify all schema literal replacements across `src/` and `scripts/`
+- [x] T015 [P] [US4] Update documentation guidance in `docs/frontend-nextjs-schema-auth-guide.md` to reference `app_auth` and `contracts/db-namespace.md`
 
 **Checkpoint**: Zero hardcoded `"auth"` schema strings remain in source code or documentation.
 
@@ -91,9 +91,9 @@ graph TD
 
 **Independent Test**: Restore database dump to scratch environment, run `pnpm db:migrate` followed by `pnpm db:generate`, and verify zero migration errors and an empty schema diff.
 
-- [ ] T016 [US2] Update helper script `scripts/baseline-drizzle-migrations.mjs` to resolve auth schema via `process.env.AUTH_SCHEMA ?? "app_auth"`
-- [ ] T017 [P] [US2] Update database inspection script `scripts/inspect-db.js` to default auth schema to `"app_auth"`
-- [ ] T018 [P] [US2] Update raw migration helper SQL files in `scripts/migrations/` to reference `app_auth`
+- [x] T016 [US2] Update helper script `scripts/baseline-drizzle-migrations.mjs` to resolve auth schema via `process.env.AUTH_SCHEMA ?? "app_auth"`
+- [x] T017 [P] [US2] Update database inspection script `scripts/inspect-db.js` to default auth schema to `"app_auth"`
+- [x] T018 [P] [US2] Update raw migration helper SQL files in `scripts/migrations/` to reference `app_auth`
 - [ ] T019 [US2] Regenerate baseline migration `drizzle/0000_round_william_stryker.sql` with `CREATE SCHEMA IF NOT EXISTS "app_auth"` and `CREATE TABLE IF NOT EXISTS` guards
 - [ ] T020 [US2] Rebase remaining migration chain SQL files in `drizzle/` and snapshots in `drizzle/meta/` to reference `app_auth`
 - [ ] T021 [US2] Validate fresh restore idempotency by executing `pnpm db:migrate` and `pnpm db:generate` against a scratch database restore
@@ -108,8 +108,8 @@ graph TD
 
 **Independent Test**: Execute executive analytics and admin audit queries before and after cutover to verify identical row counts and join resolution.
 
-- [ ] T022 [US3] Refactor 7 raw SQL query locations in `src/domain/executive/infrastructure/db/executive.repository.ts` to interpolate `sql.identifier(DB_SCHEMAS.auth)`
-- [ ] T023 [P] [US3] Update description and metadata strings in `src/domain/executive/application/metric-definition.registry.ts` to reference `app_auth`
+- [x] T022 [US3] Refactor 7 raw SQL query locations in `src/domain/executive/infrastructure/db/executive.repository.ts` to interpolate `sql.identifier(DB_SCHEMAS.auth)`
+- [x] T023 [P] [US3] Update description and metadata strings in `src/domain/executive/application/metric-definition.registry.ts` to reference `app_auth`
 
 **Checkpoint**: Executive domain raw SQL queries resolve `app_auth` dynamically without hardcoded strings.
 
@@ -121,7 +121,7 @@ graph TD
 
 **Independent Test**: Verify `specs/020-auth-schema-migration/orm-analysis.md` exists, contains issue history, alternatives comparison, and clear recommendations.
 
-- [ ] T024 [P] [US5] Create migration tooling analysis document in `specs/020-auth-schema-migration/orm-analysis.md`
+- [x] T024 [P] [US5] Create migration tooling analysis document in `specs/020-auth-schema-migration/orm-analysis.md`
 
 **Checkpoint**: Decision-support deliverable `orm-analysis.md` completed and reviewed.
 
@@ -131,9 +131,9 @@ graph TD
 
 **Purpose**: Cross-repo consumer documentation, SPECKIT index updates, and final DoD verification.
 
-- [ ] T025 [P] Document cross-repository consumer audit in `docs/consumer-audit-020.md`
-- [ ] T026 Update `AGENTS.md` SPECKIT markers to include `specs/020-auth-schema-migration/plan.md`
-- [ ] T027 Validate full Definition of Done by executing `pnpm audit:schema-literals`, `pnpm typecheck`, `pnpm lint`, and `pnpm test`
+- [x] T025 [P] Document cross-repository consumer audit in `docs/consumer-audit-020.md`
+- [x] T026 Update `AGENTS.md` SPECKIT markers to include `specs/020-auth-schema-migration/plan.md`
+- [x] T027 Validate full Definition of Done by executing `pnpm audit:schema-literals`, `pnpm typecheck`, `pnpm lint`, and `pnpm test`
 
 ---
 
