@@ -3,7 +3,6 @@ import {
   index,
   integer,
   jsonb,
-  pgSchema,
   text,
   timestamp,
   uniqueIndex,
@@ -22,8 +21,7 @@ import type {
   EmailRateLimitScope,
   ProviderCircuitStateName,
 } from "@/domain/email/contracts/email-types";
-
-export const emailSchema = pgSchema("email");
+import { emailSchema } from "./namespaces";
 
 export const dbEmailBatches = emailSchema.table("email_batches", {
   id: uuid("id").primaryKey().defaultRandom(),
