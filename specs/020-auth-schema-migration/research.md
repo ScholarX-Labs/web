@@ -66,8 +66,11 @@ export const executiveSchema = pgSchema(DB_SCHEMAS.executive);
 
 - Work against a scratch DB restored from the provided dump (contains the already-renamed `app_auth`).
 - After updating the schema definitions to the centralized `app_auth` source, run `drizzle-kit generate` to produce a fresh `0000` snapshot that reflects the entire current schema under `app_auth` (plus `public` leaderboard tables).
+- Reconcile `drizzle/meta/_journal.json` hashes and snapshots so Drizzle migration tracking remains valid.
+- Validate the existing `app_auth` schema shape (tables, columns, indexes, foreign keys) against the snapshot via schema-drift assertions (`drizzle-kit generate` / schema-diff clean) rather than relying solely on `IF NOT EXISTS` syntax.
+- Run an existing-database rollback test against the pre-migration dump to verify clean restore and fallback behavior.
 - Reset the migration journal/`drizzle/meta/_journal.json` to start from the new `0000`, and update `scripts/baseline-drizzle-migrations.mjs` defaults (`DEFAULT_BASELINE_THROUGH`) and its legacy-schema detection (auth check → `AUTH_SCHEMA`).
-- Verify on a *second* fresh restore that `db:migrate` reproduces the schema exactly (schema-diff clean).
+- Verify on both a *fresh* restore and an *existing* `app_auth` database that `db:migrate` and `db:generate` reproduce the schema exactly (schema-diff clean).
 
 **Why regenerate instead of find/replace**: Hand-editing ~54 statements across applied migrations invalidates stored journal hashes and risks a corrupted history — the exact failure mode the user reported ("push schema to make it work"). A regenerated baseline is the production-grade fix: fresh environments reproduce `app_auth`, and the shared DB (already renamed) stays untouched.
 
