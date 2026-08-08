@@ -4,7 +4,6 @@ import {
   index,
   integer,
   jsonb,
-  pgSchema,
   text,
   timestamp,
   uniqueIndex,
@@ -12,8 +11,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { user as dbUsers } from "@/db/schema/auth-schema";
-
-export const executiveSchema = pgSchema("executive");
+import { executiveSchema } from "./namespaces";
 
 export type ExecutiveAnalyticsEventType =
   | "website_visit"
