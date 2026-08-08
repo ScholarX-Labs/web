@@ -50,10 +50,17 @@ function validateEnv() {
     }
   }
 
-  for (const key of ["REDIS_URL", "UPSTASH_REDIS_REST_URL", "R2_ENDPOINT", "R2_PUBLIC_URL", "BETTER_AUTH_URL"]) {
+  for (const key of ["REDIS_URL", "R2_ENDPOINT", "R2_PUBLIC_URL", "BETTER_AUTH_URL"]) {
     if (!isUrl(readEnv(key))) {
       issues.push(`${key} must be a valid URL.`);
     }
+  }
+
+  const upstashUrl = readEnv("UPSTASH_REDIS_REST_URL");
+  if (upstashUrl && !isUrl(upstashUrl)) {
+    issues.push("UPSTASH_REDIS_REST_URL must be a valid URL.");
+  } else if (upstashUrl && !/^https:\/\//i.test(upstashUrl)) {
+    issues.push("UPSTASH_REDIS_REST_URL must use the https:// scheme.");
   }
 
   const cacheEnabled = readEnv("CACHE_ENABLED") === "true";
