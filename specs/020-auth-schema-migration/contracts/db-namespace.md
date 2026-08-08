@@ -25,9 +25,9 @@ A single, typed, authoritative source for schema names so that renaming a namesp
 import { pgSchema } from "drizzle-orm/pg-core";
 
 /**
- * DB_SCHEMAS is the single source of truth for every PostgreSQL schema name.
- * To rename a schema: change exactly one value here. All consumers follow automatically.
- * To add a schema: add one key here. drizzle.config.ts schemaFilter updates automatically.
+ * DB_SCHEMAS is the registry for PostgreSQL schema names used by TypeScript
+ * builders and drizzle.config.ts schemaFilter. It is not a generator for
+ * static SQL or shell-script literals.
  */
 export const DB_SCHEMAS = {
   auth:         "app_auth",
