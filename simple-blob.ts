@@ -17,7 +17,7 @@ async function main() {
     const props = await blobClient.getProperties();
     console.log('Blob exists!', props.contentLength);
   } catch (e) {
-    console.log('Blob does not exist:', e.message);
+    console.log('Blob does not exist:', e instanceof Error ? e.message : e);
   }
 }
 main().catch(console.error);
