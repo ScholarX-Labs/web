@@ -128,7 +128,7 @@ test("admin courses service", async (t) => {
   await t.test("update validates input (throws ZodError for invalid data)", async () => {
     const repo = makeRepo({ getCourse: async () => ({ id: "c-1" }) });
     const service = createAdminCoursesService(repo, makeAudit());
-    await assert.rejects(() => service.update(makeSession(), "c-1", { invalid: true }), ZodError);
+    await assert.rejects(() => service.update(makeSession(), "c-1", { title: "ab" }), ZodError);
   });
 
   await t.test("update writes audit log with before/after", async () => {
