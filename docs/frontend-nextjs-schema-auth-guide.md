@@ -73,13 +73,15 @@ exists only so Drizzle can type-check foreign keys and relations.
 ### Primary Rule
 
 The Next.js/Auth team should own all authentication and identity schema objects
-in a separate namespace from courses (for example: auth).
+in a separate namespace from courses (currently: `app_auth`).
 
-### Suggested namespace options
+### Namespace (current)
 
-- Preferred: auth.users, auth.sessions, auth.accounts,
-  auth.verification_tokens
-- Acceptable (current compatibility): public.users while transitioning
+- Auth namespace: `app_auth` — canonical name resolved from
+  `src/db/schema/namespaces.ts` (see
+  `specs/020-auth-schema-migration/contracts/db-namespace.md`).
+- Tables: `app_auth.user`, `app_auth.session`, `app_auth.account`,
+  `app_auth.verification`, `app_auth.admin_audit_log`.
 
 ### What to avoid
 
@@ -116,7 +118,7 @@ export default defineConfig({
   dbCredentials: {
     url: process.env.DATABASE_URL!,
   },
-  schemaFilter: ['auth'],
+  schemaFilter: ['app_auth'],
   strict: true,
   verbose: true,
 });
@@ -149,16 +151,16 @@ export default defineConfig({
 ## Decoupling Checklist
 
 - Backend migrations only manage courses schema.
-- Frontend/auth migrations only manage auth (or public during migration window).
+- Frontend/auth migrations only manage app_auth.
 - Cross-domain references use stable IDs (UUID), not business-coupled fields.
 - Shared user contract is versioned and documented.
 - Breaking contract changes are coordinated via release notes.
 
-## Migration Path (If Moving from public.users to auth.users)
+## Migration Path (If Moving from public.users to app_auth.users)
 
-1. Create auth.users with required contract columns.
-2. Backfill data from public.users to auth.users.
-3. Update backend reference table definition to auth.users (or a compatibility
+1. Create app_auth.user with required contract columns.
+2. Backfill data from public.users to app_auth.user.
+3. Update backend reference table definition to app_auth.user (or a compatibility
    view).
 4. Update FK references if needed through controlled migration.
 5. Keep a rollback plan and validate all joins/relations.
@@ -174,6 +176,6 @@ export default defineConfig({
 ## Quick Summary for Frontend Team
 
 - Yes, backend is already isolated in courses namespace.
-- Keep auth schema separate (prefer auth namespace).
+- Keep auth schema separate (app_auth).
 - Scope your migration config so frontend cannot affect courses schema.
 - Maintain a strict shared user identity contract and evolve it safely.
