@@ -4,10 +4,10 @@
 
 ## 1. Decision: Centralize namespace resolution in `src/db/schema/namespaces.ts`
 
-**Decision**: Create one typed module that is the single source of truth for every PostgreSQL schema name used by the application, and derive every `pgSchema()` instance from it.
+**Decision**: Create one typed module that is the registry for PostgreSQL schema names used by TypeScript builders and `drizzle.config.ts` `schemaFilter`, and derive every `pgSchema()` instance from it (it is not a generator for static SQL or shell-script literals).
 
 **Rationale**:
-- The rename touched 6+ categories of files because the schema name was a hardcoded literal scattered across the codebase. Centralizing makes the next rename a one-line edit (FR-013, SC-007).
+- Centralizing provides a single registry for TypeScript builders and `drizzle.config.ts` `schemaFilter` (FR-013, SC-007), eliminating hardcoded schema literals in application code, though static SQL and shell scripts are not generated automatically.
 - Drizzle's `pgSchema(name)` objects are plain singleton builders; a facade adds no runtime cost and no new architectural layer.
 - Typed `as const` map satisfies Constitution principle II (no magic strings, no `any`).
 - `drizzle.config.ts` can derive `schemaFilter` from the same map, so tooling and app code cannot drift apart.
