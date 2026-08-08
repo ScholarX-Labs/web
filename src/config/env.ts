@@ -14,6 +14,14 @@ const optionalUrl = z.preprocess(
   normalizeOptionalString,
   z.string().url().optional(),
 );
+const optionalHttpsUrl = z.preprocess(
+  normalizeOptionalString,
+  z
+    .string()
+    .url()
+    .regex(/^https:\/\//i, "must use the https:// scheme")
+    .optional(),
+);
 const optionalDigits = z.preprocess(
   normalizeOptionalString,
   z.string().regex(/^\d+$/).optional(),
@@ -48,7 +56,7 @@ const envSchema = z.object({
   DISTRIBUTED_RATE_LIMITS_ENABLED: optionalBooleanString,
 
   // Upstash Redis — SERVER ONLY (optional REST-based Redis client)
-  UPSTASH_REDIS_REST_URL: optionalUrl,
+  UPSTASH_REDIS_REST_URL: optionalHttpsUrl,
   UPSTASH_REDIS_REST_TOKEN: optionalString,
 
   AVATAR_UPLOAD_ENABLED: optionalBooleanString,
