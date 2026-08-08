@@ -56,6 +56,13 @@ function validateEnv() {
     }
   }
 
+  const upstashUrl = readEnv("UPSTASH_REDIS_REST_URL");
+  if (upstashUrl && !isUrl(upstashUrl)) {
+    issues.push("UPSTASH_REDIS_REST_URL must be a valid URL.");
+  } else if (upstashUrl && !/^https:\/\//i.test(upstashUrl)) {
+    issues.push("UPSTASH_REDIS_REST_URL must use the https:// scheme.");
+  }
+
   const cacheEnabled = readEnv("CACHE_ENABLED") === "true";
   const distributedRateLimitsEnabled =
     readEnv("DISTRIBUTED_RATE_LIMITS_ENABLED") === "true";

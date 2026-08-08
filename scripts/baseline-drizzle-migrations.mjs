@@ -13,6 +13,7 @@ const MIGRATIONS_SCHEMA = "drizzle";
 const MIGRATIONS_TABLE = "__drizzle_migrations";
 const DEFAULT_BASELINE_THROUGH = "0004_rapid_stone_men";
 const COURSE_CATEGORIES_BASELINE_THROUGH = "0005_course_categories";
+const AUTH_SCHEMA = process.env.AUTH_SCHEMA ?? "app_auth";
 
 function getConnectionString() {
   const connectionString = process.env.DATABASE_URL;
@@ -93,7 +94,7 @@ async function main() {
     );
 
     const hasLegacyCourseTable = await tableExists(client, "courses", "courses");
-    const hasLegacyUserTable = await tableExists(client, "auth", "user");
+    const hasLegacyUserTable = await tableExists(client, AUTH_SCHEMA, "user");
 
     if (!hasLegacyCourseTable || !hasLegacyUserTable) {
       if (latestMigration.rowCount > 0) {

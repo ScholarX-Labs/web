@@ -1,6 +1,6 @@
 -- Rollback Step 1
-DROP INDEX IF EXISTS auth.idx_user_username;
-ALTER TABLE auth.user
+DROP INDEX IF EXISTS app_auth.idx_user_username;
+ALTER TABLE app_auth.user
   DROP COLUMN IF EXISTS username,
   DROP COLUMN IF EXISTS github_url,
   DROP COLUMN IF EXISTS facebook_url,

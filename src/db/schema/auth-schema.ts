@@ -1,19 +1,12 @@
-// [AUTO-FIXED] Array defaults and other Postgres-specific patches applied by scripts/fix-auth-schema.js
-// [AUTO-FIXED] Array defaults and other Postgres-specific patches applied by scripts/fix-auth-schema.js
-// [AUTO-FIXED] Array defaults and other Postgres-specific patches applied by scripts/fix-auth-schema.js
-// [AUTO-FIXED] Array defaults and other Postgres-specific patches applied by scripts/fix-auth-schema.js
-// [AUTO-FIXED] Array defaults and other Postgres-specific patches applied by scripts/fix-auth-schema.js
 import { relations, sql } from "drizzle-orm";
 import {
-  pgSchema,
   text,
   timestamp,
   boolean,
   integer,
   index,
 } from "drizzle-orm/pg-core";
-
-export const authSchema = pgSchema("auth");
+import { authSchema } from "./namespaces";
 
 export const user = authSchema.table("user", {
   id: text("id").primaryKey(),

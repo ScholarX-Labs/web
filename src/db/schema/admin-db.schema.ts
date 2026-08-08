@@ -1,5 +1,4 @@
 import {
-  pgSchema,
   text,
   uuid,
   varchar,
@@ -12,9 +11,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { user as dbUsers } from "@/db/schema/auth-schema";
 import { dbCourses } from "@/db/schema/courses-db.schema";
-
-const coursesSchema = pgSchema("courses");
-const authSchema = pgSchema("auth");
+import { authSchema, coursesSchema } from "./namespaces";
 
 export const dbLessons = coursesSchema.table(
   "lessons",

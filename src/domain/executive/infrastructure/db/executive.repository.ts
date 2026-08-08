@@ -1,6 +1,7 @@
 import { and, count, desc, eq, gte, inArray, lte, ne, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { session as dbSessions, user as dbUsers } from "@/db/schema/auth-schema";
+import { DB_SCHEMAS } from "@/db/schema/namespaces";
 import { adminAuditLog } from "@/db/schema/admin-db.schema";
 import { dbLessons } from "@/db/schema/admin-db.schema";
 import {
@@ -340,7 +341,7 @@ export class DrizzleExecutiveReadRepository implements ExecutiveReadRepository {
         executeRows<{ value: string | number }>(sql`
           select count(distinct pse.user_id) as value
           from courses.progress_sync_events pse
-          inner join auth.user u on u.id = pse.user_id
+          inner join ${sql.identifier(DB_SCHEMAS.auth)}.user u on u.id = pse.user_id
           where pse.created_at between ${from} and ${to}
             and (${role ?? null}::text is null or u.role = ${role ?? null})
         `),
@@ -379,7 +380,7 @@ export class DrizzleExecutiveReadRepository implements ExecutiveReadRepository {
       registrations as (
         select date_trunc('day', created_at)::date as date,
                count(*) as new_users
-        from auth.user
+        from ${sql.identifier(DB_SCHEMAS.auth)}.user
         where created_at between ${from} and ${to}
           and (${role ?? null}::text is null or role = ${role ?? null})
         group by 1
@@ -423,7 +424,7 @@ export class DrizzleExecutiveReadRepository implements ExecutiveReadRepository {
     const rows = await executeRows<{ occurred_at: Date | string }>(sql`
       select pse.created_at as occurred_at
       from courses.progress_sync_events pse
-      inner join auth.user u on u.id = pse.user_id
+      inner join ${sql.identifier(DB_SCHEMAS.auth)}.user u on u.id = pse.user_id
       where pse.created_at between ${from} and ${to}
         and (${role ?? null}::text is null or u.role = ${role ?? null})
       order by pse.created_at asc
@@ -442,7 +443,7 @@ export class DrizzleExecutiveReadRepository implements ExecutiveReadRepository {
       select to_char(date_trunc('month', pse.created_at), 'YYYY-MM') as month,
              count(*) as value
       from courses.progress_sync_events pse
-      inner join auth.user u on u.id = pse.user_id
+      inner join ${sql.identifier(DB_SCHEMAS.auth)}.user u on u.id = pse.user_id
       where pse.created_at between ${from} and ${to}
         and (${role ?? null}::text is null or u.role = ${role ?? null})
       group by 1
@@ -897,7 +898,7 @@ export class DrizzleExecutiveReadRepository implements ExecutiveReadRepository {
       }>(sql`
         select saved.opportunity_id,
                count(*) as saved_count
-        from auth.user u
+        from ${sql.identifier(DB_SCHEMAS.auth)}.user u
         cross join lateral unnest(coalesce(u.saved_opportunities, '{}'::text[])) as saved(opportunity_id)
         group by saved.opportunity_id
       `),
@@ -955,7 +956,7 @@ export class DrizzleExecutiveReadRepository implements ExecutiveReadRepository {
   /**
    * T148 — Event registration query.
    *
-   * `auth.user.registered_events` is a `text[]` column holding raw event IDs.
+   * `app_auth.user.registered_events` is a `text[]` column holding raw event IDs.
    * We unnest all users' arrays and group by event_id to get a registration
    * count per event.
    *
@@ -971,7 +972,7 @@ export class DrizzleExecutiveReadRepository implements ExecutiveReadRepository {
     _from?: Date,
     _to?: Date,
   ): Promise<readonly RegisteredEventSnapshot[]> {
-    // `auth.user.registered_events` has no per-registration timestamp, so
+    // `app_auth.user.registered_events` has no per-registration timestamp, so
     // date-scoped requests cannot be answered correctly at this layer.
     // Return an explicit unsupported-period representation instead of
     // misleading all-time counts.
@@ -986,7 +987,7 @@ export class DrizzleExecutiveReadRepository implements ExecutiveReadRepository {
       select
         ev.event_id,
         count(*) as registration_count
-      from auth.user u
+      from ${sql.identifier(DB_SCHEMAS.auth)}.user u
       cross join lateral unnest(coalesce(u.registered_events, '{}'::text[])) as ev(event_id)
       where ev.event_id is not null
         and ev.event_id <> ''
@@ -1255,7 +1256,7 @@ export class DrizzleExecutiveReadRepository implements ExecutiveReadRepository {
       with cohorts as (
         select date_trunc('month', u.created_at)::date as cohort,
                u.id as user_id
-        from auth.user u
+        from ${sql.identifier(DB_SCHEMAS.auth)}.user u
         where u.created_at between ${from} and ${to}
       )
       select to_char(cohort, 'YYYY-MM') as cohort,

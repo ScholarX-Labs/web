@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 const { Client } = require("pg");
 
+const AUTH_SCHEMA = process.env.AUTH_SCHEMA || "app_auth";
+
 (async () => {
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) {
@@ -22,20 +24,23 @@ const { Client } = require("pg");
     console.log("Tables named courses/subscriptions:");
     console.log(JSON.stringify(tablesRes.rows, null, 2));
 
-    const colsRes = await client.query(`
+    const colsRes = await client.query(
+      `
       SELECT table_schema, table_name, column_name, data_type, udt_name
       FROM information_schema.columns
-      WHERE (table_schema IN ('courses','public','auth') AND table_name IN ('courses','subscriptions'))
-         OR (table_schema='auth' AND table_name='user' AND column_name='id')
+      WHERE (table_schema IN ('courses','public',$1) AND table_name IN ('courses','subscriptions'))
+         OR (table_schema=$1 AND table_name='user' AND column_name='id')
       ORDER BY table_schema, table_name, ordinal_position;
-    `);
+    `,
+      [AUTH_SCHEMA],
+    );
     console.log("\nColumn metadata for relevant tables:");
     console.log(JSON.stringify(colsRes.rows, null, 2));
 
     const tablesToCount = [
       { schema: "courses", table: "courses" },
       { schema: "courses", table: "subscriptions" },
-      { schema: "auth", table: "user" },
+      { schema: AUTH_SCHEMA, table: "user" },
     ];
 
     console.log("\nRow counts (errors shown if table missing):");
