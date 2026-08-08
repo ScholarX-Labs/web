@@ -133,7 +133,7 @@ graph TD
 
 - [x] T025 [P] Document cross-repository consumer audit in `docs/consumer-audit-020.md`
 - [x] T026 Update `AGENTS.md` SPECKIT markers to include `specs/020-auth-schema-migration/plan.md`
-- [ ] T027 Validate full Definition of Done by executing `pnpm audit:schema-literals`, `pnpm typecheck`, `pnpm lint`, and `pnpm test` (kept incomplete until both fresh and existing `app_auth` database checks pass)
+- [x] T027 Validate full Definition of Done by executing `pnpm audit:schema-literals`, `pnpm typecheck`, `pnpm lint`, and `pnpm test` (verified across fresh and existing app_auth database checks)
 
 ---
 
