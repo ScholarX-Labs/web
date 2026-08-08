@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS "courses"."course_progress" (
   "created_at" timestamp DEFAULT now() NOT NULL,
   "updated_at" timestamp DEFAULT now() NOT NULL,
   CONSTRAINT "course_progress_user_id_user_id_fk"
-    FOREIGN KEY ("user_id") REFERENCES "auth"."user"("id") ON DELETE cascade,
+    FOREIGN KEY ("user_id") REFERENCES "app_auth"."user"("id") ON DELETE cascade,
   CONSTRAINT "course_progress_course_id_courses_id_fk"
     FOREIGN KEY ("course_id") REFERENCES "courses"."courses"("id") ON DELETE cascade,
   CONSTRAINT "course_progress_percentage_chk"
@@ -102,7 +102,7 @@ CREATE TABLE IF NOT EXISTS "courses"."progress_sync_events" (
   "response_snapshot" jsonb,
   "created_at" timestamp DEFAULT now() NOT NULL,
   CONSTRAINT "progress_sync_events_user_id_user_id_fk"
-    FOREIGN KEY ("user_id") REFERENCES "auth"."user"("id") ON DELETE cascade,
+    FOREIGN KEY ("user_id") REFERENCES "app_auth"."user"("id") ON DELETE cascade,
   CONSTRAINT "progress_sync_events_course_id_courses_id_fk"
     FOREIGN KEY ("course_id") REFERENCES "courses"."courses"("id") ON DELETE cascade
 );
@@ -129,7 +129,7 @@ CREATE TABLE IF NOT EXISTS "courses"."certificates" (
   "created_at" timestamp DEFAULT now() NOT NULL,
   "updated_at" timestamp DEFAULT now() NOT NULL,
   CONSTRAINT "certificates_user_id_user_id_fk"
-    FOREIGN KEY ("user_id") REFERENCES "auth"."user"("id") ON DELETE cascade,
+    FOREIGN KEY ("user_id") REFERENCES "app_auth"."user"("id") ON DELETE cascade,
   CONSTRAINT "certificates_course_id_courses_id_fk"
     FOREIGN KEY ("course_id") REFERENCES "courses"."courses"("id") ON DELETE cascade,
   CONSTRAINT "certificates_course_progress_id_course_progress_id_fk"
