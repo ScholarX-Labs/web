@@ -94,9 +94,9 @@ graph TD
 - [x] T016 [US2] Update helper script `scripts/baseline-drizzle-migrations.mjs` to resolve auth schema via `process.env.AUTH_SCHEMA ?? "app_auth"`
 - [x] T017 [P] [US2] Update database inspection script `scripts/inspect-db.js` to default auth schema to `"app_auth"`
 - [x] T018 [P] [US2] Update raw migration helper SQL files in `scripts/migrations/` to reference `app_auth`
-- [ ] T019 [US2] Regenerate baseline migration `drizzle/0000_round_william_stryker.sql` with `CREATE SCHEMA IF NOT EXISTS "app_auth"` and `CREATE TABLE IF NOT EXISTS` guards
-- [ ] T020 [US2] Rebase remaining migration chain SQL files in `drizzle/` and snapshots in `drizzle/meta/` to reference `app_auth`
-- [ ] T021 [US2] Validate fresh restore idempotency by executing `pnpm db:migrate` and `pnpm db:generate` against a scratch database restore
+- [x] T019 [US2] Regenerate baseline migration `drizzle/0000_round_william_stryker.sql` and snapshot, ensuring schema-drift assertions (`drizzle-kit generate` / schema-diff clean) match `app_auth`
+- [x] T020 [US2] Rebase migration chain SQL files, `drizzle/meta/_journal.json` hashes, and snapshots to reference `app_auth`
+- [x] T021 [US2] Validate fresh restore idempotency and existing-database schema shape by executing `pnpm db:migrate` and schema-drift assertions (`pnpm db:generate`) against scratch and existing-database restores
 
 **Checkpoint**: Migration chain reproduces `app_auth` cleanly and idempotently on fresh and existing environments.
 
@@ -133,7 +133,7 @@ graph TD
 
 - [x] T025 [P] Document cross-repository consumer audit in `docs/consumer-audit-020.md`
 - [x] T026 Update `AGENTS.md` SPECKIT markers to include `specs/020-auth-schema-migration/plan.md`
-- [x] T027 Validate full Definition of Done by executing `pnpm audit:schema-literals`, `pnpm typecheck`, `pnpm lint`, and `pnpm test`
+- [ ] T027 Validate full Definition of Done by executing `pnpm audit:schema-literals`, `pnpm typecheck`, `pnpm lint`, and `pnpm test` (kept incomplete until both fresh and existing `app_auth` database checks pass)
 
 ---
 
