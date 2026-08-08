@@ -50,27 +50,43 @@ jobs:
       group: production-database-migrations
       cancel-in-progress: false
     steps:
+      - name: Check migration gate
+        id: skip-check
+        run: |
+          if [ "${{ vars.SKIP_DB_MIGRATIONS }}" = "true" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "::warning::Database migrations skipped via SKIP_DB_MIGRATIONS. Production schema is managed out-of-band while the 020 app_auth migration chain is rebased. Remove the variable to re-enable."
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Checkout Code
+        if: steps.skip-check.outputs.skip != 'true'
         uses: actions/checkout@v4
 
       - name: Enable Corepack
+        if: steps.skip-check.outputs.skip != 'true'
         run: corepack enable
 
       - name: Setup Node.js
+        if: steps.skip-check.outputs.skip != 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: pnpm
 
       - name: Install Dependencies
+        if: steps.skip-check.outputs.skip != 'true'
         run: pnpm install --frozen-lockfile
 
       - name: Validate Production Database URL
+        if: steps.skip-check.outputs.skip != 'true'
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: test -n "$DATABASE_URL"
 
       - name: Run Production Database Migrations
+        if: steps.skip-check.outputs.skip != 'true'
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DATABASE_SSL: ${{ secrets.DATABASE_SSL }}
