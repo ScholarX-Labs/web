@@ -46,6 +46,7 @@ const PATTERNS = [
   { name: '"auth".', regex: /["']auth["']\./g },
   { name: "from auth.", regex: /\bfrom\s+auth\./gi },
   { name: "join auth.", regex: /\bjoin\s+auth\./gi },
+  { name: "unquoted auth.", regex: /\b(alter\s+table|update|create\s+(?:\w+\s+)?index|into|table|on|references)\s+auth\./gi },
   { name: 'schema: "auth"', regex: /schema\s*:\s*["']auth["']/g },
   { name: 'CREATE SCHEMA "auth"', regex: /create\s+schema\s+["']auth["']/gi },
 ];
