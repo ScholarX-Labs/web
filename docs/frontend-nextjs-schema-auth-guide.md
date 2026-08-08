@@ -13,7 +13,7 @@ teams remain decoupled.
 
 - Backend domain namespace: courses
 - Auth table currently referenced by backend: public.users (reference-only in
-  this repo)
+  this repo; separate backend deployment scenario)
 - Migration ownership in this repo: courses schema only
 
 ### Why This Matters
@@ -61,7 +61,7 @@ In drizzle.config.ts:
 - schemaFilter is ['courses']
 
 This ensures drizzle-kit only generates/applies migrations for courses schema
-and ignores public/users or any other namespaces.
+and ignores any other namespaces.
 
 ### 3) Auth table used as reference-only
 
@@ -156,7 +156,12 @@ export default defineConfig({
 - Shared user contract is versioned and documented.
 - Breaking contract changes are coordinated via release notes.
 
-## Migration Path (If Moving from public.users to app_auth.users)
+## Migration Path (If Moving from public.users to app_auth.user)
+
+> `public.users` is the separate backend deployment's identity table — not the
+> canonical auth namespace. The canonical namespace is `app_auth`, resolved
+> from `src/db/schema/namespaces.ts` (see
+> `specs/020-auth-schema-migration/contracts/db-namespace.md`).
 
 1. Create app_auth.user with required contract columns.
 2. Backfill data from public.users to app_auth.user.
