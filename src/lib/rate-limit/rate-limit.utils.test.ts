@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { getRedisKeyPrefix } from "@/lib/cache/redis-key-namespace";
 import {
   buildRateLimitPrefix,
   buildRateLimitSubject,
@@ -27,9 +28,10 @@ test("buildRateLimitSubject avoids delimiter collisions", () => {
 });
 
 test("buildRateLimitPrefix applies the app Redis namespace", () => {
+  const prefix = getRedisKeyPrefix();
   assert.equal(
     buildRateLimitPrefix("public.profile.ip.minute"),
-    "scholarx:v2:web:ratelimit:public.profile.ip.minute",
+    `${prefix}:ratelimit:public.profile.ip.minute`,
   );
 });
 
