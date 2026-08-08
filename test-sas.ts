@@ -63,14 +63,19 @@ async function main() {
   });
 
   const signedUrl = baseUrl + '?' + queryParams.toString();
-  console.log('Signed URL:', signedUrl);
+  console.log('Blob:', container + '/' + key, 'expires:', expiresOn.toISOString());
 
   const res = await fetch(signedUrl, { cache: 'no-store' });
   console.log('Status:', res.status, res.statusText);
   if (!res.ok) {
     console.log('Error Body:', await res.text());
+    process.exitCode = 1;
   } else {
     console.log('Success, length:', (await res.arrayBuffer()).byteLength);
   }
 }
-main().catch(console.error);
+main().catch((err) => {
+  console.error(err);
+  process.exitCode = 1;
+});
+
