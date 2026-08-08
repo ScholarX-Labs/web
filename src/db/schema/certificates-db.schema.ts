@@ -1,6 +1,5 @@
 import { sql } from "drizzle-orm";
 import {
-  pgSchema,
   text,
   uuid,
   varchar,
@@ -13,12 +12,7 @@ import {
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { user as dbUsers } from "@/db/schema/auth-schema";
-
-// ---------------------------------------------------------------------------
-// Schema namespace
-// ---------------------------------------------------------------------------
-
-export const certificatesSchema = pgSchema("certificates");
+import { certificatesSchema } from "./namespaces";
 
 // ---------------------------------------------------------------------------
 // Allowed value types (string unions for type safety across the codebase)
