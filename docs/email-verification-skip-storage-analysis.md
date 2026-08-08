@@ -51,7 +51,7 @@ This means any flag stored in the database is only propagated to the client **ev
 ### Implementation
 
 ```sql
-ALTER TABLE auth."user"
+ALTER TABLE app_auth."user"
   ADD COLUMN email_verification_skipped boolean DEFAULT false NOT NULL;
 ```
 
