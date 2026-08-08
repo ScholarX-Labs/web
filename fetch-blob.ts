@@ -13,6 +13,7 @@ async function main() {
   
   const accountName = client.accountName;
   const accountKey = connectionString!.split(';').find(p => p.startsWith('AccountKey='))?.replace('AccountKey=', '');
+  if (!accountKey) throw new Error('AccountKey not found in connection string');
   
   const credential = new StorageSharedKeyCredential(accountName, accountKey);
   const expiresOn = new Date(Date.now() + 300 * 1000);
