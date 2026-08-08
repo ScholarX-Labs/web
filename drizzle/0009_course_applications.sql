@@ -28,8 +28,8 @@ CREATE TABLE "courses"."course_applications" (
   "created_at" timestamp DEFAULT now() NOT NULL,
   "updated_at" timestamp DEFAULT now() NOT NULL,
   CONSTRAINT "course_applications_course_id_courses_id_fk" FOREIGN KEY ("course_id") REFERENCES "courses"."courses"("id") ON DELETE cascade ON UPDATE no action,
-  CONSTRAINT "course_applications_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "auth"."user"("id") ON DELETE cascade ON UPDATE no action,
-  CONSTRAINT "course_applications_reviewed_by_user_id_fk" FOREIGN KEY ("reviewed_by") REFERENCES "auth"."user"("id") ON DELETE set null ON UPDATE no action,
+  CONSTRAINT "course_applications_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "app_auth"."user"("id") ON DELETE cascade ON UPDATE no action,
+  CONSTRAINT "course_applications_reviewed_by_user_id_fk" FOREIGN KEY ("reviewed_by") REFERENCES "app_auth"."user"("id") ON DELETE set null ON UPDATE no action,
   CONSTRAINT "course_applications_age_chk" CHECK ("courses"."course_applications"."age" between 10 and 100),
   CONSTRAINT "course_applications_years_of_experience_chk" CHECK ("courses"."course_applications"."years_of_experience" is null or "courses"."course_applications"."years_of_experience" >= 0)
 );

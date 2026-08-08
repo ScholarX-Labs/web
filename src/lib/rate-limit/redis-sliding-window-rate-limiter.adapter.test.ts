@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import type { RedisClient } from "@/lib/cache/redis-cache.adapter";
+import { getRedisKeyPrefix } from "@/lib/cache/redis-key-namespace";
 import { RedisSlidingWindowRateLimiterAdapter } from "./redis-sliding-window-rate-limiter.adapter";
 
 test("RedisSlidingWindowRateLimiterAdapter uses a namespaced Redis key", async () => {
@@ -23,8 +24,9 @@ test("RedisSlidingWindowRateLimiterAdapter uses a namespaced Redis key", async (
     "subject-hash",
   );
 
+  const prefix = getRedisKeyPrefix();
   assert.equal(result.allowed, true);
   assert.equal(result.remaining, 4);
   assert.equal(calls.length, 1);
-  assert.equal(calls[0]?.[2], "scholarx:v2:web:ratelimit:public.profile.ip.minute:subject-hash");
+  assert.equal(calls[0]?.[2], `${prefix}:ratelimit:public.profile.ip.minute:subject-hash`);
 });

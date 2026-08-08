@@ -3,9 +3,9 @@
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "auth.account": {
+    "app_auth.account": {
       "name": "account",
-      "schema": "auth",
+      "schema": "app_auth",
       "columns": {
         "id": {
           "name": "id",
@@ -109,7 +109,7 @@
           "name": "account_user_id_user_id_fk",
           "tableFrom": "account",
           "tableTo": "user",
-          "schemaTo": "auth",
+          "schemaTo": "app_auth",
           "columnsFrom": [
             "user_id"
           ],
@@ -126,9 +126,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "auth.session": {
+    "app_auth.session": {
       "name": "session",
-      "schema": "auth",
+      "schema": "app_auth",
       "columns": {
         "id": {
           "name": "id",
@@ -208,7 +208,7 @@
           "name": "session_user_id_user_id_fk",
           "tableFrom": "session",
           "tableTo": "user",
-          "schemaTo": "auth",
+          "schemaTo": "app_auth",
           "columnsFrom": [
             "user_id"
           ],
@@ -233,9 +233,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "auth.user": {
+    "app_auth.user": {
       "name": "user",
-      "schema": "auth",
+      "schema": "app_auth",
       "columns": {
         "id": {
           "name": "id",
@@ -447,9 +447,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "auth.verification": {
+    "app_auth.verification": {
       "name": "verification",
-      "schema": "auth",
+      "schema": "app_auth",
       "columns": {
         "id": {
           "name": "id",
@@ -771,7 +771,7 @@
           "name": "courses_instructor_id_user_id_fk",
           "tableFrom": "courses",
           "tableTo": "user",
-          "schemaTo": "auth",
+          "schemaTo": "app_auth",
           "columnsFrom": [
             "instructor_id"
           ],
@@ -785,7 +785,7 @@
           "name": "courses_updated_by_user_id_fk",
           "tableFrom": "courses",
           "tableTo": "user",
-          "schemaTo": "auth",
+          "schemaTo": "app_auth",
           "columnsFrom": [
             "updated_by"
           ],
@@ -973,7 +973,7 @@
           "name": "inquiries_user_id_user_id_fk",
           "tableFrom": "inquiries",
           "tableTo": "user",
-          "schemaTo": "auth",
+          "schemaTo": "app_auth",
           "columnsFrom": [
             "user_id"
           ],
@@ -1110,7 +1110,7 @@
           "name": "lesson_progress_user_id_user_id_fk",
           "tableFrom": "lesson_progress",
           "tableTo": "user",
-          "schemaTo": "auth",
+          "schemaTo": "app_auth",
           "columnsFrom": [
             "user_id"
           ],
@@ -1201,7 +1201,7 @@
           "name": "subscriptions_user_id_user_id_fk",
           "tableFrom": "subscriptions",
           "tableTo": "user",
-          "schemaTo": "auth",
+          "schemaTo": "app_auth",
           "columnsFrom": [
             "user_id"
           ],
@@ -1232,9 +1232,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "auth.admin_audit_log": {
+    "app_auth.admin_audit_log": {
       "name": "admin_audit_log",
-      "schema": "auth",
+      "schema": "app_auth",
       "columns": {
         "id": {
           "name": "id",
@@ -1372,7 +1372,7 @@
           "name": "admin_audit_log_admin_id_user_id_fk",
           "tableFrom": "admin_audit_log",
           "tableTo": "user",
-          "schemaTo": "auth",
+          "schemaTo": "app_auth",
           "columnsFrom": [
             "admin_id"
           ],
@@ -1572,8 +1572,8 @@
     }
   },
   "schemas": {
-    "auth": "auth",
-    "courses": "courses"
+    "courses": "courses",
+    "app_auth": "app_auth"
   },
   "sequences": {},
   "roles": {},

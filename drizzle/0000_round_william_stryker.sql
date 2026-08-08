@@ -1,9 +1,14 @@
-CREATE SCHEMA "auth";
+CREATE SCHEMA IF NOT EXISTS "app_auth";
 --> statement-breakpoint
-CREATE SCHEMA "courses";
+CREATE SCHEMA IF NOT EXISTS "courses";
 --> statement-breakpoint
-CREATE TYPE "public"."status_enum" AS ENUM('pending', 'resolved');--> statement-breakpoint
-CREATE TABLE "auth"."account" (
+DO $$ BEGIN
+ CREATE TYPE "public"."status_enum" AS ENUM('pending', 'resolved');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "app_auth"."account" (
 	"id" text PRIMARY KEY NOT NULL,
 	"account_id" text NOT NULL,
 	"provider_id" text NOT NULL,
@@ -19,7 +24,7 @@ CREATE TABLE "auth"."account" (
 	"updated_at" timestamp NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "auth"."session" (
+CREATE TABLE IF NOT EXISTS "app_auth"."session" (
 	"id" text PRIMARY KEY NOT NULL,
 	"expires_at" timestamp NOT NULL,
 	"token" text NOT NULL,
@@ -32,7 +37,7 @@ CREATE TABLE "auth"."session" (
 	CONSTRAINT "session_token_unique" UNIQUE("token")
 );
 --> statement-breakpoint
-CREATE TABLE "auth"."user" (
+CREATE TABLE IF NOT EXISTS "app_auth"."user" (
 	"id" text PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
 	"email" text NOT NULL,
@@ -67,7 +72,7 @@ CREATE TABLE "auth"."user" (
 	CONSTRAINT "user_phone_number_unique" UNIQUE("phone_number")
 );
 --> statement-breakpoint
-CREATE TABLE "auth"."verification" (
+CREATE TABLE IF NOT EXISTS "app_auth"."verification" (
 	"id" text PRIMARY KEY NOT NULL,
 	"identifier" text NOT NULL,
 	"value" text NOT NULL,
@@ -76,7 +81,7 @@ CREATE TABLE "auth"."verification" (
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "contact_us" (
+CREATE TABLE IF NOT EXISTS "contact_us" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"first_name" text NOT NULL,
 	"last_name" text NOT NULL,
@@ -87,7 +92,7 @@ CREATE TABLE "contact_us" (
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "courses"."courses" (
+CREATE TABLE IF NOT EXISTS "courses"."courses" (
 	"id" uuid PRIMARY KEY NOT NULL,
 	"slug" varchar(255),
 	"title" varchar(100) NOT NULL,
@@ -114,7 +119,7 @@ CREATE TABLE "courses"."courses" (
 	"updated_at" timestamp
 );
 --> statement-breakpoint
-CREATE TABLE "courses"."subscriptions" (
+CREATE TABLE IF NOT EXISTS "courses"."subscriptions" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"user_id" text NOT NULL,
 	"course_id" uuid NOT NULL,
@@ -125,11 +130,36 @@ CREATE TABLE "courses"."subscriptions" (
 	"enrolled_at" timestamp
 );
 --> statement-breakpoint
-ALTER TABLE "auth"."account" ADD CONSTRAINT "account_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "auth"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "auth"."session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "auth"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "courses"."courses" ADD CONSTRAINT "courses_instructor_id_user_id_fk" FOREIGN KEY ("instructor_id") REFERENCES "auth"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "courses"."subscriptions" ADD CONSTRAINT "subscriptions_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "auth"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "courses"."subscriptions" ADD CONSTRAINT "subscriptions_course_id_courses_id_fk" FOREIGN KEY ("course_id") REFERENCES "courses"."courses"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-CREATE INDEX "account_userId_idx" ON "auth"."account" USING btree ("user_id");--> statement-breakpoint
-CREATE INDEX "session_userId_idx" ON "auth"."session" USING btree ("user_id");--> statement-breakpoint
-CREATE INDEX "verification_identifier_idx" ON "auth"."verification" USING btree ("identifier");
+DO $$ BEGIN
+ ALTER TABLE "app_auth"."account" ADD CONSTRAINT "account_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "app_auth"."user"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "app_auth"."session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "app_auth"."user"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "courses"."courses" ADD CONSTRAINT "courses_instructor_id_user_id_fk" FOREIGN KEY ("instructor_id") REFERENCES "app_auth"."user"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "courses"."subscriptions" ADD CONSTRAINT "subscriptions_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "app_auth"."user"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "courses"."subscriptions" ADD CONSTRAINT "subscriptions_course_id_courses_id_fk" FOREIGN KEY ("course_id") REFERENCES "courses"."courses"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "account_userId_idx" ON "app_auth"."account" USING btree ("user_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "session_userId_idx" ON "app_auth"."session" USING btree ("user_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "verification_identifier_idx" ON "app_auth"."verification" USING btree ("identifier");

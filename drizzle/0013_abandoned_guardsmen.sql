@@ -93,8 +93,8 @@ CREATE TABLE "email"."email_rate_limit_counters" (
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-ALTER TABLE "email"."email_batches" ADD CONSTRAINT "email_batches_requested_by_user_id_user_id_fk" FOREIGN KEY ("requested_by_user_id") REFERENCES "auth"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "email"."email_deliveries" ADD CONSTRAINT "email_deliveries_requested_by_user_id_user_id_fk" FOREIGN KEY ("requested_by_user_id") REFERENCES "auth"."user"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "email"."email_batches" ADD CONSTRAINT "email_batches_requested_by_user_id_user_id_fk" FOREIGN KEY ("requested_by_user_id") REFERENCES "app_auth"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "email"."email_deliveries" ADD CONSTRAINT "email_deliveries_requested_by_user_id_user_id_fk" FOREIGN KEY ("requested_by_user_id") REFERENCES "app_auth"."user"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "email"."email_deliveries" ADD CONSTRAINT "email_deliveries_batch_id_email_batches_id_fk" FOREIGN KEY ("batch_id") REFERENCES "email"."email_batches"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "email"."email_delivery_attempts" ADD CONSTRAINT "email_delivery_attempts_delivery_id_email_deliveries_id_fk" FOREIGN KEY ("delivery_id") REFERENCES "email"."email_deliveries"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "email"."email_delivery_events" ADD CONSTRAINT "email_delivery_events_delivery_id_email_deliveries_id_fk" FOREIGN KEY ("delivery_id") REFERENCES "email"."email_deliveries"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint

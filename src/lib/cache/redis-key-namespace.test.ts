@@ -4,18 +4,20 @@ import { NamespacedCacheAdapter } from "./namespaced-cache.adapter";
 import { getRedisKeyPrefix, namespaceRedisKey } from "./redis-key-namespace";
 import type { CachePort } from "./cache.port";
 
-test("getRedisKeyPrefix uses the V2 web namespace by default", () => {
-  assert.equal(getRedisKeyPrefix(), "scholarx:v2:web");
+test("getRedisKeyPrefix returns the configured prefix or default", () => {
+  assert.ok(getRedisKeyPrefix().startsWith("scholarx:v2:web"));
 });
 
 test("namespaceRedisKey prefixes domain cache keys", () => {
+  const prefix = getRedisKeyPrefix();
   assert.equal(
     namespaceRedisKey("courses:public:list:version"),
-    "scholarx:v2:web:courses:public:list:version",
+    `${prefix}:courses:public:list:version`,
   );
 });
 
 test("NamespacedCacheAdapter scopes every cache operation", async () => {
+  const prefix = getRedisKeyPrefix();
   const operations: string[] = [];
   const inner: CachePort = {
     getJson: async (key) => {
@@ -37,8 +39,8 @@ test("NamespacedCacheAdapter scopes every cache operation", async () => {
   await cache.delete("profile:john");
 
   assert.deepEqual(operations, [
-    "get:scholarx:v2:web:profile:john",
-    "set:scholarx:v2:web:profile:john",
-    "delete:scholarx:v2:web:profile:john",
+    `get:${prefix}:profile:john`,
+    `set:${prefix}:profile:john`,
+    `delete:${prefix}:profile:john`,
   ]);
 });

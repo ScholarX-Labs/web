@@ -18,9 +18,9 @@ CREATE TABLE "point_events" (
 	CONSTRAINT "point_events_idempotency_key_unique" UNIQUE("idempotency_key")
 );
 --> statement-breakpoint
-ALTER TABLE "leaderboard_opt_outs" ADD CONSTRAINT "leaderboard_opt_outs_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "auth"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "leaderboard_opt_outs" ADD CONSTRAINT "leaderboard_opt_outs_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "app_auth"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "leaderboard_opt_outs" ADD CONSTRAINT "leaderboard_opt_outs_course_id_courses_id_fk" FOREIGN KEY ("course_id") REFERENCES "courses"."courses"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "point_events" ADD CONSTRAINT "point_events_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "auth"."user"("id") ON DELETE restrict ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "point_events" ADD CONSTRAINT "point_events_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "app_auth"."user"("id") ON DELETE restrict ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "point_events" ADD CONSTRAINT "point_events_course_id_courses_id_fk" FOREIGN KEY ("course_id") REFERENCES "courses"."courses"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "pe_course_window_idx" ON "point_events" USING btree ("course_id","created_at","user_id","activity_type");--> statement-breakpoint
 CREATE INDEX "pe_user_course_idx" ON "point_events" USING btree ("user_id","course_id");--> statement-breakpoint

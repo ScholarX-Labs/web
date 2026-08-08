@@ -39,6 +39,8 @@ This checklist exists to make every such consumer explicit and coordinated **bef
 ### 4. Tooling and pipelines
 
 - [ ] CI/CD jobs that run SQL or DB migrations for other services.
+- [ ] `SKIP_DB_MIGRATIONS=true` is set on the `production` environment to gate the `migrate-production` jobs in `.github/workflows/deploy-aca.yml` and `.github/workflows/deploy-worker-aca.yml` while the repo migration chain still references `auth`.
+- [ ] The `SKIP_DB_MIGRATIONS` variable is **removed (migrations re-enabled)** as part of this cutover, immediately after the chain is rebased to `app_auth` (T019/T020) and `db:migrate` + `db:generate` zero-diff are validated on a scratch DB (T021).
 - [ ] Backfill/ETL scripts and data-team notebooks referencing `auth.`.
 - [ ] Monitoring/observability queries (Datadog/Grafana/CloudWatch) that reference `auth.*` — note these should be left to alert on the old name per SC-003 (see `quickstart.md` Gate 5), then migrated to `app_auth` after the 30-day window.
 

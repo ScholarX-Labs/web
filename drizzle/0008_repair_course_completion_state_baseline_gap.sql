@@ -113,7 +113,7 @@ BEGIN
   ) THEN
     ALTER TABLE "courses"."course_progress"
       ADD CONSTRAINT "course_progress_user_id_user_id_fk"
-      FOREIGN KEY ("user_id") REFERENCES "auth"."user"("id") ON DELETE cascade;
+      FOREIGN KEY ("user_id") REFERENCES "app_auth"."user"("id") ON DELETE cascade;
   END IF;
 END $$;
 --> statement-breakpoint
@@ -240,7 +240,7 @@ BEGIN
   ) THEN
     ALTER TABLE "courses"."progress_sync_events"
       ADD CONSTRAINT "progress_sync_events_user_id_user_id_fk"
-      FOREIGN KEY ("user_id") REFERENCES "auth"."user"("id") ON DELETE cascade;
+      FOREIGN KEY ("user_id") REFERENCES "app_auth"."user"("id") ON DELETE cascade;
   END IF;
 END $$;
 --> statement-breakpoint
@@ -293,7 +293,7 @@ BEGIN
   ) THEN
     ALTER TABLE "courses"."certificates"
       ADD CONSTRAINT "certificates_user_id_user_id_fk"
-      FOREIGN KEY ("user_id") REFERENCES "auth"."user"("id") ON DELETE cascade;
+      FOREIGN KEY ("user_id") REFERENCES "app_auth"."user"("id") ON DELETE cascade;
   END IF;
 END $$;
 --> statement-breakpoint

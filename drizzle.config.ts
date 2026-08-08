@@ -20,6 +20,7 @@ if (
 export default defineConfig({
   out: "./drizzle",
   schema: [
+    "./src/db/schema/namespaces.ts",
     "./src/db/schema/auth-schema.ts",
     "./src/db/schema/contact-us-schema.ts",
     "./src/db/schema/courses-db.schema.ts",
