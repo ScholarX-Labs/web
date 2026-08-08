@@ -1,6 +1,12 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 const { Client } = require("pg");
 
+const AUTH_SCHEMA = process.env.AUTH_SCHEMA || "app_auth";
+if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(AUTH_SCHEMA)) {
+  console.error(`Invalid AUTH_SCHEMA value: ${AUTH_SCHEMA}`);
+  process.exit(1);
+}
+
 (async () => {
   const email = process.argv[2];
   if (!email) {
@@ -19,7 +25,7 @@ const { Client } = require("pg");
 
   try {
     const userRes = await client.query(
-      `SELECT id, name, email, role FROM auth."user" WHERE email = $1`,
+      `SELECT id, name, email, role FROM "${AUTH_SCHEMA}"."user" WHERE email = $1`,
       [email],
     );
 
@@ -34,7 +40,7 @@ const { Client } = require("pg");
       return;
     }
 
-    await client.query(`UPDATE auth."user" SET role = 'admin' WHERE id = $1`, [
+    await client.query(`UPDATE "${AUTH_SCHEMA}"."user" SET role = 'admin' WHERE id = $1`, [
       user.id,
     ]);
 
