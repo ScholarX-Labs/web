@@ -1,5 +1,5 @@
 -- Step 1: Add profile columns as NULLABLE (safe for existing rows)
-ALTER TABLE auth.user
+ALTER TABLE app_auth.user
   ADD COLUMN IF NOT EXISTS username text,
   ADD COLUMN IF NOT EXISTS github_url text,
   ADD COLUMN IF NOT EXISTS facebook_url text,
@@ -9,7 +9,7 @@ ALTER TABLE auth.user
   ADD COLUMN IF NOT EXISTS is_profile_public boolean DEFAULT true;
 
 -- Create unique index on non-null usernames (supports partial NULLs during backfill)
-CREATE UNIQUE INDEX IF NOT EXISTS idx_user_username ON auth.user (username) WHERE username IS NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS idx_user_username ON app_auth.user (username) WHERE username IS NOT NULL;
 
 -- Create app_config table
 CREATE TABLE IF NOT EXISTS app_config (
