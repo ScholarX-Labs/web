@@ -1,0 +1,4 @@
+## 2024-05-24 - [Timing Attack] Constant-time comparison for Internal API Keys
+**Vulnerability:** A strict equality comparison (`===`) was being used to validate an internal API key against a stored secret (`INTERNAL_API_KEY`). This can expose the length and contents of the secret through timing side channels.
+**Learning:** Comparing sensitive strings (like API keys, passwords, or HMAC signatures) byte-by-byte using standard equality operators allows an attacker to deduce the secret by measuring how long the comparison takes (since `===` returns `false` on the first mismatch).
+**Prevention:** Always use constant-time comparison functions like `crypto.timingSafeEqual` when verifying secrets. Ensure inputs are converted to Buffers first and that their byte lengths match (`buf1.length === buf2.length`) before calling `timingSafeEqual`, rather than relying on string lengths, to prevent `RangeError` with multi-byte characters and empty string matches.
