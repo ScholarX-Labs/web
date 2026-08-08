@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS "executive"."action_item_states" (
   "source_section" varchar(80) NOT NULL,
   "entity_type" varchar(64) NOT NULL,
   "entity_id" varchar(255) NOT NULL,
-  "assigned_owner_id" text REFERENCES "auth"."user"("id") ON DELETE SET NULL,
+  "assigned_owner_id" text REFERENCES "app_auth"."user"("id") ON DELETE SET NULL,
   "status" varchar(16) NOT NULL DEFAULT 'open',
   "due_at" timestamp,
   "resolution_note" text,
