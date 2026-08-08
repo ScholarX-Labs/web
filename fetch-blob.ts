@@ -31,15 +31,20 @@ async function main() {
   ).toString();
   
   const signedUrl = blobClient.url + '?' + sasToken;
-  console.log('Signed URL:', signedUrl);
+  console.log('Blob:', key, 'expires:', expiresOn.toISOString());
   
   const res = await fetch(signedUrl, { cache: 'no-store' });
   console.log('Status:', res.status, res.statusText);
   if (!res.ok) {
     const text = await res.text();
     console.log('Error Body:', text);
+    process.exitCode = 1;
   } else {
     console.log('Success, length:', (await res.arrayBuffer()).byteLength);
   }
 }
-main().catch(console.error);
+main().catch((err) => {
+  console.error(err);
+  process.exitCode = 1;
+});
+
