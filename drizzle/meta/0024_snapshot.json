@@ -4,9 +4,9 @@
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "auth.account": {
+    "app_auth.account": {
       "name": "account",
-      "schema": "auth",
+      "schema": "app_auth",
       "columns": {
         "id": {
           "name": "id",
@@ -110,7 +110,7 @@
           "name": "account_user_id_user_id_fk",
           "tableFrom": "account",
           "tableTo": "user",
-          "schemaTo": "auth",
+          "schemaTo": "app_auth",
           "columnsFrom": [
             "user_id"
           ],
@@ -127,9 +127,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "auth.session": {
+    "app_auth.session": {
       "name": "session",
-      "schema": "auth",
+      "schema": "app_auth",
       "columns": {
         "id": {
           "name": "id",
@@ -209,7 +209,7 @@
           "name": "session_user_id_user_id_fk",
           "tableFrom": "session",
           "tableTo": "user",
-          "schemaTo": "auth",
+          "schemaTo": "app_auth",
           "columnsFrom": [
             "user_id"
           ],
@@ -234,9 +234,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "auth.user": {
+    "app_auth.user": {
       "name": "user",
-      "schema": "auth",
+      "schema": "app_auth",
       "columns": {
         "id": {
           "name": "id",
@@ -519,9 +519,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "auth.verification": {
+    "app_auth.verification": {
       "name": "verification",
-      "schema": "auth",
+      "schema": "app_auth",
       "columns": {
         "id": {
           "name": "id",
@@ -783,7 +783,7 @@
           "name": "certificates_user_id_user_id_fk",
           "tableFrom": "certificates",
           "tableTo": "user",
-          "schemaTo": "auth",
+          "schemaTo": "app_auth",
           "columnsFrom": [
             "user_id"
           ],
@@ -1168,7 +1168,7 @@
           "name": "course_applications_user_id_user_id_fk",
           "tableFrom": "course_applications",
           "tableTo": "user",
-          "schemaTo": "auth",
+          "schemaTo": "app_auth",
           "columnsFrom": [
             "user_id"
           ],
@@ -1182,7 +1182,7 @@
           "name": "course_applications_reviewed_by_user_id_fk",
           "tableFrom": "course_applications",
           "tableTo": "user",
-          "schemaTo": "auth",
+          "schemaTo": "app_auth",
           "columnsFrom": [
             "reviewed_by"
           ],
@@ -1502,7 +1502,7 @@
           "name": "course_progress_user_id_user_id_fk",
           "tableFrom": "course_progress",
           "tableTo": "user",
-          "schemaTo": "auth",
+          "schemaTo": "app_auth",
           "columnsFrom": [
             "user_id"
           ],
@@ -1775,7 +1775,7 @@
           "name": "courses_instructor_id_user_id_fk",
           "tableFrom": "courses",
           "tableTo": "user",
-          "schemaTo": "auth",
+          "schemaTo": "app_auth",
           "columnsFrom": [
             "instructor_id"
           ],
@@ -1789,7 +1789,7 @@
           "name": "courses_updated_by_user_id_fk",
           "tableFrom": "courses",
           "tableTo": "user",
-          "schemaTo": "auth",
+          "schemaTo": "app_auth",
           "columnsFrom": [
             "updated_by"
           ],
@@ -1977,7 +1977,7 @@
           "name": "inquiries_user_id_user_id_fk",
           "tableFrom": "inquiries",
           "tableTo": "user",
-          "schemaTo": "auth",
+          "schemaTo": "app_auth",
           "columnsFrom": [
             "user_id"
           ],
@@ -2147,7 +2147,7 @@
           "name": "lesson_progress_user_id_user_id_fk",
           "tableFrom": "lesson_progress",
           "tableTo": "user",
-          "schemaTo": "auth",
+          "schemaTo": "app_auth",
           "columnsFrom": [
             "user_id"
           ],
@@ -2291,7 +2291,7 @@
           "name": "progress_sync_events_user_id_user_id_fk",
           "tableFrom": "progress_sync_events",
           "tableTo": "user",
-          "schemaTo": "auth",
+          "schemaTo": "app_auth",
           "columnsFrom": [
             "user_id"
           ],
@@ -2411,7 +2411,7 @@
           "name": "subscriptions_user_id_user_id_fk",
           "tableFrom": "subscriptions",
           "tableTo": "user",
-          "schemaTo": "auth",
+          "schemaTo": "app_auth",
           "columnsFrom": [
             "user_id"
           ],
@@ -2442,9 +2442,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "auth.admin_audit_log": {
+    "app_auth.admin_audit_log": {
       "name": "admin_audit_log",
-      "schema": "auth",
+      "schema": "app_auth",
       "columns": {
         "id": {
           "name": "id",
@@ -2582,7 +2582,7 @@
           "name": "admin_audit_log_admin_id_user_id_fk",
           "tableFrom": "admin_audit_log",
           "tableTo": "user",
-          "schemaTo": "auth",
+          "schemaTo": "app_auth",
           "columnsFrom": [
             "admin_id"
           ],
@@ -3058,7 +3058,7 @@
           "name": "certificates_user_id_user_id_fk",
           "tableFrom": "certificates",
           "tableTo": "user",
-          "schemaTo": "auth",
+          "schemaTo": "app_auth",
           "columnsFrom": [
             "user_id"
           ],
@@ -3072,7 +3072,7 @@
           "name": "certificates_revoked_by_user_id_fk",
           "tableFrom": "certificates",
           "tableTo": "user",
-          "schemaTo": "auth",
+          "schemaTo": "app_auth",
           "columnsFrom": [
             "revoked_by"
           ],
@@ -3616,7 +3616,7 @@
           "name": "email_batches_requested_by_user_id_user_id_fk",
           "tableFrom": "email_batches",
           "tableTo": "user",
-          "schemaTo": "auth",
+          "schemaTo": "app_auth",
           "columnsFrom": [
             "requested_by_user_id"
           ],
@@ -3977,7 +3977,7 @@
           "name": "email_deliveries_requested_by_user_id_user_id_fk",
           "tableFrom": "email_deliveries",
           "tableTo": "user",
-          "schemaTo": "auth",
+          "schemaTo": "app_auth",
           "columnsFrom": [
             "requested_by_user_id"
           ],
@@ -4503,7 +4503,7 @@
           "name": "leaderboard_opt_outs_user_id_user_id_fk",
           "tableFrom": "leaderboard_opt_outs",
           "tableTo": "user",
-          "schemaTo": "auth",
+          "schemaTo": "app_auth",
           "columnsFrom": [
             "user_id"
           ],
@@ -4674,7 +4674,7 @@
           "name": "point_events_user_id_user_id_fk",
           "tableFrom": "point_events",
           "tableTo": "user",
-          "schemaTo": "auth",
+          "schemaTo": "app_auth",
           "columnsFrom": [
             "user_id"
           ],
@@ -4729,10 +4729,11 @@
     }
   },
   "schemas": {
-    "auth": "auth",
     "courses": "courses",
     "certificates": "certificates",
-    "email": "email"
+    "email": "email",
+    "app_auth": "app_auth",
+    "executive": "executive"
   },
   "sequences": {},
   "roles": {},
