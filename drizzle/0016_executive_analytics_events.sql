@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS "executive"."analytics_events" (
   "id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
   "event_type" varchar(64) NOT NULL,
   "occurred_at" timestamp NOT NULL,
-  "user_id" text REFERENCES "auth"."user"("id") ON DELETE SET NULL,
+  "user_id" text REFERENCES "app_auth"."user"("id") ON DELETE SET NULL,
   "session_id_hash" varchar(128),
   "entity_type" varchar(64),
   "entity_id" varchar(255),
