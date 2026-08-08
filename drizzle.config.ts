@@ -1,5 +1,6 @@
 import "dotenv/config";
 import { defineConfig } from "drizzle-kit";
+import { DB_SCHEMAS } from "./src/db/schema/namespaces";
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
@@ -31,5 +32,5 @@ export default defineConfig({
   dbCredentials: {
     url: dbUrl.toString(),
   },
-  schemaFilter: ["auth", "public", "courses", "certificates", "email"],
+  schemaFilter: [...Object.values(DB_SCHEMAS), "public"],
 });
