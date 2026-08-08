@@ -68,7 +68,7 @@ An engineer who needs to move the identity data to a different schema name edits
 
 **Acceptance Scenarios**:
 
-1. **Given** the centralized schema configuration, **When** the schema name is changed in that one place, **Then** no other code, migration, or tooling change is needed for queries to resolve.
+1. **Given** the centralized schema configuration, **When** the schema name is changed in that one place, **Then** TypeScript builders and `drizzle.config.ts` schemaFilter resolve the new name automatically (static SQL and shell-script literals are not generated automatically).
 2. **Given** the migration completion, **When** an audit is run, **Then** no direct reference to the old schema name remains anywhere in the platform.
 
 ---
@@ -134,7 +134,7 @@ Engineering receives a written analysis that documents the pain points with the 
 - **SC-004**: A fresh environment provisioned from the provided dump passes all authentication and course-enrollment checks with zero manual SQL repairs.
 - **SC-005**: Rollback, if ever needed, restores the prior state within 30 minutes.
 - **SC-006**: No database connection details (including the connection string) appear in the committed repository.
-- **SC-007**: Relocating the identity schema again requires changing exactly one configuration definition; all identity queries and migrations resolve without additional changes.
+- **SC-007**: Relocating the identity schema name updates TypeScript builders and `drizzle.config.ts` `schemaFilter` from the centralized registry; static SQL or shell-script literals are not generated automatically and must be updated explicitly if changed.
 - **SC-008**: A written analysis on schema/migration tooling is delivered and reviewed, and it makes no production code or database changes.
 
 ## Assumptions
