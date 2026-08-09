@@ -56,26 +56,30 @@ function validateEnv() {
     }
   }
 
-  const upstashUrl = readEnv("UPSTASH_REDIS_REST_URL");
+  const upstashUrl = readEnv("UPSTASH_REDIS_KV_REST_API_URL");
   if (upstashUrl && !isUrl(upstashUrl)) {
-    issues.push("UPSTASH_REDIS_REST_URL must be a valid URL.");
+    issues.push("UPSTASH_REDIS_KV_REST_API_URL must be a valid URL.");
   } else if (upstashUrl && !/^https:\/\//i.test(upstashUrl)) {
-    issues.push("UPSTASH_REDIS_REST_URL must use the https:// scheme.");
+    issues.push("UPSTASH_REDIS_KV_REST_API_URL must use the https:// scheme.");
   }
 
   const cacheEnabled = readEnv("CACHE_ENABLED") === "true";
   const distributedRateLimitsEnabled =
     readEnv("DISTRIBUTED_RATE_LIMITS_ENABLED") === "true";
   const redisRequired = cacheEnabled || distributedRateLimitsEnabled;
+  const upstashToken = readEnv("UPSTASH_REDIS_KV_REST_API_TOKEN");
+  const upstashConfigured = Boolean(upstashUrl && upstashToken);
   const redisUrl = readEnv("REDIS_URL");
   const azureHost = readEnv("AZURE_REDIS_HOST");
   const redisHost = readEnv("REDIS_HOST");
   const redisPrefix = readEnv("REDIS_KEY_PREFIX");
 
   if (redisRequired) {
-    if (!redisUrl && !azureHost && !redisHost) {
+    if (!upstashConfigured && !redisUrl && !azureHost && !redisHost) {
       issues.push(
-        "Set one Redis connection mode when CACHE_ENABLED=true or DISTRIBUTED_RATE_LIMITS_ENABLED=true: REDIS_URL, AZURE_REDIS_HOST, or REDIS_HOST.",
+        "Set one Redis connection mode when CACHE_ENABLED=true or DISTRIBUTED_RATE_LIMITS_ENABLED=true: " +
+        "UPSTASH_REDIS_KV_REST_API_URL + UPSTASH_REDIS_KV_REST_API_TOKEN (recommended for Vercel), " +
+        "REDIS_URL, AZURE_REDIS_HOST, or REDIS_HOST.",
       );
     }
 
@@ -88,6 +92,14 @@ function validateEnv() {
         "In development, REDIS_KEY_PREFIX must include ':dev' or ':local' to avoid mixing with shared/prod keys.",
       );
     }
+  }
+
+  if (upstashUrl && !upstashToken) {
+    issues.push("Set UPSTASH_REDIS_KV_REST_API_TOKEN when UPSTASH_REDIS_KV_REST_API_URL is set.");
+  }
+
+  if (upstashToken && !upstashUrl) {
+    issues.push("Set UPSTASH_REDIS_KV_REST_API_URL when UPSTASH_REDIS_KV_REST_API_TOKEN is set.");
   }
 
   if (redisUrl && !/^rediss?:\/\//i.test(redisUrl)) {
@@ -128,7 +140,7 @@ function validateEnv() {
     throw new Error(
       "[ENV] Invalid environment configuration:\n" +
         issues.map((issue) => `- ${issue}`).join("\n") +
-        "\nCheck your .env.local file or Azure App Settings.",
+        "\nCheck your Vercel env vars or Doppler prod config.",
     );
   }
 }
