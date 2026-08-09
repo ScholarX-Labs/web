@@ -6,11 +6,13 @@ import type {
 import { createFallbackDecision } from "./rate-limit.utils";
 import {
   getSharedRedisClient,
+  isUpstashPrimary,
   markSharedRedisUnavailable,
 } from "@/lib/cache/shared-redis";
 import { env } from "@/config/env";
 import type { RedisClient } from "@/lib/cache/redis-cache.adapter";
 import { RedisSlidingWindowRateLimiterAdapter } from "./redis-sliding-window-rate-limiter.adapter";
+import { UpstashSlidingWindowRateLimiterAdapter } from "./upstash-sliding-window-rate-limiter.adapter";
 import { emitCacheMetricEvent } from "@/lib/cache/cache-metrics";
 
 class FallbackDistributedRateLimiter implements DistributedRateLimiter {
@@ -48,6 +50,16 @@ function getAdapter(): DistributedRateLimiter {
     return fallbackLimiter;
   }
 
+  // --- Upstash REST (primary on Vercel) ---
+  if (isUpstashPrimary()) {
+    if (!adapter || !(adapter instanceof UpstashSlidingWindowRateLimiterAdapter)) {
+      adapter = new UpstashSlidingWindowRateLimiterAdapter();
+      cachedRedis = null;
+    }
+    return adapter;
+  }
+
+  // --- ioredis (Azure / generic TCP) ---
   const redis = getSharedRedisClient();
   if (!redis) {
     adapter = null;
