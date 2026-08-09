@@ -9,6 +9,7 @@
  *   e.g. "avatars/userId/uuid.jpg"
  * The path prefix up to the first "/" is treated as the Azure container name.
  */
+import { env } from "@/config/env";
 import { BlobServiceClient } from "@azure/storage-blob";
 import type { IImageStoragePort, ImageUploadInput } from "../image-storage.port";
 import { UploadError } from "@/lib/upload-errors";
@@ -30,7 +31,7 @@ export class AzureBlobImageStorageAdapter implements IImageStoragePort {
   private readonly connectionString: string;
 
   constructor(connectionString?: string) {
-    const cs = connectionString ?? process.env.AZURE_STORAGE_CONNECTION_STRING;
+    const cs = connectionString ?? env.AZURE_STORAGE_CONNECTION_STRING;
     if (!cs) {
       throw new UploadError(
         "STORAGE_NOT_CONFIGURED",
