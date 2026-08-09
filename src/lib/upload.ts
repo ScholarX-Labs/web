@@ -1,14 +1,33 @@
-import { BlobServiceClient } from "@azure/storage-blob";
+/**
+ * src/lib/upload.ts
+ *
+ * Application-level upload helpers for avatars and course images.
+ * Storage is delegated to the active IImageStoragePort adapter
+ * (selected by UPLOAD_STORAGE_ADAPTER env var — "vercel" by default).
+ *
+ * This module is intentionally free of any storage-SDK imports.
+ * All provider-specific code lives in src/lib/storage/adapters/.
+ */
 import sharp from "sharp";
+import { createImageStorageAdapter } from "@/lib/storage";
+
+// Import locally and re-export so existing route imports (`import { UploadError } from "@/lib/upload"`) continue working.
+import { UploadError } from "@/lib/upload-errors";
+export { UploadError } from "@/lib/upload-errors";
+
+
+// ---------------------------------------------------------------------------
+// Constants
+// ---------------------------------------------------------------------------
 
 const ACCEPTED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp"];
-const MAX_FILE_SIZE = 1 * 1024 * 1024;
+const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1 MB
 const AVATAR_MAX_DIMENSION = 512;
-const AVATAR_CONTAINER = "avatars";
+const AVATAR_PATH_PREFIX = "avatars";
 
-const COURSE_IMAGE_MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+const COURSE_IMAGE_MAX_FILE_SIZE = 4 * 1024 * 1024; // 4 MB (Vercel server upload limit is 4.5 MB)
 const COURSE_IMAGE_MAX_DIMENSION = 1920;
-const COURSE_IMAGE_CONTAINER = "course-images";
+const COURSE_IMAGE_PATH_PREFIX = "course-images";
 const COURSE_IMAGE_ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
 const MAGIC_BYTES: Record<string, number[]> = {
@@ -17,28 +36,9 @@ const MAGIC_BYTES: Record<string, number[]> = {
   "image/webp": [0x52, 0x49, 0x46, 0x46],
 };
 
-function getBlobServiceClient(): BlobServiceClient {
-  const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-  if (!connectionString) {
-    throw new UploadError(
-      "STORAGE_NOT_CONFIGURED",
-      503,
-      "AZURE_STORAGE_CONNECTION_STRING is not configured."
-    );
-  }
-  return BlobServiceClient.fromConnectionString(connectionString);
-}
-
-export class UploadError extends Error {
-  constructor(
-    public code: string,
-    public statusCode: number,
-    message: string
-  ) {
-    super(message);
-    this.name = "UploadError";
-  }
-}
+// ---------------------------------------------------------------------------
+// Validation helpers
+// ---------------------------------------------------------------------------
 
 export function detectMagicBytes(buffer: Buffer): string | null {
   for (const [mime, sig] of Object.entries(MAGIC_BYTES)) {
@@ -48,6 +48,10 @@ export function detectMagicBytes(buffer: Buffer): string | null {
   }
   return null;
 }
+
+// ---------------------------------------------------------------------------
+// Image processing
+// ---------------------------------------------------------------------------
 
 export async function processAvatar(inputBuffer: Buffer): Promise<Buffer> {
   try {
@@ -62,106 +66,8 @@ export async function processAvatar(inputBuffer: Buffer): Promise<Buffer> {
     throw new UploadError(
       "SHARP_REENCODE_FAILED",
       422,
-      "Image processing failed — file may be corrupt"
+      "Image processing failed — file may be corrupt",
     );
-  }
-}
-
-export async function uploadAvatar(
-  userId: string,
-  fileBuffer: Buffer,
-  mimeType: string
-): Promise<string> {
-  if (fileBuffer.length > MAX_FILE_SIZE) {
-    throw new UploadError(
-      "FILE_TOO_LARGE",
-      413,
-      `File exceeds ${MAX_FILE_SIZE / 1024 / 1024}MB limit`
-    );
-  }
-
-  if (!ACCEPTED_MIME_TYPES.includes(mimeType)) {
-    throw new UploadError(
-      "INVALID_FILE_TYPE",
-      415,
-      `Accepted types: ${ACCEPTED_MIME_TYPES.join(", ")}`
-    );
-  }
-
-  const detectedMime = detectMagicBytes(fileBuffer);
-  if (detectedMime !== mimeType) {
-    throw new UploadError(
-      "INVALID_MAGIC_BYTES",
-      415,
-      "File content does not match declared type"
-    );
-  }
-
-  const processedBuffer = await processAvatar(fileBuffer);
-
-  const blobName = `${userId}/${crypto.randomUUID()}.jpg`;
-
-  try {
-    const client = getBlobServiceClient();
-    const containerClient = client.getContainerClient(AVATAR_CONTAINER);
-    const blobClient = containerClient.getBlockBlobClient(blobName);
-    await blobClient.uploadData(processedBuffer, {
-      blobHTTPHeaders: {
-        blobContentType: "image/jpeg",
-        blobCacheControl: "public, max-age=86400",
-      },
-    });
-    return blobClient.url;
-  } catch (error) {
-    if (error instanceof UploadError) throw error;
-    // Provide a more specific message for common Azure errors
-    const azureCode = (error as { code?: string })?.code;
-    if (azureCode === "ContainerNotFound") {
-      throw new UploadError(
-        "CONTAINER_NOT_FOUND",
-        503,
-        `Azure Blob container '${AVATAR_CONTAINER}' does not exist. Create it in the Azure Portal.`
-      );
-    }
-    if (azureCode === "PublicAccessNotPermitted") {
-      throw new UploadError(
-        "PUBLIC_ACCESS_DENIED",
-        503,
-        "Storage account has public blob access disabled. Set 'Allow Blob public access' in Azure Portal, or use a private container with SAS tokens."
-      );
-    }
-    console.error("[upload] Azure upload error:", error);
-    throw new UploadError("UPLOAD_FAILED", 500, "Failed to upload to storage");
-  }
-}
-
-export async function deleteAvatar(blobUrl: string): Promise<void> {
-  try {
-    const client = getBlobServiceClient();
-    const containerClient = client.getContainerClient(AVATAR_CONTAINER);
-    // Extract blob name from the full URL: everything after the container segment
-    const url = new URL(blobUrl);
-    // pathname is like /<container>/<blobName>
-    const segments = url.pathname.split("/").filter(Boolean);
-    // segments[0] = container name, rest = blob name parts
-    const blobName = segments.slice(1).join("/");
-    if (blobName) {
-      await containerClient.deleteBlob(blobName);
-    }
-  } catch (error) {
-    console.error("[upload] Failed to delete old avatar:", error);
-  }
-}
-
-export function getAvatarKeyFromUrl(url: string): string | null {
-  try {
-    const parsed = new URL(url);
-    const segments = parsed.pathname.split("/").filter(Boolean);
-    // segments[0] = container, rest = blob name
-    if (segments.length < 2) return null;
-    return segments.slice(1).join("/");
-  } catch {
-    return null;
   }
 }
 
@@ -178,29 +84,33 @@ export async function processCourseImage(inputBuffer: Buffer): Promise<Buffer> {
     throw new UploadError(
       "SHARP_REENCODE_FAILED",
       422,
-      "Image processing failed — file may be corrupt"
+      "Image processing failed — file may be corrupt",
     );
   }
 }
 
-export async function uploadCourseImage(
-  courseId: string,
+// ---------------------------------------------------------------------------
+// Avatar
+// ---------------------------------------------------------------------------
+
+export async function uploadAvatar(
+  userId: string,
   fileBuffer: Buffer,
-  mimeType: string
+  mimeType: string,
 ): Promise<string> {
-  if (fileBuffer.length > COURSE_IMAGE_MAX_FILE_SIZE) {
+  if (fileBuffer.length > MAX_FILE_SIZE) {
     throw new UploadError(
       "FILE_TOO_LARGE",
       413,
-      `File exceeds ${COURSE_IMAGE_MAX_FILE_SIZE / 1024 / 1024}MB limit`
+      `File exceeds ${MAX_FILE_SIZE / 1024 / 1024}MB limit`,
     );
   }
 
-  if (!COURSE_IMAGE_ACCEPTED_TYPES.includes(mimeType)) {
+  if (!ACCEPTED_MIME_TYPES.includes(mimeType)) {
     throw new UploadError(
       "INVALID_FILE_TYPE",
       415,
-      `Accepted types: ${COURSE_IMAGE_ACCEPTED_TYPES.join(", ")}`
+      `Accepted types: ${ACCEPTED_MIME_TYPES.join(", ")}`,
     );
   }
 
@@ -209,60 +119,93 @@ export async function uploadCourseImage(
     throw new UploadError(
       "INVALID_MAGIC_BYTES",
       415,
-      "File content does not match declared type"
+      "File content does not match declared type",
+    );
+  }
+
+  const processedBuffer = await processAvatar(fileBuffer);
+  const path = `${AVATAR_PATH_PREFIX}/${userId}/${crypto.randomUUID()}.jpg`;
+
+  const adapter = createImageStorageAdapter();
+  return adapter.upload({
+    path,
+    content: processedBuffer,
+    contentType: "image/jpeg",
+    cacheControl: "public, max-age=86400",
+  });
+}
+
+export async function deleteAvatar(blobUrl: string): Promise<void> {
+  const adapter = createImageStorageAdapter();
+  await adapter.deleteByUrl(blobUrl);
+}
+
+/**
+ * Extract the storage key from an avatar URL.
+ * Works for both Azure (/avatars/<blobName>) and Vercel Blob URLs.
+ */
+export function getAvatarKeyFromUrl(url: string): string | null {
+  try {
+    const parsed = new URL(url);
+    const segments = parsed.pathname.split("/").filter(Boolean);
+    if (segments.length < 2) return null;
+    // Azure: segments[0] = container, rest = blob name
+    // Vercel: segments[0] = path prefix (avatars), rest = blob name
+    return segments.slice(1).join("/");
+  } catch {
+    return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Course image
+// ---------------------------------------------------------------------------
+
+export async function uploadCourseImage(
+  courseId: string,
+  fileBuffer: Buffer,
+  mimeType: string,
+): Promise<string> {
+  if (fileBuffer.length > COURSE_IMAGE_MAX_FILE_SIZE) {
+    throw new UploadError(
+      "FILE_TOO_LARGE",
+      413,
+      `File exceeds ${COURSE_IMAGE_MAX_FILE_SIZE / 1024 / 1024}MB limit`,
+    );
+  }
+
+  if (!COURSE_IMAGE_ACCEPTED_TYPES.includes(mimeType)) {
+    throw new UploadError(
+      "INVALID_FILE_TYPE",
+      415,
+      `Accepted types: ${COURSE_IMAGE_ACCEPTED_TYPES.join(", ")}`,
+    );
+  }
+
+  const detectedMime = detectMagicBytes(fileBuffer);
+  if (detectedMime !== mimeType) {
+    throw new UploadError(
+      "INVALID_MAGIC_BYTES",
+      415,
+      "File content does not match declared type",
     );
   }
 
   const processedBuffer = await processCourseImage(fileBuffer);
+  const path = `${COURSE_IMAGE_PATH_PREFIX}/${courseId}/${crypto.randomUUID()}.jpg`;
 
-  const blobName = `${courseId}/${crypto.randomUUID()}.jpg`;
-
-  try {
-    const client = getBlobServiceClient();
-    const containerClient = client.getContainerClient(COURSE_IMAGE_CONTAINER);
-    const blobClient = containerClient.getBlockBlobClient(blobName);
-    await blobClient.uploadData(processedBuffer, {
-      blobHTTPHeaders: {
-        blobContentType: "image/jpeg",
-        blobCacheControl: "public, max-age=604800",
-      },
-    });
-    return blobClient.url;
-  } catch (error) {
-    if (error instanceof UploadError) throw error;
-    const azureCode = (error as { code?: string })?.code;
-    if (azureCode === "ContainerNotFound") {
-      throw new UploadError(
-        "CONTAINER_NOT_FOUND",
-        503,
-        `Azure Blob container '${COURSE_IMAGE_CONTAINER}' does not exist. Create it in the Azure Portal.`
-      );
-    }
-    if (azureCode === "PublicAccessNotPermitted") {
-      throw new UploadError(
-        "PUBLIC_ACCESS_DENIED",
-        503,
-        "Storage account has public blob access disabled."
-      );
-    }
-    console.error("[upload] Azure upload error:", error);
-    throw new UploadError("UPLOAD_FAILED", 500, "Failed to upload to storage");
-  }
+  const adapter = createImageStorageAdapter();
+  return adapter.upload({
+    path,
+    content: processedBuffer,
+    contentType: "image/jpeg",
+    cacheControl: "public, max-age=604800",
+  });
 }
 
 export async function deleteCourseImage(blobUrl: string): Promise<void> {
-  try {
-    const client = getBlobServiceClient();
-    const containerClient = client.getContainerClient(COURSE_IMAGE_CONTAINER);
-    const url = new URL(blobUrl);
-    const segments = url.pathname.split("/").filter(Boolean);
-    const blobName = segments.slice(1).join("/");
-    if (blobName) {
-      await containerClient.deleteBlob(blobName);
-    }
-  } catch (error) {
-    console.error("[upload] Failed to delete old course image:", error);
-  }
+  const adapter = createImageStorageAdapter();
+  await adapter.deleteByUrl(blobUrl);
 }
 
 export function getCourseImageKeyFromUrl(url: string): string | null {
@@ -276,29 +219,24 @@ export function getCourseImageKeyFromUrl(url: string): string | null {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Storage usage — provider-agnostic
+// ---------------------------------------------------------------------------
+
+/**
+ * Calculate total bytes used by image storage (avatars + course images).
+ * Delegates to the active adapter so this works with both Vercel Blob and Azure.
+ *
+ * @deprecated Use calculateStorageUsage() — this alias kept for compatibility.
+ */
 export async function calculateAzureStorageUsage(): Promise<number> {
-  try {
-    const client = getBlobServiceClient();
-    const avatarContainer = client.getContainerClient(AVATAR_CONTAINER);
-    const courseContainer = client.getContainerClient(COURSE_IMAGE_CONTAINER);
-    
-    let totalBytes = 0;
+  return calculateStorageUsage();
+}
 
-    if (await avatarContainer.exists()) {
-      for await (const blob of avatarContainer.listBlobsFlat()) {
-        totalBytes += blob.properties.contentLength || 0;
-      }
-    }
-
-    if (await courseContainer.exists()) {
-      for await (const blob of courseContainer.listBlobsFlat()) {
-        totalBytes += blob.properties.contentLength || 0;
-      }
-    }
-
-    return totalBytes;
-  } catch (error) {
-    console.error("[upload] Failed to calculate Azure storage usage:", error);
-    return 0;
-  }
+export async function calculateStorageUsage(): Promise<number> {
+  const adapter = createImageStorageAdapter();
+  return adapter.calculateUsageBytes([
+    AVATAR_PATH_PREFIX,
+    COURSE_IMAGE_PATH_PREFIX,
+  ]);
 }
