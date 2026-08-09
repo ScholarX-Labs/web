@@ -2,6 +2,34 @@ import { lookup } from "node:dns/promises";
 import net from "node:net";
 import tls from "node:tls";
 import Redis, { Cluster } from "ioredis";
+import { createRequire } from "node:module";
+import { fileURLToPath } from "node:url";
+import path from "node:path";
+
+// ---------------------------------------------------------------------------
+// Upstash fast-exit: when Upstash env vars are set, use the HTTP diagnostic
+// instead of the TCP/TLS ioredis path. Upstash REST needs no open ports.
+// ---------------------------------------------------------------------------
+const _require = createRequire(import.meta.url);
+const _dirname = path.dirname(fileURLToPath(import.meta.url));
+
+function readEnvRaw(key) {
+  const value = process.env[key];
+  if (typeof value !== "string") return undefined;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : undefined;
+}
+
+if (readEnvRaw("UPSTASH_REDIS_KV_REST_API_URL")) {
+  console.log(
+    "[redis-diagnose] UPSTASH_REDIS_KV_REST_API_URL detected — delegating to upstash-diagnose.mjs",
+  );
+  // Dynamically import so the rest of this file is never parsed for TCP setup.
+  const upstashDiagnosePath = path.join(_dirname, "upstash-diagnose.mjs");
+  await import(upstashDiagnosePath);
+  process.exit(process.exitCode ?? 0);
+}
+
 
 function readEnv(key) {
   const value = process.env[key];
