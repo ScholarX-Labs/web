@@ -7,6 +7,10 @@ import { auth } from "@/lib/auth";
 import { uploadCourseImage, deleteCourseImage, UploadError, COURSE_IMAGE_MAX_FILE_SIZE } from "@/lib/upload";
 import { isCourseImageUploadEnabled } from "@/lib/app-config";
 import { peekCourseImageUploadLimit, consumeCourseImageUploadSlot } from "@/lib/rate-limiter";
+import {
+  invalidatePublicCourseDetailCache,
+  invalidatePublicCourseListCache,
+} from "@/domain/courses/application/course-cache";
 
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
@@ -85,7 +89,7 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(await file.arrayBuffer());
 
     const [currentCourse] = await db
-        .select({ imageUrl: dbCourses.imageUrl })
+        .select({ imageUrl: dbCourses.imageUrl, slug: dbCourses.slug })
         .from(dbCourses)
         .where(eq(dbCourses.id, courseId))
         .limit(1);
@@ -118,6 +122,12 @@ export async function POST(request: NextRequest) {
       .update(dbCourses)
       .set({ imageUrl: url })
       .where(eq(dbCourses.id, courseId));
+
+    // Invalidate public caches so the new image shows up immediately
+    await Promise.all([
+      invalidatePublicCourseDetailCache({ courseId, slug: currentCourse.slug }),
+      invalidatePublicCourseListCache(),
+    ]);
 
     // Consume a slot AFTER the upload succeeds
     await consumeCourseImageUploadSlot(session.user.id);
