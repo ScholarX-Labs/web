@@ -19,6 +19,7 @@ import {
 } from "@/lib/i18n/locales";
 import { loadMessages } from "@/lib/i18n/messages";
 import NextTopLoader from "nextjs-toploader";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -123,6 +124,7 @@ export default async function RootLayout({
                   </div>
                 ) : null}
                 <main className="flex-1 flex flex-col pt-16 lg:pt-[72px]">{children}</main>
+                <SpeedInsights />
               </TooltipProvider>
             </AppProviders>
             <GlobalShellExclusions>
