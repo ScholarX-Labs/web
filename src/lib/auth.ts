@@ -114,8 +114,34 @@ function getOtpEmailContent(type: string, otp: string, locale: "en" | "ar") {
   }
 }
 
+const betterAuthUrl = process.env.BETTER_AUTH_URL?.replace(/\/+$/, "");
+const appUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/+$/, "");
+const customTrustedOrigins =
+  process.env.BETTER_AUTH_TRUSTED_ORIGINS
+    ?.split(",")
+    .map((origin) => origin.trim().replace(/\/+$/, ""))
+    .filter(Boolean) ?? [];
+
+const trustedOrigins = Array.from(
+  new Set(
+    [
+      betterAuthUrl,
+      appUrl,
+      ...customTrustedOrigins,
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "http://127.0.0.1:3000",
+      "http://127.0.0.1:3001",
+      "https://scholar-x.org",
+      "https://www.scholar-x.org",
+      "https://dev.scholar-x.org",
+    ].filter((origin): origin is string => Boolean(origin)),
+  ),
+);
+
 export const auth = betterAuth({
-  baseURL: process.env.BETTER_AUTH_URL,
+  baseURL: betterAuthUrl || "http://localhost:3000",
+  trustedOrigins,
   secret: process.env.BETTER_AUTH_SECRET,
   database: drizzleAdapter(db, { provider: "pg", schema }),
   emailAndPassword: {
