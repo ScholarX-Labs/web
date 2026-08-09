@@ -39,6 +39,12 @@ const envSchema = z.object({
 
   AZURE_STORAGE_CONNECTION_STRING: optionalString,
 
+  // Image storage — controls avatar & course-image uploads
+  // "vercel" (default) uses Vercel Blob; "azure" falls back to Azure Blob Storage
+  UPLOAD_STORAGE_ADAPTER: z.enum(["vercel", "azure"]).optional(),
+  // Vercel Blob token — auto-injected by Vercel when a store is linked to the project
+  BLOB_READ_WRITE_TOKEN: optionalString,
+
   AZURE_REDIS_HOST: optionalString,
   AZURE_REDIS_PORT: optionalDigits,
   AZURE_REDIS_KEY: optionalString,
