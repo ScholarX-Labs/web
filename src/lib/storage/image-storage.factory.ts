@@ -13,6 +13,7 @@
  * Both adapters are lazily required at call time so neither SDK leaks into
  * the other adapter's bundle.
  */
+import { env } from "@/config/env";
 import type { IImageStoragePort } from "./image-storage.port";
 
 let _adapter: IImageStoragePort | null = null;
@@ -20,7 +21,7 @@ let _adapter: IImageStoragePort | null = null;
 export function createImageStorageAdapter(): IImageStoragePort {
   if (_adapter) return _adapter;
 
-  const choice = process.env.UPLOAD_STORAGE_ADAPTER ?? "vercel";
+  const choice = env.UPLOAD_STORAGE_ADAPTER ?? "vercel";
 
   if (choice === "azure") {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
