@@ -58,6 +58,12 @@ export const cachePolicy = {
     listTtlSeconds: 60,
     categoriesTtlSeconds: 60,
     detailTtlSeconds: 60,
+    counters: {
+      ttlSeconds: 300,
+      versionTtlSeconds: 60 * 60 * 24 * 365,
+      key: (courseId: string) => `courses:counters:${courseId}`,
+      versionKey: () => `courses:counters:version`,
+    },
     listVersionKey(): string {
       return "courses:public:list:version";
     },
