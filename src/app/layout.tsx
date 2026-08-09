@@ -20,6 +20,7 @@ import {
 import { loadMessages } from "@/lib/i18n/messages";
 import NextTopLoader from "nextjs-toploader";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/react";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -131,6 +132,7 @@ export default async function RootLayout({
             </GlobalShellExclusions>
           </div>
         </RootIntlProvider>
+        <Analytics />
       </body>
     </html>
   );
