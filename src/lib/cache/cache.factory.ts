@@ -5,12 +5,23 @@ import {
   getSharedRedisClient,
   getSharedRedisStatus,
   isSharedCacheEnabled,
+  isUpstashPrimary,
 } from "./shared-redis";
 import { RedisCacheAdapter } from "./redis-cache.adapter";
+import { UpstashCacheAdapter } from "./upstash-cache.adapter";
 import { emitCacheMetricEvent } from "./cache-metrics";
 
 const memoryFallback = new NamespacedCacheAdapter(new MemoryCacheAdapter());
 
+/**
+ * Resolves the active cache backend in priority order:
+ *   1. Upstash REST adapter  — when UPSTASH_REDIS_KV_REST_API_URL + TOKEN are set
+ *   2. ioredis adapter       — when any ioredis env var is set and client is ready
+ *   3. In-process memory     — last-resort fallback
+ *
+ * The selection happens per-operation so a Redis failure that opens the circuit
+ * automatically falls through to memory without a process restart.
+ */
 class DynamicServerCache implements CachePort {
   async getJson<T>(key: string): Promise<T | null> {
     if (!isSharedCacheEnabled()) {
@@ -24,6 +35,12 @@ class DynamicServerCache implements CachePort {
       return memoryFallback.getJson<T>(key);
     }
 
+    // --- Upstash REST (primary on Vercel) ---
+    if (isUpstashPrimary()) {
+      return new NamespacedCacheAdapter(new UpstashCacheAdapter()).getJson<T>(key);
+    }
+
+    // --- ioredis (Azure / generic TCP) ---
     const redis = getSharedRedisClient();
     if (!redis) {
       emitCacheMetricEvent({
@@ -52,6 +69,13 @@ class DynamicServerCache implements CachePort {
       return;
     }
 
+    // --- Upstash REST (primary on Vercel) ---
+    if (isUpstashPrimary()) {
+      await new NamespacedCacheAdapter(new UpstashCacheAdapter()).setJson(key, value, ttlSeconds);
+      return;
+    }
+
+    // --- ioredis (Azure / generic TCP) ---
     const redis = getSharedRedisClient();
     if (!redis) {
       emitCacheMetricEvent({
@@ -85,6 +109,13 @@ class DynamicServerCache implements CachePort {
       return;
     }
 
+    // --- Upstash REST (primary on Vercel) ---
+    if (isUpstashPrimary()) {
+      await new NamespacedCacheAdapter(new UpstashCacheAdapter()).delete(key);
+      return;
+    }
+
+    // --- ioredis (Azure / generic TCP) ---
     const redis = getSharedRedisClient();
     if (!redis) {
       emitCacheMetricEvent({
