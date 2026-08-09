@@ -4,7 +4,7 @@ import { env } from "@/config/env";
 let client: Redis | null = null;
 
 export function isUpstashRedisConfigured(): boolean {
-  return Boolean(env.UPSTASH_REDIS_REST_URL && env.UPSTASH_REDIS_REST_TOKEN);
+  return Boolean(env.UPSTASH_REDIS_KV_REST_API_URL && env.UPSTASH_REDIS_KV_REST_API_TOKEN);
 }
 
 export function getUpstashRedis(): Redis | null {
@@ -13,7 +13,10 @@ export function getUpstashRedis(): Redis | null {
   }
 
   if (!client) {
-    client = Redis.fromEnv();
+    client = new Redis({
+      url: env.UPSTASH_REDIS_KV_REST_API_URL!,
+      token: env.UPSTASH_REDIS_KV_REST_API_TOKEN!,
+    });
   }
 
   return client;
