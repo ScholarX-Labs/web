@@ -5,6 +5,7 @@ import {
   getCacheMetricsSnapshot,
 } from "./cache-metrics";
 import type { RedisClient } from "./redis-cache.adapter";
+import { isUpstashRedisConfigured } from "./upstash-redis";
 
 const CIRCUIT_BREAKER_COOLDOWN_MS = 30_000;
 
@@ -19,7 +20,8 @@ export interface SharedRedisStatus {
   enabled: boolean;
   cacheEnabled: boolean;
   configured: boolean;
-  provider: "azure" | "generic" | "unconfigured";
+  /** "upstash" = Upstash REST; "azure" = Azure Cache for Redis; "generic" = REDIS_URL/REDIS_HOST; "unconfigured" = no Redis vars set */
+  provider: "upstash" | "azure" | "generic" | "unconfigured";
   host: string | null;
   port: number | null;
   circuitOpen: boolean;
@@ -68,11 +70,28 @@ export function isSharedCacheEnabled(): boolean {
   return env.CACHE_ENABLED !== "false";
 }
 
+/**
+ * Returns true when any supported Redis backend is configured.
+ * Provider priority (for selection, not just detection):
+ *   1. Upstash REST  (UPSTASH_REDIS_KV_REST_API_URL + UPSTASH_REDIS_KV_REST_API_TOKEN)
+ *   2. ioredis URL   (REDIS_URL)
+ *   3. ioredis Azure (AZURE_REDIS_HOST)
+ *   4. ioredis host  (REDIS_HOST)
+ */
 export function isSharedRedisConfigured(): boolean {
-  return Boolean(env.REDIS_URL || env.AZURE_REDIS_HOST || env.REDIS_HOST);
+  return (
+    isUpstashRedisConfigured() ||
+    Boolean(env.REDIS_URL || env.AZURE_REDIS_HOST || env.REDIS_HOST)
+  );
+}
+
+/** Returns true when the Upstash REST client is the active provider. */
+export function isUpstashPrimary(): boolean {
+  return isUpstashRedisConfigured();
 }
 
 function getRedisProvider(): SharedRedisStatus["provider"] {
+  if (isUpstashRedisConfigured()) return "upstash";
   if (env.AZURE_REDIS_HOST) return "azure";
   if (env.REDIS_URL || env.REDIS_HOST) return "generic";
   return "unconfigured";
@@ -275,13 +294,23 @@ function createSharedRedisClient(): RedisClient {
 }
 
 export function getSharedRedisStatus(): SharedRedisStatus {
+  const provider = getRedisProvider();
+  // Upstash REST has no TCP host/port to expose — surface a stable sentinel.
+  const host =
+    provider === "upstash"
+      ? (env.UPSTASH_REDIS_KV_REST_API_URL?.replace(/\/+$/, "") ?? "upstash-rest-api")
+      : isSharedRedisConfigured()
+        ? getRedisHost()
+        : null;
+  const port = provider === "upstash" ? null : isSharedRedisConfigured() ? getRedisPort() : null;
+
   return {
     enabled: isSharedRedisEnabled(),
     cacheEnabled: isSharedCacheEnabled(),
     configured: isSharedRedisConfigured(),
-    provider: getRedisProvider(),
-    host: isSharedRedisConfigured() ? getRedisHost() : null,
-    port: isSharedRedisConfigured() ? getRedisPort() : null,
+    provider,
+    host,
+    port,
     circuitOpen: redisDown && isCircuitOpen(),
     circuitCooldownMs: CIRCUIT_BREAKER_COOLDOWN_MS,
     consecutiveFailures,
