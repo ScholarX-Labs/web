@@ -4,11 +4,10 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { dbCourses } from "@/db/schema/courses-db.schema";
 import { auth } from "@/lib/auth";
-import { uploadCourseImage, deleteCourseImage, UploadError } from "@/lib/upload";
+import { uploadCourseImage, deleteCourseImage, UploadError, COURSE_IMAGE_MAX_FILE_SIZE } from "@/lib/upload";
 import { isCourseImageUploadEnabled } from "@/lib/app-config";
 import { peekCourseImageUploadLimit, consumeCourseImageUploadSlot } from "@/lib/rate-limiter";
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
 export const dynamic = "force-dynamic";
@@ -76,9 +75,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (file.size > MAX_FILE_SIZE) {
+    if (file.size > COURSE_IMAGE_MAX_FILE_SIZE) {
       return NextResponse.json(
-        { success: false, error: "File exceeds 5MB limit" },
+        { success: false, error: "File exceeds 4MB limit" },
         { status: 413 }
       );
     }

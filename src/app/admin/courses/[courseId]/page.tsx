@@ -731,8 +731,8 @@ function MediaTab({ course, courseId }: { course: AdminCourse; courseId: string 
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("File exceeds 5MB limit.");
+    if (file.size > 4 * 1024 * 1024) {
+      toast.error("File exceeds 4MB limit.");
       return;
     }
 
@@ -797,8 +797,8 @@ function MediaTab({ course, courseId }: { course: AdminCourse; courseId: string 
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("File exceeds 5MB limit.");
+    if (file.size > 4 * 1024 * 1024) {
+      toast.error("File exceeds 4MB limit.");
       return;
     }
 
