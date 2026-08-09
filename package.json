@@ -10,6 +10,7 @@
     "validate:env": "node scripts/validate-env.mjs",
     "redis:diagnose": "node scripts/redis-diagnose.mjs",
     "redis:smoke": "tsx scripts/redis-smoke-test.ts",
+    "upstash:diagnose": "node scripts/upstash-diagnose.mjs",
     "lint": "eslint && pnpm audit:schema-literals",
     "audit:schema-literals": "node scripts/audit-schema-literals.mjs",
     "typecheck": "tsc --noEmit",
