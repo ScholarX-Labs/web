@@ -61,9 +61,9 @@ const envSchema = z.object({
   CACHE_ENABLED: optionalBooleanString,
   DISTRIBUTED_RATE_LIMITS_ENABLED: optionalBooleanString,
 
-  // Upstash Redis — SERVER ONLY (optional REST-based Redis client)
-  UPSTASH_REDIS_REST_URL: optionalHttpsUrl,
-  UPSTASH_REDIS_REST_TOKEN: optionalString,
+  // Upstash REST / Vercel KV REST
+  UPSTASH_REDIS_KV_REST_API_URL: optionalHttpsUrl,
+  UPSTASH_REDIS_KV_REST_API_TOKEN: optionalString,
 
   AVATAR_UPLOAD_ENABLED: optionalBooleanString,
 
@@ -105,17 +105,32 @@ function validateRedisEnv(input: EnvInput): string[] {
     readEnv(input, "DISTRIBUTED_RATE_LIMITS_ENABLED") === "true";
   const redisRequired = cacheEnabled || distributedRateLimitsEnabled;
 
+  const upstashUrl = readEnv(input, "UPSTASH_REDIS_KV_REST_API_URL");
+  const upstashToken = readEnv(input, "UPSTASH_REDIS_KV_REST_API_TOKEN");
   const redisUrl = readEnv(input, "REDIS_URL");
   const azureHost = readEnv(input, "AZURE_REDIS_HOST");
   const redisHost = readEnv(input, "REDIS_HOST");
   const redisPrefix = readEnv(input, "REDIS_KEY_PREFIX");
 
+  // An Upstash REST connection is valid when both URL and token are provided.
+  const upstashConfigured = Boolean(upstashUrl && upstashToken);
+
   if (!redisRequired) return issues;
 
-  if (!redisUrl && !azureHost && !redisHost) {
+  if (!upstashConfigured && !redisUrl && !azureHost && !redisHost) {
     issues.push(
-      "Set one Redis connection mode when CACHE_ENABLED=true or DISTRIBUTED_RATE_LIMITS_ENABLED=true: REDIS_URL, AZURE_REDIS_HOST, or REDIS_HOST.",
+      "Set one Redis connection mode when CACHE_ENABLED=true or DISTRIBUTED_RATE_LIMITS_ENABLED=true: " +
+      "UPSTASH_REDIS_KV_REST_API_URL + UPSTASH_REDIS_KV_REST_API_TOKEN (recommended for Vercel), " +
+      "REDIS_URL, AZURE_REDIS_HOST, or REDIS_HOST.",
     );
+  }
+
+  if (upstashUrl && !upstashToken) {
+    issues.push("Set UPSTASH_REDIS_KV_REST_API_TOKEN when UPSTASH_REDIS_KV_REST_API_URL is set.");
+  }
+
+  if (upstashToken && !upstashUrl) {
+    issues.push("Set UPSTASH_REDIS_KV_REST_API_URL when UPSTASH_REDIS_KV_REST_API_TOKEN is set.");
   }
 
   if (!redisPrefix) {
@@ -187,7 +202,7 @@ export function validateEnv(input: EnvInput = process.env) {
     throw new Error(
       "[ENV] Invalid environment configuration:\n" +
         issues.map((issue) => `- ${issue}`).join("\n") +
-        "\nCheck your .env.local file or Azure App Settings.",
+        "\nCheck your Vercel env vars or Doppler prod config.",
     );
   }
 
