@@ -13,10 +13,12 @@ export function getUpstashRedis(): Redis | null {
   }
 
   if (!client) {
-    client = new Redis({
+    const config: any = {
       url: env.UPSTASH_REDIS_KV_REST_API_URL!,
       token: env.UPSTASH_REDIS_KV_REST_API_TOKEN!,
-    });
+      fetch: (url: any, init: any) => fetch(url, { ...init, cache: "no-store" }),
+    };
+    client = new Redis(config);
   }
 
   return client;
