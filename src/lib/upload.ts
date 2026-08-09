@@ -25,7 +25,7 @@ const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1 MB
 const AVATAR_MAX_DIMENSION = 512;
 const AVATAR_PATH_PREFIX = "avatars";
 
-const COURSE_IMAGE_MAX_FILE_SIZE = 4 * 1024 * 1024; // 4 MB (Vercel server upload limit is 4.5 MB)
+export const COURSE_IMAGE_MAX_FILE_SIZE = 4 * 1024 * 1024; // 4 MB (Vercel server upload limit is 4.5 MB)
 const COURSE_IMAGE_MAX_DIMENSION = 1920;
 const COURSE_IMAGE_PATH_PREFIX = "course-images";
 const COURSE_IMAGE_ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -47,6 +47,10 @@ export function detectMagicBytes(buffer: Buffer): string | null {
     }
   }
   return null;
+}
+
+export function isValidIdentifier(id: string): boolean {
+  return /^[a-zA-Z0-9_-]+$/.test(id);
 }
 
 // ---------------------------------------------------------------------------
@@ -98,6 +102,14 @@ export async function uploadAvatar(
   fileBuffer: Buffer,
   mimeType: string,
 ): Promise<string> {
+  if (!isValidIdentifier(userId)) {
+    throw new UploadError(
+      "INVALID_IDENTIFIER",
+      400,
+      "Invalid user identifier",
+    );
+  }
+
   if (fileBuffer.length > MAX_FILE_SIZE) {
     throw new UploadError(
       "FILE_TOO_LARGE",
@@ -166,6 +178,14 @@ export async function uploadCourseImage(
   fileBuffer: Buffer,
   mimeType: string,
 ): Promise<string> {
+  if (!isValidIdentifier(courseId)) {
+    throw new UploadError(
+      "INVALID_IDENTIFIER",
+      400,
+      "Invalid course identifier",
+    );
+  }
+
   if (fileBuffer.length > COURSE_IMAGE_MAX_FILE_SIZE) {
     throw new UploadError(
       "FILE_TOO_LARGE",
