@@ -237,12 +237,14 @@ This ensures the counter cache is busted after every real enrollment event.
 
 **File**: `src/app/api/courses/[courseId]/counters/route.ts`
 
-The route already exists and is keyed by `courseId` (not `slug`). It awaits the async params, resolves metrics through the domain service, and returns the metrics payload directly:
+The route already exists and is keyed by `courseId` (not `slug`). It awaits the async params, validates the UUID, resolves metrics through the domain service, and returns the metrics payload directly:
 
 ```typescript
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { createNextCourseDomain } from "@/domain/courses/factory/next-course-domain.factory";
-import { CourseMetricsSchema } from "@/domain/courses/contracts/course-metrics.contract";
+
+const courseIdSchema = z.string().uuid();
 
 export async function GET(
   request: NextRequest,
@@ -250,6 +252,10 @@ export async function GET(
 ) {
   try {
     const { courseId } = await params;
+    if (!courseIdSchema.safeParse(courseId).success) {
+      return NextResponse.json({ error: "Invalid courseId" }, { status: 400 });
+    }
+
     const domain = createNextCourseDomain();
 
     // Fast path: cached or DB read
@@ -262,7 +268,12 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(metrics);
+    return NextResponse.json(metrics, {
+      status: 200,
+      headers: {
+        "Cache-Control": "public, s-maxage=300, stale-while-revalidate=60",
+      },
+    });
   } catch (error) {
     console.error("[Counters API Error]", error);
     return NextResponse.json(
@@ -276,8 +287,9 @@ export async function GET(
 Contract notes:
 
 - **URL**: `GET /api/courses/{courseId}/counters`
-- **Request parameter**: `courseId` in the path segment. There is no body, no `slug` param, and no zod schema — the handler does **not** resolve the course via `catalog.getBySlug()` or use a `fallbackStudentsCount`. `getCourseMetrics` handles the fallback to the denormalized column internally.
-- **Responses**: `200` with the metrics JSON payload; `404` with `{ error: "Course metrics not found" }` when metrics cannot be resolved; `500` with `{ error: "Internal Server Error" }` for unexpected failures.
+- **Request parameter**: `courseId` in the path segment, validated as a UUID. There is no body and no `slug` param — the handler does **not** resolve the course via `catalog.getBySlug()` or use a `fallbackStudentsCount`. `getCourseMetrics` handles the fallback to the denormalized column internally.
+- **Success response**: `200` with the `CourseMetrics` payload directly (`{ courseId, enrollmentCount, ratingCount, averageRating, source }`), plus `Cache-Control: public, s-maxage=300, stale-while-revalidate=60`.
+- **Error responses**: `400` with `{ error: "Invalid courseId" }` for a non-UUID param; `404` with `{ error: "Course metrics not found" }` when metrics cannot be resolved; `500` with `{ error: "Internal Server Error" }` for unexpected failures.
 
 ---
 
