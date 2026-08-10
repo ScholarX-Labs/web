@@ -56,9 +56,9 @@
     "@types/canvas-confetti": "^1.9.0",
     "@types/gsap": "^3.0.0",
     "@upstash/redis": "^1.38.2",
+    "@vercel/analytics": "^2.0.1",
     "@vercel/blob": "^2.7.0",
     "@vercel/speed-insights": "^2.0.0",
-    "@vercel/analytics": "^2.0.1",
     "@vidstack/react": "^1.12.13",
     "axios": "^1.13.5",
     "better-auth": "^1.5.4",
@@ -122,6 +122,9 @@
     "@faker-js/faker": "^10.5.0",
     "@tailwindcss/postcss": "^4",
     "@tanstack/react-query-devtools": "^5.91.3",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^7.0.0",
+    "@testing-library/react": "^16.3.2",
     "@types/json-schema": "7.0.15",
     "@types/node": "^20",
     "@types/nodemailer": "^7.0.11",
@@ -132,10 +135,12 @@
     "drizzle-kit": "^0.31.9",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "jsdom": "^30.0.1",
     "playwright": "^1.60.0",
     "server-only": "^0.0.1",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.10"
   }
 }
