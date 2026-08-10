@@ -1,6 +1,16 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeAll, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { AnimatedCounter } from "./animated-counter";
+
+class MockIntersectionObserver {
+  observe = vi.fn();
+  unobserve = vi.fn();
+  disconnect = vi.fn();
+}
+
+beforeAll(() => {
+  global.IntersectionObserver = MockIntersectionObserver as unknown as typeof globalThis.IntersectionObserver;
+});
 
 describe("AnimatedCounter", () => {
   it("renders correctly with initial value", () => {
