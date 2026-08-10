@@ -44,7 +44,7 @@ All unknowns were resolved by inspecting the existing `src/lib/cache/`, `src/dom
 
 ### Decision 4: Live Event Mechanism — TanStack Query Polling (Not SSE/WebSocket) for v1
 
-**Decision**: Background revalidation on the course detail page uses TanStack Query `refetchInterval` polling at a 5-minute interval against the `/api/courses/[slug]/counters` route. SSE or WebSocket is explicitly out of scope for v1.
+**Decision**: Background revalidation on the course detail page uses TanStack Query `refetchInterval` polling at a 5-minute interval against the `/api/courses/[courseId]/counters` route. SSE or WebSocket is explicitly out of scope for v1.
 
 **Rationale**: Polling at the same interval as the cache TTL is the simplest mechanism that provides the desired "alive" UX without requiring new server-side infrastructure (SSE/WebSocket server, connection pooling). The API route itself returns cached data, so polling does not add meaningful DB load. At this polling interval, users will see counter updates within 5 minutes of a real enrollment — which meets the spec's SC-004 criterion.
 
