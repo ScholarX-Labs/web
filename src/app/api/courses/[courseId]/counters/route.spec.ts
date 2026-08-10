@@ -32,6 +32,9 @@ describe("GET /api/courses/[courseId]/counters", () => {
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.enrollmentCount).toBe(150);
+    expect(res.headers.get("Cache-Control")).toBe(
+      "public, s-maxage=300, stale-while-revalidate=60",
+    );
   });
 
   it("returns 404 when not found", async () => {
