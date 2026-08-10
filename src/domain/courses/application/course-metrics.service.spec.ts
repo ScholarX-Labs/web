@@ -157,8 +157,8 @@ describe("CourseMetricsService", () => {
     });
 
     // Make repo call take some time so we can test concurrency
-    let resolveRepo: any;
-    mockRepository.getLiveEnrollmentCount = vi.fn().mockImplementation(() => new Promise((res) => {
+    let resolveRepo!: (value: number) => void;
+    mockRepository.getLiveEnrollmentCount = vi.fn().mockImplementation(() => new Promise<number>((res) => {
       resolveRepo = res;
     }));
 
