@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { createNextCourseDomain } from "@/domain/courses";
-import { CourseHero } from "./_components/course-hero";
+import { CourseHero, CourseStaticCounters } from "./_components/course-hero";
 import { CourseStickyCta } from "./_components/course-sticky-cta";
 import { CourseCurriculum } from "./_components/course-curriculum";
 import { CourseInstructor } from "./_components/course-instructor";
@@ -9,6 +9,7 @@ import { EnrollModal } from "@/components/courses/enroll-modal";
 import { CourseCertificateLinkCard } from "@/components/certificates/course-certificate-link-card";
 import type { LearnerCertificateLinkDto } from "@/domain/certificates/application/certificate-verification-query.service";
 import { ensureCourseCompletionCertificate } from "@/lib/certificates/course-certificate-repair";
+import { CourseCountersSection } from "@/components/courses/course-counters-section";
 
 import { getSession } from "@/lib/dal";
 import { ROUTES } from "@/lib/routes";
@@ -83,7 +84,25 @@ export default async function CourseDetailPage({
   
   return (
     <div className="relative w-full flex flex-col min-h-screen pb-24 bg-white dark:bg-card">
-      <CourseHero course={course} />
+      <CourseHero 
+        course={course} 
+        countersSlot={
+          <CourseCountersSection 
+            courseId={course.id} 
+            fallbackStudentsCount={course.studentsCount ?? 0}
+            fallbackRating={course.rating ? Number(course.rating) : null}
+            fallbackTotalRatings={course.totalRatings}
+            fallback={
+              <CourseStaticCounters
+                rating={course.rating}
+                totalRatings={course.totalRatings}
+                studentsCount={course.studentsCount}
+              />
+            }
+            variant="hero"
+          />
+        }
+      />
 
       {/* Navigation Tabs */}
       <div className="border-b bg-card">
@@ -111,6 +130,7 @@ export default async function CourseDetailPage({
             issuedAt={certificateLink.issuedAt}
           />
         ) : null}
+
         <CourseCurriculum course={course} />
         <CourseInstructor instructor={course.instructor} />
       </div>

@@ -15,9 +15,41 @@ import { CourseRichText } from "@/components/courses/course-rich-text";
 
 interface CourseHeroProps {
   course: Course;
+  countersSlot?: React.ReactNode;
 }
 
-export function CourseHero({ course }: CourseHeroProps) {
+export function CourseStaticCounters({
+  rating,
+  totalRatings,
+  studentsCount,
+}: {
+  rating?: number;
+  totalRatings?: number;
+  studentsCount?: number;
+}) {
+  return (
+    <>
+      {rating !== undefined && (
+        <div className="flex items-center gap-1.5 text-amber-400">
+          <Star className="w-4 h-4 fill-amber-400" />
+          <span className="text-white">{rating.toFixed(1)}</span>
+          <span className="text-slate-400">
+            ({totalRatings || 0} reviews)
+          </span>
+        </div>
+      )}
+
+      {studentsCount !== undefined && (
+        <div className="flex items-center gap-1.5">
+          <Users className="w-4 h-4 text-slate-400" />
+          <span>{studentsCount.toLocaleString()} enrolled</span>
+        </div>
+      )}
+    </>
+  );
+}
+
+export function CourseHero({ course, countersSlot }: CourseHeroProps) {
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 500], [0, 150]);
   const opacity = useTransform(scrollY, [0, 300], [1, 0.3]);
@@ -127,21 +159,14 @@ export function CourseHero({ course }: CourseHeroProps) {
 
           {/* Stats Bar */}
           <StaggerItem className="flex flex-wrap items-center gap-x-6 gap-y-3 py-2 text-sm font-medium text-slate-300">
-            {course.rating !== undefined && (
-              <div className="flex items-center gap-1.5 text-amber-400">
-                <Star className="w-4 h-4 fill-amber-400" />
-                <span className="text-white">{course.rating.toFixed(1)}</span>
-                <span className="text-slate-400">
-                  ({course.totalRatings || 0} reviews)
-                </span>
-              </div>
-            )}
-
-            {course.studentsCount !== undefined && (
-              <div className="flex items-center gap-1.5">
-                <Users className="w-4 h-4 text-slate-400" />
-                <span>{course.studentsCount.toLocaleString()} enrolled</span>
-              </div>
+            {countersSlot ? (
+              countersSlot
+            ) : (
+              <CourseStaticCounters
+                rating={course.rating}
+                totalRatings={course.totalRatings}
+                studentsCount={course.studentsCount}
+              />
             )}
 
             {course.duration && (

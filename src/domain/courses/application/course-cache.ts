@@ -5,6 +5,7 @@ import { markSharedRedisUnavailable } from "@/lib/cache/shared-redis";
 import type { CourseCategory, CourseListQuery } from "@/domain/courses/contracts";
 import type { Course } from "@/types/course.types";
 import type { PaginatedCoursesApiResponse } from "@/lib/api/courses.service";
+import type { CounterCacheEntry } from "../contracts/course-metrics.contract";
 
 const cache = createServerCache();
 
@@ -179,4 +180,41 @@ export async function invalidatePublicCourseDetailCache(input: {
     ttlSeconds: cachePolicy.courses.versionTtlSeconds,
     context: "course-cache-version-bump:detail",
   });
+}
+
+const counterKey = (courseId: string) =>
+  cachePolicy.courses.counters.key(courseId);
+const counterTtl = cachePolicy.courses.counters.ttlSeconds;
+
+export async function getCachedCourseMetrics(
+  courseId: string
+): Promise<CounterCacheEntry | null> {
+  try {
+    return await cache.getJson<CounterCacheEntry>(counterKey(courseId));
+  } catch (error) {
+    markSharedRedisUnavailable(`course-counter-get:${courseId}`, error);
+    return null;
+  }
+}
+
+export async function setCachedCourseMetrics(
+  courseId: string,
+  entry: CounterCacheEntry
+): Promise<void> {
+  try {
+    await cache.setJson(counterKey(courseId), entry, counterTtl);
+  } catch (error) {
+    markSharedRedisUnavailable(`course-counter-set:${courseId}`, error);
+    // Non-fatal: page still renders with DB data
+  }
+}
+
+export async function invalidateCourseMetricsCache(
+  courseId: string
+): Promise<void> {
+  try {
+    await cache.delete(counterKey(courseId));
+  } catch (error) {
+    markSharedRedisUnavailable(`course-counter-invalidate:${courseId}`, error);
+  }
 }

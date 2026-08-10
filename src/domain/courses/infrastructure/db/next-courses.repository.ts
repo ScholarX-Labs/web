@@ -259,6 +259,19 @@ export class NextCoursesRepository {
     return rows[0] ?? null;
   }
 
+  async getLiveEnrollmentCount(courseId: string): Promise<number> {
+    const [result] = await db
+      .select({ count: count() })
+      .from(dbSubscriptions)
+      .where(
+        and(
+          eq(dbSubscriptions.courseId, courseId),
+          eq(dbSubscriptions.isActive, true)
+        )
+      );
+    return result?.count ?? 0;
+  }
+
   async findActiveSubscriptionsByUser(
     userId: string,
     courseIds: string[],

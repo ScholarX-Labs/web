@@ -155,7 +155,7 @@ export const createAdminRepository = (): AdminRepository => {
       return results[0];
     },
 
-    async updateCourse(id: string, data: UpdateCourseInput, _expectedVersion: Date) {
+    async updateCourse(id: string, data: UpdateCourseInput, _expectedVersion?: Date) {
       const whereConditions = [eq(dbCourses.id, id)];
       if (_expectedVersion) {
         whereConditions.push(eq(dbCourses.updatedAt, _expectedVersion));
@@ -375,17 +375,10 @@ export const createAdminRepository = (): AdminRepository => {
       }
     },
 
-    async updateLesson(id: string, data: UpdateLessonInput, _expectedVersion: Date) {
-      const current = await db
-        .select({ updatedAt: dbLessons.updatedAt })
-        .from(dbLessons)
-        .where(eq(dbLessons.id, id))
-        .limit(1);
-
-      if (current.length > 0 && current[0].updatedAt && _expectedVersion) {
-        if (current[0].updatedAt.getTime() !== _expectedVersion.getTime()) {
-          throw AdminErrors.conflict("Lesson was modified by another user. Please refresh and try again.");
-        }
+    async updateLesson(id: string, data: UpdateLessonInput, _expectedVersion?: Date) {
+      const whereConditions = [eq(dbLessons.id, id)];
+      if (_expectedVersion) {
+        whereConditions.push(eq(dbLessons.updatedAt, _expectedVersion));
       }
 
       const results = await db
@@ -400,8 +393,13 @@ export const createAdminRepository = (): AdminRepository => {
           ...(data.status !== undefined && { status: data.status }),
           updatedAt: new Date(),
         })
-        .where(eq(dbLessons.id, id))
+        .where(and(...whereConditions))
         .returning();
+
+      if (results.length === 0) {
+        throw AdminErrors.conflict("Lesson was modified by another user. Please refresh and try again.");
+      }
+
       return results[0];
     },
 

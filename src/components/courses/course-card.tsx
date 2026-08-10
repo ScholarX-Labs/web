@@ -212,6 +212,7 @@ export function CourseCard({ course, className }: CourseCardProps) {
               duration={course.duration}
               level={course.level}
               videosCount={course.videosCount}
+              studentsCount={course.studentsCount}
               className="mt-auto pt-6 border-t border-border/30"
             />
           </CardContent>
