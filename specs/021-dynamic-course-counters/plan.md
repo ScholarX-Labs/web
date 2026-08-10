@@ -112,7 +112,7 @@ Server Component fetches CourseMetrics
 Client receives rendered HTML with cached counter value
       │
       ▼
-TanStack Query client polls /api/courses/[slug]/counters
+TanStack Query client polls /api/courses/[courseId]/counters
 every 5 minutes (configurable, same as Redis TTL)
       │
       ├─ Value unchanged → no action, no animation
@@ -422,7 +422,7 @@ import { NextRequest, NextResponse } from "next/server";
  * Used by TanStack Query on the course detail page for background revalidation.
  * Returns cached data — does NOT bypass cache.
  * Public route, no authentication required.
- * Response: { data: { enrollmentCount, ratingCount, averageRating, source } }
+ * Response: CourseMetrics payload (200) — { courseId, enrollmentCount, ratingCount, averageRating, source }
  */
 export async function GET(
   request: NextRequest,
@@ -430,7 +430,7 @@ export async function GET(
 ): Promise<NextResponse>
 ```
 
-Validates `courseId` param. Calls `courseDomain.metrics.getCourseMetrics(courseId)`. Returns `{ data: CourseMetrics }` or `{ error: "not_found" }` (404) or `{ error: "service_unavailable" }` (500) with appropriate HTTP status. Adds `Cache-Control: public, s-maxage=300, stale-while-revalidate=60` header.
+Validates `courseId` as a UUID. Calls `courseDomain.metrics.getCourseMetrics(courseId)`. Returns the `CourseMetrics` payload directly on 200; `{ error: "Invalid courseId" }` (400) for a non-UUID param; `{ error: "Course metrics not found" }` (404) when metrics cannot be resolved; `{ error: "Internal Server Error" }` (500) for unexpected failures. Success responses include `Cache-Control: public, s-maxage=300, stale-while-revalidate=60`.
 
 ### 1.9 UI Components
 
@@ -603,7 +603,7 @@ const shouldReduceMotion = useReducedMotion();
 | `course-metrics.service.test.ts` | Cache HIT → returns cached value, no DB call; Cache MISS → calls DB, populates cache; DB throws → returns fallback from denormalized column; Both fail → returns null; `invalidate()` → calls cache.delete() |
 | `animated-counter.test.tsx` | Renders correct number; Digit decomposition correct; Only changed digits receive motion props; `useReducedMotion=true` → no transform animations; `abbreviated=true` → formats 10K+ correctly |
 | `activity-badge.test.tsx` | Renders when increment > 0; Does not render when increment = 0; Calls dismiss callback after `dismissAfterMs`; Does not move when reduced motion |
-| `counters-route.test.ts` | Returns 200 with CourseMetrics; Returns 404 for unknown slug; Returns Cache-Control header; Does not expose internal errors |
+| `counters-route.spec.ts` | Returns 200 with the CourseMetrics payload and Cache-Control header; Returns 400 for a non-UUID courseId; Returns 404 when metrics are not found; Returns 500 without exposing internal error details |
 
 ### Integration Tests (Playwright)
 
@@ -622,7 +622,7 @@ const shouldReduceMotion = useReducedMotion();
 ```bash
 pnpm test src/domain/courses/application/course-metrics.service.test.ts
 pnpm test src/components/courses/animated-counter.test.tsx
-pnpm test src/app/api/courses/\[slug\]/counters/route.test.ts
+pnpm test src/app/api/courses/\[courseId\]/counters/route.spec.ts
 pnpm tsc --noEmit   # must pass with zero errors
 pnpm lint           # must pass with zero warnings in changed files
 ```
