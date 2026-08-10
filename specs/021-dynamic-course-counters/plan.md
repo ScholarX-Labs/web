@@ -412,23 +412,25 @@ await this.metricsService.invalidate(courseId);
 
 ### 1.8 API Route for Client-Side Polling
 
-**File**: `src/app/api/courses/[slug]/counters/route.ts` (NEW)
+**File**: `src/app/api/courses/[courseId]/counters/route.ts` (NEW)
 
 ```typescript
+import { NextRequest, NextResponse } from "next/server";
+
 /**
- * @description Thin route handler returning CourseMetrics for a course slug.
+ * @description Thin route handler returning CourseMetrics for a course ID.
  * Used by TanStack Query on the course detail page for background revalidation.
  * Returns cached data — does NOT bypass cache.
  * Public route, no authentication required.
- * Response: { enrollmentCount, ratingCount, averageRating }
+ * Response: { data: { enrollmentCount, ratingCount, averageRating, source } }
  */
 export async function GET(
-  request: Request,
-  { params }: { params: { slug: string } }
-): Promise<Response>
+  request: NextRequest,
+  { params }: { params: Promise<{ courseId: string }> }
+): Promise<NextResponse>
 ```
 
-Validates `slug` param. Calls `courseDomain.metrics.getCourseMetrics(courseId)`. Returns `{ data: CourseMetrics }` or `{ error: "not_found" }` with appropriate HTTP status. Adds `Cache-Control: public, s-maxage=300, stale-while-revalidate=60` header.
+Validates `courseId` param. Calls `courseDomain.metrics.getCourseMetrics(courseId)`. Returns `{ data: CourseMetrics }` or `{ error: "not_found" }` (404) or `{ error: "service_unavailable" }` (500) with appropriate HTTP status. Adds `Cache-Control: public, s-maxage=300, stale-while-revalidate=60` header.
 
 ### 1.9 UI Components
 
