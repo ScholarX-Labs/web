@@ -156,24 +156,28 @@ const fallbackCount = course.studentsCount ?? 0;
 
 **Response body** (application/json):
 ```typescript
-// Success (HTTP 200)
+// Success (HTTP 200) — CourseMetrics payload directly
 {
-  data: {
-    enrollmentCount: number;   // integer
-    ratingCount: number;       // integer
-    averageRating: number;     // 0–5, 2 decimal places
-    source: "live" | "cache" | "fallback";
-  }
+  courseId: string;             // UUID
+  enrollmentCount: number;      // integer
+  ratingCount: number;          // integer
+  averageRating: number;        // 0–5, 2 decimal places
+  source: "live" | "cache" | "fallback";
+}
+
+// Invalid courseId (HTTP 400) — non-UUID param
+{
+  error: "Invalid courseId"
 }
 
 // Not found (HTTP 404)
 {
-  error: "not_found"
+  error: "Course metrics not found"
 }
 
 // Server error (HTTP 500) — never exposes internal details
 {
-  error: "service_unavailable"
+  error: "Internal Server Error"
 }
 ```
 
