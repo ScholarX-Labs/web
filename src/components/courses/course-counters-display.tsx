@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatedCounter } from "./animated-counter";
 import { ActivityBadge } from "./activity-badge";
@@ -15,7 +16,10 @@ export function CourseCountersDisplay({
   initialMetrics,
   variant = "default",
 }: CourseCountersDisplayProps) {
-  const { data: metrics } = useQuery({
+  const previousEnrollmentRef = useRef(initialMetrics.enrollmentCount);
+  const [enrollmentDiff, setEnrollmentDiff] = useState(0);
+
+  const { data: metrics, isSuccess } = useQuery({
     queryKey: ["course-counters", initialMetrics.courseId],
     queryFn: async () => {
       const res = await fetch(`/api/courses/${initialMetrics.courseId}/counters`);
@@ -27,32 +31,39 @@ export function CourseCountersDisplay({
     staleTime: 10000,
   });
 
-  const enrollmentDiff = metrics.enrollmentCount - initialMetrics.enrollmentCount;
+  useEffect(() => {
+    if (isSuccess && metrics.enrollmentCount !== previousEnrollmentRef.current) {
+      setEnrollmentDiff(metrics.enrollmentCount - previousEnrollmentRef.current);
+      previousEnrollmentRef.current = metrics.enrollmentCount;
+    }
+  }, [metrics.enrollmentCount, isSuccess]);
 
   if (variant === "hero") {
     return (
       <>
-        <div className="flex items-center gap-1.5 text-amber-400">
-          <Star className="w-4 h-4 fill-amber-400" />
-          <AnimatedCounter
-            value={metrics.averageRating}
-            label=""
-            className="text-white"
-            layout="inline"
-            abbreviated={false}
-          />
-          <span className="text-slate-400">
-            (
+        {metrics.averageRating !== undefined && metrics.ratingCount !== undefined && (
+          <div className="flex items-center gap-1.5 text-amber-400">
+            <Star className="w-4 h-4 fill-amber-400" />
             <AnimatedCounter
-              value={metrics.ratingCount}
+              value={metrics.averageRating}
               label=""
-              className="inline"
+              className="text-white"
               layout="inline"
               abbreviated={false}
             />
-            {" reviews)"}
-          </span>
-        </div>
+            <span className="text-slate-400">
+              (
+              <AnimatedCounter
+                value={metrics.ratingCount}
+                label=""
+                className="inline"
+                layout="inline"
+                abbreviated={false}
+              />
+              {" reviews)"}
+            </span>
+          </div>
+        )}
         <div className="flex items-center gap-1.5">
           <Users className="w-4 h-4 text-slate-400" />
           <div className="flex items-center">
@@ -83,23 +94,27 @@ export function CourseCountersDisplay({
           <ActivityBadge increment={enrollmentDiff} />
         </div>
       </div>
-      <div className="flex flex-col">
-        <AnimatedCounter
-          value={metrics.ratingCount}
-          label="reviews"
-          className="text-3xl font-bold"
-          abbreviated={false}
-        />
-      </div>
-      <div className="flex flex-col">
-        <AnimatedCounter
-          value={metrics.averageRating}
-          label="average rating"
-          suffix="/5"
-          className="text-3xl font-bold"
-          abbreviated={false}
-        />
-      </div>
+      {metrics.ratingCount !== undefined && (
+        <div className="flex flex-col">
+          <AnimatedCounter
+            value={metrics.ratingCount}
+            label="reviews"
+            className="text-3xl font-bold"
+            abbreviated={false}
+          />
+        </div>
+      )}
+      {metrics.averageRating !== undefined && (
+        <div className="flex flex-col">
+          <AnimatedCounter
+            value={metrics.averageRating}
+            label="average rating"
+            suffix="/5"
+            className="text-3xl font-bold"
+            abbreviated={false}
+          />
+        </div>
+      )}
     </div>
   );
 }
