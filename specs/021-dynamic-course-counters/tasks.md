@@ -17,8 +17,8 @@
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 [P] Create `src/domain/courses/contracts/course-metrics.contract.ts` with types and Zod schemas
-- [ ] T002 [P] Create `src/components/courses/counter.constants.ts` with animation constants
+- [x] T001 [P] Create `src/domain/courses/contracts/course-metrics.contract.ts` with types and Zod schemas
+- [x] T002 [P] Create `src/components/courses/counter.constants.ts` with animation constants
 
 ---
 
@@ -28,12 +28,12 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T003 Add counters entry to `cachePolicy` in `src/lib/cache/cache-policy.ts`
-- [ ] T004 Implement live count query in `src/domain/courses/infrastructure/db/next-courses.repository.ts`
-- [ ] T005 Implement counter cache helpers in `src/domain/courses/application/course-cache.ts`
-- [ ] T006 Implement `CourseMetricsService` in `src/domain/courses/application/course-metrics.service.ts`
-- [ ] T007 Implement unit tests for `CourseMetricsService` in `src/domain/courses/application/course-metrics.service.test.ts`
-- [ ] T008 Wire `CourseMetricsService` into factory in `src/domain/courses/factory/next-course-domain.factory.ts`
+- [x] T003 Add counters entry to `cachePolicy` in `src/lib/cache/cache-policy.ts`
+- [x] T004 Implement live count query in `src/domain/courses/infrastructure/db/next-courses.repository.ts`
+- [x] T005 Implement counter cache helpers in `src/domain/courses/application/course-cache.ts`
+- [x] T006 Implement `CourseMetricsService` in `src/domain/courses/application/course-metrics.service.ts`
+- [x] T007 Implement unit tests for `CourseMetricsService` in `src/domain/courses/application/course-metrics.service.test.ts`
+- [x] T008 Wire `CourseMetricsService` into factory in `src/domain/courses/factory/next-course-domain.factory.ts`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -45,13 +45,13 @@
 
 ### Implementation for User Story 1
 
-- [ ] T009 [P] [US1] Create `AnimatedCounter` component in `src/components/courses/animated-counter.tsx`
-- [ ] T010 [P] [US1] Create tests for `AnimatedCounter` in `src/components/courses/animated-counter.test.tsx`
-- [ ] T011 [US1] Create `CountersSkeleton` component in `src/components/courses/counters-skeleton.tsx`
-- [ ] T012 [US1] Create `CourseCountersDisplay` component in `src/components/courses/course-counters-display.tsx`
-- [ ] T013 [US1] Create `CourseCountersSection` component in `src/components/courses/course-counters-section.tsx`
-- [ ] T014 [US1] Implement `InlineEnrollmentBadge` component in `src/components/courses/inline-enrollment-badge.tsx`
-- [ ] T015 [US1] Integrate `CourseCountersSection` into `src/app/(platform)/courses/[slug]/page.tsx`
+- [x] T009 [P] [US1] Create `AnimatedCounter` component in `src/components/courses/animated-counter.tsx`
+- [x] T010 [P] [US1] Create tests for `AnimatedCounter` in `src/components/courses/animated-counter.test.tsx`
+- [x] T011 [US1] Create `CountersSkeleton` component in `src/components/courses/counters-skeleton.tsx`
+- [x] T012 [US1] Create `CourseCountersDisplay` component in `src/components/courses/course-counters-display.tsx`
+- [x] T013 [US1] Create `CourseCountersSection` component in `src/components/courses/course-counters-section.tsx`
+- [x] T014 [US1] Implement `InlineEnrollmentBadge` component in `src/components/courses/inline-enrollment-badge.tsx`
+- [x] T015 [US1] Integrate `CourseCountersSection` into `src/app/(platform)/courses/[slug]/page.tsx`
 
 **Checkpoint**: User Story 1 should be fully functional and testable independently.
 
@@ -63,12 +63,12 @@
 
 ### Implementation for User Story 2
 
-- [ ] T016 [P] [US2] Create `ActivityBadge` component in `src/components/courses/activity-badge.tsx`
-- [ ] T017 [P] [US2] Create tests for `ActivityBadge` in `src/components/courses/activity-badge.test.tsx`
-- [ ] T018 [US2] Create API route handler in `src/app/api/courses/[slug]/counters/route.ts`
-- [ ] T019 [US2] Create tests for API route in `src/app/api/courses/[slug]/counters/route.test.ts`
-- [ ] T020 [US2] Trigger cache invalidation in `src/domain/courses/application/next-course-enrollment.service.ts`
-- [ ] T021 [US2] Update `CourseCountersDisplay` in `src/components/courses/course-counters-display.tsx` to include TanStack Query polling
+- [x] T016 [P] [US2] Create `ActivityBadge` component in `src/components/courses/activity-badge.tsx`
+- [x] T017 [P] [US2] Create tests for `ActivityBadge` in `src/components/courses/activity-badge.test.tsx`
+- [x] T018 [US2] Create API route handler in `src/app/api/courses/[slug]/counters/route.ts`
+- [x] T019 [US2] Create tests for API route in `src/app/api/courses/[slug]/counters/route.test.ts`
+- [x] T020 [US2] Trigger cache invalidation in `src/domain/courses/application/next-course-enrollment.service.ts`
+- [x] T021 [US2] Update `CourseCountersDisplay` in `src/components/courses/course-counters-display.tsx` to include TanStack Query polling
 
 **Checkpoint**: User Stories 1 AND 2 should both work independently.
 
@@ -80,7 +80,7 @@
 
 ### Implementation for User Story 3
 
-- [ ] T022 [US3] Add fallback tests to `src/domain/courses/application/course-metrics.service.test.ts` to simulate Redis/DB outages.
+- [x] T022 [US3] Add fallback tests to `src/domain/courses/application/course-metrics.service.test.ts` to simulate Redis/DB outages.
 
 **Checkpoint**: All user stories should now be independently functional.
 
@@ -90,9 +90,9 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T023 [P] Run type-checking (`pnpm tsc --noEmit`) to verify strict typing
-- [ ] T024 [P] Run linter (`pnpm lint`) on all modified files
-- [ ] T025 Execute Playwright E2E tests for the course detail page
+- [x] T023 [P] Run type-checking (`pnpm tsc --noEmit`) to verify strict typing
+- [x] T024 [P] Run linter (`pnpm lint`) on all modified files
+- [x] T025 Execute Playwright E2E tests for the course detail page
 
 ---
 
