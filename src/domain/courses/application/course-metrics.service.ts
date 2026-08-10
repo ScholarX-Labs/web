@@ -1,5 +1,5 @@
 import { getCachedCourseMetrics, setCachedCourseMetrics, invalidateCourseMetricsCache } from "./course-cache";
-import { CourseMetricsSchema } from "../contracts/course-metrics.contract";
+import { CounterCacheEntrySchema } from "../contracts/course-metrics.contract";
 import type { CourseMetrics, CounterCacheEntry, CourseMetricsFallbackOptions } from "../contracts/course-metrics.contract";
 import type { NextCoursesRepository } from "../infrastructure/db/next-courses.repository";
 import { cachePolicy } from "@/lib/cache/cache-policy";
@@ -16,17 +16,18 @@ export class CourseMetricsService {
     // 1. Try cache
     const cached = await getCachedCourseMetrics(courseId);
     if (cached) {
-      const parsed = CourseMetricsSchema.safeParse(cached.metrics);
-      if (parsed.success && parsed.data.courseId === courseId) {
+      const parsed = CounterCacheEntrySchema.safeParse(cached);
+      if (parsed.success && parsed.data.metrics.courseId === courseId) {
+        const entry = parsed.data;
         const isStale =
-          Date.now() - new Date(cached.cachedAt).getTime() >
-          cached.ttlSeconds * 1000;
+          Date.now() - new Date(entry.cachedAt).getTime() >
+          entry.ttlSeconds * 1000;
 
         if (isStale) {
           this.triggerBackgroundRefresh(courseId);
         }
 
-        return { ...parsed.data, source: "cache" };
+        return { ...entry.metrics, source: "cache" };
       }
       // Invalid cache entry — fall through
     }
