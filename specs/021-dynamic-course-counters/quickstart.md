@@ -233,55 +233,51 @@ This ensures the counter cache is busted after every real enrollment event.
 
 ---
 
-## 7. Creating the API Route
+## 7. Existing API Route
 
-**File**: `src/app/api/courses/[slug]/counters/route.ts` (NEW)
+**File**: `src/app/api/courses/[courseId]/counters/route.ts`
+
+The route already exists and is keyed by `courseId` (not `slug`). It awaits the async params, resolves metrics through the domain service, and returns the metrics payload directly:
 
 ```typescript
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { createNextCourseDomain } from "@/domain/courses/factory/next-course-domain.factory";
-import { z } from "zod";
-
-const slugSchema = z.string().min(1).max(200);
+import { CourseMetricsSchema } from "@/domain/courses/contracts/course-metrics.contract";
 
 export async function GET(
-  _request: Request,
-  { params }: { params: { slug: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ courseId: string }> }
 ) {
-  const slugResult = slugSchema.safeParse(params.slug);
-  if (!slugResult.success) {
-    return NextResponse.json({ error: "invalid_params" }, { status: 400 });
-  }
-
   try {
+    const { courseId } = await params;
     const domain = createNextCourseDomain();
-    const course = await domain.catalog.getBySlug(slugResult.data);
-    if (!course) {
-      return NextResponse.json({ error: "not_found" }, { status: 404 });
-    }
 
-    const metrics = await domain.metrics.getCourseMetrics(
-      course.id,
-      course.studentsCount ?? 0
-    );
+    // Fast path: cached or DB read
+    const metrics = await domain.metrics.getCourseMetrics(courseId);
+
     if (!metrics) {
-      return NextResponse.json({ error: "service_unavailable" }, { status: 503 });
+      return NextResponse.json(
+        { error: "Course metrics not found" },
+        { status: 404 }
+      );
     }
 
+    return NextResponse.json(metrics);
+  } catch (error) {
+    console.error("[Counters API Error]", error);
     return NextResponse.json(
-      { data: metrics },
-      {
-        status: 200,
-        headers: {
-          "Cache-Control": "public, s-maxage=300, stale-while-revalidate=60",
-        },
-      }
+      { error: "Internal Server Error" },
+      { status: 500 }
     );
-  } catch {
-    return NextResponse.json({ error: "service_unavailable" }, { status: 503 });
   }
 }
 ```
+
+Contract notes:
+
+- **URL**: `GET /api/courses/{courseId}/counters`
+- **Request parameter**: `courseId` in the path segment. There is no body, no `slug` param, and no zod schema — the handler does **not** resolve the course via `catalog.getBySlug()` or use a `fallbackStudentsCount`. `getCourseMetrics` handles the fallback to the denormalized column internally.
+- **Responses**: `200` with the metrics JSON payload; `404` with `{ error: "Course metrics not found" }` when metrics cannot be resolved; `500` with `{ error: "Internal Server Error" }` for unexpected failures.
 
 ---
 
@@ -415,7 +411,7 @@ export function ActivityBadge({ increment, dismissAfterMs = COUNTER_ANIMATION.AC
           role="status"
           aria-live="polite"
         >
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          <span className={`w-1.5 h-1.5 rounded-full bg-emerald-500 ${shouldReduceMotion ? "" : "animate-pulse"}`} />
           +{increment} just now
         </motion.div>
       )}
