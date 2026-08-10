@@ -8,3 +8,4 @@ export * from "./course-progress-command.service";
 export * from "./course-progress-query.service";
 export * from "./course-progress.mapper";
 export * from "./certificate.service";
+export * from "./course-metrics.service";
