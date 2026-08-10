@@ -155,7 +155,7 @@ export const createAdminRepository = (): AdminRepository => {
       return results[0];
     },
 
-    async updateCourse(id: string, data: UpdateCourseInput, _expectedVersion: Date) {
+    async updateCourse(id: string, data: UpdateCourseInput, _expectedVersion?: Date) {
       const whereConditions = [eq(dbCourses.id, id)];
       if (_expectedVersion) {
         whereConditions.push(eq(dbCourses.updatedAt, _expectedVersion));
@@ -375,7 +375,7 @@ export const createAdminRepository = (): AdminRepository => {
       }
     },
 
-    async updateLesson(id: string, data: UpdateLessonInput, _expectedVersion: Date) {
+    async updateLesson(id: string, data: UpdateLessonInput, _expectedVersion?: Date) {
       const current = await db
         .select({ updatedAt: dbLessons.updatedAt })
         .from(dbLessons)
