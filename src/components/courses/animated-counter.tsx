@@ -1,9 +1,8 @@
 "use client";
 
 import { useReducedMotion, animate, useInView } from "framer-motion";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { AnimatedCounterProps } from "@/domain/courses/contracts/course-metrics.contract";
-import { COUNTER_ANIMATION } from "./counter.constants";
 import { cn } from "@/lib/utils";
 
 function formatNumber(value: number, abbreviated: boolean): string {
@@ -24,16 +23,16 @@ export function AnimatedCounter({
   const nodeRef = useRef<HTMLSpanElement>(null);
   const previousValueRef = useRef(0);
   const isInView = useInView(nodeRef, { once: true, margin: "0px 0px -50px 0px" });
+  const [displayValue, setDisplayValue] = useState(() => formatNumber(0, abbreviated));
 
   useEffect(() => {
-    const node = nodeRef.current;
-    if (!node || !isInView) return;
-
     if (shouldReduceMotion) {
-      node.textContent = formatNumber(value, abbreviated);
       previousValueRef.current = value;
       return;
     }
+
+    const node = nodeRef.current;
+    if (!node || !isInView) return;
 
     const controls = animate(previousValueRef.current, value, {
       duration: 3,
@@ -43,6 +42,7 @@ export function AnimatedCounter({
       },
       onComplete() {
         previousValueRef.current = value;
+        setDisplayValue(formatNumber(value, abbreviated));
       }
     });
 
@@ -53,7 +53,7 @@ export function AnimatedCounter({
     <div className={cn(layout === "inline" ? "inline-flex items-baseline gap-1" : "", className)} aria-live="polite" aria-atomic="true">
       <span className="sr-only">{formatNumber(value, abbreviated)}{suffix} {label}</span>
       <span className={cn("flex items-baseline gap-0 font-semibold", layout === "inline" ? "" : "")} aria-hidden="true">
-        <span ref={nodeRef}>{formatNumber(previousValueRef.current, abbreviated)}</span>
+        <span ref={nodeRef}>{shouldReduceMotion ? formatNumber(value, abbreviated) : displayValue}</span>
         <span>{suffix}</span>
       </span>
       {layout === "inline" ? (
