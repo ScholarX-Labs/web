@@ -90,6 +90,8 @@ export default async function CourseDetailPage({
           <CourseCountersSection 
             courseId={course.id} 
             fallbackStudentsCount={course.studentsCount ?? 0}
+            fallbackRating={course.rating ? Number(course.rating) : null}
+            fallbackTotalRatings={course.totalRatings}
             fallback={
               <CourseStaticCounters
                 rating={course.rating}
