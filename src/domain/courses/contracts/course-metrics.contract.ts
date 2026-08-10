@@ -11,8 +11,8 @@ import { z } from "zod";
 export const CourseMetricsSchema = z.object({
   courseId: z.string().uuid(),
   enrollmentCount: z.number().int().nonnegative(),
-  ratingCount: z.number().int().nonnegative(),
-  averageRating: z.number().min(0).max(5),
+  ratingCount: z.number().int().nonnegative().optional(),
+  averageRating: z.number().min(0).max(5).optional(),
   source: z.enum(["live", "cache", "fallback"]),
 });
 
@@ -21,6 +21,12 @@ export const CounterCacheEntrySchema = z.object({
   cachedAt: z.string().datetime(),
   ttlSeconds: z.number().positive(),
 });
+
+export interface CourseMetricsFallbackOptions {
+  enrollmentCount: number;
+  ratingCount?: number;
+  averageRating?: number;
+}
 
 export type CourseMetrics = z.infer<typeof CourseMetricsSchema>;
 export type CounterCacheEntry = z.infer<typeof CounterCacheEntrySchema>;
@@ -31,6 +37,7 @@ export interface AnimatedCounterProps {
   label: string;
   suffix?: string;    // e.g., "+" for social-proof "at least" framing
   abbreviated?: boolean; // true = 10K+, false = 10,000+
+  decimals?: number;
   className?: string;
 }
 
