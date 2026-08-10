@@ -152,7 +152,7 @@ const fallbackCount = course.studentsCount ?? 0;
 
 ## 5. API Route Response Schema
 
-**Endpoint**: `GET /api/courses/[slug]/counters`
+**Endpoint**: `GET /api/courses/[courseId]/counters`
 
 **Response body** (application/json):
 ```typescript
