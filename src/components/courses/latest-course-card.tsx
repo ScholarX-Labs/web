@@ -25,6 +25,7 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 import { useCourseSheetStore } from "@/stores/course-sheet.store";
 import { useEnrollIntentController } from "@/lib/enrollment/intent-controller";
 import { useTranslations } from "next-intl";
+import { AnimatedCounter } from "@/components/courses/animated-counter";
 
 interface LatestCourseCardProps {
   course: Course;
@@ -124,19 +125,27 @@ export function LatestCourseCard({
     >
       <Parallax3DWrapper
         className={cn(
-          "group relative bg-white rounded-[1.5rem] shadow-[0_2px_15px_rgba(0,0,0,0.06)] border border-gray-100/80 hover:border-hero-blue/20 flex flex-col h-full overflow-hidden",
+          "group relative p-[1.5px] bg-slate-100/80 rounded-[1.5rem] shadow-[0_2px_15px_rgba(0,0,0,0.06)] flex flex-col h-full overflow-hidden",
           className,
         )}
       >
-        {/* Subtle hover background glow */}
-        <div className="absolute inset-0 bg-linear-to-br from-hero-blue/4 via-transparent to-hero-orange/3 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-[1.5rem] pointer-events-none z-0" />
+        {/* The dynamic spinning gradient border */}
+        <div 
+          className="absolute inset-[-100%] bg-[conic-gradient(from_0deg,transparent_60%,#3b82f6_80%,#f97316_100%)] opacity-0 group-hover:opacity-100 transition-opacity duration-700 animate-spin pointer-events-none" 
+          style={{ animationDuration: '4s' }} 
+        />
 
-        <div
-          className="relative aspect-4/3 w-full rounded-t-[1.5rem] overflow-hidden shrink-0 z-10 group/image"
-          style={{ viewTransitionName: `course-thumbnail-${course.slug}` }}
-        >
-          <HoverMedia
-            thumbnail={course.thumbnail}
+        {/* Card Body - masks the center of the gradient */}
+        <div className="relative bg-white rounded-[calc(1.5rem-1.5px)] h-full w-full flex flex-col overflow-hidden z-10">
+          {/* Subtle hover background glow */}
+          <div className="absolute inset-0 bg-linear-to-br from-hero-blue/4 via-transparent to-hero-orange/3 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-[calc(1.5rem-1.5px)] pointer-events-none z-0" />
+
+          <div
+            className="relative aspect-4/3 w-full rounded-t-[calc(1.5rem-1.5px)] overflow-hidden shrink-0 z-10 group/image"
+            style={{ viewTransitionName: `course-thumbnail-${course.slug}` }}
+          >
+            <HoverMedia
+              thumbnail={course.thumbnail}
             title={course.title}
             videoPreviewUrl={course.videoPreviewUrl}
           />
@@ -200,16 +209,33 @@ export function LatestCourseCard({
               </div>
             )}
             {course.lessonsCount !== undefined && (
-              <div className="flex items-center gap-1.5 bg-blue-50/80 text-blue-700 px-2.5 py-1 rounded-md text-[11px] font-bold border border-blue-100/50">
+              <motion.div 
+                whileHover={{ scale: 1.05, y: -2 }}
+                className="flex items-center gap-1.5 bg-blue-500/15 text-blue-700 px-2.5 py-1 rounded-md text-[11px] font-bold border border-blue-500/30 shadow-[0_0_12px_-2px_rgba(59,130,246,0.4)] backdrop-blur-sm transition-all"
+              >
                 <BookOpen className="w-3.5 h-3.5" />
-                <span>{t("lessonsCount", { count: course.lessonsCount })}</span>
-              </div>
+                <AnimatedCounter 
+                  value={course.lessonsCount} 
+                  label={t("lessonsCount", { count: course.lessonsCount }).replace(/[\d,K\+]+/g, "").trim()}
+                  layout="inline"
+                  suffix=""
+                />
+              </motion.div>
             )}
             {course.studentsCount !== undefined && (
-              <div className="flex items-center gap-1.5 bg-orange-50/80 text-orange-700 px-2.5 py-1 rounded-md text-[11px] font-bold border border-orange-100/50">
+              <motion.div 
+                whileHover={{ scale: 1.05, y: -2 }}
+                className="flex items-center gap-1.5 bg-orange-500/15 text-orange-700 px-2.5 py-1 rounded-md text-[11px] font-bold border border-orange-500/30 shadow-[0_0_12px_-2px_rgba(249,115,22,0.4)] backdrop-blur-sm transition-all"
+              >
                 <Users className="w-3.5 h-3.5" />
-                <span>{t("studentsCount", { count: course.studentsCount })}</span>
-              </div>
+                <AnimatedCounter 
+                  value={course.studentsCount} 
+                  label={t("studentsCount", { count: course.studentsCount }).replace(/[\d,K\+]+/g, "").trim()}
+                  layout="inline"
+                  suffix="+"
+                  abbreviated={true}
+                />
+              </motion.div>
             )}
             <div
               className={cn(
@@ -324,6 +350,7 @@ export function LatestCourseCard({
               <ChevronRight className="w-3.5 h-3.5 transition-transform group-hover/link:translate-x-1" />
             </Link>
           </div>
+        </div>
         </div>
       </Parallax3DWrapper>
     </motion.div>
