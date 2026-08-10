@@ -7,14 +7,15 @@ interface CourseCountersSectionProps {
   courseId: string;
   fallbackStudentsCount: number;
   variant?: "default" | "hero";
+  fallback?: React.ReactNode;
 }
 
-async function CountersDataFetch({ courseId, fallbackStudentsCount, variant }: CourseCountersSectionProps) {
+async function CountersDataFetch({ courseId, fallbackStudentsCount, variant, fallback }: CourseCountersSectionProps) {
   const domain = createNextCourseDomain();
   const metrics = await domain.metrics.getCourseMetrics(courseId, fallbackStudentsCount);
 
   if (!metrics) {
-    return null; // Fallback entirely if we can't load data
+    return <>{fallback}</>; // Fallback entirely if we can't load data
   }
 
   return <CourseCountersDisplay initialMetrics={metrics} variant={variant} />;
@@ -24,10 +25,11 @@ export function CourseCountersSection({
   courseId,
   fallbackStudentsCount,
   variant = "default",
+  fallback,
 }: CourseCountersSectionProps) {
   return (
     <Suspense fallback={<CountersSkeleton variant={variant} />}>
-      <CountersDataFetch courseId={courseId} fallbackStudentsCount={fallbackStudentsCount} variant={variant} />
+      <CountersDataFetch courseId={courseId} fallbackStudentsCount={fallbackStudentsCount} variant={variant} fallback={fallback} />
     </Suspense>
   );
 }
