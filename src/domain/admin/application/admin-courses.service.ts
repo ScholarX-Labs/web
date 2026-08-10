@@ -50,7 +50,7 @@ export const createAdminCoursesService = (
     const course = await repo.updateCourse(
       id,
       parsed as UpdateCourseInput,
-      parsed.expectedVersion ? new Date(parsed.expectedVersion) : new Date(NaN),
+      parsed.expectedVersion ? new Date(parsed.expectedVersion) : undefined,
     );
     await invalidatePublicCourseListCache();
     await invalidatePublicCourseDetailCache({
