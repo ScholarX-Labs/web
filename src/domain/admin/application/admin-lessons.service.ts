@@ -50,7 +50,7 @@ export const createAdminLessonsService = (
     const lesson = await repo.updateLesson(
       id,
       parsed as UpdateLessonInput,
-      parsed.expectedVersion ? new Date(parsed.expectedVersion) : new Date(NaN),
+      parsed.expectedVersion ? new Date(parsed.expectedVersion) : undefined,
     );
     const course = existing.courseId ? await repo.getCourse(existing.courseId) : null;
     await invalidatePublicCourseListCache();
