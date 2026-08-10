@@ -21,7 +21,7 @@ export interface AdminRepository {
   listCourses(query: AdminCourseQuery): Promise<PaginatedData<any>>;
   getCourse(id: string): Promise<any>;
   createCourse(data: CreateCourseInput): Promise<any>;
-  updateCourse(id: string, data: UpdateCourseInput, expectedVersion: Date): Promise<any>;
+  updateCourse(id: string, data: UpdateCourseInput, expectedVersion?: Date): Promise<any>;
   updateCourseStatus(id: string, status: string): Promise<any>;
   archiveCourse(id: string): Promise<void>;
   enrollUser(courseId: string, email: string): Promise<void>;
@@ -30,7 +30,7 @@ export interface AdminRepository {
   listLessons(courseId: string): Promise<any[]>;
   getLesson(id: string): Promise<any>;
   createLesson(courseId: string, data: CreateLessonInput): Promise<any>;
-  updateLesson(id: string, data: UpdateLessonInput, expectedVersion: Date): Promise<any>;
+  updateLesson(id: string, data: UpdateLessonInput, expectedVersion?: Date): Promise<any>;
   toggleLessonVisibility(id: string): Promise<any>;
   archiveLesson(id: string): Promise<void>;
   reorderLessons(courseId: string, lessonIds: string[]): Promise<any[]>;
