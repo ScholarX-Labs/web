@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { createNextCourseDomain } from "@/domain/courses";
-import { CourseHero } from "./_components/course-hero";
+import { CourseHero, CourseStaticCounters } from "./_components/course-hero";
 import { CourseStickyCta } from "./_components/course-sticky-cta";
 import { CourseCurriculum } from "./_components/course-curriculum";
 import { CourseInstructor } from "./_components/course-instructor";
@@ -90,6 +90,13 @@ export default async function CourseDetailPage({
           <CourseCountersSection 
             courseId={course.id} 
             fallbackStudentsCount={course.studentsCount ?? 0}
+            fallback={
+              <CourseStaticCounters
+                rating={course.rating}
+                totalRatings={course.totalRatings}
+                studentsCount={course.studentsCount}
+              />
+            }
             variant="hero"
           />
         }
