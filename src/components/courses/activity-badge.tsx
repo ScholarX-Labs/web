@@ -10,10 +10,15 @@ export function ActivityBadge({
   dismissAfterMs = COUNTER_ANIMATION.ACTIVITY_BADGE_DISMISS_MS,
 }: ActivityBadgeProps) {
   const shouldReduceMotion = useReducedMotion();
+  const [prevIncrement, setPrevIncrement] = useState(increment);
   const [isVisible, setIsVisible] = useState(true);
 
-  useEffect(() => {
+  if (increment !== prevIncrement) {
+    setPrevIncrement(increment);
     setIsVisible(true);
+  }
+
+  useEffect(() => {
     const timer = setTimeout(() => {
       setIsVisible(false);
     }, dismissAfterMs);
