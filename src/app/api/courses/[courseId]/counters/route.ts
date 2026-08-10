@@ -21,24 +21,21 @@ export async function GET(
 
     if (!metrics) {
       return NextResponse.json(
-        { error: "not_found" },
+        { error: "Course metrics not found" },
         { status: 404 }
       );
     }
 
-    return NextResponse.json(
-      { data: metrics },
-      {
-        status: 200,
-        headers: {
-          "Cache-Control": "public, s-maxage=300, stale-while-revalidate=60",
-        },
-      }
-    );
+    return NextResponse.json(metrics, {
+      status: 200,
+      headers: {
+        "Cache-Control": "public, s-maxage=300, stale-while-revalidate=60",
+      },
+    });
   } catch (error) {
     console.error("[Counters API Error]", error);
     return NextResponse.json(
-      { error: "service_unavailable" },
+      { error: "Internal Server Error" },
       { status: 500 }
     );
   }
