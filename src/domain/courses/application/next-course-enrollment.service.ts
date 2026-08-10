@@ -13,6 +13,7 @@ import { ZodError } from "zod";
 import {
   invalidatePublicCourseDetailCache,
   invalidatePublicCourseListCache,
+  invalidateCourseMetricsCache,
 } from "@/domain/courses/application/course-cache";
 
 interface EnrollmentContext {
@@ -136,6 +137,7 @@ export class NextCourseEnrollmentService {
     });
     await invalidatePublicCourseListCache();
     await invalidatePublicCourseDetailCache({ courseId, slug: course.slug });
+    await invalidateCourseMetricsCache(courseId);
 
     return {
       requestId,
@@ -405,6 +407,7 @@ export class NextCourseEnrollmentService {
           });
           await invalidatePublicCourseListCache();
           await invalidatePublicCourseDetailCache({ courseId, slug: course.slug });
+          await invalidateCourseMetricsCache(courseId);
 
           return {
             ...application,
