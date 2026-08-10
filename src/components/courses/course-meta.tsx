@@ -1,10 +1,12 @@
-import { Clock, PlayCircle, Signal } from "lucide-react";
+import { Clock, PlayCircle, Signal, Users } from "lucide-react";
+import { InlineEnrollmentBadge } from "@/components/courses/inline-enrollment-badge";
 import { cn } from "@/lib/utils";
 
 interface CourseMetaProps {
   duration?: string;
   level?: "Beginner" | "Intermediate" | "Advanced" | string;
   videosCount?: number;
+  studentsCount?: number;
   className?: string;
 }
 
@@ -12,6 +14,7 @@ export function CourseMeta({
   duration,
   level,
   videosCount,
+  studentsCount,
   className,
 }: CourseMetaProps) {
   return (
@@ -40,6 +43,14 @@ export function CourseMeta({
           <PlayCircle className="h-3.5 w-3.5" />
           <span>{videosCount} lessons</span>
         </div>
+      )}
+
+      {studentsCount !== undefined && (
+        <InlineEnrollmentBadge 
+          count={studentsCount} 
+          label="enrolled" 
+          className="text-primary/80 font-medium" 
+        />
       )}
     </div>
   );
