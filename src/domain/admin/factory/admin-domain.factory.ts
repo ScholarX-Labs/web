@@ -8,20 +8,25 @@ import { createAdminInquiriesService } from "@/domain/admin/application/admin-in
 import { createAdminStatsService } from "@/domain/admin/application/admin-stats.service";
 import { createAdminReportsService } from "@/domain/admin/application/admin-reports.service";
 import { createAdminCashEnrollmentService } from "@/domain/admin/application/admin-cash-enrollment.service";
+import { CourseCountersSyncService } from "@/domain/admin/application/course-counters-sync.service";
 
 export const createAdminDomain = () => {
   const repo = createAdminRepository();
   const audit = createAuditLogger();
 
+  // Single instance shared across all services that mutate subscriptions or
+  // lessons. Centralises counter sync and cache invalidation responsibility.
+  const counterSync = new CourseCountersSyncService(repo);
+
   return {
-    courses: createAdminCoursesService(repo, audit),
-    lessons: createAdminLessonsService(repo, audit),
+    courses: createAdminCoursesService(repo, audit, counterSync),
+    lessons: createAdminLessonsService(repo, audit, counterSync),
     users: createAdminUsersService(repo, audit),
     subscriptions: createAdminSubscriptionsService(repo, audit),
     inquiries: createAdminInquiriesService(repo, audit),
     stats: createAdminStatsService(repo),
     reports: createAdminReportsService(repo),
-    cashEnrollment: createAdminCashEnrollmentService(repo, audit),
+    cashEnrollment: createAdminCashEnrollmentService(repo, audit, counterSync),
   };
 };
 
