@@ -90,6 +90,7 @@ export class CourseCountersSyncService {
     await Promise.all([
       invalidatePublicCourseListCache(),
       invalidatePublicCourseDetailCache({ courseId, slug }),
+      invalidateCourseMetricsCache(courseId),
     ]);
   }
 }
