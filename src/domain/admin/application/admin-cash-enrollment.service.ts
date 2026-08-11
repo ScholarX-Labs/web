@@ -5,10 +5,12 @@ import type { AdminSession } from "@/domain/admin/contracts/admin-types";
 import { CashEnrollmentSchema } from "@/domain/admin/contracts/admin-validation.schemas";
 import { AdminErrors } from "@/domain/admin/application/admin-errors";
 import type { AuditLogger } from "@/domain/admin/infrastructure/audit/audit-logger";
+import { CourseCountersSyncService } from "@/domain/admin/application/course-counters-sync.service";
 
 export const createAdminCashEnrollmentService = (
   repo: AdminRepository,
   audit: AuditLogger,
+  counterSync: CourseCountersSyncService,
 ) => ({
   async execute(session: AdminSession, data: unknown) {
     const parsed = CashEnrollmentSchema.parse(data);
@@ -66,6 +68,9 @@ export const createAdminCashEnrollmentService = (
       parsed.course.paymentMethod,
       parsed.course.paymentId,
     );
+
+    // Sync students_count and all related caches after cash enrollment
+    await counterSync.syncOnEnrollment(parsed.course.courseId, course.slug);
 
     await audit.log({
       adminId: session.userId,
