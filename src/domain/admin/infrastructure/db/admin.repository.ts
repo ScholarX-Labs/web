@@ -250,6 +250,48 @@ export const createAdminRepository = (): AdminRepository => {
         );
     },
 
+    async syncStudentsCount(courseId: string): Promise<number> {
+      // Recompute from source of truth: COUNT active subscriptions
+      const [countResult] = await db
+        .select({ count: count() })
+        .from(dbSubscriptions)
+        .where(
+          and(
+            eq(dbSubscriptions.courseId, courseId),
+            eq(dbSubscriptions.isActive, true),
+          ),
+        );
+      const accurate = countResult?.count ?? 0;
+
+      await db
+        .update(dbCourses)
+        .set({ studentsCount: accurate, updatedAt: new Date() })
+        .where(eq(dbCourses.id, courseId));
+
+      return accurate;
+    },
+
+    async syncLessonsCount(courseId: string): Promise<number> {
+      // Recompute from source of truth: COUNT non-archived lessons
+      const [countResult] = await db
+        .select({ count: count() })
+        .from(dbLessons)
+        .where(
+          and(
+            eq(dbLessons.courseId, courseId),
+            eq(dbLessons.isArchived, false),
+          ),
+        );
+      const accurate = countResult?.count ?? 0;
+
+      await db
+        .update(dbCourses)
+        .set({ lessonsCount: accurate, updatedAt: new Date() })
+        .where(eq(dbCourses.id, courseId));
+
+      return accurate;
+    },
+
     async listLessons(courseId: string) {
       return db
         .select()
