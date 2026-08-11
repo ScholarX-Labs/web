@@ -5,6 +5,7 @@ import { AdminError, AdminErrors } from "@/domain/admin/application/admin-errors
 import type { AdminRepository } from "@/domain/admin/contracts/admin-repository.contract";
 import type { AuditLogEntry } from "@/domain/admin/infrastructure/audit/audit-logger";
 import type { AdminSession } from "@/domain/admin/contracts/admin-types";
+import { CourseCountersSyncService } from "@/domain/admin/application/course-counters-sync.service";
 
 const makeSession = (overrides: Partial<AdminSession> = {}): AdminSession => ({
   userId: "admin-1",
@@ -40,6 +41,8 @@ const makeRepo = (overrides: Partial<AdminRepository> = {}): AdminRepository => 
   getUserByEmail: async () => null,
   setMustChangePassword: async () => undefined,
   enrollUserWithPayment: async () => ({ id: "enrollment-1" }),
+  syncStudentsCount: async () => 0,
+  syncLessonsCount: async () => 0,
   listEnrollmentsByCourse: async () => ({ items: [], pagination: { page: 1, limit: 20, total: 0, pages: 0 } }),
   listSubscriptions: async () => ({ items: [], pagination: { page: 1, limit: 20, total: 0, pages: 0 } }),
   getSubscription: async () => null,
@@ -62,17 +65,26 @@ const makeAudit = () => {
   };
 };
 
+const makeCounterSync = () => {
+  const calls: Array<{ method: string; courseId: string }> = [];
+  const stubRepo = makeRepo({
+    syncStudentsCount: async (courseId) => { calls.push({ method: "syncStudentsCount", courseId }); return 0; },
+    syncLessonsCount: async (courseId) => { calls.push({ method: "syncLessonsCount", courseId }); return 0; },
+  });
+  return Object.assign(new CourseCountersSyncService(stubRepo), { calls });
+};
+
 test("admin lessons service", async (t) => {
   await t.test("list delegates to repository", async () => {
     const repo = makeRepo({ listLessons: async (courseId) => [{ id: "l-1", courseId, title: "Lesson 1" }] });
-    const service = createAdminLessonsService(repo, makeAudit());
+    const service = createAdminLessonsService(repo, makeAudit(), makeCounterSync());
     const result = await service.list("c-1");
     assert.equal(result.length, 1);
     assert.equal(result[0].id, "l-1");
   });
 
   await t.test("getById throws notFound when missing", async () => {
-    const service = createAdminLessonsService(makeRepo(), makeAudit());
+    const service = createAdminLessonsService(makeRepo(), makeAudit(), makeCounterSync());
     await assert.rejects(() => service.getById("missing"), (err: AdminError) => {
       assert.equal(err.code, "RESOURCE_NOT_FOUND");
       return true;
@@ -81,7 +93,7 @@ test("admin lessons service", async (t) => {
 
   await t.test("getById returns lesson when found", async () => {
     const repo = makeRepo({ getLesson: async () => ({ id: "l-1", title: "Test Lesson" }) });
-    const service = createAdminLessonsService(repo, makeAudit());
+    const service = createAdminLessonsService(repo, makeAudit(), makeCounterSync());
     const lesson = await service.getById("l-1");
     assert.equal(lesson.title, "Test Lesson");
   });
@@ -109,7 +121,7 @@ test("admin lessons service", async (t) => {
       },
     });
 
-    const service = createAdminLessonsService(repo, makeAudit());
+    const service = createAdminLessonsService(repo, makeAudit(), makeCounterSync());
     const expectedVersion = "2026-08-10T20:00:00.000Z";
 
     // First update with expectedVersion succeeds
@@ -131,6 +143,48 @@ test("admin lessons service", async (t) => {
         assert.equal(err.statusCode, 409);
         return true;
       },
+    );
+  });
+
+  await t.test("create triggers syncOnLessonCreated", async () => {
+    const repo = makeRepo({
+      getCourse: async () => ({ id: "c-1", slug: "test-course" }),
+      createLesson: async (courseId, data) => ({ id: "l-new", courseId, ...data }),
+    });
+    const counterSync = makeCounterSync();
+    const service = createAdminLessonsService(repo, makeAudit(), counterSync);
+    await service.create(makeSession(), "c-1", { title: "New Lesson" });
+    assert.ok(
+      counterSync.calls.some((c) => c.method === "syncLessonsCount" && c.courseId === "c-1"),
+      "syncLessonsCount should be called after lesson creation",
+    );
+  });
+
+  await t.test("archive triggers syncOnLessonRemoved", async () => {
+    const repo = makeRepo({
+      getLesson: async () => ({ id: "l-1", courseId: "c-1", title: "Lesson" }),
+      getCourse: async () => ({ id: "c-1", slug: "test-course" }),
+    });
+    const counterSync = makeCounterSync();
+    const service = createAdminLessonsService(repo, makeAudit(), counterSync);
+    await service.archive(makeSession(), "l-1");
+    assert.ok(
+      counterSync.calls.some((c) => c.method === "syncLessonsCount" && c.courseId === "c-1"),
+      "syncLessonsCount should be called after lesson archive",
+    );
+  });
+
+  await t.test("toggleVisibility does NOT trigger counter sync", async () => {
+    const repo = makeRepo({
+      getLesson: async () => ({ id: "l-1", courseId: "c-1", isPrivate: false }),
+      getCourse: async () => ({ id: "c-1", slug: "test-course" }),
+    });
+    const counterSync = makeCounterSync();
+    const service = createAdminLessonsService(repo, makeAudit(), counterSync);
+    await service.toggleVisibility(makeSession(), "l-1");
+    assert.equal(
+      counterSync.calls.length, 0,
+      "No counter sync should occur for visibility toggle — it doesn't change lesson count",
     );
   });
 });
