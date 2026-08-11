@@ -251,45 +251,39 @@ export const createAdminRepository = (): AdminRepository => {
     },
 
     async syncStudentsCount(courseId: string): Promise<number> {
-      // Recompute from source of truth: COUNT active subscriptions
-      const [countResult] = await db
-        .select({ count: count() })
-        .from(dbSubscriptions)
-        .where(
-          and(
-            eq(dbSubscriptions.courseId, courseId),
-            eq(dbSubscriptions.isActive, true),
-          ),
-        );
-      const accurate = countResult?.count ?? 0;
-
-      await db
+      const [updated] = await db
         .update(dbCourses)
-        .set({ studentsCount: accurate, updatedAt: new Date() })
-        .where(eq(dbCourses.id, courseId));
+        .set({
+          studentsCount: sql<number>`(
+            SELECT COUNT(*)::integer
+            FROM ${dbSubscriptions}
+            WHERE ${dbSubscriptions.courseId} = ${courseId}
+              AND ${dbSubscriptions.isActive} = true
+          )`,
+          updatedAt: new Date(),
+        })
+        .where(eq(dbCourses.id, courseId))
+        .returning({ studentsCount: dbCourses.studentsCount });
 
-      return accurate;
+      return updated?.studentsCount ?? 0;
     },
 
     async syncLessonsCount(courseId: string): Promise<number> {
-      // Recompute from source of truth: COUNT non-archived lessons
-      const [countResult] = await db
-        .select({ count: count() })
-        .from(dbLessons)
-        .where(
-          and(
-            eq(dbLessons.courseId, courseId),
-            eq(dbLessons.isArchived, false),
-          ),
-        );
-      const accurate = countResult?.count ?? 0;
-
-      await db
+      const [updated] = await db
         .update(dbCourses)
-        .set({ lessonsCount: accurate, updatedAt: new Date() })
-        .where(eq(dbCourses.id, courseId));
+        .set({
+          lessonsCount: sql<number>`(
+            SELECT COUNT(*)::integer
+            FROM ${dbLessons}
+            WHERE ${dbLessons.courseId} = ${courseId}
+              AND ${dbLessons.isArchived} = false
+          )`,
+          updatedAt: new Date(),
+        })
+        .where(eq(dbCourses.id, courseId))
+        .returning({ lessonsCount: dbCourses.lessonsCount });
 
-      return accurate;
+      return updated?.lessonsCount ?? 0;
     },
 
     async listLessons(courseId: string) {
