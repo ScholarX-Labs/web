@@ -55,6 +55,18 @@ export interface AdminRepository {
     paymentMethod: string,
     paymentId?: string,
   ): Promise<any>;
+  /**
+   * Recomputes students_count from the source of truth (active subscriptions)
+   * and writes it atomically. Idempotent — safe to call multiple times.
+   * Returns the accurate count.
+   */
+  syncStudentsCount(courseId: string): Promise<number>;
+  /**
+   * Recomputes lessons_count from the source of truth (non-archived lessons)
+   * and writes it atomically. Idempotent — safe to call multiple times.
+   * Returns the accurate count.
+   */
+  syncLessonsCount(courseId: string): Promise<number>;
   listEnrollmentsByCourse(
     courseId: string,
     page?: number,
