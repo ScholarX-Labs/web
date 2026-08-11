@@ -3,6 +3,7 @@ import type { AdminSession, CreateCourseInput, EnrollmentQuery, UpdateCourseInpu
 import { CreateCourseSchema, CourseStatusSchema, EnrollUserSchema, EnrollWithPaymentSchema, UpdateCourseSchema } from "@/domain/admin/contracts/admin-validation.schemas";
 import { AdminErrors } from "@/domain/admin/application/admin-errors";
 import type { AuditLogger } from "@/domain/admin/infrastructure/audit/audit-logger";
+import { CourseCountersSyncService } from "@/domain/admin/application/course-counters-sync.service";
 import {
   invalidatePublicCourseDetailCache,
   invalidatePublicCourseListCache,
@@ -12,6 +13,7 @@ import { invalidateEnrollmentCache } from "@/domain/admin/application/admin-cach
 export const createAdminCoursesService = (
   repo: AdminRepository,
   audit: AuditLogger,
+  counterSync: CourseCountersSyncService,
 ) => ({
   async list(query: { page?: number; limit?: number; search?: string; status?: string; category?: string }) {
     return repo.listCourses(query);
@@ -126,8 +128,8 @@ export const createAdminCoursesService = (
     if (!course) throw AdminErrors.notFound("Course");
 
     await repo.enrollUser(courseId, parsed.email);
-    await invalidatePublicCourseListCache();
-    await invalidatePublicCourseDetailCache({ courseId, slug: course.slug });
+    // Sync students_count and all related caches after admin enrollment
+    await counterSync.syncOnEnrollment(courseId, course.slug);
 
     await audit.log({
       adminId: session.userId,
@@ -146,8 +148,8 @@ export const createAdminCoursesService = (
     if (!course) throw AdminErrors.notFound("Course");
 
     await repo.revokeUser(courseId, parsed.email);
-    await invalidatePublicCourseListCache();
-    await invalidatePublicCourseDetailCache({ courseId, slug: course.slug });
+    // Sync students_count and all related caches after admin revocation
+    await counterSync.syncOnRevocation(courseId, course.slug);
 
     await audit.log({
       adminId: session.userId,
@@ -188,9 +190,8 @@ export const createAdminCoursesService = (
       parsed.paymentId,
     );
 
-    await invalidatePublicCourseListCache();
-    await invalidatePublicCourseDetailCache({ courseId: parsed.courseId, slug: course.slug });
-    await invalidateEnrollmentCache(parsed.courseId);
+    // Sync students_count and all related caches after admin paid enrollment
+    await counterSync.syncOnEnrollment(parsed.courseId, course.slug);
 
     await audit.log({
       adminId: session.userId,
