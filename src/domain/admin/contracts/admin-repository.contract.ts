@@ -56,14 +56,16 @@ export interface AdminRepository {
     paymentId?: string,
   ): Promise<any>;
   /**
-   * Recomputes students_count from the source of truth (active subscriptions)
-   * and writes it atomically. Idempotent — safe to call multiple times.
+   * Atomically derives students_count from the source of truth (active subscriptions)
+   * and persists it using a single database statement. This prevents concurrent
+   * syncs from causing stale reads to overwrite newer values.
    * Returns the accurate count.
    */
   syncStudentsCount(courseId: string): Promise<number>;
   /**
-   * Recomputes lessons_count from the source of truth (non-archived lessons)
-   * and writes it atomically. Idempotent — safe to call multiple times.
+   * Atomically derives lessons_count from the source of truth (non-archived lessons)
+   * and persists it using a single database statement. This prevents concurrent
+   * syncs from causing stale reads to overwrite newer values.
    * Returns the accurate count.
    */
   syncLessonsCount(courseId: string): Promise<number>;
