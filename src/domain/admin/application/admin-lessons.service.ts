@@ -3,6 +3,7 @@ import type { AdminSession, CreateLessonInput, UpdateLessonInput } from "@/domai
 import { CreateLessonSchema, UpdateLessonSchema, ReorderLessonsSchema } from "@/domain/admin/contracts/admin-validation.schemas";
 import { AdminErrors } from "@/domain/admin/application/admin-errors";
 import type { AuditLogger } from "@/domain/admin/infrastructure/audit/audit-logger";
+import { CourseCountersSyncService } from "@/domain/admin/application/course-counters-sync.service";
 import {
   invalidatePublicCourseDetailCache,
   invalidatePublicCourseListCache,
@@ -11,6 +12,7 @@ import {
 export const createAdminLessonsService = (
   repo: AdminRepository,
   audit: AuditLogger,
+  counterSync: CourseCountersSyncService,
 ) => ({
   async list(courseId: string) {
     return repo.listLessons(courseId);
@@ -26,8 +28,9 @@ export const createAdminLessonsService = (
     const parsed = CreateLessonSchema.parse(data);
     const lesson = await repo.createLesson(courseId, parsed as CreateLessonInput);
     const course = await repo.getCourse(courseId);
-    await invalidatePublicCourseListCache();
-    await invalidatePublicCourseDetailCache({ courseId, slug: course?.slug });
+
+    // Sync lessons_count and invalidate public caches after lesson creation
+    await counterSync.syncOnLessonCreated(courseId, course?.slug);
 
     await audit.log({
       adminId: session.userId,
@@ -53,6 +56,7 @@ export const createAdminLessonsService = (
       parsed.expectedVersion ? new Date(parsed.expectedVersion) : undefined,
     );
     const course = existing.courseId ? await repo.getCourse(existing.courseId) : null;
+    // Update does not change lesson count — only invalidate caches
     await invalidatePublicCourseListCache();
     await invalidatePublicCourseDetailCache({
       courseId: existing.courseId,
@@ -79,6 +83,9 @@ export const createAdminLessonsService = (
 
     const lesson = await repo.toggleLessonVisibility(id);
     const course = existing.courseId ? await repo.getCourse(existing.courseId) : null;
+    // toggleVisibility changes isPrivate, not isArchived.
+    // lessons_count counts all non-archived lessons (regardless of visibility).
+    // No counter sync needed — only cache invalidation.
     await invalidatePublicCourseListCache();
     await invalidatePublicCourseDetailCache({
       courseId: existing.courseId,
@@ -105,11 +112,9 @@ export const createAdminLessonsService = (
 
     await repo.archiveLesson(id);
     const course = existing.courseId ? await repo.getCourse(existing.courseId) : null;
-    await invalidatePublicCourseListCache();
-    await invalidatePublicCourseDetailCache({
-      courseId: existing.courseId,
-      slug: course?.slug,
-    });
+
+    // Sync lessons_count and invalidate public caches after archiving a lesson
+    await counterSync.syncOnLessonRemoved(existing.courseId, course?.slug);
 
     await audit.log({
       adminId: session.userId,
@@ -126,6 +131,7 @@ export const createAdminLessonsService = (
     const parsed = ReorderLessonsSchema.parse(data);
     const lessons = await repo.reorderLessons(courseId, parsed.lessonIds);
     const course = await repo.getCourse(courseId);
+    // Reorder does not change lesson count — only invalidate caches
     await invalidatePublicCourseListCache();
     await invalidatePublicCourseDetailCache({ courseId, slug: course?.slug });
 

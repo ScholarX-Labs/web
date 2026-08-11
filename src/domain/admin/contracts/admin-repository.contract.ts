@@ -55,6 +55,20 @@ export interface AdminRepository {
     paymentMethod: string,
     paymentId?: string,
   ): Promise<any>;
+  /**
+   * Atomically derives students_count from the source of truth (active subscriptions)
+   * and persists it using a single database statement. This prevents concurrent
+   * syncs from causing stale reads to overwrite newer values.
+   * Returns the accurate count.
+   */
+  syncStudentsCount(courseId: string): Promise<number>;
+  /**
+   * Atomically derives lessons_count from the source of truth (non-archived lessons)
+   * and persists it using a single database statement. This prevents concurrent
+   * syncs from causing stale reads to overwrite newer values.
+   * Returns the accurate count.
+   */
+  syncLessonsCount(courseId: string): Promise<number>;
   listEnrollmentsByCourse(
     courseId: string,
     page?: number,

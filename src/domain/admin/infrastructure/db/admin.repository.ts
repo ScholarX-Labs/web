@@ -250,6 +250,42 @@ export const createAdminRepository = (): AdminRepository => {
         );
     },
 
+    async syncStudentsCount(courseId: string): Promise<number> {
+      const [updated] = await db
+        .update(dbCourses)
+        .set({
+          studentsCount: sql<number>`(
+            SELECT COUNT(*)::integer
+            FROM ${dbSubscriptions}
+            WHERE ${dbSubscriptions.courseId} = ${courseId}
+              AND ${dbSubscriptions.isActive} = true
+          )`,
+          updatedAt: new Date(),
+        })
+        .where(eq(dbCourses.id, courseId))
+        .returning({ studentsCount: dbCourses.studentsCount });
+
+      return updated?.studentsCount ?? 0;
+    },
+
+    async syncLessonsCount(courseId: string): Promise<number> {
+      const [updated] = await db
+        .update(dbCourses)
+        .set({
+          lessonsCount: sql<number>`(
+            SELECT COUNT(*)::integer
+            FROM ${dbLessons}
+            WHERE ${dbLessons.courseId} = ${courseId}
+              AND ${dbLessons.isArchived} = false
+          )`,
+          updatedAt: new Date(),
+        })
+        .where(eq(dbCourses.id, courseId))
+        .returning({ lessonsCount: dbCourses.lessonsCount });
+
+      return updated?.lessonsCount ?? 0;
+    },
+
     async listLessons(courseId: string) {
       return db
         .select()

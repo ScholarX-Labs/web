@@ -5,6 +5,7 @@ import { AdminError } from "@/domain/admin/application/admin-errors";
 import type { AdminRepository } from "@/domain/admin/contracts/admin-repository.contract";
 import type { AuditLogEntry } from "@/domain/admin/infrastructure/audit/audit-logger";
 import type { AdminSession } from "@/domain/admin/contracts/admin-types";
+import { CourseCountersSyncService } from "@/domain/admin/application/course-counters-sync.service";
 import { ZodError } from "zod";
 
 const makeSession = (overrides: Partial<AdminSession> = {}): AdminSession => ({
@@ -41,6 +42,8 @@ const makeRepo = (overrides: Partial<AdminRepository> = {}): AdminRepository => 
   getUserByEmail: async () => null,
   setMustChangePassword: async () => undefined,
   enrollUserWithPayment: async () => ({ id: "enrollment-1" }),
+  syncStudentsCount: async () => 0,
+  syncLessonsCount: async () => 0,
   listEnrollmentsByCourse: async () => ({ items: [], pagination: { page: 1, limit: 20, total: 0, pages: 0 } }),
   listSubscriptions: async () => ({ items: [], pagination: { page: 1, limit: 20, total: 0, pages: 0 } }),
   getSubscription: async () => null,
@@ -63,6 +66,19 @@ const makeAudit = () => {
   };
 };
 
+/**
+ * No-op mock for CourseCountersSyncService. Records calls for assertions.
+ * Passes a minimal repo stub since the service is constructed from one.
+ */
+const makeCounterSync = () => {
+  const calls: Array<{ method: string; courseId: string }> = [];
+  const stubRepo = makeRepo({
+    syncStudentsCount: async (courseId) => { calls.push({ method: "syncStudentsCount", courseId }); return 0; },
+    syncLessonsCount: async (courseId) => { calls.push({ method: "syncLessonsCount", courseId }); return 0; },
+  });
+  return Object.assign(new CourseCountersSyncService(stubRepo), { calls });
+};
+
 const validCreateInput = {
   title: "Test Course Title",
   slug: "test-course-title",
@@ -80,14 +96,14 @@ test("admin courses service", async (t) => {
   await t.test("list delegates to repository", async () => {
     const repo = makeRepo({ listCourses: async () => ({ items: [{ id: "1" }], pagination: { page: 1, limit: 20, total: 1, pages: 1 } }) });
     const audit = makeAudit();
-    const service = createAdminCoursesService(repo, audit);
+    const service = createAdminCoursesService(repo, audit, makeCounterSync());
     const result = await service.list({});
     assert.equal(result.items.length, 1);
     assert.equal(result.items[0].id, "1");
   });
 
   await t.test("getById throws notFound when missing", async () => {
-    const service = createAdminCoursesService(makeRepo(), makeAudit());
+    const service = createAdminCoursesService(makeRepo(), makeAudit(), makeCounterSync());
     await assert.rejects(() => service.getById("missing"), (err: AdminError) => {
       assert.equal(err.code, "RESOURCE_NOT_FOUND");
       return true;
@@ -96,20 +112,20 @@ test("admin courses service", async (t) => {
 
   await t.test("getById returns course when found", async () => {
     const repo = makeRepo({ getCourse: async () => ({ id: "c-1", title: "Test" }) });
-    const service = createAdminCoursesService(repo, makeAudit());
+    const service = createAdminCoursesService(repo, makeAudit(), makeCounterSync());
     const course = await service.getById("c-1");
     assert.equal(course.title, "Test");
   });
 
   await t.test("create validates input (throws ZodError for missing required fields)", async () => {
-    const service = createAdminCoursesService(makeRepo(), makeAudit());
+    const service = createAdminCoursesService(makeRepo(), makeAudit(), makeCounterSync());
     await assert.rejects(() => service.create(makeSession(), {}), ZodError);
   });
 
   await t.test("create writes audit log", async () => {
     const repo = makeRepo({ createCourse: async (data) => ({ id: "c-new", ...data, slug: "test-course-title" }) });
     const audit = makeAudit();
-    const service = createAdminCoursesService(repo, audit);
+    const service = createAdminCoursesService(repo, audit, makeCounterSync());
     await service.create(makeSession(), validCreateInput);
     assert.equal(audit.logs.length, 1);
     assert.equal(audit.logs[0].action, "course.create");
@@ -118,7 +134,7 @@ test("admin courses service", async (t) => {
 
   await t.test("update throws notFound when missing", async () => {
     const repo = makeRepo({ getCourse: async () => null, updateCourse: async () => null });
-    const service = createAdminCoursesService(repo, makeAudit());
+    const service = createAdminCoursesService(repo, makeAudit(), makeCounterSync());
     await assert.rejects(() => service.update(makeSession(), "missing", validUpdateInput), (err: AdminError) => {
       assert.equal(err.code, "RESOURCE_NOT_FOUND");
       return true;
@@ -127,7 +143,7 @@ test("admin courses service", async (t) => {
 
   await t.test("update validates input (throws ZodError for invalid data)", async () => {
     const repo = makeRepo({ getCourse: async () => ({ id: "c-1" }) });
-    const service = createAdminCoursesService(repo, makeAudit());
+    const service = createAdminCoursesService(repo, makeAudit(), makeCounterSync());
     await assert.rejects(() => service.update(makeSession(), "c-1", { title: "ab" }), ZodError);
   });
 
@@ -138,7 +154,7 @@ test("admin courses service", async (t) => {
       updateCourse: async (id, data) => ({ ...existing, ...data }),
     });
     const audit = makeAudit();
-    const service = createAdminCoursesService(repo, audit);
+    const service = createAdminCoursesService(repo, audit, makeCounterSync());
     await service.update(makeSession(), "c-1", validUpdateInput);
     assert.equal(audit.logs.length, 1);
     assert.equal(audit.logs[0].before?.title, "Old Title");
@@ -148,7 +164,7 @@ test("admin courses service", async (t) => {
   await t.test("updateStatus writes audit log", async () => {
     const repo = makeRepo({ getCourse: async () => ({ id: "c-1", status: "draft" }) });
     const audit = makeAudit();
-    const service = createAdminCoursesService(repo, audit);
+    const service = createAdminCoursesService(repo, audit, makeCounterSync());
     await service.updateStatus(makeSession(), "c-1", { status: "active" });
     assert.equal(audit.logs.length, 1);
     assert.equal(audit.logs[0].before?.status, "draft");
@@ -156,7 +172,7 @@ test("admin courses service", async (t) => {
   });
 
   await t.test("archive throws notFound when missing", async () => {
-    const service = createAdminCoursesService(makeRepo(), makeAudit());
+    const service = createAdminCoursesService(makeRepo(), makeAudit(), makeCounterSync());
     await assert.rejects(() => service.archive(makeSession(), "missing"), (err: AdminError) => {
       assert.equal(err.code, "RESOURCE_NOT_FOUND");
       return true;
@@ -166,7 +182,7 @@ test("admin courses service", async (t) => {
   await t.test("archive writes audit log", async () => {
     const repo = makeRepo({ getCourse: async () => ({ id: "c-1", status: "active" }) });
     const audit = makeAudit();
-    const service = createAdminCoursesService(repo, audit);
+    const service = createAdminCoursesService(repo, audit, makeCounterSync());
     await service.archive(makeSession(), "c-1");
     assert.equal(audit.logs.length, 1);
     assert.equal(audit.logs[0].action, "course.archive");
@@ -175,17 +191,40 @@ test("admin courses service", async (t) => {
 
   await t.test("enrollUser validates input (throws ZodError for missing email)", async () => {
     const repo = makeRepo({ getCourse: async () => ({ id: "c-1" }) });
-    const service = createAdminCoursesService(repo, makeAudit());
+    const service = createAdminCoursesService(repo, makeAudit(), makeCounterSync());
     await assert.rejects(() => service.enrollUser(makeSession(), "c-1", {}), ZodError);
   });
 
   await t.test("enrollUser writes audit log", async () => {
     const repo = makeRepo({ getCourse: async () => ({ id: "c-1" }) });
     const audit = makeAudit();
-    const service = createAdminCoursesService(repo, audit);
+    const counterSync = makeCounterSync();
+    const service = createAdminCoursesService(repo, audit, counterSync);
     await service.enrollUser(makeSession(), "c-1", validEnrollInput);
     assert.equal(audit.logs.length, 1);
     assert.equal(audit.logs[0].action, "course.enroll_user");
+  });
+
+  await t.test("enrollUser triggers counter sync", async () => {
+    const repo = makeRepo({ getCourse: async () => ({ id: "c-1", slug: "test-course" }) });
+    const counterSync = makeCounterSync();
+    const service = createAdminCoursesService(repo, makeAudit(), counterSync);
+    await service.enrollUser(makeSession(), "c-1", validEnrollInput);
+    assert.ok(
+      counterSync.calls.some((c) => c.method === "syncStudentsCount" && c.courseId === "c-1"),
+      "syncStudentsCount should be called with the correct courseId",
+    );
+  });
+
+  await t.test("revokeUser triggers counter sync", async () => {
+    const repo = makeRepo({ getCourse: async () => ({ id: "c-1", slug: "test-course" }) });
+    const counterSync = makeCounterSync();
+    const service = createAdminCoursesService(repo, makeAudit(), counterSync);
+    await service.revokeUser(makeSession(), "c-1", validEnrollInput);
+    assert.ok(
+      counterSync.calls.some((c) => c.method === "syncStudentsCount" && c.courseId === "c-1"),
+      "syncStudentsCount should be called on revocation",
+    );
   });
 });
 
