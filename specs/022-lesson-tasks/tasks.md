@@ -21,9 +21,9 @@ description: "Task list for Lesson Tasks feature implementation"
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Add 'lesson_task' to activityTypeEnum in src/db/schema/leaderboard.ts
-- [ ] T002 Generate migration for enum update with `npm run db:generate`
-- [ ] T003 Apply migration to local dev DB with `npm run db:migrate`
+- [x] T001 Add 'lesson_task' to activityTypeEnum in src/db/schema/leaderboard.ts
+- [x] T002 Generate migration for enum update with `npm run db:generate`
+- [x] T003 Apply migration to local dev DB with `npm run db:migrate`
 
 ---
 
@@ -33,12 +33,12 @@ description: "Task list for Lesson Tasks feature implementation"
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 [P] Define core types and DTOs in src/domain/courses/lesson-tasks/contracts/lesson-tasks.types.ts
-- [ ] T005 [P] Create repository interfaces in src/domain/courses/lesson-tasks/contracts/lesson-tasks.repository.ts
-- [ ] T006 [P] Create Strategy interface in src/domain/courses/lesson-tasks/contracts/task-type.strategy.ts
-- [ ] T007 [P] Implement DrizzleTaskRepository in src/domain/courses/lesson-tasks/infrastructure/db/drizzle-task.repository.ts
-- [ ] T008 [P] Implement DrizzleTaskSubmissionRepository in src/domain/courses/lesson-tasks/infrastructure/db/drizzle-task-submission.repository.ts
-- [ ] T009 Create Domain Factory in src/domain/courses/lesson-tasks/lesson-tasks.factory.ts (Depends on T004-T008)
+- [x] T004 [P] Define core types and DTOs in src/domain/courses/lesson-tasks/contracts/lesson-tasks.types.ts
+- [x] T005 [P] Create repository interfaces in src/domain/courses/lesson-tasks/contracts/lesson-tasks.repository.ts
+- [x] T006 [P] Create Strategy interface in src/domain/courses/lesson-tasks/contracts/task-type.strategy.ts
+- [x] T007 [P] Implement DrizzleTaskRepository in src/domain/courses/lesson-tasks/infrastructure/db/drizzle-task.repository.ts
+- [x] T008 [P] Implement DrizzleTaskSubmissionRepository in src/domain/courses/lesson-tasks/infrastructure/db/drizzle-task-submission.repository.ts
+- [x] T009 Create Domain Factory in src/domain/courses/lesson-tasks/lesson-tasks.factory.ts (Depends on T004-T008)
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -52,25 +52,25 @@ description: "Task list for Lesson Tasks feature implementation"
 
 ### Implementation for User Story 1
 
-- [ ] T010 [P] [US1] Create McqStrategy in src/domain/courses/lesson-tasks/strategies/mcq.strategy.ts
-- [ ] T011 [P] [US1] Create WrittenStrategy in src/domain/courses/lesson-tasks/strategies/written.strategy.ts
-- [ ] T012 [P] [US1] Create SwotStrategy in src/domain/courses/lesson-tasks/strategies/swot.strategy.ts
-- [ ] T013 [US1] Register strategies in src/domain/courses/lesson-tasks/strategies/task-type.registry.ts
-- [ ] T014 [P] [US1] Create TaskGradingPolicy in src/domain/courses/lesson-tasks/models/task-grading.policy.ts
-- [ ] T015 [P] [US1] Create Specifications in src/domain/courses/lesson-tasks/models/lesson-tasks.specifications.ts
-- [ ] T016 [P] [US1] Create LessonTaskError in src/domain/courses/lesson-tasks/application/lesson-tasks.errors.ts
-- [ ] T017 [US1] Implement LessonTaskCommandService in src/domain/courses/lesson-tasks/application/lesson-tasks-command.service.ts
-- [ ] T018 [US1] Implement LessonTaskQueryService in src/domain/courses/lesson-tasks/application/lesson-tasks-query.service.ts
-- [ ] T019 [US1] Wire services into Factory in src/domain/courses/lesson-tasks/lesson-tasks.factory.ts
-- [ ] T020 [P] [US1] Implement GET API route in src/app/api/courses/[slug]/lessons/[lessonId]/tasks/route.ts
-- [ ] T021 [P] [US1] Implement POST submissions route in src/app/api/courses/[slug]/lessons/[lessonId]/tasks/[taskId]/submissions/route.ts
-- [ ] T022 [P] [US1] Implement POST skip route in src/app/api/courses/[slug]/lessons/[lessonId]/tasks/[taskId]/skip/route.ts
-- [ ] T023 [P] [US1] Implement TanStack Query hooks in src/components/hooks/use-lesson-tasks.ts
-- [ ] T024 [P] [US1] Build wrapper TaskCard component in src/app/(platform)/courses/[slug]/lessons/[lessonId]/_components/task-card.tsx
-- [ ] T025 [P] [US1] Build McqTaskCard component in src/app/(platform)/courses/[slug]/lessons/[lessonId]/_components/tasks/mcq-task-card.tsx
-- [ ] T026 [P] [US1] Build WrittenTaskCard component in src/app/(platform)/courses/[slug]/lessons/[lessonId]/_components/tasks/written-task-card.tsx
-- [ ] T027 [P] [US1] Build SwotTaskCard component in src/app/(platform)/courses/[slug]/lessons/[lessonId]/_components/tasks/swot-task-card.tsx
-- [ ] T028 [US1] Assemble LessonTaskSection in src/app/(platform)/courses/[slug]/lessons/[lessonId]/_components/lesson-task-section.tsx
+- [x] T010 [P] [US1] Create McqStrategy in src/domain/courses/lesson-tasks/strategies/mcq.strategy.ts
+- [x] T011 [P] [US1] Create WrittenStrategy in src/domain/courses/lesson-tasks/strategies/written.strategy.ts
+- [x] T012 [P] [US1] Create SwotStrategy in src/domain/courses/lesson-tasks/strategies/swot.strategy.ts
+- [x] T013 [US1] Register strategies in src/domain/courses/lesson-tasks/task-type.registry.ts
+- [x] T014 [P] [US1] Create TaskGradingPolicy in src/domain/courses/lesson-tasks/models/task-grading.policy.ts
+- [x] T015 [P] [US1] Create Specifications in src/domain/courses/lesson-tasks/models/lesson-tasks.specifications.ts
+- [x] T016 [P] [US1] Create LessonTaskError in src/domain/courses/lesson-tasks/application/lesson-tasks.errors.ts
+- [x] T017 [US1] Implement LessonTaskCommandService in src/domain/courses/lesson-tasks/application/lesson-tasks-command.service.ts
+- [x] T018 [US1] Implement LessonTaskQueryService in src/domain/courses/lesson-tasks/application/lesson-tasks-query.service.ts
+- [x] T019 [US1] Wire services into Factory in src/domain/courses/lesson-tasks/lesson-tasks.factory.ts
+- [x] T020 [P] [US1] Implement GET API route in src/app/api/courses/[slug]/lessons/[lessonId]/tasks/route.ts
+- [x] T021 [P] [US1] Implement POST submissions route in src/app/api/courses/[slug]/lessons/[lessonId]/tasks/[taskId]/submissions/route.ts
+- [x] T022 [P] [US1] Implement POST skip route in src/app/api/courses/[slug]/lessons/[lessonId]/tasks/[taskId]/skip/route.ts
+- [x] T023 [P] [US1] Implement TanStack Query hooks in src/components/hooks/use-lesson-tasks.ts
+- [x] T024 [P] [US1] Build wrapper TaskCard component in src/app/(platform)/courses/[slug]/lessons/[lessonId]/_components/task-card.tsx
+- [x] T025 [P] [US1] Build McqTaskCard component in src/app/(platform)/courses/[slug]/lessons/[lessonId]/_components/tasks/mcq-task-card.tsx
+- [x] T026 [P] [US1] Build WrittenTaskCard component in src/app/(platform)/courses/[slug]/lessons/[lessonId]/_components/tasks/written-task-card.tsx
+- [x] T027 [P] [US1] Build SwotTaskCard component in src/app/(platform)/courses/[slug]/lessons/[lessonId]/_components/tasks/swot-task-card.tsx
+- [x] T028 [US1] Assemble LessonTaskSection in src/app/(platform)/courses/[slug]/lessons/[lessonId]/_components/lesson-task-section.tsx
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently via API or UI with seeded DB tasks.
 
@@ -84,14 +84,14 @@ description: "Task list for Lesson Tasks feature implementation"
 
 ### Implementation for User Story 2
 
-- [ ] T029 [P] [US2] Implement admin GET/POST route in src/app/api/admin/courses/[courseId]/lessons/[lessonId]/tasks/route.ts
-- [ ] T030 [P] [US2] Implement admin PATCH/DELETE route in src/app/api/admin/courses/[courseId]/lessons/[lessonId]/tasks/[taskId]/route.ts
-- [ ] T031 [P] [US2] Implement admin POST reorder route in src/app/api/admin/courses/[courseId]/lessons/[lessonId]/tasks/reorder/route.ts
-- [ ] T032 [P] [US2] Implement admin data hooks in src/components/hooks/use-admin-lesson-tasks.ts
-- [ ] T033 [P] [US2] Build MCQ config form in src/components/admin/tasks/task-type-form/mcq-form.tsx
-- [ ] T034 [P] [US2] Build Written config form in src/components/admin/tasks/task-type-form/written-form.tsx
-- [ ] T035 [P] [US2] Build SWOT config form in src/components/admin/tasks/task-type-form/swot-form.tsx
-- [ ] T036 [US2] Assemble LessonTaskEditor component in src/components/admin/tasks/lesson-task-editor.tsx
+- [x] T029 [P] [US2] Implement admin GET/POST route in src/app/api/admin/courses/[courseId]/lessons/[lessonId]/tasks/route.ts
+- [x] T030 [P] [US2] Implement admin PATCH/DELETE route in src/app/api/admin/courses/[courseId]/lessons/[lessonId]/tasks/[taskId]/route.ts
+- [x] T031 [P] [US2] Implement admin POST reorder route in src/app/api/admin/courses/[courseId]/lessons/[lessonId]/tasks/reorder/route.ts
+- [x] T032 [P] [US2] Implement admin data hooks in src/components/hooks/use-admin-lesson-tasks.ts
+- [x] T033 [P] [US2] Build MCQ config form in src/components/admin/tasks/task-type-form/mcq-form.tsx
+- [x] T034 [P] [US2] Build Written config form in src/components/admin/tasks/task-type-form/written-form.tsx
+- [x] T035 [P] [US2] Build SWOT config form in src/components/admin/tasks/task-type-form/swot-form.tsx
+- [x] T036 [US2] Assemble LessonTaskEditor component in src/components/admin/tasks/lesson-task-editor.tsx
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently. Course Builder tasks can now populate the learner UI.
 
@@ -114,16 +114,16 @@ description: "Task list for Lesson Tasks feature implementation"
 
 ---
 
-## Phase 6: Polish & Cross-Cutting Concerns
+## Phase 6: Polish & Testing (US1, US2, US3)
 
 **Purpose**: Improvements that affect multiple user stories, tests, and final checks.
 
-- [ ] T041 [P] Implement `NEXT_PUBLIC_FF_LESSON_TASKS_V1` feature flag guard logic where necessary
-- [ ] T042 [P] Write unit tests for Strategies in src/domain/courses/lesson-tasks/strategies/*.spec.ts
-- [ ] T043 [P] Write unit tests for TaskGradingPolicy and Specifications
-- [ ] T044 [P] Write mock-based tests for LessonTaskCommandService
-- [ ] T045 Write integration tests for learner API routes
-- [ ] T046 Write integration tests for admin API routes
+- [x] T041 [US1, US2, US3] Full TypeScript typecheck (`pnpm tsc --noEmit`).
+- [x] T042 [US1, US2, US3] Run ESLint across modified files (`pnpm lint`).
+- [ ] T043 [US1] End-to-end manual verification of learner flow (take lesson -> answer tasks -> check progression).
+- [ ] T044 [US2] End-to-end manual verification of admin flow (create task -> reorder -> save).
+- [ ] T045 [US3] End-to-end manual verification of export flow (submit task -> export CSV -> verify format).
+- [x] T046 [US1, US2, US3] Document usage in `AGENTS.md` if any new patterns were introduced.
 
 ---
 

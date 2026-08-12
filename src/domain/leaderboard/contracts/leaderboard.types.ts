@@ -6,7 +6,8 @@ export type LeaderboardActivityType =
   | "forum_post"
   | "assignment_submit"
   | "lesson_completion"
-  | "course_completion";
+  | "course_completion"
+  | "lesson_task";
 
 export type LeaderboardActivityCategory =
   | "quizzesAndExams"
@@ -20,6 +21,7 @@ export const ACTIVITY_CATEGORY_MAP: Record<LeaderboardActivityType, LeaderboardA
   assignment_submit: "participation",
   lesson_completion: "courseCompletion",
   course_completion: "courseCompletion",
+  lesson_task: "participation",
 };
 
 export const CATEGORY_WEIGHTS: Record<LeaderboardActivityCategory, number> = {

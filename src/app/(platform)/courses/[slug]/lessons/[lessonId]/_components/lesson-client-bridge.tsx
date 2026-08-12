@@ -7,6 +7,7 @@ import { VideoPlayer } from "./video-player";
 import { VideoPlayerSkeleton } from "./video-player-skeleton";
 import { VideoErrorDisplay } from "./video-error-display";
 import { LessonMeta } from "./lesson-meta";
+import { LessonTaskSection } from "./lesson-task-section";
 import { LessonSidebar } from "./lesson-sidebar";
 import { useUILayoutStore } from "@/store/ui-layout-store";
 import { cn } from "@/lib/utils";
@@ -358,6 +359,9 @@ export function LessonClientBridge({
             onResume={handleResume}
             isCompleted={isLessonCompleted}
           />
+          
+          {/* Lesson Tasks */}
+          <LessonTaskSection courseId={courseId} lessonId={lessonId} />
         </div>
 
         {/* ── RIGHT: CURRICULUM SIDEBAR ───────────────────── */}

@@ -9,6 +9,7 @@ export const activityTypeEnum = pgEnum("activity_type", [
   "assignment_submit",
   "lesson_completion",
   "course_completion",
+  "lesson_task",
 ]);
 
 export const pointEvents = pgTable(
