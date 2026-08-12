@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useAdminLessonTasks } from "@/components/hooks/use-admin-lesson-tasks";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -34,6 +35,11 @@ export function LessonTaskEditor({ courseId, lessonId }: LessonTaskEditorProps) 
   const [config, setConfig] = useState<Record<string, unknown>>({});
 
   const handleCreate = async () => {
+    if (!title.trim()) {
+      toast.error("Title is required");
+      return;
+    }
+    
     try {
       await createTask({
         type,
@@ -49,7 +55,9 @@ export function LessonTaskEditor({ courseId, lessonId }: LessonTaskEditorProps) 
       setTitle("");
       setInstructions("");
       setConfig({});
-    } catch (error) {
+      toast.success("Task created successfully");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to create task");
       console.error("Failed to create task", error);
     }
   };
@@ -65,11 +73,11 @@ export function LessonTaskEditor({ courseId, lessonId }: LessonTaskEditorProps) 
   const renderConfigForm = () => {
     switch (type) {
       case "mcq":
-        return <McqForm config={config} onChange={setConfig} />;
+        return <McqForm config={config as any} onChange={setConfig} />;
       case "written":
-        return <WrittenForm config={config} onChange={setConfig} />;
+        return <WrittenForm config={config as any} onChange={setConfig} />;
       case "swot":
-        return <SwotForm config={config} onChange={setConfig} />;
+        return <SwotForm config={config as any} onChange={setConfig} />;
       default:
         return null;
     }

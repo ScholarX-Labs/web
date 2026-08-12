@@ -24,7 +24,8 @@ export function useAdminLessonTasks(courseId: string, lessonId: string) {
         body: JSON.stringify(payload),
       });
       if (!res.ok) {
-        throw new Error("Failed to create task");
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || "Failed to create task");
       }
       return res.json();
     },
