@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ChevronLeft, ChevronRight, BookOpen, Clock,
   Bookmark, MoreHorizontal, Check, Link2,
-  Flag, NotebookPen, Gauge, Plus
+  Flag, NotebookPen, Gauge, Plus, ListChecks
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -31,6 +31,9 @@ interface LessonMetaProps {
   resumePoint?: number | null;
   onResume?: (position: number) => void;
   isCompleted?: boolean;
+  hasTasks?: boolean;
+  tasksCompleted?: boolean;
+  onOpenTasks?: () => void;
 }
 
 // ── Inline Toast ───────────────────────────────────────────────────────────────
@@ -126,6 +129,9 @@ export function LessonMeta({
   resumePoint,
   onResume,
   isCompleted = false,
+  hasTasks = false,
+  tasksCompleted = false,
+  onOpenTasks,
 }: LessonMetaProps) {
   const idx = Number(lessonIndex) || 0;
   const total = Number(totalLessons) || 1;
@@ -307,6 +313,33 @@ export function LessonMeta({
                 <Plus className="w-5 h-5 group-hover:scale-110 transition-transform" />
               </AnimatedButton>
             </ContextTooltip>
+
+
+            {hasTasks && (
+              <ContextTooltip content="Lesson Tasks">
+                <AnimatedButton
+                  onClick={() => onOpenTasks?.()}
+                  className={cn(
+                    "relative w-11 h-11 rounded-2xl flex items-center justify-center transition-all duration-500 shadow-lg",
+                    tasksCompleted
+                      ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-emerald-500/10"
+                      : "bg-indigo-600 text-white shadow-indigo-500/20"
+                  )}
+                >
+                  {tasksCompleted ? (
+                    <Check className="w-5 h-5" />
+                  ) : (
+                    <ListChecks className="w-5 h-5" />
+                  )}
+                  {!tasksCompleted && (
+                    <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-indigo-500 border-2 border-[hsl(222.2,84%,4.9%)]"></span>
+                    </span>
+                  )}
+                </AnimatedButton>
+              </ContextTooltip>
+            )}
 
             <ContextTooltip content="More Options">
               <div className="relative">

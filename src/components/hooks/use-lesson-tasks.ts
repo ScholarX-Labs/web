@@ -4,9 +4,9 @@ interface LessonTask {
   id: string;
   lessonId: string;
   title: string;
-  description: string | null;
-  taskType: string;
-  isMandatory: boolean;
+  instructions: string | null;
+  type: string;
+  isOptional: boolean;
   pointsAwarded: number;
   status: string;
   sortIndex: number;

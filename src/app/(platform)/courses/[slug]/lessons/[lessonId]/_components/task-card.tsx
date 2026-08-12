@@ -14,7 +14,7 @@ interface TaskCardProps {
 
 export function TaskCard({ task, courseId, lessonId }: TaskCardProps) {
   const renderTaskContent = () => {
-    switch (task.taskType) {
+    switch (task.type) {
       case "mcq":
         return <McqTaskCard task={task} courseId={courseId} lessonId={lessonId} />;
       case "written":
@@ -22,7 +22,7 @@ export function TaskCard({ task, courseId, lessonId }: TaskCardProps) {
       case "swot":
         return <SwotTaskCard task={task} courseId={courseId} lessonId={lessonId} />;
       default:
-        return <div>Unsupported task type: {task.taskType}</div>;
+        return <div>Unsupported task type: {task.type}</div>;
     }
   };
 
@@ -33,12 +33,12 @@ export function TaskCard({ task, courseId, lessonId }: TaskCardProps) {
           <div>
             <CardTitle className="text-xl flex items-center gap-2">
               {task.title}
-              {task.isMandatory && (
+              {!task.isOptional && (
                 <Badge variant="destructive" className="ml-2">Mandatory</Badge>
               )}
             </CardTitle>
             <CardDescription className="mt-2 text-sm text-muted-foreground whitespace-pre-wrap">
-              {task.description}
+              {task.instructions}
             </CardDescription>
           </div>
           <div className="text-sm font-medium bg-muted px-2 py-1 rounded-md">

@@ -7,7 +7,8 @@ import { VideoPlayer } from "./video-player";
 import { VideoPlayerSkeleton } from "./video-player-skeleton";
 import { VideoErrorDisplay } from "./video-error-display";
 import { LessonMeta } from "./lesson-meta";
-import { LessonTaskSection } from "./lesson-task-section";
+import { LessonTasksModal } from "./lesson-tasks-modal";
+import { useLessonTasks } from "@/components/hooks/use-lesson-tasks";
 import { LessonSidebar } from "./lesson-sidebar";
 import { useUILayoutStore } from "@/store/ui-layout-store";
 import { cn } from "@/lib/utils";
@@ -71,6 +72,12 @@ export function LessonClientBridge({
     certificateUrl?: string;
     certificateNumber?: string;
   } | null>(null);
+
+  const [isTasksModalOpen, setIsTasksModalOpen] = useState(false);
+  const { tasks } = useLessonTasks(courseId, lessonId);
+  const publishedTasks = tasks.filter((t) => t.status === "published");
+  const hasTasks = publishedTasks.length > 0;
+  const allTasksCompleted = hasTasks && publishedTasks.every(t => t.submission !== null);
 
   // 1. Initialize Progress Tracking
   const {
@@ -326,7 +333,12 @@ export function LessonClientBridge({
                 onTimeUpdate={onTimeUpdate}
                 onPause={onPause}
                 onSeeked={onSeeked}
-                onEnded={onEnded}
+                onEnded={() => {
+                  onEnded();
+                  if (hasTasks && !allTasksCompleted) {
+                    setIsTasksModalOpen(true);
+                  }
+                }}
                 onDurationChange={setVideoDuration}
                 onTokenExpired={onTokenExpired}
               />
@@ -358,10 +370,17 @@ export function LessonClientBridge({
             resumePoint={resumePoint}
             onResume={handleResume}
             isCompleted={isLessonCompleted}
+            hasTasks={hasTasks}
+            tasksCompleted={allTasksCompleted}
+            onOpenTasks={() => setIsTasksModalOpen(true)}
           />
           
-          {/* Lesson Tasks */}
-          <LessonTaskSection courseId={courseId} lessonId={lessonId} />
+          <LessonTasksModal
+            isOpen={isTasksModalOpen}
+            onOpenChange={setIsTasksModalOpen}
+            courseId={courseId}
+            lessonId={lessonId}
+          />
         </div>
 
         {/* ── RIGHT: CURRICULUM SIDEBAR ───────────────────── */}

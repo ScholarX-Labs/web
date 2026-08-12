@@ -1,13 +1,14 @@
 import { LessonTaskEditor } from "@/components/admin/tasks/lesson-task-editor";
 
 interface LessonPageProps {
-  params: {
+  params: Promise<{
     courseId: string;
     lessonId: string;
-  };
+  }>;
 }
 
-export default function AdminLessonPage({ params }: LessonPageProps) {
+export default async function AdminLessonPage({ params }: LessonPageProps) {
+  const { courseId, lessonId } = await params;
   return (
     <div className="p-8 space-y-8">
       <div>
@@ -19,7 +20,7 @@ export default function AdminLessonPage({ params }: LessonPageProps) {
         </p>
       </div>
 
-      <LessonTaskEditor courseId={params.courseId} lessonId={params.lessonId} />
+      <LessonTaskEditor courseId={courseId} lessonId={lessonId} />
     </div>
   );
 }
