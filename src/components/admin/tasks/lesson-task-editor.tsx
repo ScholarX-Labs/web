@@ -357,7 +357,14 @@ export function LessonTaskEditor({ courseId, lessonId }: LessonTaskEditorProps) 
                           variant="ghost"
                           size="icon"
                           className="h-8 w-8 text-slate-400 hover:text-red-600 hover:bg-red-50"
-                          onClick={() => deleteTask(task.id)}
+                          onClick={async () => {
+                            try {
+                              await deleteTask(task.id);
+                              toast.success("Task deleted successfully");
+                            } catch (err) {
+                              toast.error(err instanceof Error ? err.message : "Failed to delete task");
+                            }
+                          }}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
