@@ -58,6 +58,7 @@ import {
   Zap,
   Clock,
    ArrowRight,
+   ListChecks,
    Users
 } from "lucide-react";
 import { toast } from "sonner";
@@ -584,6 +585,17 @@ function CurriculumTab({ courseId, lessons, onReorder, isLoading, onEditLesson }
                     >
                       <Edit3 className="size-3.5 mr-2 stroke-[3]" />
                       Configure Node
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      asChild
+                      className="h-10 rounded-xl font-black uppercase tracking-[0.2em] text-[10px] hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-100 border border-transparent shadow-sm hover:shadow-md transition-all px-5"
+                    >
+                      <Link href={`/admin/courses/${courseId}/lessons/${lesson.id}`}>
+                        <ListChecks className="size-3.5 mr-2 stroke-[3]" />
+                        Manage Tasks
+                      </Link>
                     </Button>
                   </div>
                 </div>

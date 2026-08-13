@@ -7,6 +7,8 @@ import { VideoPlayer } from "./video-player";
 import { VideoPlayerSkeleton } from "./video-player-skeleton";
 import { VideoErrorDisplay } from "./video-error-display";
 import { LessonMeta } from "./lesson-meta";
+import { LessonTasksModal } from "./lesson-tasks-modal";
+import { useLessonTasks } from "@/components/hooks/use-lesson-tasks";
 import { LessonSidebar } from "./lesson-sidebar";
 import { useUILayoutStore } from "@/store/ui-layout-store";
 import { cn } from "@/lib/utils";
@@ -71,6 +73,22 @@ export function LessonClientBridge({
     certificateNumber?: string;
   } | null>(null);
 
+  const [isTasksModalOpen, setIsTasksModalOpen] = useState(false);
+  const [playbackCompleted, setPlaybackCompleted] = useState(false);
+  const { tasks, isLoading } = useLessonTasks(courseId, lessonId);
+  const publishedTasks = tasks.filter((t) => t.status === "published");
+  const hasTasks = publishedTasks.length > 0;
+  const allTasksCompleted = hasTasks && publishedTasks.every(t => t.submission !== null);
+
+  useEffect(() => {
+    if (playbackCompleted && !isLoading) {
+      if (hasTasks && !allTasksCompleted) {
+        setIsTasksModalOpen(true);
+      }
+      setPlaybackCompleted(false);
+    }
+  }, [playbackCompleted, isLoading, hasTasks, allTasksCompleted]);
+
   // 1. Initialize Progress Tracking
   const {
     progress,
@@ -112,6 +130,7 @@ export function LessonClientBridge({
     completionToastShownRef.current = false;
     courseCompletionHandledRef.current = false;
     setCourseCompletion(null);
+    setPlaybackCompleted(false);
   }, [lessonId]);
 
   const syncToServer = useCallback(async () => {
@@ -325,7 +344,10 @@ export function LessonClientBridge({
                 onTimeUpdate={onTimeUpdate}
                 onPause={onPause}
                 onSeeked={onSeeked}
-                onEnded={onEnded}
+                onEnded={() => {
+                  onEnded();
+                  setPlaybackCompleted(true);
+                }}
                 onDurationChange={setVideoDuration}
                 onTokenExpired={onTokenExpired}
               />
@@ -357,6 +379,16 @@ export function LessonClientBridge({
             resumePoint={resumePoint}
             onResume={handleResume}
             isCompleted={isLessonCompleted}
+            hasTasks={hasTasks}
+            tasksCompleted={allTasksCompleted}
+            onOpenTasks={() => setIsTasksModalOpen(true)}
+          />
+          
+          <LessonTasksModal
+            isOpen={isTasksModalOpen}
+            onOpenChange={setIsTasksModalOpen}
+            courseId={courseId}
+            lessonId={lessonId}
           />
         </div>
 

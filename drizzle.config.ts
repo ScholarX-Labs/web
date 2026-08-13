@@ -28,6 +28,7 @@ export default defineConfig({
     "./src/db/schema/certificates-db.schema.ts",
     "./src/db/schema/email-db.schema.ts",
     "./src/db/schema/leaderboard.ts",
+    "./src/db/schema/lesson-tasks.schema.ts",
   ],
   dialect: "postgresql",
   dbCredentials: {
