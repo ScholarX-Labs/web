@@ -74,10 +74,20 @@ export function LessonClientBridge({
   } | null>(null);
 
   const [isTasksModalOpen, setIsTasksModalOpen] = useState(false);
-  const { tasks } = useLessonTasks(courseId, lessonId);
+  const [playbackCompleted, setPlaybackCompleted] = useState(false);
+  const { tasks, isLoading } = useLessonTasks(courseId, lessonId);
   const publishedTasks = tasks.filter((t) => t.status === "published");
   const hasTasks = publishedTasks.length > 0;
   const allTasksCompleted = hasTasks && publishedTasks.every(t => t.submission !== null);
+
+  useEffect(() => {
+    if (playbackCompleted && !isLoading) {
+      if (hasTasks && !allTasksCompleted) {
+        setIsTasksModalOpen(true);
+      }
+      setPlaybackCompleted(false);
+    }
+  }, [playbackCompleted, isLoading, hasTasks, allTasksCompleted]);
 
   // 1. Initialize Progress Tracking
   const {
@@ -120,6 +130,7 @@ export function LessonClientBridge({
     completionToastShownRef.current = false;
     courseCompletionHandledRef.current = false;
     setCourseCompletion(null);
+    setPlaybackCompleted(false);
   }, [lessonId]);
 
   const syncToServer = useCallback(async () => {
@@ -335,9 +346,7 @@ export function LessonClientBridge({
                 onSeeked={onSeeked}
                 onEnded={() => {
                   onEnded();
-                  if (hasTasks && !allTasksCompleted) {
-                    setIsTasksModalOpen(true);
-                  }
+                  setPlaybackCompleted(true);
                 }}
                 onDurationChange={setVideoDuration}
                 onTokenExpired={onTokenExpired}

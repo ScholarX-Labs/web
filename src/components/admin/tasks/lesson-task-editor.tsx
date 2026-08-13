@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAdminLessonTasks } from "@/components/hooks/use-admin-lesson-tasks";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -18,7 +18,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GlassCard } from "@/components/ui/glass-panel";
 import { Reorder } from "framer-motion";
 import { Loader2, Trash2, GripVertical, Settings, Plus } from "lucide-react";
-import type { TaskType } from "@/domain/courses/lesson-tasks/contracts/lesson-tasks.types";
+import type { TaskType, TaskStatus, TaskConfig, AdminTaskPayload, McqTaskConfig, WrittenTaskConfig, SwotTaskConfig, LinkTaskConfig } from "@/domain/courses/lesson-tasks/contracts/lesson-tasks.types";
 
 interface LessonTaskEditorProps {
   courseId: string;
@@ -26,12 +26,12 @@ interface LessonTaskEditorProps {
 }
 
 export function LessonTaskEditor({ courseId, lessonId }: LessonTaskEditorProps) {
-  const { tasks, isLoading, createTask, updateTask, deleteTask, reorderTasks } = useAdminLessonTasks(courseId, lessonId);
+  const { tasks, isLoading, isError, error, refetch, createTask, updateTask, deleteTask, reorderTasks } = useAdminLessonTasks(courseId, lessonId);
 
   // New task form state
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
-  
+
   // Local state for smooth drag-and-drop
   const [localTasks, setLocalTasks] = useState(tasks);
   
@@ -40,33 +40,52 @@ export function LessonTaskEditor({ courseId, lessonId }: LessonTaskEditorProps) 
     setLocalTasks(tasks);
   }, [tasks]);
 
-  const handleReorder = async (newOrder: typeof tasks) => {
-    setLocalTasks(newOrder);
-    const newOrderIds = newOrder.map(t => t.id);
+  const isReorderingRef = useRef(false);
+  const nextOrderIdsRef = useRef<string[] | null>(null);
+
+  const processReorder = async (orderIds: string[]) => {
+    if (isReorderingRef.current) {
+      nextOrderIdsRef.current = orderIds;
+      return;
+    }
+    
+    isReorderingRef.current = true;
     try {
-      await reorderTasks(newOrderIds);
-    } catch (error) {
+      await reorderTasks(orderIds);
+    } catch {
       toast.error("Failed to save task order");
       setLocalTasks(tasks); // Revert on failure
+    } finally {
+      isReorderingRef.current = false;
+      if (nextOrderIdsRef.current) {
+        const nextIds = nextOrderIdsRef.current;
+        nextOrderIdsRef.current = null;
+        processReorder(nextIds);
+      }
     }
+  };
+
+  const handleReorder = (newOrder: typeof tasks) => {
+    setLocalTasks(newOrder);
+    processReorder(newOrder.map(t => t.id));
   };
   const [type, setType] = useState<TaskType>("mcq");
   const [title, setTitle] = useState("");
   const [instructions, setInstructions] = useState("");
   const [pointsAwarded, setPointsAwarded] = useState(10);
   const [isOptional, setIsOptional] = useState(false);
-  const [status, setStatus] = useState<"draft" | "published">("published");
-  const [config, setConfig] = useState<Record<string, unknown>>({});
+  const [status, setStatus] = useState<TaskStatus>("published");
+  const [config, setConfig] = useState<TaskConfig>({ options: [], correctOptionId: "" });
 
-  const handleEditClick = (task: any) => {
+  const handleEditClick = (task: AdminTaskPayload) => {
     setEditingTaskId(task.id);
-    setType(task.type as TaskType);
+    setType(task.type);
     setTitle(task.title);
     setInstructions(task.instructions || "");
     setPointsAwarded(task.pointsAwarded);
     setIsOptional(task.isOptional);
-    setStatus(task.status as "draft" | "published");
-    setConfig(task.config || {});
+    setStatus(task.status);
+    setConfig(task.config);
     setIsFormOpen(true);
   };
 
@@ -124,17 +143,30 @@ export function LessonTaskEditor({ courseId, lessonId }: LessonTaskEditorProps) 
     if (newType === "mcq") setConfig({ options: [], correctOptionId: "" });
     else if (newType === "written") setConfig({});
     else if (newType === "swot") setConfig({ requiredCategories: ["strengths", "weaknesses"] });
-    else if (newType === "link") setConfig({ url: "" });
+    else if (newType === "link") setConfig({ urlTemplate: "" });
   };
 
   const renderConfigForm = () => {
     switch (type) {
       case "mcq":
-        return <McqForm config={config as unknown as any} onChange={(c) => setConfig(c as unknown as Record<string, unknown>)} />;
+        return <McqForm config={config as McqTaskConfig} onChange={setConfig} />;
       case "written":
-        return <WrittenForm config={config as unknown as any} onChange={(c) => setConfig(c as unknown as Record<string, unknown>)} />;
+        return <WrittenForm config={config as WrittenTaskConfig} onChange={setConfig} />;
       case "swot":
-        return <SwotForm config={config as unknown as any} onChange={(c) => setConfig(c as unknown as Record<string, unknown>)} />;
+        return <SwotForm config={config as SwotTaskConfig} onChange={setConfig} />;
+      case "link":
+        return (
+          <div className="space-y-3">
+            <Label className="text-slate-600 font-medium">Link URL</Label>
+            <Input
+              className="bg-white"
+              type="url"
+              value={(config as LinkTaskConfig).urlTemplate || ""}
+              onChange={(e) => setConfig({ ...(config as LinkTaskConfig), urlTemplate: e.target.value })}
+              placeholder="https://..."
+            />
+          </div>
+        );
       default:
         return null;
     }
@@ -144,6 +176,20 @@ export function LessonTaskEditor({ courseId, lessonId }: LessonTaskEditorProps) 
     return (
       <div className="flex justify-center p-8">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="border border-red-200 bg-red-50/50 rounded-2xl p-6 text-center space-y-4">
+        <div className="space-y-2">
+          <p className="text-red-800 font-medium">Failed to load tasks</p>
+          {error && <p className="text-sm text-red-600">{(error as Error).message}</p>}
+        </div>
+        <Button onClick={() => refetch()} variant="outline" className="border-red-200 text-red-800 hover:bg-red-50">
+          Retry
+        </Button>
       </div>
     );
   }
@@ -175,16 +221,17 @@ export function LessonTaskEditor({ courseId, lessonId }: LessonTaskEditorProps) 
                 <div className="space-y-3 col-span-2 sm:col-span-1">
                   <Label className="text-slate-600 font-medium">Task Type</Label>
                   <Tabs value={type} onValueChange={(val) => handleTypeChange(val as TaskType)} className="w-full">
-                    <TabsList className="grid w-full grid-cols-3 bg-slate-100/80 p-1">
+                    <TabsList className="grid w-full grid-cols-4 bg-slate-100/80 p-1">
                       <TabsTrigger value="mcq" className="text-xs">MCQ</TabsTrigger>
                       <TabsTrigger value="written" className="text-xs">Written</TabsTrigger>
                       <TabsTrigger value="swot" className="text-xs">SWOT</TabsTrigger>
+                      <TabsTrigger value="link" className="text-xs">External Link</TabsTrigger>
                     </TabsList>
                   </Tabs>
                 </div>
                 <div className="space-y-3 col-span-2 sm:col-span-1">
                   <Label className="text-slate-600 font-medium">Status</Label>
-                  <Select value={status} onValueChange={(val: "draft" | "published") => setStatus(val)}>
+                  <Select value={status} onValueChange={(val: TaskStatus) => setStatus(val)}>
                     <SelectTrigger className="bg-white">
                       <SelectValue />
                     </SelectTrigger>
@@ -302,7 +349,7 @@ export function LessonTaskEditor({ courseId, lessonId }: LessonTaskEditorProps) 
                       <span className="text-sm font-medium text-slate-600 bg-white px-2 py-1 rounded-md shadow-sm border border-slate-100">
                         {task.pointsAwarded} pts
                       </span>
-                      <div className="flex opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
                         <Button variant="ghost" size="icon" onClick={() => handleEditClick(task)} className="h-8 w-8 text-slate-400 hover:text-indigo-600">
                           <Settings className="h-4 w-4" />
                         </Button>

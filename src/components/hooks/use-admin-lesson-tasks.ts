@@ -5,7 +5,7 @@ export function useAdminLessonTasks(courseId: string, lessonId: string) {
   const queryClient = useQueryClient();
   const queryKey = ["admin", "courses", courseId, "lessons", lessonId, "tasks"];
 
-  const { data: tasks = [], isLoading, isError, error } = useQuery<AdminTaskPayload[]>({
+  const { data: tasks = [], isLoading, isError, error, refetch } = useQuery<AdminTaskPayload[]>({
     queryKey,
     queryFn: async () => {
       const res = await fetch(`/api/admin/courses/${courseId}/lessons/${lessonId}/tasks`);
@@ -105,6 +105,7 @@ export function useAdminLessonTasks(courseId: string, lessonId: string) {
     isLoading,
     isError,
     error,
+    refetch,
     createTask: createTaskMutation.mutateAsync,
     updateTask: updateTaskMutation.mutateAsync,
     deleteTask: deleteTaskMutation.mutateAsync,
