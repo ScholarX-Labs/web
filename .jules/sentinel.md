@@ -1,0 +1,4 @@
+## 2025-02-27 - Timing Attack in API Key Comparison
+**Vulnerability:** The API key validation in `src/app/api/admin/storage-check/route.ts` used strict string equality (`===`) to compare the incoming `x-internal-key` against the expected `process.env.INTERNAL_API_KEY`.
+**Learning:** String equality (`===`) compares strings character-by-character and returns early if a mismatch is found. This slight variation in response time allows an attacker to deduce the correct API key character by character using a timing attack.
+**Prevention:** When comparing sensitive strings like secrets, API keys, or passwords, always convert them to `Buffer` objects and use `crypto.timingSafeEqual()`. Compare their lengths first before passing them to `timingSafeEqual()` to avoid a `RangeError`. Avoid fallback strings (like `|| ""`) that might allow trivial bypasses.
