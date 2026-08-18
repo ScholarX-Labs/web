@@ -1,0 +1,4 @@
+## 2024-05-18 - Fix Timing Attack Vulnerability in API Key Comparison
+**Vulnerability:** The internal API key in `src/app/api/admin/storage-check/route.ts` was being compared using strict equality (`===`), making it susceptible to timing attacks. This could allow an attacker to guess the API key by measuring response times.
+**Learning:** Hardcoded string comparison (`===`) for secrets in Node.js/Next.js exposes the length and content of the secret due to the fast-fail nature of string comparison algorithms. Both strings must be converted to buffers of equal length to perform a timing-safe comparison.
+**Prevention:** Use `node:crypto`'s `timingSafeEqual(bufferA, bufferB)` for comparing any sensitive strings (API keys, secrets, tokens). Ensure the buffers are of equal length before comparison to prevent `RangeError` exceptions, and ensure empty string fallbacks do not inadvertently bypass authentication.
