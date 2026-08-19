@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { db } from "@/db";
@@ -24,7 +25,19 @@ export async function GET(request: NextRequest) {
     });
 
     const isAdmin = session?.user?.role === "admin";
-    const isInternal = request.headers.get("x-internal-key") === process.env.INTERNAL_API_KEY;
+
+    const providedKey = request.headers.get("x-internal-key");
+    const expectedKey = process.env.INTERNAL_API_KEY;
+
+    let isInternal = false;
+    // Security Fix: Prevent timing attacks by using crypto.timingSafeEqual
+    if (providedKey && expectedKey) {
+      const providedBuf = Buffer.from(providedKey);
+      const expectedBuf = Buffer.from(expectedKey);
+      if (providedBuf.length === expectedBuf.length) {
+        isInternal = crypto.timingSafeEqual(providedBuf, expectedBuf);
+      }
+    }
 
     if (!isAdmin && !isInternal) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
