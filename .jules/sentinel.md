@@ -1,4 +1,0 @@
-## 2025-02-18 - Prevent Timing Attacks in API Key Verification
-**Vulnerability:** The API key validation used strict equality `===` (e.g., `request.headers.get("x-internal-key") === process.env.INTERNAL_API_KEY`), which returns early on the first mismatched character. This allows attackers to progressively guess the API key by measuring response times (timing attack).
-**Learning:** Comparing sensitive strings (like API keys or secrets) using `===` in server-side logic is unsafe against timing attacks. Even internally expected API keys must use constant-time comparison methods.
-**Prevention:** Always use `crypto.timingSafeEqual` for comparing secrets. Before comparing, verify both the provided and expected keys exist, convert them to `Buffer`, and verify their lengths match (`buf1.length === buf2.length`) to avoid length-mismatch errors in `timingSafeEqual`.
