@@ -22,7 +22,7 @@ interface AuthorFormCardProps {
 
 const FADE_IN_VARIANTS = {
   hidden: { opacity: 0, y: 10 },
-  show: { opacity: 1, y: 0, transition: { type: "spring" } },
+  show: { opacity: 1, y: 0, transition: { type: "spring" as const } },
 };
 
 export const AuthorFormCard: React.FC<AuthorFormCardProps> = ({
@@ -116,7 +116,7 @@ export const AuthorFormCard: React.FC<AuthorFormCardProps> = ({
                     <Info className="h-3 w-3 cursor-pointer text-muted-foreground" />
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>The author's role or position.</p>
+                    <p>The author&apos;s role or position.</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
