@@ -1,0 +1,4 @@
+## 2024-08-20 - [Timing Attack via String Equality on Internal API Key]
+**Vulnerability:** Comparing an internal API key against a process environment variable using strict equality (`===`) instead of a constant-time comparison algorithm.
+**Learning:** Strict equality operators perform character-by-character comparison and return `false` as soon as a mismatch is found. This leaks the length of the matching prefix via the timing of the response, allowing an attacker to iteratively guess the internal API key.
+**Prevention:** Use `crypto.timingSafeEqual` to compare secrets in constant time. When comparing potentially undefined values or strings of different lengths (which `timingSafeEqual` cannot handle directly), first convert them to `Buffer` objects, ensure their lengths match, and then perform the `timingSafeEqual` check.
