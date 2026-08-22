@@ -16,3 +16,4 @@ export default async function AdminCoursesPage() {
     />
   );
 }
+export const dynamic = "force-dynamic";
