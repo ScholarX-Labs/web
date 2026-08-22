@@ -252,3 +252,4 @@ export default function AdminDashboardPage() {
     </div>
   );
 }
+export const dynamic = "force-dynamic";
