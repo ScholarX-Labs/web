@@ -1,6 +1,8 @@
 import { createAdminDomain } from "@/domain/admin";
 import { SubscriptionsTable } from "./_components/subscriptions-table";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminSubscriptionsPage() {
   const domain = createAdminDomain();
   const result = await domain.subscriptions.list({ page: 1, limit: 20 });
