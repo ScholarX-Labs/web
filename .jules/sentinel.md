@@ -1,0 +1,4 @@
+## 2025-02-28 - Secure API Key Comparison
+**Vulnerability:** The internal API route (`src/app/api/admin/storage-check/route.ts`) verified the `x-internal-key` header using strict string equality (`===`). This exposed a timing attack vulnerability, where an attacker could theoretically deduce the API key character by character based on the time it takes the server to reject incorrect keys.
+**Learning:** Even internal API secrets transmitted via HTTP headers are susceptible to timing side channels if the comparison fails fast on the first mismatched character.
+**Prevention:** Always use constant-time comparison functions, like `crypto.timingSafeEqual`, when comparing secrets (API keys, tokens, passwords, signatures). Before comparing, verify that both strings exist and have the same byte length to avoid exceptions in the underlying Buffer comparison.
