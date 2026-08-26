@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 "use client";
 
 import { useAdminStats } from "@/hooks/admin/use-admin-stats";
