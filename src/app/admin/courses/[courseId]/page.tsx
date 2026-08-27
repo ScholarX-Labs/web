@@ -7,6 +7,11 @@ interface AdminLesson {
   title: string;
   status: string;
   duration?: number;
+  updatedAt?: string | Date;
+  isPrivate?: boolean;
+  description?: string;
+  content?: string;
+  videoUrl?: string;
 }
 
 interface AdminCourse {

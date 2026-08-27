@@ -11,7 +11,7 @@ interface LessonData {
   duration?: number;
   isPrivate?: boolean;
   status?: string;
-  updatedAt?: string;
+  updatedAt?: string | Date;
 }
 import { useUpdateLesson } from "@/hooks/admin/use-admin-lessons";
 import { Button } from "@/components/ui/button";
@@ -99,11 +99,19 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
   const handleSave = async () => {
     if (!lesson) return;
     try {
+      const expectedVersion = lesson.updatedAt
+        ? typeof lesson.updatedAt === "string"
+          ? lesson.updatedAt
+          : lesson.updatedAt instanceof Date
+            ? lesson.updatedAt.toISOString()
+            : String(lesson.updatedAt)
+        : undefined;
+
       await updateLesson.mutateAsync({
         id: lesson.id,
         data: {
           ...formData,
-          expectedVersion: lesson.updatedAt || new Date().toISOString()
+          ...(expectedVersion ? { expectedVersion } : {}),
         },
       });
       toast.success("Lesson configuration synchronized", {
@@ -149,7 +157,7 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
                 </div>
                 <div className="space-y-3">
                   <h3 className="text-2xl font-[1000] text-slate-900 dark:text-white uppercase tracking-tighter">Synchronizing Architecture</h3>
-                  <p className="text-[12px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-[0.3em]">Curriculum Node v{lesson.updatedAt?.slice(0, 4) || "2.0"} Propagation</p>
+                  <p className="text-[12px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-[0.3em]">Curriculum Node v{(typeof lesson.updatedAt === "string" ? lesson.updatedAt : lesson.updatedAt?.toISOString())?.slice(0, 4) || "2.0"} Propagation</p>
                 </div>
                 <div className="space-y-4">
                   <div className="w-full h-2 bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden shadow-inner">

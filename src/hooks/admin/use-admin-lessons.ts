@@ -37,8 +37,8 @@ export function useUpdateLesson() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: unknown }) =>
       adminApi.lessons.update(id, data),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.admin.lessons.all(id) });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.admin.courses.all() });
     },
   });
 }
@@ -48,7 +48,7 @@ export function useToggleLessonVisibility() {
   return useMutation({
     mutationFn: (id: string) => adminApi.lessons.toggleVisibility(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.admin.courses.lists() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.admin.courses.all() });
     },
   });
 }
@@ -58,7 +58,7 @@ export function useArchiveLesson() {
   return useMutation({
     mutationFn: (id: string) => adminApi.lessons.archive(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.admin.courses.lists() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.admin.courses.all() });
     },
   });
 }
