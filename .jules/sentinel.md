@@ -1,0 +1,5 @@
+
+## 2025-02-21 - [Prevent authentication bypass via empty string fallbacks with timingSafeEqual]
+**Vulnerability:** Comparing `request.headers.get("x-internal-key") === process.env.INTERNAL_API_KEY` is vulnerable to timing attacks. More importantly, simply fixing it to `crypto.timingSafeEqual` can introduce a critical bypass if both the provided key and expected key default to empty strings when missing, resulting in `timingSafeEqual(Buffer.from(""), Buffer.from(""))` which returns true.
+**Learning:** In JavaScript, strings are compared securely via `crypto.timingSafeEqual(Buffer.from(a), Buffer.from(b))`. Before comparison, both buffers must be checked to ensure they have the same length. Additionally, both inputs must be validated to ensure they exist and are non-empty before comparison to prevent trivial bypasses when environment variables or headers are omitted.
+**Prevention:** Always check if the expected secret and provided secret exist before performing a timing-safe equality check. Ensure buffer lengths match before comparison.
