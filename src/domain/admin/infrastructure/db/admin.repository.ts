@@ -156,9 +156,11 @@ export const createAdminRepository = (): AdminRepository => {
     },
 
     async updateCourse(id: string, data: UpdateCourseInput, _expectedVersion?: Date) {
-      const whereConditions = [eq(dbCourses.id, id)];
+      const whereConditions: SQL[] = [eq(dbCourses.id, id)];
       if (_expectedVersion) {
-        whereConditions.push(eq(dbCourses.updatedAt, _expectedVersion));
+        whereConditions.push(
+          sql`date_trunc('milliseconds', ${dbCourses.updatedAt}) = date_trunc('milliseconds', ${_expectedVersion}::timestamp)`,
+        );
       }
 
       const results = await db
@@ -412,9 +414,11 @@ export const createAdminRepository = (): AdminRepository => {
     },
 
     async updateLesson(id: string, data: UpdateLessonInput, _expectedVersion?: Date) {
-      const whereConditions = [eq(dbLessons.id, id)];
+      const whereConditions: SQL[] = [eq(dbLessons.id, id)];
       if (_expectedVersion) {
-        whereConditions.push(eq(dbLessons.updatedAt, _expectedVersion));
+        whereConditions.push(
+          sql`date_trunc('milliseconds', ${dbLessons.updatedAt}) = date_trunc('milliseconds', ${_expectedVersion}::timestamp)`,
+        );
       }
 
       const results = await db
