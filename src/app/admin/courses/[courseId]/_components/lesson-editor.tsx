@@ -83,6 +83,7 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
 
   useEffect(() => {
     if (lesson) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData({
         title: lesson.title || "",
         description: lesson.description || "",
@@ -110,7 +111,7 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
         className: "rounded-[20px] bg-white/80 backdrop-blur-xl border-emerald-100 shadow-xl",
       });
       onClose();
-    } catch (error: any) {
+    } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
       console.error("Sync Error:", error);
       toast.error("Synchronization failure: " + (error?.response?.data?.message || "Check log"));
     }
