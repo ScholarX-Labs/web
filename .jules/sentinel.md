@@ -1,0 +1,4 @@
+## 2025-02-14 - Fix Timing Attack Vulnerability in Internal API Key Comparison
+**Vulnerability:** Timing Attack via strict equality comparison (`===`) of `x-internal-key` against `process.env.INTERNAL_API_KEY` in `src/app/api/admin/storage-check/route.ts`.
+**Learning:** Checking secret keys using strict equality (`===`) is vulnerable to timing attacks, where an attacker can figure out the secret string character-by-character by measuring the time it takes for the comparison to fail. Also, when using `crypto.timingSafeEqual` in a Next.js Edge/Cloudflare environment, it's best to import `node:crypto` to ensure ESM compatibility.
+**Prevention:** Always use `crypto.timingSafeEqual` with byte array (Buffer) comparisons instead of strict equality for secrets, checking lengths first to prevent RangeErrors, and avoid empty string fallbacks which can bypass auth if an env var is missing.
