@@ -92,7 +92,7 @@ export default function AdminCourseDetailPage({ params }: { params: Promise<{ co
 
   useEffect(() => {
     if (lessonsData) {
-      setTimeout(() => setLessons(lessonsData as AdminLesson[]), 0);
+      setLessons(lessonsData as AdminLesson[]);
     }
   }, [lessonsData]);
 

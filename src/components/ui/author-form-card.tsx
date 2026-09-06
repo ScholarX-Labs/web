@@ -33,7 +33,7 @@ export const AuthorFormCard: React.FC<AuthorFormCardProps> = ({
 }) => {
   const [name, setName] = React.useState(initialData?.name || "");
   const [title, setTitle] = React.useState(initialData?.title || "");
-  const [imageUrl] = React.useState<string | undefined>(initialData?.imageUrl);
+  const [imageUrl, setImageUrl] = React.useState<string | undefined>(initialData?.imageUrl);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -116,7 +116,7 @@ export const AuthorFormCard: React.FC<AuthorFormCardProps> = ({
                     <Info className="h-3 w-3 cursor-pointer text-muted-foreground" />
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>The author&apos;s role or position.</p>
+                    <p>The author's role or position.</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
