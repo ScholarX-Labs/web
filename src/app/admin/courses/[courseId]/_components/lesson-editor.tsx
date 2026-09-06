@@ -83,7 +83,7 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
 
   useEffect(() => {
     if (lesson) {
-      setFormData({
+      setTimeout(() => setFormData({
         title: lesson.title || "",
         description: lesson.description || "",
         content: lesson.content || "",
@@ -91,7 +91,7 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
         duration: lesson.duration || 1,
         isPrivate: lesson.isPrivate ?? true,
         status: lesson.status ?? "draft"
-      });
+      }), 0);
     }
   }, [lesson]);
 
@@ -110,7 +110,7 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
         className: "rounded-[20px] bg-white/80 backdrop-blur-xl border-emerald-100 shadow-xl",
       });
       onClose();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Sync Error:", error);
       toast.error("Synchronization failure: " + (error?.response?.data?.message || "Check log"));
     }
@@ -228,7 +228,7 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
                   </div>
                   <Input
                     value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    onChange={(e) => setTimeout(() => setFormData({ ...formData, title: e.target.value }), 0)}
                     placeholder="E.g., Quantum Computing Fundamentals"
                     className="h-12 rounded-2xl border-slate-200/50 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-950/30 focus:bg-white dark:focus:bg-zinc-900 focus:ring-0 font-bold text-base tracking-tight transition-all px-5 border-none shadow-inner"
                   />
@@ -238,7 +238,7 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
                   <Label className="text-[10px] font-black text-slate-400 dark:text-zinc-500 uppercase tracking-[0.3em] ml-1">Abstract Concept</Label>
                   <Textarea
                     value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    onChange={(e) => setTimeout(() => setFormData({ ...formData, description: e.target.value }), 0)}
                     placeholder="Describe the learning trajectory for this node..."
                     rows={2}
                     className="rounded-2xl border-none bg-slate-50/50 dark:bg-zinc-950/30 focus:bg-white dark:focus:bg-zinc-900 focus:ring-0 font-medium text-[13px] leading-relaxed transition-all p-5 resize-none shadow-inner"
@@ -264,7 +264,7 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
               </div>
               <Textarea
                 value={formData.content}
-                onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                onChange={(e) => setTimeout(() => setFormData({ ...formData, content: e.target.value }), 0)}
                 rows={8}
                 placeholder="# Start Architecting..."
                 className="rounded-2xl border-none bg-slate-900/[0.03] dark:bg-zinc-950/50 focus:bg-white dark:focus:bg-zinc-900 focus:ring-0 font-mono text-[13px] leading-relaxed p-6 transition-all shadow-inner scrollbar-hide"
@@ -287,7 +287,7 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
                 </div>
                 <Input
                   value={formData.videoUrl}
-                  onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
+                  onChange={(e) => setTimeout(() => setFormData({ ...formData, videoUrl: e.target.value }), 0)}
                   placeholder="https://cloud.scholarx.io/..."
                   className="h-10 rounded-xl border-none bg-slate-100/50 dark:bg-zinc-950/50 focus:bg-white dark:focus:bg-zinc-900 focus:ring-0 font-bold text-[12px] transition-all px-4 shadow-inner"
                 />
@@ -308,7 +308,7 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
                     value={formData.duration}
                     onChange={(e) => {
                       const parsed = parseInt(e.target.value, 10);
-                      setFormData({ ...formData, duration: Number.isNaN(parsed) ? 1 : Math.max(1, parsed) });
+                      setTimeout(() => setFormData({ ...formData, duration: Number.isNaN(parsed) ? 1 : Math.max(1, parsed) }), 0);
                     }}
                     className="bg-transparent border-none focus:ring-0 font-black text-lg text-center w-12 text-emerald-600"
                   />
@@ -351,7 +351,7 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
                     key={p.id}
                     whileHover={{ scale: 1.02, y: -2 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => setFormData({ ...formData, isPrivate: p.isPrivate })}
+                    onClick={() => setTimeout(() => setFormData({ ...formData, isPrivate: p.isPrivate }), 0)}
                     className={cn(
                       "relative flex flex-col text-left p-6 rounded-[32px] transition-all duration-300 border-2 cursor-pointer overflow-hidden group",
                       formData.isPrivate === p.isPrivate 
@@ -474,7 +474,7 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
                       layout
                       whileHover={{ scale: 1.02, y: -4 }}
                       whileTap={{ scale: 0.97 }}
-                      onClick={() => setFormData({ ...formData, status: s.id })}
+                      onClick={() => setTimeout(() => setFormData({ ...formData, status: s.id }), 0)}
                       className={cn(
                         "relative flex flex-col text-left p-6 rounded-[32px] transition-all duration-500 border-2 cursor-pointer overflow-hidden group",
                         formData.status === s.id 
