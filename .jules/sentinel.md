@@ -1,0 +1,4 @@
+## 2024-05-24 - Timing Attack Mitigation for API Keys
+**Vulnerability:** Direct string comparison (`===`) was used for internal API key validation in `src/app/api/admin/storage-check/route.ts`, which could theoretically leak information via timing differences when attackers try to guess the key.
+**Learning:** Even internal backend routes should use constant-time comparison when verifying secrets/keys. Also, when using `crypto.timingSafeEqual`, we must first check `providedBuffer.length === expectedBuffer.length` because it throws an error if buffer lengths mismatch. We also need to avoid empty string fallback bypasses when either expected or provided keys are falsy.
+**Prevention:** Always use `node:crypto`'s `timingSafeEqual` after converting strings to `Buffer` and checking for equal lengths when verifying tokens, keys, or passwords.
