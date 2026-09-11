@@ -1,0 +1,5 @@
+
+## 2024-11-20 - Prevent Timing Attacks in API Key Validation
+**Vulnerability:** The internal API endpoint (`/api/admin/storage-check`) compared the user-provided `x-internal-key` header with the expected `INTERNAL_API_KEY` using strict equality (`===`). This allows an attacker to perform a timing attack by measuring the time it takes for the comparison to fail, which can leak information about the correct API key character by character.
+**Learning:** In V8 and Node.js, string equality checks fail fast as soon as a mismatch is found. When comparing sensitive strings like API keys, secrets, or passwords, this allows timing-based inference of the secret.
+**Prevention:** Always use constant-time comparison mechanisms like `crypto.timingSafeEqual` (from `node:crypto`) when verifying secrets. Remember to convert inputs to Buffers first and verify their lengths match (`buf1.length === buf2.length`) before calling `timingSafeEqual` to avoid a `RangeError`. Also, ensure we don't compare fallback strings if both the expected secret and provided secret are missing.
