@@ -1,0 +1,4 @@
+## 2024-05-18 - Prevent Timing Attacks in Secret Comparison
+**Vulnerability:** Comparing sensitive strings (like API keys or secrets) using strict equality (`===`) exposes the application to timing attacks. An attacker can measure the time it takes for the comparison to fail to determine the correct secret character by character.
+**Learning:** Strict equality operators short-circuit when they encounter a mismatch, meaning the comparison time is proportional to the number of matching prefix characters.
+**Prevention:** Always use `crypto.timingSafeEqual` for comparing secrets. Furthermore, do not use `|| ""` as fallbacks, as `crypto.timingSafeEqual(Buffer.from(""), Buffer.from(""))` will succeed, causing authentication bypass if both sides are missing. Check lengths first to avoid `RangeError` with multi-byte characters and to prevent bypasses when secrets are empty.
