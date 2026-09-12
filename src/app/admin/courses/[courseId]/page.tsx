@@ -1,4 +1,5 @@
 "use client";
+export const dynamic = "force-dynamic";
 
 import { use, useState, useEffect } from "react";
 
@@ -92,7 +93,7 @@ export default function AdminCourseDetailPage({ params }: { params: Promise<{ co
 
   useEffect(() => {
     if (lessonsData) {
-      setLessons(lessonsData as AdminLesson[]);
+      setTimeout(() => { setLessons(lessonsData as AdminLesson[]); }, 0);
     }
   }, [lessonsData]);
 

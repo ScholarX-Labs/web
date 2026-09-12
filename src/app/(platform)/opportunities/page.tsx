@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { Dot, Zap } from "lucide-react";
 import Filters from "../../../components/opportunities/Filters";
 import { requireSession } from "@/lib/dal";
