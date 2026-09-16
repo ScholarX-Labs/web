@@ -1,0 +1,4 @@
+## 2026-09-16 - Prevent Timing Attacks on Constant Strings
+**Vulnerability:** A timing attack vulnerability existed where a direct string comparison (`===`) was used against an internal API key (`process.env.INTERNAL_API_KEY`). This could allow attackers to deduce the key character-by-character based on response times.
+**Learning:** Even internal API key checks via headers must be compared in constant time. When using `crypto.timingSafeEqual`, the input and expected values must be converted to `Buffer`s, and their lengths must match exactly to avoid a `RangeError`. It is also important not to fall back to an empty string to avoid authentication bypass if the environment variable is unset.
+**Prevention:** Always use `crypto.timingSafeEqual` with strict length checking for comparing secure strings, hashes, or API keys instead of equality operators.
