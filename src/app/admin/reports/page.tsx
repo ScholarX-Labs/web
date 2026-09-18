@@ -1,4 +1,5 @@
 "use client";
+// NOTE: dynamic is set in a server component that renders this, or ignored.
 
 import { useState } from "react";
 import Link from "next/link";
