@@ -6,6 +6,8 @@ import { getSession } from "@/lib/dal";
 import { and, eq, ne } from "drizzle-orm";
 import { isValidPhoneNumber } from "libphonenumber-js";
 
+export const dynamic = "force-dynamic";
+
 function hasCode(value: unknown): value is { code: string } {
   return (
     typeof value === "object" &&

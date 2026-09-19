@@ -5,6 +5,8 @@ import { contactUs } from "@/db/schema/contact-us-schema";
 
 import { contactSchema } from "@/app/contact/contact.schema";
 
+export const dynamic = "force-dynamic";
+
 const MAX_CONTACT_BODY_BYTES = 16 * 1024;
 
 export async function POST(req: Request) {
