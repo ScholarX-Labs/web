@@ -1,0 +1,4 @@
+## 2024-05-18 - [timingSafeEqual for string comparisons]
+**Vulnerability:** A timing attack vulnerability existed in `src/app/api/admin/storage-check/route.ts` because it used strict equality (`===`) to compare the `x-internal-key` header with `process.env.INTERNAL_API_KEY`. Strict equality returns early on the first mismatched character, allowing an attacker to incrementally guess the secret by measuring response times.
+**Learning:** When comparing sensitive strings like API keys or secrets in Next.js routes, strict equality is insecure against timing attacks. The comparison must be done in constant time.
+**Prevention:** Always use `crypto.timingSafeEqual` (imported from `node:crypto`) to compare secrets. Convert the strings to Buffers first and ensure their byte lengths match (`buf1.length === buf2.length`) before calling `timingSafeEqual` to avoid `RangeError`. Also, avoid empty string fallbacks for missing keys.

@@ -4,6 +4,8 @@ import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { getConfig, setConfig, clearConfigCache } from "@/lib/app-config";
 
+export const dynamic = "force-dynamic";
+
 const putSchema = z.object({
   value: z.string().min(1),
 });
