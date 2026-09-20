@@ -39,11 +39,11 @@ const updateProfileSchema = z.object({
 });
 
 const socialLinksSchema = z.object({
-  githubUrl: z.string().url().optional().or(z.literal("")),
-  facebookUrl: z.string().url().optional().or(z.literal("")),
-  instagramUrl: z.string().url().optional().or(z.literal("")),
-  twitterUrl: z.string().url().optional().or(z.literal("")),
-  linkedinUrl: z.string().url().optional().or(z.literal("")),
+  githubUrl: z.union([z.literal(""), z.string().url().refine(val => /^https?:\/\//i.test(val), 'URL must be http or https').optional()]),
+  facebookUrl: z.union([z.literal(""), z.string().url().refine(val => /^https?:\/\//i.test(val), 'URL must be http or https').optional()]),
+  instagramUrl: z.union([z.literal(""), z.string().url().refine(val => /^https?:\/\//i.test(val), 'URL must be http or https').optional()]),
+  twitterUrl: z.union([z.literal(""), z.string().url().refine(val => /^https?:\/\//i.test(val), 'URL must be http or https').optional()]),
+  linkedinUrl: z.union([z.literal(""), z.string().url().refine(val => /^https?:\/\//i.test(val), 'URL must be http or https').optional()]),
 });
 
 export async function getProfile(): Promise<ActionResponse<ProfileData>> {
