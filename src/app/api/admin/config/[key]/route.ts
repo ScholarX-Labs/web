@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+export const dynamic = "force-dynamic";
 import { headers } from "next/headers";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
