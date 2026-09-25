@@ -24,7 +24,22 @@ export async function GET(request: NextRequest) {
     });
 
     const isAdmin = session?.user?.role === "admin";
-    const isInternal = request.headers.get("x-internal-key") === process.env.INTERNAL_API_KEY;
+
+    const providedKey = request.headers.get("x-internal-key");
+    const expectedKey = process.env.INTERNAL_API_KEY;
+
+    let isInternal = false;
+    if (providedKey && expectedKey) {
+      const providedBuffer = Buffer.from(providedKey);
+      const expectedBuffer = Buffer.from(expectedKey);
+
+      if (providedBuffer.length === expectedBuffer.length) {
+        // Use Node.js crypto module for timing safe comparison
+        const crypto = await import('node:crypto');
+        isInternal = crypto.timingSafeEqual(providedBuffer, expectedBuffer);
+      }
+    }
+
 
     if (!isAdmin && !isInternal) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
