@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import "server-only";
 
 import * as schema from "@/db/schema/auth-schema";
