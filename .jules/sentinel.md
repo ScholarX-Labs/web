@@ -1,0 +1,4 @@
+## 2024-05-18 - [Preventing Timing Attacks with crypto.timingSafeEqual]
+**Vulnerability:** The internal API key in `src/app/api/admin/storage-check/route.ts` was being validated using standard strict equality `===`, which is vulnerable to timing attacks that could allow an attacker to guess the key character by character.
+**Learning:** We need to ensure that secret keys and passwords are compared using `crypto.timingSafeEqual`. However, when using `timingSafeEqual`, we must first verify the buffers have identical length. We also cannot use empty string fallbacks for provided and expected keys, as this could bypass authentication if the environment variable is missing and the user sends an empty header.
+**Prevention:** Use `crypto.timingSafeEqual` for sensitive comparisons. Check `buffer.length === expectedBuffer.length` first, and ensure the keys are actually truthy values before comparing them.
