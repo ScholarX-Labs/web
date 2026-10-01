@@ -1,6 +1,9 @@
 import { getTranslations } from "next-intl/server";
 import { generateLocalizedMetadata } from "@/lib/i18n/metadata";
 import { DEFAULT_LOCALE, isLocale, type Locale } from "@/lib/i18n/locales";
+import { OPPORTUNITIES_LIST_REVALIDATE } from "@/lib/opportunities/server";
+
+export const revalidate = OPPORTUNITIES_LIST_REVALIDATE;
 
 export { default } from "../../../(platform)/opportunities/page";
 

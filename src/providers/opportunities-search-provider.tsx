@@ -5,6 +5,8 @@ import {
   useContext,
   useState,
   ReactNode,
+  Suspense,
+  useEffect,
 } from "react";
 import { useSearchParams } from "next/navigation";
 
@@ -23,23 +25,20 @@ const OpportunitiesSearchContext = createContext<
 
 export function OpportunitiesSearchProvider({
   children,
+  initialSearchQuery = "",
+  initialFilters = {},
 }: {
   children: ReactNode;
+  initialSearchQuery?: string;
+  initialFilters?: Record<string, string[]>;
 }) {
-  const searchParams = useSearchParams();
-
-  const [searchQuery, setSearchQuery] = useState<string>(
-    () => searchParams.get("q") || "",
-  );
-  const [filters, setFilters] = useState<Record<string, string[]>>(() => {
-    const nextFilters: Record<string, string[]> = {};
-    searchParams.forEach((value, key) => {
-      if (key !== "q" && key !== "page") {
-        nextFilters[key] = value ? value.split(",") : [];
-      }
-    });
-    return nextFilters;
-  });
+  // Seed from server-normalized props so SSR HTML and the first client
+  // render match. URL sync happens in a Suspense-isolated effect below,
+  // avoiding a `useSearchParams` CSR bailout for the whole subtree.
+  const [searchQuery, setSearchQuery] =
+    useState<string>(initialSearchQuery);
+  const [filters, setFilters] =
+    useState<Record<string, string[]>>(initialFilters);
 
   const updateFilter = (key: string, values: string[]) => {
     setFilters((prev) => ({ ...prev, [key]: values }));
@@ -60,9 +59,39 @@ export function OpportunitiesSearchProvider({
         clearFilters,
       }}
     >
+      <Suspense fallback={null}>
+        <SearchParamsSync
+          onSync={(nextQuery, nextFilters) => {
+            setSearchQuery(nextQuery);
+            setFilters(nextFilters);
+          }}
+        />
+      </Suspense>
       {children}
     </OpportunitiesSearchContext.Provider>
   );
+}
+
+function SearchParamsSync({
+  onSync,
+}: {
+  onSync: (query: string, filters: Record<string, string[]>) => void;
+}) {
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const nextQuery = searchParams.get("q") || "";
+    const nextFilters: Record<string, string[]> = {};
+    searchParams.forEach((value, key) => {
+      if (key !== "q" && key !== "page") {
+        nextFilters[key] = value ? value.split(",") : [];
+      }
+    });
+    onSync(nextQuery, nextFilters);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
+  return null;
 }
 
 export function useOpportunitiesSearch() {

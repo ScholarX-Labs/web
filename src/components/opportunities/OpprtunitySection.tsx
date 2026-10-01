@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense, useMemo } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { ChevronLeft, ChevronRight, MoreHorizontal, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
+import type { OpportunitiesResponse } from "@/lib/opportunities/types";
 
 const outfit = Outfit({ subsets: ["latin"] });
 
@@ -55,9 +57,35 @@ const containerVariants = {
   },
 };
 
-function OpportunitySection() {
-  const t = useTranslations("opportunities");
+function OpportunitySection({
+  initialData,
+}: {
+  initialData?: OpportunitiesResponse;
+}) {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex flex-col space-y-6 py-6 sm:py-8">
+          <Skeleton className="h-12 w-64 rounded-xl" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[...Array(6)].map((_, i) => (
+              <Skeleton key={i} className="h-[400px] w-full rounded-[24px]" />
+            ))}
+          </div>
+        </div>
+      }
+    >
+      <OpportunityResults initialData={initialData} />
+    </Suspense>
+  );
+}
 
+function OpportunityResults({
+  initialData,
+}: {
+  initialData?: OpportunitiesResponse;
+}) {
+  const t = useTranslations("opportunities");
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -74,13 +102,20 @@ function OpportunitySection() {
     }
   });
 
-  const { data, isLoading, isFetching, error } = useOpportunitiesQuery({
-    query: searchQuery,
-    page,
-    ...filters,
-  });
+  const query = useMemo(
+    () => ({ query: searchQuery, page, ...filters }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [searchQuery, page, searchParams.toString()],
+  );
 
-  if (isLoading || isFetching) {
+  const { data, isLoading, isFetching, error } = useOpportunitiesQuery(
+    query,
+    initialData ? { initialData } : undefined,
+  );
+
+  // Only block on the initial load. Background refetches keep previous data
+  // on screen (placeholderData) instead of flashing skeletons.
+  if (isLoading) {
     return (
       <div className="flex flex-col space-y-6 py-6 sm:py-8">
         <Skeleton className="h-12 w-64 rounded-xl" />
@@ -124,7 +159,10 @@ function OpportunitySection() {
   const pagesInfo = generatePagination(page, totalPages);
 
   return (
-    <div className="flex flex-col py-6 sm:py-8 space-y-8">
+    <div
+      className="flex flex-col py-6 sm:py-8 space-y-8"
+      aria-busy={isFetching}
+    >
       <motion.div
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
