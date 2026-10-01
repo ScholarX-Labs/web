@@ -6,11 +6,11 @@ import OpportunitiesHero from "@/components/opportunities/OpportunitiesHero";
 import {
   getOpportunitiesSSR,
   normalizeOpportunitiesSearchParams,
-  OPPORTUNITIES_LIST_REVALIDATE,
   toProviderFilters,
 } from "@/lib/opportunities/server";
 
-export const revalidate = OPPORTUNITIES_LIST_REVALIDATE;
+// Segment configs must be literals for static analysis (no imported values).
+export const revalidate = 300;
 
 type SearchParamsInput =
   | Record<string, string | string[] | undefined>
