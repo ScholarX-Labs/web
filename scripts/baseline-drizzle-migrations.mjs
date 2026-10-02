@@ -13,6 +13,10 @@ const MIGRATIONS_SCHEMA = "drizzle";
 const MIGRATIONS_TABLE = "__drizzle_migrations";
 const DEFAULT_BASELINE_THROUGH = "0004_rapid_stone_men";
 const COURSE_CATEGORIES_BASELINE_THROUGH = "0005_course_categories";
+// Covers databases where 0022–0025 were applied directly (e.g. via drizzle-kit push
+// or manual SQL) but never recorded in the drizzle journal.  Detected by the presence
+// of the activity_type enum which is created in 0022_solid_dorian_gray.
+const LEADERBOARD_BASELINE_THROUGH = "0025_confused_moondragon";
 const AUTH_SCHEMA = process.env.AUTH_SCHEMA ?? "app_auth";
 
 function getConnectionString() {
@@ -114,11 +118,26 @@ async function main() {
       "course_categories",
     );
 
+    // Detect databases that have the leaderboard/activity_type schema applied
+    // (migrations 0022–0025) but never had those migrations recorded in the
+    // drizzle journal.  The activity_type enum is the most reliable sentinel.
+    const hasActivityTypeEnum = await client
+      .query(
+        `select exists (
+          select 1 from pg_type
+          where typname = 'activity_type' and typnamespace = 'public'::regnamespace
+        ) as exists`,
+      )
+      .then((r) => Boolean(r.rows[0]?.exists));
+
     const baselineThrough =
       process.env.DRIZZLE_BASELINE_THROUGH ??
-      (hasCourseCategoriesTable
-        ? COURSE_CATEGORIES_BASELINE_THROUGH
-        : DEFAULT_BASELINE_THROUGH);
+      (hasActivityTypeEnum
+        ? LEADERBOARD_BASELINE_THROUGH
+        : hasCourseCategoriesTable
+          ? COURSE_CATEGORIES_BASELINE_THROUGH
+          : DEFAULT_BASELINE_THROUGH);
+
 
     const baselineIndex = migrations.findIndex(
       (migration) => migration.tag === baselineThrough,

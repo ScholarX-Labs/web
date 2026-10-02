@@ -176,6 +176,13 @@
       "when": 1786514353904,
       "tag": "0025_confused_moondragon",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1790926279000,
+      "tag": "0026_course_learning_outcomes",
+      "breakpoints": true
     }
   ]
 }
