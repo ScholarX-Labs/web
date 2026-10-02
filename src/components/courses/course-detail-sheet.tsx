@@ -17,7 +17,8 @@ import { CourseSurfaceIntent } from "@/stores/course-sheet.store";
 import { useFlipAnimation } from "@/hooks/use-flip-animation";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CourseRichText } from "./course-rich-text";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
+import { resolveCourseLearningOutcomes } from "@/lib/course-outcomes";
 
 interface CourseDetailSheetProps {
   course: Course;
@@ -27,13 +28,6 @@ interface CourseDetailSheetProps {
   onClose: () => void;
   onEnrollIntent: () => void;
 }
-
-const learningOutcomes = [
-  "Master the fundamentals from zero to hero",
-  "Build real-world projects you can show off",
-  "Understand the underlying architecture",
-  "Performance-minded best practices and patterns",
-];
 
 export function CourseDetailSheet({
   course,
@@ -53,6 +47,9 @@ export function CourseDetailSheet({
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const [flipComplete, setFlipComplete] = useState(false);
   const [isDismissing, setIsDismissing] = useState(false);
+
+  const locale = useLocale();
+  const outcomes = resolveCourseLearningOutcomes(course, { locale });
 
   useLayoutEffect(() => {
     if (!sheetRef.current) {
@@ -319,7 +316,7 @@ export function CourseDetailSheet({
                         {t("whatYouWillLearn")}
                       </h4>
                       <ul className="mt-4 space-y-4">
-                        {learningOutcomes.map((item) => (
+                        {outcomes.map((item) => (
                           <li
                             key={item}
                             className="flex items-start text-[17px] leading-relaxed text-slate-700 dark:text-slate-300"
@@ -371,7 +368,7 @@ export function CourseDetailSheet({
                           onClick={onEnrollIntent}
                           className="inline-flex w-full items-center justify-center rounded-2xl bg-hero-blue px-6 py-4 text-[15px] font-medium text-white transition-transform hover:scale-[1.02] active:scale-[0.98]"
                         >
-                          {t("enrollNow")}
+                          {course.requiresForm ? t("applyNow") : t("enrollNow")}
                         </button>
                       )}
                     </div>
