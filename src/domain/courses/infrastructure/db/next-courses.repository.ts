@@ -40,6 +40,8 @@ export interface FlatCourseRecord {
   isBestseller: boolean | null;
   urgencyText: string | null;
   tags: string[] | null;
+  learningOutcomes: string[] | null;
+  targetAudience: string[] | null;
   requiresForm: boolean | null;
   autoApproveApplications: boolean;
   createdAt: string | null;
@@ -73,6 +75,8 @@ const courseColumns = {
   isBestseller: dbCourses.isBestseller,
   urgencyText: dbCourses.urgencyText,
   tags: dbCourses.tags,
+  learningOutcomes: dbCourses.learningOutcomes,
+  targetAudience: dbCourses.targetAudience,
   requiresForm: dbCourses.requiresForm,
   autoApproveApplications: dbCourses.autoApproveApplications,
   createdAt: dbCourses.createdAt,
@@ -136,6 +140,8 @@ const mapCourseRecord = (row: {
   isBestseller: row.course.isBestseller as boolean | null,
   urgencyText: row.course.urgencyText as string | null,
   tags: row.course.tags as string[] | null,
+  learningOutcomes: row.course.learningOutcomes as string[] | null,
+  targetAudience: row.course.targetAudience as string[] | null,
   requiresForm: row.course.requiresForm as boolean | null,
   autoApproveApplications: row.course.autoApproveApplications as boolean,
   createdAt: row.course.createdAt
