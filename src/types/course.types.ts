@@ -3,6 +3,10 @@ export interface Instructor {
   name: string;
   avatar?: string;
   title?: string;
+  bio?: string;
+  rating?: number;
+  studentsCount?: number;
+  coursesCount?: number;
 }
 
 export interface Course {
@@ -33,6 +37,8 @@ export interface Course {
   isBestseller?: boolean;
   urgencyText?: string;
   tags?: string[];
+  learningOutcomes?: string[];
+  targetAudience?: string[];
 
   // Access and Status
   requiresForm: boolean;
