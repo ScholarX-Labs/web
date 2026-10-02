@@ -292,7 +292,7 @@ export function LessonClientBridge({
           "flex flex-1 flex-col lg:flex-row mx-auto transition-all duration-700",
           isFocusMode
             ? "w-screen max-w-none p-10 min-h-[100vh] justify-center items-center gap-0"
-            : "w-full max-w-[1800px] p-4 lg:p-6 xl:p-8 gap-6",
+            : "w-full max-w-[1800px] p-4 lg:p-6 xl:p-8 gap-6 items-start",
         )}
       >
         {/* ── LEFT: VIDEO + META ───────────────────────────── */}

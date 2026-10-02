@@ -121,7 +121,7 @@ export const VideoPlayer = React.forwardRef<MediaPlayerInstance, VideoPlayerProp
           }}
           transition={springApple}
           className={cn(
-            "relative w-full transition-all duration-700",
+            "relative w-full aspect-video transition-all duration-700",
             isFocusMode ? "overflow-visible" : "overflow-hidden w-full",
             "rounded-2xl lg:rounded-3xl",
             "border border-white/10",
@@ -135,6 +135,7 @@ export const VideoPlayer = React.forwardRef<MediaPlayerInstance, VideoPlayerProp
             margin: "auto",
             boxShadow: "0 40px 100px -20px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05)",
           } : {
+            aspectRatio: "16 / 9",
             boxShadow: "0 40px 100px -20px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05)",
           }}
         >
