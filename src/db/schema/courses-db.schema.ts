@@ -71,6 +71,8 @@ export const dbCourses = coursesSchema.table("courses", {
   certificateEnabled: boolean("certificate_enabled").notNull().default(true),
   urgencyText: varchar("urgency_text", { length: 255 }),
   tags: jsonb("tags").$type<string[] | null>(),
+  learningOutcomes: jsonb("learning_outcomes").$type<string[] | null>(),
+  targetAudience: jsonb("target_audience").$type<string[] | null>(),
   requiresForm: boolean("requires_form"),
   autoApproveApplications: boolean("auto_approve_applications")
     .notNull()

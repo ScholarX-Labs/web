@@ -3,6 +3,8 @@
 import { Course } from "@/types/course.types";
 import { CheckCircle2, PlayCircle, Lock, Clock } from "lucide-react";
 import { StaggerContainer, StaggerItem } from "@/components/animations/stagger";
+import { resolveCourseLearningOutcomes } from "@/lib/course-outcomes";
+import { useLocale } from "next-intl";
 
 interface CourseCurriculumProps {
   course: Course;
@@ -10,6 +12,8 @@ interface CourseCurriculumProps {
 
 export function CourseCurriculum({ course }: CourseCurriculumProps) {
   const lessons = course.lessons ?? [];
+  const locale = useLocale();
+  const outcomes = resolveCourseLearningOutcomes(course, { locale });
 
   return (
     <section className="space-y-12">
@@ -20,14 +24,7 @@ export function CourseCurriculum({ course }: CourseCurriculumProps) {
 
         <StaggerContainer className="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 md:p-10 shadow-sm">
           <ul className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {[
-              "Master the fundamentals from zero to hero",
-              "Build real-world projects you can show off",
-              "Understand the underlying architecture",
-              "Best practices and standard patterns",
-              "Performance optimization techniques",
-              "Deploying your applications to production",
-            ].map((item, i) => (
+            {outcomes.map((item, i) => (
               <StaggerItem key={i} as="li" className="flex gap-4 items-start">
                 <div className="size-6 rounded-full bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center shrink-0">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />

@@ -38,15 +38,17 @@ export function CourseInstructor({ instructor }: CourseInstructorProps) {
           <div className="flex flex-col gap-2 text-sm text-slate-600 dark:text-slate-400">
             <div className="flex items-center gap-2">
               <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-              <span className="font-medium text-slate-900 dark:text-white">4.8 Instructor Rating</span>
+              <span className="font-medium text-slate-900 dark:text-white">
+                {instructor.rating ? `${instructor.rating.toFixed(1)} Instructor Rating` : "4.9 Mentor Rating"}
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <Users className="w-4 h-4" />
-              <span>45,213 Students</span>
+              <span>{instructor.studentsCount ? `${instructor.studentsCount.toLocaleString()} Scholars Mentored` : "1,200+ Scholars Mentored"}</span>
             </div>
             <div className="flex items-center gap-2">
               <PlayCircle className="w-4 h-4" />
-              <span>12 Courses</span>
+              <span>{instructor.coursesCount ? `${instructor.coursesCount} Programs` : "Scholarship Advisor"}</span>
             </div>
           </div>
         </div>
@@ -54,13 +56,12 @@ export function CourseInstructor({ instructor }: CourseInstructorProps) {
         <div className="flex-1 space-y-4 text-center md:text-left">
           <div>
             <h3 className="text-xl font-bold text-slate-900 dark:text-white text-balance">{instructor.name}</h3>
-            <p className="text-hero-blue font-medium">{instructor.title || "Senior Instructor"}</p>
+            <p className="text-hero-blue font-medium">{instructor.title || "Academic & Scholarship Advisor"}</p>
           </div>
           
           <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-balance">
-            Passionate educator with over 15 years of industry experience. 
-            I&apos;ve helped thousands of students transition into tech careers through clear, concise, and practical teaching methods.
-            My courses focus on real-world applications and building portfolios that get you hired.
+            {instructor.bio ||
+              "Distinguished academic mentor and scholarship advisor dedicated to guiding ambitious scholars toward fully funded opportunities worldwide. Specializes in competitive application strategy, persuasive statement of purpose formulation, research proposals, and academic committee interview preparation."}
           </p>
         </div>
       </div>

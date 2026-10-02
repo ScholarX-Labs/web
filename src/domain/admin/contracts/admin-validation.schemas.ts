@@ -14,6 +14,8 @@ export const CreateCourseSchema = z.object({
   imageUrl: z.string().url().optional().or(z.literal("")),
   videoPreviewUrl: z.string().url().optional().or(z.literal("")),
   tags: z.array(z.string()).optional(),
+  learningOutcomes: z.array(z.string().trim().min(1).max(255)).optional(),
+  targetAudience: z.array(z.string().trim().min(1).max(255)).optional(),
   status: z.enum(["active", "inactive", "draft"]).optional(),
   instructorId: z.string().min(1).optional(),
   seoDescription: z.string().max(500).optional(),
