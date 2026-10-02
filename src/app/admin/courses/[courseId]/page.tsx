@@ -28,6 +28,8 @@ interface AdminCourse {
   autoApproveApplications?: boolean;
   imageUrl?: string;
   videoPreviewUrl?: string;
+  learningOutcomes?: string[];
+  targetAudience?: string[];
 }
 import Link from "next/link";
 import { useAdminCourse, useUpdateCourse, useUpdateCourseStatus } from "@/hooks/admin/use-admin-courses";
@@ -617,12 +619,31 @@ function BasicTab({ course, onChanges }: { course: AdminCourse; onChanges: (data
   const [title, setTitle] = useState(String(course.title ?? ""));
   const [description, setDescription] = useState(String(course.description ?? ""));
   const [category, setCategory] = useState(String(course.category ?? ""));
+  const [learningOutcomes, setLearningOutcomes] = useState<string[]>(
+    Array.isArray(course.learningOutcomes) ? course.learningOutcomes : []
+  );
+  const [newOutcome, setNewOutcome] = useState("");
 
   const handleChange = (field: string, value: string) => {
     if (field === "title") setTitle(value);
     if (field === "description") setDescription(value);
     if (field === "category") setCategory(value);
     onChanges({ [field]: value });
+  };
+
+  const handleAddOutcome = () => {
+    const trimmed = newOutcome.trim();
+    if (!trimmed) return;
+    const updated = [...learningOutcomes, trimmed];
+    setLearningOutcomes(updated);
+    setNewOutcome("");
+    onChanges({ learningOutcomes: updated });
+  };
+
+  const handleRemoveOutcome = (index: number) => {
+    const updated = learningOutcomes.filter((_, i) => i !== index);
+    setLearningOutcomes(updated);
+    onChanges({ learningOutcomes: updated });
   };
 
   return (
@@ -657,6 +678,73 @@ function BasicTab({ course, onChanges }: { course: AdminCourse; onChanges: (data
             onChange={(e) => handleChange("category", e.target.value)} 
             className="h-14 rounded-[20px] border-slate-200 bg-white focus:ring-[10px] focus:ring-blue-500/5 font-black text-sm transition-all px-6"
           />
+        </div>
+
+        <div className="space-y-4 pt-4 border-t border-slate-100">
+          <div className="space-y-1">
+            <label className="text-[11px] font-[900] text-slate-400 uppercase tracking-[0.25em] ml-1">
+              Learning Outcomes & Deliverables (Scholarship Focus)
+            </label>
+            <p className="text-xs text-slate-500 ml-1">
+              Key takeaways displayed across the Quick-View Popup and the Course Curriculum section.
+            </p>
+          </div>
+
+          <div className="flex gap-3">
+            <Input
+              placeholder="e.g. Master Statement of Purpose drafting techniques..."
+              value={newOutcome}
+              onChange={(e) => setNewOutcome(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  handleAddOutcome();
+                }
+              }}
+              className="h-14 rounded-[20px] border-slate-200 bg-white focus:ring-[10px] focus:ring-blue-500/5 font-medium text-sm transition-all px-6"
+            />
+            <Button
+              type="button"
+              onClick={handleAddOutcome}
+              className="h-14 px-6 rounded-[20px] bg-slate-900 hover:bg-black text-white font-black text-xs uppercase tracking-wider"
+            >
+              <Plus className="size-4 mr-1.5" />
+              Add
+            </Button>
+          </div>
+
+          {learningOutcomes.length > 0 ? (
+            <div className="space-y-2.5 mt-3">
+              {learningOutcomes.map((outcome, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-center justify-between gap-3 p-4 rounded-[18px] bg-slate-50 border border-slate-200/70"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="size-6 rounded-full bg-blue-100 text-blue-700 text-xs font-black flex items-center justify-center shrink-0">
+                      {idx + 1}
+                    </span>
+                    <span className="text-sm font-semibold text-slate-800 truncate">
+                      {outcome}
+                    </span>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleRemoveOutcome(idx)}
+                    className="size-8 p-0 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50"
+                  >
+                    <AlertCircle className="size-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs font-semibold text-slate-400 italic ml-1">
+              No custom outcomes configured. System will display scholarship prep defaults.
+            </p>
+          )}
         </div>
       </div>
     </Card>
