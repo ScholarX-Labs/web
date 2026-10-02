@@ -71,6 +71,8 @@ const toCourse = (record: FlatCourseRecord, isSubscribed = false): Course => ({
   isBestseller: record.isBestseller ?? undefined,
   urgencyText: record.urgencyText ?? undefined,
   tags: Array.isArray(record.tags) ? record.tags : [],
+  learningOutcomes: Array.isArray(record.learningOutcomes) ? record.learningOutcomes : [],
+  targetAudience: Array.isArray(record.targetAudience) ? record.targetAudience : [],
   videoPreviewUrl: record.videoPreviewUrl ?? undefined,
   instructor: record.instructor
     ? {
