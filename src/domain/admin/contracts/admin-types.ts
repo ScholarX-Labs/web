@@ -93,6 +93,8 @@ export interface CreateCourseInput {
   imageUrl?: string;
   videoPreviewUrl?: string;
   tags?: string[];
+  learningOutcomes?: string[];
+  targetAudience?: string[];
   status?: "active" | "inactive" | "draft";
   instructorId?: string;
   seoDescription?: string;
@@ -113,6 +115,8 @@ export interface UpdateCourseInput {
   imageUrl?: string;
   videoPreviewUrl?: string;
   tags?: string[];
+  learningOutcomes?: string[];
+  targetAudience?: string[];
   status?: "active" | "inactive" | "draft";
   instructorId?: string;
   seoDescription?: string;
