@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { db } from "@/db";
@@ -24,7 +25,16 @@ export async function GET(request: NextRequest) {
     });
 
     const isAdmin = session?.user?.role === "admin";
-    const isInternal = request.headers.get("x-internal-key") === process.env.INTERNAL_API_KEY;
+        const headerKey = request.headers.get("x-internal-key");
+    const expectedKey = process.env.INTERNAL_API_KEY;
+
+    let isInternal = false;
+    if (headerKey && expectedKey) {
+      const bufHeaderKey = Buffer.from(headerKey);
+      const bufExpectedKey = Buffer.from(expectedKey);
+      isInternal = bufHeaderKey.length === bufExpectedKey.length &&
+                   crypto.timingSafeEqual(bufHeaderKey, bufExpectedKey);
+    }
 
     if (!isAdmin && !isInternal) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
