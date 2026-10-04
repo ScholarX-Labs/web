@@ -28,6 +28,7 @@ interface LessonTabsProps {
   lessonId: string;
   courseSlug: string;
   description?: string;
+  content?: string;
   resources?: Resource[];
   initialTab?: TabId;
   onTabChange?: () => void;
@@ -53,6 +54,7 @@ export function LessonTabs({
   lessonId,
   courseSlug,
   description,
+  content,
   initialTab,
   onTabChange,
 }: LessonTabsProps) {
@@ -136,15 +138,26 @@ export function LessonTabs({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.18 }}
-              className="text-white/60 text-sm leading-relaxed space-y-3"
+              className="text-white/70 text-sm leading-relaxed space-y-4"
             >
-              <p>
-                {description ??
-                  "In this lesson, we dive deep into the core mechanics of building robust, scalable front-end architectures. By combining industry-standard patterns with fluid UI aesthetics, you'll learn how to craft experiences that resonate deeply with users."}
-              </p>
-              <p className="text-white/40">
-                Ensure you have completed the prerequisites before continuing.
-                All project assets are available in the course repository.
+              {description ? (
+                <div className="whitespace-pre-line text-white/80 font-normal">
+                  {description}
+                </div>
+              ) : (
+                <p>
+                  In this session, you will explore strategic frameworks and proven techniques designed to optimize your scholarship applications, academic credentials, and interview readiness.
+                </p>
+              )}
+
+              {content && (
+                <div className="pt-3 border-t border-white/[0.08] text-white/60 text-xs whitespace-pre-line leading-relaxed">
+                  {content}
+                </div>
+              )}
+
+              <p className="text-white/40 text-xs pt-1">
+                Make sure to review accompanying materials and check the lesson tasks to track your application milestones.
               </p>
             </motion.div>
           )}

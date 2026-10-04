@@ -20,6 +20,8 @@ import { zIndex } from "@/lib/design-tokens";
 interface LessonMetaProps {
   lessonId: string;
   title: string;
+  description?: string;
+  content?: string;
   lessonIndex: number;
   totalLessons: number;
   courseSlug: string;
@@ -118,6 +120,8 @@ function MoreOptionsDropdown({ open, onClose, items }: {
 export function LessonMeta({
   lessonId,
   title,
+  description,
+  content,
   lessonIndex,
   totalLessons,
   courseSlug,
@@ -380,6 +384,8 @@ export function LessonMeta({
           <LessonTabs
             lessonId={lessonId}
             courseSlug={courseSlug}
+            description={description}
+            content={content}
             initialTab={activeTabOverride}
             onTabChange={() => setActiveTabOverride(undefined)}
           />

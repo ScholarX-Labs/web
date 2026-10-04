@@ -77,7 +77,7 @@ const createRepositoryWithUuidFallback = () =>
     findLessonProgress: async () => null,
   }) as never;
 
-test("getLesson maps DB videoUrl into currentLesson media source", async () => {
+test("getLesson maps DB videoUrl, description and content into currentLesson", async () => {
   const service = new NextCourseCatalogService(createRepository());
 
   const result = await service.getLesson(
@@ -92,6 +92,8 @@ test("getLesson maps DB videoUrl into currentLesson media source", async () => {
     "https://www.youtube.com/watch?v=jNQXAC9IVRw",
   );
   assert.equal(result.currentLesson.isLocked, false);
+  assert.equal(result.currentLesson.description, null);
+  assert.equal(result.currentLesson.content, null);
 });
 
 test("getLesson returns playable media sources for every lesson", async () => {

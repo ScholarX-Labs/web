@@ -28,6 +28,9 @@ interface LessonClientBridgeProps {
   courseId: string;
   courseTitle: string;
   lessonTitle: string;
+  lessonDescription?: string | null;
+  lessonContent?: string | null;
+  duration?: string;
   lessonIndex: number;
   totalLessons: number;
   prevLesson?: { id: string; title: string };
@@ -54,6 +57,9 @@ export function LessonClientBridge({
   courseId,
   courseTitle,
   lessonTitle,
+  lessonDescription,
+  lessonContent,
+  duration,
   lessonIndex,
   totalLessons,
   prevLesson,
@@ -368,6 +374,8 @@ export function LessonClientBridge({
           <LessonMeta
             lessonId={lessonId}
             title={lessonTitle}
+            description={lessonDescription ?? undefined}
+            content={lessonContent ?? undefined}
             lessonIndex={lessonIndex}
             totalLessons={totalLessons}
             courseSlug={courseSlug}
@@ -375,7 +383,7 @@ export function LessonClientBridge({
             prevLessonTitle={prevLesson?.title}
             nextLessonId={nextLesson?.id}
             nextLessonTitle={nextLesson?.title}
-            duration="18 min"
+            duration={duration ?? "18 min"}
             resumePoint={resumePoint}
             onResume={handleResume}
             isCompleted={isLessonCompleted}

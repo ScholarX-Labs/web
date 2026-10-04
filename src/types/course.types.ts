@@ -82,6 +82,8 @@ export interface LessonSummary {
   id: string;
   title: string;
   duration: string;
+  description?: string | null;
+  content?: string | null;
   isCompleted?: boolean;
   isLocked?: boolean;
   media?: {

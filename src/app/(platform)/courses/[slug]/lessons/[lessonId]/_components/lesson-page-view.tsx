@@ -130,6 +130,9 @@ export async function LessonPageView({
             courseId={lessonData.course.id}
             courseTitle={lessonData.course.title}
             lessonTitle={currentLesson.title}
+            lessonDescription={currentLesson.description}
+            lessonContent={currentLesson.content}
+            duration={currentLesson.duration}
             lessonIndex={lessonIndex + 1}
             totalLessons={allLessons.length}
             prevLesson={allLessons[lessonIndex - 1]}

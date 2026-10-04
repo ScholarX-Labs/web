@@ -91,13 +91,23 @@ const toCourse = (record: FlatCourseRecord, isSubscribed = false): Course => ({
 });
 
 const toLessonSummary = (
-  lesson: { id: string; title: string; videoUrl?: string | null; duration?: number | null; sortIndex: number },
+  lesson: {
+    id: string;
+    title: string;
+    description?: string | null;
+    content?: string | null;
+    videoUrl?: string | null;
+    duration?: number | null;
+    sortIndex: number;
+  },
   progress: { completed: boolean } | null,
   isSubscribed: boolean,
 ): LessonSummary => ({
   id: lesson.id,
   title: lesson.title,
   duration: formatDuration(lesson.duration),
+  description: lesson.description ?? null,
+  content: lesson.content ?? null,
   isCompleted: progress?.completed ?? false,
   isLocked: !isSubscribed,
   media: {
