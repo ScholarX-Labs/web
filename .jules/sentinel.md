@@ -1,0 +1,5 @@
+
+## 2024-05-18 - Prevent Timing Attack in Internal API Authorization
+**Vulnerability:** The internal API key in `src/app/api/admin/storage-check/route.ts` was being validated using strict string equality (`===`). This exposes a timing attack vulnerability, where an attacker could theoretically guess the key character-by-character based on the time it takes the server to reject the request, since `===` short-circuits on the first character mismatch.
+**Learning:** When using `crypto.timingSafeEqual`, it is critical to ensure both compared buffers are of the same length and, crucially, to avoid hardcoded string fallbacks like `"UNSET"` if the environment variable is missing. A fallback to `"UNSET"` introduces a critical backdoor where an attacker could bypass authentication by sending `x-internal-key: UNSET` if the server is misconfigured.
+**Prevention:** Always verify that both the provided key and the expected environment variable actually exist before comparison. If either is missing, default to a secure fail state (e.g., `false`) rather than providing default string values. Convert to Buffers and check length equality before passing to `timingSafeEqual`.
