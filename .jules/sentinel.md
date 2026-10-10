@@ -1,0 +1,5 @@
+
+## 2026-10-10 - [Prevent Timing Attacks on API Keys]
+**Vulnerability:** The `x-internal-key` was being checked against `INTERNAL_API_KEY` using a strict equality operator (`===`), which is vulnerable to timing attacks. This could allow an attacker to progressively guess the API key by observing response times. Additionally, falling back to empty strings when keys are undefined creates a bypass vulnerability, and using string lengths rather than buffer lengths for comparisons introduces a length oracle vulnerability via multi-byte characters.
+**Learning:** Security-sensitive string comparisons must use constant-time operations like `crypto.timingSafeEqual` to prevent side-channel timing leaks. Furthermore, when implementing these checks, it's critical to verify both keys exist (to prevent bypasses) and use buffer lengths instead of string lengths for the preliminary size check (to prevent length oracles).
+**Prevention:** Use `crypto.timingSafeEqual` with proper length checks on buffers and ensure both keys are defined before comparison. Never fallback to an empty string. Use the provided secure pattern for API key verification.
