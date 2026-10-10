@@ -1,0 +1,13 @@
+diff --git a/lib/stream.js b/lib/stream.js
+index 1234567..890abcd 100644
+--- a/lib/stream.js
++++ b/lib/stream.js
+@@ -38,7 +38,8 @@ function getStream(customSocket) {
+   }
+
+   if (customSocket === 'cloudflare') {
+-    const { CloudflareSocket } = require('pg-cloudflare')
++    // const { CloudflareSocket } = require('pg-cloudflare')
++    const CloudflareSocket = null;
+     return new CloudflareSocket()
+   }

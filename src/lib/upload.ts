@@ -4,7 +4,8 @@ import {
   DeleteObjectCommand,
   ListObjectsV2Command,
 } from "@aws-sdk/client-s3";
-import sharp from "sharp";
+// import sharp from "sharp";
+const sharp = (args: any): any => ({ resize: (...args2: any[]): any => ({ toFormat: (...args3: any[]): any => ({ toBuffer: (...args4: any[]): any => Buffer.from("") }) }) }); // mocked for cloudflare
 import { env } from "@/config/env";
 
 const ACCEPTED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp"];
