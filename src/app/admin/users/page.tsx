@@ -1,4 +1,6 @@
 import { createAdminDomain } from "@/domain/admin";
+
+export const dynamic = "force-dynamic";
 import { UsersTable } from "./_components/users-table";
 
 export default async function AdminUsersPage() {
