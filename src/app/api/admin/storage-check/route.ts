@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
+import crypto from "node:crypto";
 import { db } from "@/db";
 import { appConfig } from "@/db/schema/app-config-schema";
 import { auth } from "@/lib/auth";
@@ -24,7 +25,19 @@ export async function GET(request: NextRequest) {
     });
 
     const isAdmin = session?.user?.role === "admin";
-    const isInternal = request.headers.get("x-internal-key") === process.env.INTERNAL_API_KEY;
+    const headerKey = request.headers.get("x-internal-key");
+    const expectedKey = process.env.INTERNAL_API_KEY;
+
+    let isInternal = false;
+    // Security: Use constant-time comparison to prevent timing attacks
+    // Ensure both keys exist to prevent auth bypass if environment variable is missing
+    if (headerKey && expectedKey) {
+      const headerBuf = Buffer.from(headerKey, "utf8");
+      const expectedBuf = Buffer.from(expectedKey, "utf8");
+      if (headerBuf.length === expectedBuf.length) {
+        isInternal = crypto.timingSafeEqual(headerBuf, expectedBuf);
+      }
+    }
 
     if (!isAdmin && !isInternal) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
