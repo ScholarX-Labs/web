@@ -1,0 +1,53 @@
+
+> web@0.1.0 lint /app
+> eslint
+
+
+/app/src/app/admin/courses/[courseId]/_components/lesson-editor.tsx
+   86:7   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/app/src/app/admin/courses/[courseId]/_components/lesson-editor.tsx:86:7
+  84 |   useEffect(() => {
+  85 |     if (lesson) {
+> 86 |       setFormData({
+     |       ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  87 |         title: lesson.title || "",
+  88 |         description: lesson.description || "",
+  89 |         content: lesson.content || "",  react-hooks/set-state-in-effect
+  113:21  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              @typescript-eslint/no-explicit-any
+
+/app/src/app/admin/courses/[courseId]/page.tsx
+  95:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/app/src/app/admin/courses/[courseId]/page.tsx:95:7
+  93 |   useEffect(() => {
+  94 |     if (lessonsData) {
+> 95 |       setLessons(lessonsData as AdminLesson[]);
+     |       ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  96 |     }
+  97 |   }, [lessonsData]);
+  98 |  react-hooks/set-state-in-effect
+
+/app/src/app/api/admin/storage-check/route.ts
+  4:10  warning  'db' is defined but never used         @typescript-eslint/no-unused-vars
+  5:10  warning  'appConfig' is defined but never used  @typescript-eslint/no-unused-vars
+
+/app/src/components/ui/author-form-card.tsx
+   36:20  warning  'setImageUrl' is assigned a value but never used                 @typescript-eslint/no-unused-vars
+  119:34  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+✖ 7 problems (4 errors, 3 warnings)
+
+ ELIFECYCLE  Command failed with exit code 1.
