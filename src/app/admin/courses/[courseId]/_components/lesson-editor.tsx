@@ -115,7 +115,7 @@ export function LessonEditor({ lesson, isOpen, onClose }: LessonEditorProps) {
       onClose();
     } catch (error: unknown) {
       console.error("Sync Error:", error);
-      toast.error("Synchronization failure: " + (error?.response?.data?.message || "Check log"));
+      toast.error("Synchronization failure: " + (((error as any)?.response)?.data?.message || "Check log"));
     }
   };
 
