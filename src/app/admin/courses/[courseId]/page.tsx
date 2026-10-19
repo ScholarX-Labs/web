@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { use, useState, useEffect } from "react";
 
 interface AdminLesson {
@@ -91,7 +93,12 @@ export default function AdminCourseDetailPage({ params }: { params: Promise<{ co
   const [resetKey, setResetKey] = useState(0);
 
   useEffect(() => {
+
     if (lessonsData) {
+
+
+
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLessons(lessonsData as AdminLesson[]);
     }
   }, [lessonsData]);
