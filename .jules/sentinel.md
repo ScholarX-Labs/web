@@ -1,0 +1,4 @@
+## 2025-02-14 - Stored XSS via Zod's `.url()` Schema Allowing `javascript:` URIs
+**Vulnerability:** Zod's default `.url()` validation passes for `javascript:` URIs (e.g., `javascript:alert(1)`). When used for user-provided links (like profile social links or image/video URLs) and later rendered in the DOM, this leads to Stored Cross-Site Scripting (XSS).
+**Learning:** We must not assume built-in URL validators implicitly enforce web-safe protocols (`http/https`). Validation libraries often strictly adhere to the URI standard, which inherently permits a wide array of potentially dangerous schemes.
+**Prevention:** Always explicitly refine Zod `.url()` schemas intended for web links using a case-insensitive regex check (e.g., `.refine(val => /^https?:\/\//i.test(val))`) to ensure only safe protocols are permitted and persisted.
