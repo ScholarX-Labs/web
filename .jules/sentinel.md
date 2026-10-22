@@ -1,0 +1,4 @@
+## 2025-02-27 - Zod URL Schema Allows javascript: URIs (Stored XSS)
+**Vulnerability:** Zod's `z.string().url()` validation natively allows ANY valid URL scheme, including `javascript:`, `data:`, and `vbscript:`. When these URLs are used in `href` attributes (like social links or media URLs), it results in a Stored XSS vulnerability.
+**Learning:** Default URL validation libraries usually only check for URI RFC compliance, not safety. The `javascript:` scheme is valid according to the RFC but inherently dangerous in web contexts.
+**Prevention:** Always use `.refine()` with a regex like `/^https?:\/\//i` after `z.string().url()` to explicitly restrict accepted schemas to `http://` and `https://` for user-supplied URLs. Be mindful of ordering when combining `.refine()` with `.optional().or(z.literal(""))`.
