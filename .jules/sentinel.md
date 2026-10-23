@@ -1,0 +1,4 @@
+## 2025-02-17 - Prevent Timing Attacks when Comparing Secrets
+**Vulnerability:** Comparing sensitive strings like API keys (`x-internal-key` against `INTERNAL_API_KEY`) using strict equality (`===`) exposes the application to timing attacks. An attacker could potentially figure out the key character by character based on how long the comparison takes.
+**Learning:** Checking the `.length` of the raw strings instead of their buffers will lead to vulnerabilities since multi-byte characters could pass the check but cause unequal buffer sizes. This leads to a `TypeError` and a potential length oracle vulnerability. Also, an empty or unset key must be accounted for to avoid a bypass.
+**Prevention:** Always use `crypto.timingSafeEqual` for sensitive comparisons. Ensure both keys are set and valid before checking. Convert both keys to Buffers and verify their byte lengths (`buf1.length === buf2.length`) before calling `timingSafeEqual`.
