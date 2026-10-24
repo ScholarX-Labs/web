@@ -1,6 +1,8 @@
 import { createAdminDomain } from "@/domain/admin";
 import { UsersTable } from "./_components/users-table";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminUsersPage() {
   const domain = createAdminDomain();
   const result = await domain.users.list({ page: 1, limit: 20, search: "" });
