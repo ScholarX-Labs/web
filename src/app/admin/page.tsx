@@ -1,4 +1,6 @@
+
 "use client";
+export const dynamic = "force-dynamic";
 
 import { useAdminStats } from "@/hooks/admin/use-admin-stats";
 import { Card } from "@/components/ui/card";
