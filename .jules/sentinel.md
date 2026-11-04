@@ -1,0 +1,4 @@
+## 2024-11-04 - [Fix] Timing Attack in Internal API Key Comparison
+**Vulnerability:** The internal API key was being compared using strict equality (`===`) instead of a timing-safe function. This exposes the API key to timing attacks, allowing an attacker to deduce the key character by character by measuring the response time.
+**Learning:** Even internal API keys need protection from timing attacks, especially if the API endpoint is accessible over a network. Comparing secrets securely requires explicit intent and awareness.
+**Prevention:** Always use `crypto.timingSafeEqual` when comparing sensitive strings like API keys, secrets, or tokens. Ensure both strings are converted to `Buffer` objects and their byte lengths are checked before comparison to prevent errors and length oracle vulnerabilities.
