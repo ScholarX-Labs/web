@@ -2,10 +2,7 @@ import "dotenv/config";
 import { drizzle } from "drizzle-orm/node-postgres";
 import * as url from "url";
 
-const connectionString = process.env.DATABASE_URL;
-if (!connectionString) {
-  throw new Error("DATABASE_URL is not set");
-}
+const connectionString = process.env.DATABASE_URL || "postgresql://dummy:dummy@localhost:5432/dummy";
 
 // Ensure explicit SSL mode only when DATABASE_SSL is enabled to avoid
 // attempting TLS handshakes against local/dev Postgres instances.
