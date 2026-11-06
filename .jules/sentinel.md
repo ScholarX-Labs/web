@@ -1,0 +1,4 @@
+## 2025-05-18 - Fix timing attack vulnerability in storage check API
+**Vulnerability:** Timing attack vulnerability due to strict equality (`===`) comparison of the `x-internal-key` header with `process.env.INTERNAL_API_KEY` in `src/app/api/admin/storage-check/route.ts`.
+**Learning:** Comparing sensitive secrets like internal API keys with `===` leaks information through the time taken to evaluate the equality (it returns early upon the first mismatched character). This allows an attacker to guess the key. Also, `timingSafeEqual` throws if buffer lengths mismatch.
+**Prevention:** Use `crypto.timingSafeEqual` for comparing secrets. Ensure both keys are present (to avoid authentication bypass when env vars are unset), convert them to `Buffer`, and compare their lengths (`buffer1.length === buffer2.length`) before calling `timingSafeEqual`.
