@@ -1,6 +1,8 @@
 import { createAdminDomain } from "@/domain/admin";
 import { CoursesTable } from "./_components/courses-table";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminCoursesPage() {
   const domain = createAdminDomain();
   const result = await domain.courses.list({ page: 1, limit: 20, search: "" });
